@@ -1,0 +1,44 @@
+{
+  "name": "jolocom-lib",
+  "version": "0.0.1",
+  "description": "Unified library for interacting with the Jolocom identity solution",
+  "main": "js/index.js",
+  "typings": "js/index",
+  "scripts": {
+    "prepare": "./node_modules/.bin/tsc -p ./ts",
+    "prepare:watch": "yarn run prepare -- -w",
+    "prepublish": "yarn run prepare",
+    "cli": "node ./js/cli",
+    "test": "./node_modules/.bin/mocha ./tests/index.ts -r ts-node/register"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jolocom/jolocom-lib.git"
+  },
+  "keywords": [
+    "Jolocom",
+    "Self-Sovereign Identity"
+  ],
+  "author": "Eugeniu Rusu <eugeniu@jolocom.com>",
+  "contributors": [
+    "Eugeniu Rusu <eugeniu@jolocom.com>",
+    "Natascha Wittenberg <natascha@jolocom.com>",
+    "Charleen Fei <charleen@jolocom.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/jolocom/jolocom-lib/issues"
+  },
+  "homepage": "https://github.com/jolocom/jolocom-lib#readme",
+  "dependencies": {
+    "colors": "^1.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.31",
+    "typescript": "^2.6.2",
+    "@types/mocha": "^2.2.43",
+    "source-map-support": "^0.4.18",
+    "ts-node": "^4.1.0",
+    "chai": "^4.1.2",
+    "mocha": "^5.0.0"
+  }
+}
