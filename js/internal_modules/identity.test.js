@@ -10,7 +10,6 @@ describe('DID', function () {
         var did = new identity_1.default(publicKey);
         var decoded = bs58.decode(did.identifier.slice(9));
         var did2 = new identity_1.default(decoded);
-        console.log(did.identifier, did2.identifier);
         chai_1.expect(did.identifier).to.be.a('string');
         chai_1.expect(did.identifier).to.equal(did2.identifier);
     });

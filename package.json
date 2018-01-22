@@ -9,8 +9,8 @@
     "prepare:watch": "yarn run prepare -- -w",
     "prepublish": "yarn run prepare",
     "cli": "node ./js/cli",
-    "test": "yarn run prepare && mocha js/internal_modules/*.test.js -r ts-node/register",
-    "test:watch": "yarn run prepare && mocha js/internal_modules/*.test.js -w -r ts-node/register"
+    "test": "mocha tests/*.test.ts -r ts-node/register",
+    "test:watch": "mocha  --watch-extensions ts tests/*.test.ts -r ts-node/register -w"
   },
   "repository": {
     "type": "git",
