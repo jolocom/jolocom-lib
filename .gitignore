@@ -1,2 +1,5 @@
+.nyc_output
+coverage
+js
 node_modules
 *.map

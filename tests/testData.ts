@@ -1,0 +1,4 @@
+export default {
+  testUserPublicKey: '04334f990cdc1281c6fed73dcc6de3db520c075a41ce2b93f36f85dbd5e0dc0b05975c51acb0bec9747fb3f52fd0146d1dc39d6077db0be1bd6579fd66ac144442',
+  testUserDID:'did:jolo:6xExKfgg2WRGBPLJeUhmYk'
+}

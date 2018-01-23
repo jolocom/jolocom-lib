@@ -6,10 +6,12 @@
   "typings": "js/index",
   "scripts": {
     "prepare": "./node_modules/.bin/tsc -p ./ts",
+    "test": "./node_modules/.bin/nyc -e 'ts' -r lcov -r text yarn run unitTests",
     "prepare:watch": "yarn run prepare -- -w",
     "prepublish": "yarn run prepare",
     "cli": "node ./js/cli",
-    "test": "./node_modules/.bin/mocha ./tests/index.ts -r ts-node/register"
+    "unitTests": "mocha tests/*.test.ts -r ts-node/register",
+    "test:watch": "mocha  --watch-extensions ts tests/*.test.ts -r ts-node/register -w"
   },
   "repository": {
     "type": "git",
@@ -30,7 +32,10 @@
   },
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
-    "colors": "^1.1.2"
+    "bs58": "^4.0.1",
+    "colors": "^1.1.2",
+    "istanbul": "^0.4.5",
+    "nyc": "^11.4.1"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.43",
