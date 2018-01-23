@@ -1,6 +1,9 @@
 import * as bs58 from 'bs58'
 
-export default class DID {
+/* Creates Identity id according to DID/DDO specifications
+ * Source: https://w3c-ccg.github.io/did-spec/
+ */
+export default class Did{
   identifier: string
   constructor(publicKey: Buffer) {
     const prefix = 'did:jolo:'
