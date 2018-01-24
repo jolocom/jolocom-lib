@@ -10,4 +10,15 @@ export default class Did{
     const suffix = bs58.encode(publicKey.substr(0, 16))
     this.identifier = prefix + suffix
   }
+
+  toJson(): string {
+    return this.identifier
+  }
+
+  static fromJson(id: string): Did {
+    let did = Object.create(Did.prototype)
+    return Object.assign(did, id, {
+      identifier: id
+    })
+  }
 }
