@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { deriveMasterKeyPairFromSeedPhrase, deriveGenericSigningKeyPair, deriveEthereumKeyPair } from '../ts/identity/key-derivation.ts'
-import testData from './testData'
+import testData from './data/key-data'
 import * as bitcoin from 'bitcoinjs-lib'
 import * as bip39 from 'bip39'
 

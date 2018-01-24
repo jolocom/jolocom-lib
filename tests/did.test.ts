@@ -1,7 +1,7 @@
 import * as bs58 from 'bs58'
 import { expect } from 'chai'
 import Did from '../ts/identity/did'
-import testData from './testData'
+import testData from './data/identity'
 
 describe('DID', () => {
   it('Should correctly instantiate a DID class from user public key', () => {
