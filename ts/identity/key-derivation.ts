@@ -34,7 +34,6 @@ export function deriveGenericSigningKeyPair(masterKeyPair: any) {
  * @returns {HDNode} - the derived Ethereum keypair.
  *
 */
-
 export function deriveEthereumKeyPair(masterKeyPair: any) {
   return masterKeyPair.derivePath('m/44\'/60\'/0\'/0/0')
 }
