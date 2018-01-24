@@ -11,7 +11,7 @@ export default class Did{
     this.identifier = prefix + suffix
   }
 
-  toJson(): string {
+  toJSON(): string {
     return this.identifier
   }
 

@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import Did from '../ts/identity/did'
 import * as AuthenticationCredential from '../ts/identity/authenticationCredential'
-import testData from './testData'
+import testData from './data/identity'
 
 describe('Authentication credential' , () => {
   const did = new Did(testData.testUserPublicKey)
