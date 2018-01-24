@@ -1,5 +1,5 @@
-import bitcoin from 'bitcoinjs-lib'
-import bip39 from 'bip39'
+import * as bitcoin from 'bitcoinjs-lib'
+import * as bip39 from 'bip39'
 
 // @summary - Generates a keypair based on provided entropy
 //eslint-disable-next-line
@@ -21,7 +21,7 @@ export function deriveMasterKeyPairFromSeedPhrase(seedPhrase: string) {
  * @returns {HDNode} - the derived child  generic signing key.
  *
 */
-export function deriveGenericSigningKeyPair(masterKeyPair) {
+export function deriveGenericSigningKeyPair(masterKeyPair: any) {
   return masterKeyPair.derivePath('m/73\'/0\'/0\'')
 }
 
@@ -33,6 +33,6 @@ export function deriveGenericSigningKeyPair(masterKeyPair) {
  * @returns {HDNode} - the derived Ethereum keypair.
  *
 */
-export function deriveEthereumKeyPair(masterKeyPair) {
+export function deriveEthereumKeyPair(masterKeyPair: any) {
   return masterKeyPair.derivePath('m/44\'/60\'/0\'/0/0')
 }
