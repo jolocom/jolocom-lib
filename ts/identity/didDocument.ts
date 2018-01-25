@@ -1,24 +1,23 @@
-import AuthenticationCredential from './AuthenticationCredential'
-import * as AuthCredential from './AuthenticationCredential'
-import LinkedDataSignature from './LinkedDataSignature'
+import AuthenticationCredential from './authenticationCredential'
+import * as AuthCredential from './authenticationCredential'
+import LinkedDataSignature from './linkedDataSignature'
 import DidDocumentAttrs from './didDocumentAttrs'
-import Did from './Did'
+import Did from './did'
 
 /* Describes Identity according to DID/DDO specifications
  * Source: https://w3c-ccg.github.io/did-spec/
  */
 export default class DidDocument implements DidDocumentAttrs {
-  '@context': string = "https://w3id.org/did/v1"
-  id: Did
-  authenticationCredential: AuthenticationCredential
-  created: Date
+  public '@context': string = "https://w3id.org/did/v1"
+  public id: Did
+  public authenticationCredential: AuthenticationCredential
+  public created: Date
 
-  constructor(publicKey: string) {
+  constructor(publicKey: Buffer) {
     this.id = new Did(publicKey)
-    this.authenticationCredential = AuthCredential.ecdsaAuthenticationCredentials(publicKey, this.id)
+    this.authenticationCredential = AuthCredential.ecdsaAuthenticationCredentials(publicKey.toString(), this.id)
     this.created = new Date(Date.now())
   }
-
 
   static fromJson(json: DidDocumentAttrs): Did {
     let did = Object.create(DidDocument.prototype)

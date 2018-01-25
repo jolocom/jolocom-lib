@@ -1,10 +1,13 @@
 import { expect } from 'chai'
 import Did from '../ts/identity/did'
+import DidDocument from '../ts/identity/didDocument'
 import * as AuthenticationCredential from '../ts/identity/authenticationCredential'
 import testData from './data/identity'
 
 describe('Authentication credential' , () => {
-  const did = new Did(testData.testUserPublicKey)
+  const publicKey = Buffer.from(testData.testUserPublicKey, 'utf8')
+  const did = new Did(publicKey)
+  const didDoc = new DidDocument(publicKey)
   let authCredential = AuthenticationCredential.ecdsaAuthenticationCredentials(testData.testUserPublicKey, did)
 
   it('Should include owners Did', () => {
@@ -12,7 +15,15 @@ describe('Authentication credential' , () => {
   })
 
   it('Should include keys identifier', () => {
-    expect(authCredential.id).to.equal(did + 'keys/generic/1')
+    expect(authCredential.id.toJSON()).to.equal(did.toJSON() + '#keys/generic/1')
+  })
+
+  it('Should stringify to a correct DDO specified format', () => {
+    expect(JSON.stringify(authCredential)).to.equal(JSON.stringify(didDoc.authenticationCredential))
+  })
+
+  it('AuthenticationCredential JSON should be parse back to the same AuthenticationCredential object', () => {
+    expect(JSON.parse(JSON.stringify(authCredential))).to.equal(didDoc.authenticationCredential)
   })
 })
 
