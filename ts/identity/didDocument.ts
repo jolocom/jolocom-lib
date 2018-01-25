@@ -19,7 +19,6 @@ export default class DidDocument implements DidDocumentAttrs {
     this.created = new Date(Date.now())
   }
 
-
   static fromJson(json: DidDocumentAttrs): Did {
     let did = Object.create(DidDocument.prototype)
     return Object.assign(did, json, {

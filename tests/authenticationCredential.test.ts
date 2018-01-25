@@ -12,7 +12,7 @@ describe('Authentication credential' , () => {
   })
 
   it('Should include keys identifier', () => {
-    expect(authCredential.id).to.equal(did + 'keys/generic/1')
+    expect(authCredential.id.toJSON()).to.equal(did.toJSON() + '#keys/generic/1')
   })
 })
 
