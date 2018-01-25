@@ -13,9 +13,9 @@ export default class DidDocument implements DidDocumentAttrs {
   authenticationCredential: AuthenticationCredential
   created: Date
 
-  constructor(publicKey: string) {
+  constructor(publicKey: Buffer) {
     this.id = new Did(publicKey)
-    this.authenticationCredential = AuthCredential.ecdsaAuthenticationCredentials(publicKey, this.id)
+    this.authenticationCredential = AuthCredential.ecdsaAuthenticationCredentials(publicKey.toString(), this.id)
     this.created = new Date(Date.now())
   }
 

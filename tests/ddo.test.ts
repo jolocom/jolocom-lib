@@ -9,7 +9,8 @@ describe('Did Document', () => {
 
   before(function() {
     clock = lolex.install({now: new Date('2018-01-24T15:42:15.882Z')})
-    ddo = new DidDocument(testData.testUserPublicKey)
+    const publicKey = Buffer.from(testData.testUserPublicKey, 'utf8')
+    ddo = new DidDocument(publicKey)
   })
 
   it('Should include context field which specifies the version of DID specification', () => {

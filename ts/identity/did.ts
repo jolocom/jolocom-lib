@@ -5,9 +5,10 @@ import * as bs58 from 'bs58'
  */
 export default class Did{
   identifier: string
-  constructor(publicKey: string) {
+
+  constructor(publicKey: Buffer) {
     const prefix = 'did:jolo:'
-    const suffix = bs58.encode(publicKey.substr(0, 16))
+    const suffix = bs58.encode(publicKey.subarray(0, 16))
     this.identifier = prefix + suffix
   }
 

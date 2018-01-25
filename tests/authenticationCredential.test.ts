@@ -4,7 +4,8 @@ import * as AuthenticationCredential from '../ts/identity/authenticationCredenti
 import testData from './data/identity'
 
 describe('Authentication credential' , () => {
-  const did = new Did(testData.testUserPublicKey)
+  const publicKey = Buffer.from(testData.testUserPublicKey, 'utf8')
+  const did = new Did(publicKey)
   let authCredential = AuthenticationCredential.ecdsaAuthenticationCredentials(testData.testUserPublicKey, did)
 
   it('Should include owners Did', () => {
