@@ -1,5 +1,5 @@
-import Did from './Did'
-import AuthenticationCredential from './AuthenticationCredential'
+import Did from './did'
+import AuthenticationCredential from './authenticationCredential'
 
 export default interface DidDocumentAttrs {
   '@context': string

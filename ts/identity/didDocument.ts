@@ -1,6 +1,6 @@
-import AuthenticationCredential from './AuthenticationCredential'
-import * as AuthCredential from './AuthenticationCredential'
-import LinkedDataSignature from './LinkedDataSignature'
+import AuthenticationCredential from './authenticationCredential'
+import * as AuthCredential from './authenticationCredential'
+import LinkedDataSignature from './linkedDataSignature'
 import DidDocumentAttrs from './didDocumentAttrs'
 import Did from './Did'
 
