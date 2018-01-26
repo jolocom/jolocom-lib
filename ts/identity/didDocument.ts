@@ -8,10 +8,10 @@ import Did from './Did'
  * Source: https://w3c-ccg.github.io/did-spec/
  */
 export default class DidDocument implements DidDocumentAttrs {
-  '@context': string = "https://w3id.org/did/v1"
-  id: Did
-  authenticationCredential: AuthenticationCredential
-  created: Date
+  public '@context': string = "https://w3id.org/did/v1"
+  public id: Did
+  public authenticationCredential: AuthenticationCredential
+  public created: Date
 
   constructor(publicKey: Buffer) {
     this.id = new Did(publicKey)
