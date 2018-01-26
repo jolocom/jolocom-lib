@@ -1,7 +1,6 @@
 import AuthenticationCredential from './authenticationCredential'
-import * as AuthCredential from './authenticationCredential'
 import LinkedDataSignature from './linkedDataSignature'
-import DidDocumentAttrs from './didDocumentAttrs'
+import { DidDocumentAttrs } from './types'
 import Did from './did'
 
 /* Describes Identity according to DID/DDO specifications
@@ -15,7 +14,7 @@ export default class DidDocument implements DidDocumentAttrs {
 
   constructor(publicKey: Buffer) {
     this.id = new Did(publicKey)
-    this.authenticationCredential = AuthCredential.ecdsaAuthenticationCredentials(publicKey.toString(), this.id)
+    this.authenticationCredential = AuthenticationCredential.ecdsaAuthenticationCredentials(publicKey.toString(), this.id)
     this.created = new Date(Date.now())
   }
 
