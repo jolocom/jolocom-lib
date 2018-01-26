@@ -6,20 +6,24 @@ import * as bs58 from 'bs58'
 export default class Did{
   identifier: string
 
-  constructor(publicKey: Buffer) {
+  constructor() {}
+
+  static create(publicKey: Buffer) {
+    let did = new Did()
     const prefix = 'did:jolo:'
     const suffix = bs58.encode(publicKey.subarray(0, 16))
-    this.identifier = prefix + suffix
+    did.identifier = prefix + suffix
+    return did
   }
 
   toJSON(): string {
     return this.identifier
   }
 
-  static fromJson(id: string): Did {
-    let did = Object.create(Did.prototype)
-    return Object.assign(did, id, {
-      identifier: id
+  static fromJSON(json: string): Did {
+    let did = new Did()
+    return Object.assign(did, json, {
+      identifier: json
     })
   }
 }

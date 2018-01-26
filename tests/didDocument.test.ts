@@ -20,4 +20,8 @@ describe('Did Document', () => {
   it('Should include properly formatted authentication credentials of ecdsa key', () => {
     expect(JSON.stringify(ddo)).to.equal(testData.expectedDdoJson)
   })
+
+  it('Should be parsed back to DdoDocument correctly', () => {
+//    expect(JSON.parse(JSON.stringify(ddo))).to.equal(ddo)
+  })
 })

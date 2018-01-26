@@ -1,14 +1,14 @@
 import { expect } from 'chai'
 import Did from '../ts/identity/did'
 import DidDocument from '../ts/identity/didDocument'
-import * as AuthenticationCredential from '../ts/identity/authenticationCredential'
+import AuthenticationCredential from '../ts/identity/authenticationCredential'
 import testData from './data/identity'
 
 describe('Authentication credential' , () => {
   const publicKey = Buffer.from(testData.testUserPublicKey, 'utf8')
-  const did = new Did(publicKey)
-  const didDoc = new DidDocument(publicKey)
-  let authCredential = AuthenticationCredential.ecdsaAuthenticationCredentials(testData.testUserPublicKey, did)
+  const did = Did.create(publicKey)
+  const didDoc = DidDocument.create(publicKey)
+  let authCredential = AuthenticationCredential.ecdsaCredentials(testData.testUserPublicKey, did)
 
   it('Should include owners Did', () => {
     expect(authCredential.owner).to.equal(did)
@@ -22,7 +22,7 @@ describe('Authentication credential' , () => {
     expect(JSON.stringify(authCredential)).to.equal(JSON.stringify(didDoc.authenticationCredential))
   })
 
-  it('AuthenticationCredential JSON should be parse back to the same AuthenticationCredential object', () => {
+  it('AuthenticationCredential JSON should be parsed back to the same AuthenticationCredential object', () => {
     expect(JSON.parse(JSON.stringify(authCredential))).to.equal(didDoc.authenticationCredential)
   })
 })
