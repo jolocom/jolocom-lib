@@ -32,6 +32,8 @@
   },
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
+    "bip39": "^2.5.0",
+    "bitcoinjs-lib": "^3.3.2",
     "bs58": "^4.0.1",
     "colors": "^1.1.2",
     "istanbul": "^0.4.5",
