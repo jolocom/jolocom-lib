@@ -3,9 +3,7 @@ import * as chaiAsPromised from 'chai-as-promised'
 import IpfsStorageAgent from '../ts/storage/ipfsStorageAgent'
 
 chai.use(chaiAsPromised)
-
 const expect = chai.expect
-
 
 describe('IpfsStorageAgent', () => {
   let StorageAgent
@@ -14,7 +12,7 @@ describe('IpfsStorageAgent', () => {
 
   beforeEach(() => {
     StorageAgent = new IpfsStorageAgent({
-      host: 'test',
+      host: 'localhost',
       port: 5001,
       protocol: 'http'
     })
@@ -22,9 +20,13 @@ describe('IpfsStorageAgent', () => {
 
   it('Should attempt to store the data', async () => {
     StorageAgent.ipfs = {
-      addJSON: async (data, callback) => {
-        expect(data).to.equal(testData)
-        return callback(null, testDataHash)
+      files: {
+        add: (data, callback) => {
+          expect(data).to.deep.equal(Buffer.from(JSON.stringify(testData)))
+
+          const result = [{hash: testDataHash}]
+          return callback(null, result)
+        }
       }
     }
     expect(await StorageAgent.storeJSON(testData)).to.equal(testDataHash)
@@ -32,35 +34,43 @@ describe('IpfsStorageAgent', () => {
 
   it('Should throw error if storing data failed', async () => {
     StorageAgent.ipfs = {
-      addJSON: async (data, callback) => {
-        return callback('error', null)
-      }
+      files: {
+        add: (data, callback) => {
+          return callback('error', null)
+        }
+      } 
     }
+
     await expect(StorageAgent.storeJSON(testData))
       .to.be.rejected
   })
 
   it('Should throw provided data is not JSON,', async () => {
     await expect(StorageAgent.storeJSON('invalidJSON'))
-      .to.be.rejectedWith('JSON expected, received string')
+      .to.be.rejected
   })
 
   it('Should retrieve data based on hash', async () => {
     StorageAgent.ipfs = {
-      catJSON: (async (hash, callback) => {
-        expect(hash).to.equal(testDataHash)
-        callback(null, testData)
-      })
+      files: {
+        cat: (hash, callback) => {
+          expect(hash).to.equal(testDataHash)
+          callback(null, Buffer.from(JSON.stringify(testData)))
+        }
+      }
     }
-    expect(await StorageAgent.catJSON(testDataHash)).to.equal(testData)
+    expect(await StorageAgent.catJSON(testDataHash)).to.deep.equal(testData)
   })
 
   it('Should throw error if reading data failed', async () => {
     StorageAgent.ipfs = {
-      catJSON: async (hash, callback) => {
-        return callback('error', null)
+      files: {
+        cat: (hash, callback) => {
+          return callback('error', null)
+        }
       }
     }
+
     await expect(StorageAgent.catJSON(testDataHash))
       .to.be.rejected
   })
