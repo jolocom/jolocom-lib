@@ -1,4 +1,4 @@
-import * as bs58 from 'bs58'
+import { utils } from 'web3'
 
 /* Creates Identity id according to DID/DDO specifications
  * Source: https://w3c-ccg.github.io/did-spec/
@@ -7,7 +7,7 @@ export default class Did{
   public identifier: string
   constructor(publicKey: Buffer) {
     const prefix = 'did:jolo:'
-    const suffix = bs58.encode(publicKey.substr(0, 16))
+    const suffix = utils.soliditySha3(publicKey)
     this.identifier = prefix + suffix
   }
 
