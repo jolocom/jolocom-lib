@@ -30,9 +30,12 @@ export default class AuthenticationCredential {
     return newDid
   }
 
+  static reviver(key: string, value: any): any {
+    return key === "" ? AuthenticationCredential.fromJSON(value) : value;
+  }
+
   static fromJSON(json: AuthenticationCredentialAttrs): AuthenticationCredential {
     let authCredential = Object.create(AuthenticationCredential.prototype)
-    console.log(json)
     return Object.assign(authCredential, json, {
       id: Did.fromJSON(json.id),
       owner: Did.fromJSON(json.owner)

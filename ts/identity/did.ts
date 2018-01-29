@@ -9,7 +9,7 @@ export default class Did{
   constructor() {}
 
   static create(publicKey: Buffer) {
-    let did = new Did()
+    const did = new Did()
     const prefix = 'did:jolo:'
     const suffix = bs58.encode(publicKey.subarray(0, 16))
     did.identifier = prefix + suffix
@@ -21,8 +21,8 @@ export default class Did{
   }
 
   static fromJSON(json: string): Did {
-    let did = new Did()
-    return Object.assign(did, json, {
+    const did = Object.create(Did.prototype)
+    return Object.assign(did, {
       identifier: json
     })
   }

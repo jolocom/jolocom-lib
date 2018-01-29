@@ -11,7 +11,7 @@ export interface AuthenticationCredentialAttrs {
 
 export interface DidDocumentAttrs {
   '@context': string
-  id: Did
-  authenticationCredential: AuthenticationCredential
-  created: Date
+  id: string
+  authenticationCredential: string
+  created: string
 }
