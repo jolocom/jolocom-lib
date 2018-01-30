@@ -1,27 +1,34 @@
 import AuthenticationCredential from './authenticationCredential'
-import LinkedDataSignature from './linkedDataSignature'
-import { DidDocumentAttrs } from './types'
 import Did from './did'
+import LinkedDataSignature from './linkedDataSignature'
+import { IDidDocumentAttrs } from './types'
 
-/* Describes Identity according to DID/DDO specifications
- * Source: https://w3c-ccg.github.io/did-spec/
- */
-export default class DidDocument implements DidDocumentAttrs {
-  public '@context': string = "https://w3id.org/did/v1"
+export default class DidDocument {
+  public '@context': string = 'https://w3id.org/did/v1'
   public id: Did
   public authenticationCredential: AuthenticationCredential
   public created: Date
 
   constructor(publicKey: Buffer) {
     this.id = new Did(publicKey)
-    this.authenticationCredential = AuthenticationCredential.ecdsaAuthenticationCredentials(publicKey.toString(), this.id)
+    this.authenticationCredential = AuthenticationCredential.ecdsaCredentials(publicKey.toString(), this.id)
     this.created = new Date(Date.now())
   }
 
-  static fromJson(json: DidDocumentAttrs): Did {
-    let did = Object.create(DidDocument.prototype)
+  public static reviver(key: string, value: any): any {
+    return key === '' ? DidDocument.fromJSON(value) : value
+  }
+
+  public static fromJSON(json: IDidDocumentAttrs): DidDocument {
+    const did = Object.create(DidDocument.prototype)
+    const parsedAuthCredentials = JSON.parse(
+      JSON.stringify(json.authenticationCredential), AuthenticationCredential.reviver,
+    )
+
     return Object.assign(did, json, {
-      created: new Date(json.created)
+      id: Did.fromJSON(json.id),
+      authenticationCredential: parsedAuthCredentials,
+      created: new Date(json.created),
     })
   }
 }
