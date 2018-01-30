@@ -1,9 +1,12 @@
 import { expect } from 'chai'
-import { deriveMasterKeyPairFromSeedPhrase, deriveGenericSigningKeyPair, deriveEthereumKeyPair } from '../ts/identity/key-derivation.ts'
-import testData from './data/key-data'
+import testData from './data/keys'
 import * as bitcoin from 'bitcoinjs-lib'
 import * as bip39 from 'bip39'
-
+import {
+  deriveMasterKeyPairFromSeedPhrase,
+  deriveGenericSigningKeyPair,
+  deriveEthereumKeyPair 
+} from '../ts/identity/keyDerivation'
 
 describe('deriveMasterKeyPairFromSeedPhrase', () => {
   it('Should correctly derive a master key pair given a seedphrase', () => {
