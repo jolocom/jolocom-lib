@@ -1,20 +1,20 @@
 {
-    "version"; : "2.5",
-    "compilerOptions"; : {
-        "target"; : "es5",
-        "module"; : "commonjs",
-        "noImplicitAny"; : false,
-        "removeComments"; : true,
-        "lib"; : ["es2015"],
-        "noLib"; : false,
-        "preserveConstEnums"; : true,
-        "declaration"; : true,
-        "sourceMap"; : true,
-        "suppressImplicitAnyIndexErrors"; : true,
-        "outDir"; : "../js";
+    "version": "2.5",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "removeComments": true,
+        "lib": ["es2015"],
+        "noLib": false,
+        "preserveConstEnums": true,
+        "declaration": true,
+        "sourceMap": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "outDir": "../js"
     },
-    "filesGlob"; : [
+    "filesGlob": [
         "./**/*.ts",
-        "!./node_modules/**/*.ts",
-    ];
+        "!./node_modules/**/*.ts"
+    ]
 }
