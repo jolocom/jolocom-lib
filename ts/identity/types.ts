@@ -1,17 +1,17 @@
-import Did from './did'
-import AuthenticationCredential from './authenticationCredential'
+import AuthenticationCredential from "./authenticationCredential";
+import Did from "./did";
 
-export interface AuthenticationCredentialAttrs {
-  id: string
-  'type': string[]
-  owner: string
-  curve: string
-  publicKeyBase64: string
+export interface IAuthenticationCredentialAttrs {
+  id: string;
+  "type": string[];
+  owner: string;
+  curve: string;
+  publicKeyBase64: string;
 }
 
-export interface DidDocumentAttrs {
-  '@context': string
-  id: string
-  authenticationCredential: string
-  created: string
+export interface IDidDocumentAttrs {
+  "@context": string;
+  id: string;
+  authenticationCredential: string;
+  created: string;
 }
