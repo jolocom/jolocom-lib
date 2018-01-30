@@ -5,7 +5,7 @@ import testData from './data/identity'
 
 describe('DID', () => {
   it('Should correctly instantiate a DID class from user public key', () => {
-    const publicKey = testData.testUserPublicKey
+    const publicKey = Buffer.from(testData.testUserPublicKey, 'utf8')
     const did = new Did(publicKey)
     const result = testData.testUserDID
     expect(did.identifier).to.be.a('string')
