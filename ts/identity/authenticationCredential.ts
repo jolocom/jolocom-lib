@@ -11,8 +11,7 @@ export default class AuthenticationCredential {
   public curve: string
   public publicKeyBase64: string
 
-  constructor() {
-  }
+  constructor() {}
 
   static ecdsaCredentials(publicKey: string, did: Did): any {
     return {
@@ -35,7 +34,7 @@ export default class AuthenticationCredential {
   }
 
   static fromJSON(json: AuthenticationCredentialAttrs): AuthenticationCredential {
-    let authCredential = Object.create(AuthenticationCredential.prototype)
+    const authCredential = Object.create(AuthenticationCredential.prototype)
     return Object.assign(authCredential, json, {
       id: Did.fromJSON(json.id),
       owner: Did.fromJSON(json.owner)

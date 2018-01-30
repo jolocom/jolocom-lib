@@ -12,15 +12,10 @@ export default class DidDocument {
   public authenticationCredential: AuthenticationCredential
   public created: Date
 
-  constructor() {
-  }
-
-  static create(publicKey: Buffer) {
-    let ddo = new DidDocument()
-    ddo.id = Did.create(publicKey)
-    ddo.authenticationCredential = AuthenticationCredential.ecdsaCredentials(publicKey.toString(), ddo.id)
-    ddo.created = new Date(Date.now())
-    return ddo
+  constructor(publicKey: Buffer) {
+    this.id = Did.create(publicKey)
+    this.authenticationCredential = AuthenticationCredential.ecdsaCredentials(publicKey.toString(), this.id)
+    this.created = new Date(Date.now())
   }
 
   static reviver(key: string, value: any): any {
