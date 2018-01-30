@@ -2,7 +2,7 @@ import * as bitcoinMessage from 'bitcoinjs-message'
 import * as bitcoin from 'bitcoinjs-lib'
 import * as bip39 from 'bip39'
 
-export function signMessage(WIF : String, message : String) {
+export function signMessage(WIF : String, message : String) : String {
   const keyPair = bitcoin.ECPair.fromWIF(WIF)
   const privateKey = keyPair.d.toBuffer(32)
 
@@ -15,6 +15,6 @@ export function verifySignedMessage(
   message : String,
   address : String,
   signedMessage : String
-) {
+) : boolean {
   return bitcoinMessage.verify(message, address, signedMessage)
 }
