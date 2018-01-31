@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import testSignVerifyData from './data/sign-verify'
 import testAuth from './data/authentication'
 import * as QRCode from 'qrcode'
+import * as bitcoin from 'bitcoinjs-lib'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 
 describe('create QR Code', () => {
@@ -55,5 +56,18 @@ describe('create and verify json webtokens', () => {
   it('should correctly verify the signature', () => {
     const verified = new TokenVerifier('ES256k', rawPublicKey).verify(testAuth.token)
     expect(verified).to.equal(true)
+  })
+})
+
+describe('get signing keys from WIF', () => {
+  it('should derive a valid private and public key from WIF', () => {
+    const WIF = testAuth.WIF
+    const keyPair = bitcoin.ECPair.fromWIF(WIF)
+    const privateKey = keyPair.d.toBuffer(32).toString('hex')
+    const publicKey = keyPair.getPublicKeyBuffer().toString('hex')
+
+    expect(privateKey.length).to.equal(64 || 66)
+    expect(privateKey).to.be.a('string')
+    expect(publicKey).to.be.a('string')
   })
 })
