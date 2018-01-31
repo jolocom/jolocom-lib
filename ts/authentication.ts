@@ -1,26 +1,21 @@
 import * as superagent from 'superagent-es6-promise'
+import TokenPayload from './tokenPayload'
 import testAuth from '../tests/data/authentication'
 import { signMessage, verifySignedMessage } from './sign-verify'
 import * as QRCode from 'qrcode'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import * as bitcoin from 'bitcoinjs-lib'
 
-// TODO: add did interface
 export async function createQRCode(did : String, claims : Array<any>, IPFSroom : String) : Promise<any> {
 
   const keys = _getSigningKeysFromWIF()
-// TODO: implement interface for token
-  const token = new TokenSigner('ES256k', keys.privKey).sign({
-    iss: did,
-    sub: '',
-    exp: '',
-    jti: Math.random().toString(32),
-    reqClaims: claims,
-    IPFSroom: IPFSroom,
-    pubKeyIss: keys.pubKey,
-    pubKeySub: '',
-    claims: ''
+  const tokenPayload = new TokenPayload({
+    iss: 'did:jolo:6xExKfgg2WRGBPLJeUhmYk',
+    reqClaims: [ 'name', 'proofOfAge' ],
+    IPFSroom: 'fekrnkegr',
+    pubKeyIss: keys.pubKey
   })
+  const token = new TokenSigner('ES256k', keys.privKey).sign(tokenPayload)
 
   QRCode.toDataURL(token, (err, url) => {
     if(err) {
@@ -43,10 +38,15 @@ export async function authenticateRequest(token : String) {
     */
 
     // const keys = _getSigningKeysFromWIF()
-    tokenData.payload.sub = testAuth.mockDIDSUB
-    tokenData.payload.pubKeySub = testAuth.rawPublicKey
 
-    const token = new TokenSigner('ES256K', testAuth.rawPrivateKey).sign(tokenData.payload)
+    const tokenPayload = TokenPayload.generateResponse({
+      tokenData: tokenData,
+      sub: testAuth.mockDIDSUB,
+      pubKeySub: testAuth.rawPublicKey,
+      claims: {name: 'Natascha'}
+    })
+
+    const token = new TokenSigner('ES256K', testAuth.rawPrivateKey).sign(tokenPayload)
 
     // TODO: post to IPFS random room here
 
