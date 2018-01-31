@@ -30,6 +30,7 @@
   "bugs": {
     "url": "https://github.com/jolocom/jolocom-lib/issues"
   },
+  "license" : "MIT",
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
     "bip39": "^2.5.0",
