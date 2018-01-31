@@ -30,6 +30,7 @@
   "bugs": {
     "url": "https://github.com/jolocom/jolocom-lib/issues"
   },
+  "license" : "MIT",
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
     "bip39": "^2.5.0",
@@ -39,7 +40,6 @@
     "colors": "^1.1.2",
     "istanbul": "^0.4.5",
     "jsontokens": "^0.7.6",
-    "jsonwebtoken": "^8.1.1",
     "nyc": "^11.4.1",
     "qrcode": "^1.2.0",
     "superagent": "^3.8.2",
@@ -49,10 +49,14 @@
     "@types/mocha": "^2.2.43",
     "@types/node": "^8.0.31",
     "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "istanbul": "^0.4.5",
     "mocha": "^5.0.0",
     "source-map-support": "^0.4.18",
     "ts-node": "^4.1.0",
     "tslint": "^5.9.1",
-    "typescript": "^2.6.2"
+    "typescript": "^2.6.2",
+    "lolex": "^2.3.1",
+    "nyc": "^11.4.1"
   }
 }
