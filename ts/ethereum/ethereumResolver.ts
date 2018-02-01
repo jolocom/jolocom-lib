@@ -1,6 +1,8 @@
 import EthereumResolver from 'jolocom-registry-contract'
 
-export default class EthereumResolver{
+export default class EthResolver{
+  private ethResolver: any
+
   constructor(address: string, providerUri: string) {
     this.ethResolver = new EthereumResolver(address, providerUri)
   }
