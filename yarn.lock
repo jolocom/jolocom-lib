@@ -1849,6 +1849,16 @@ isurl@^1.0.0-alpha5:
     has-to-string-tag-x "^1.2.0"
     is-object "^1.0.1"
 
+jolocom-registry-contract@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/jolocom-registry-contract/-/jolocom-registry-contract-0.0.2.tgz#4e302fb6b4b61eec656b23083db6e1de2791c4b4"
+  dependencies:
+    chai "^4.1.2"
+    chai-as-promised "^7.1.1"
+    ts-node "^4.1.0"
+    typescript "^2.6.2"
+    web3 "^1.0.0-beta.29"
+
 js-sha3@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.3.1.tgz#86122802142f0828502a0d1dee1d95e253bb0243"
