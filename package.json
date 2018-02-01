@@ -47,6 +47,7 @@
     "superagent-es6-promise": "^1.0.0"
   },
   "devDependencies": {
+    "@types/crypto-js": "^3.1.38",
     "@types/mocha": "^2.2.43",
     "@types/node": "^8.0.31",
     "chai": "^4.1.2",

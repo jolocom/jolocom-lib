@@ -9,9 +9,19 @@ export default class TokenPayload {
   public pubKeyIss: string
   public pubKeySub: string
   public claims: any
+  public encryptPrime: string
+  public encryptPubKeyIss: string
+  public encryptPubKeySub: string
 
-  constructor({iss, pubKeyIss, reqClaims, IPFSroom} :
-    {iss: string, pubKeyIss: string, reqClaims?: string[], IPFSroom?: string}) {
+  constructor({iss, pubKeyIss, encryptPrime, encryptPubKeyIss, reqClaims, IPFSroom} :
+    {
+      iss: string,
+      pubKeyIss: string,
+      encryptPrime?: string,
+      encryptPubKeyIss?: string,
+      reqClaims?: string[],
+      IPFSroom?: string
+    }) {
     this.iss = iss
     this.iat = new Date(Date.now())
     this.exp = new Date(Date.now() + 30000)
@@ -19,17 +29,20 @@ export default class TokenPayload {
     this.reqClaims = reqClaims
     this.IPFSroom = IPFSroom
     this.pubKeyIss = pubKeyIss
+    this.encryptPrime = encryptPrime
+    this.encryptPubKeyIss = encryptPubKeyIss
   }
 
 
-  public static generateResponse({tokenData, sub, pubKeySub, claims} :
-    {tokenData: any, sub: string, pubKeySub: string, claims?: any}
+  public static generateResponse({tokenData, sub, pubKeySub, encryptPubKeySub, claims} :
+    {tokenData: any, sub: string, pubKeySub: string, encryptPubKeySub?: string, claims?: any}
   ) {
     return Object.assign(tokenData, {
       iat: new Date(Date.now()),
       exp: new Date(Date.now() + 30000),
       sub: sub,
       pubKeySub: pubKeySub,
+      encryptPubKeySub: encryptPubKeySub,
       claims: claims
     })
   }
