@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import TokenPayload from '../ts/tokenPayload'
+import TokenPayload from '../ts/sso/tokenPayload'
 import testAuth from './data/authentication'
 
 describe.only('Token payload', () => {

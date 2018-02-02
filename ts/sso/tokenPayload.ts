@@ -24,7 +24,7 @@ export default class TokenPayload {
     }) {
     this.iss = iss
     this.iat = new Date(Date.now())
-    this.exp = new Date(Date.now() + 30000)
+    this.exp = new Date(Date.now() + 3000000)
     this.jti = Math.random().toString(32)
     this.reqClaims = reqClaims
     this.IPFSroom = IPFSroom
@@ -37,9 +37,10 @@ export default class TokenPayload {
   public static generateResponse({tokenData, sub, pubKeySub, encryptPubKeySub, claims} :
     {tokenData: any, sub: string, pubKeySub: string, encryptPubKeySub?: string, claims?: any}
   ) {
-    return Object.assign(tokenData, {
+
+    return Object.assign(tokenData.payload, {
       iat: new Date(Date.now()),
-      exp: new Date(Date.now() + 30000),
+      exp: new Date(Date.now() + 3000000),
       sub: sub,
       pubKeySub: pubKeySub,
       encryptPubKeySub: encryptPubKeySub,
