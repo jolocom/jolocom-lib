@@ -6,7 +6,7 @@ import * as lolex from 'lolex'
 
 describe('Did Document', () => {
   const clock = lolex.install({now: new Date('2018-01-24T15:42:15.882Z')})
-  const publicKey = Buffer.from(testData.testUserPublicKey, 'utf8')
+  const publicKey = testData.testUserPublicKey
   const ddo = new DidDocument(publicKey)
 
   it('Should include context field which specifies the version of DID specification', () => {

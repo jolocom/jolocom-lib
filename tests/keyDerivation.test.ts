@@ -3,7 +3,7 @@ import testData from './data/keys'
 import * as bitcoin from 'bitcoinjs-lib'
 import * as bip39 from 'bip39'
 import {
-  deriveMasterKeyPairFromSeedPhrase,
+  deriveMasterKeyPairFromMnemonic,
   deriveGenericSigningKeyPair,
   deriveEthereumKeyPair 
 } from '../ts/identity/keyDerivation'
@@ -11,7 +11,7 @@ import {
 describe('deriveMasterKeyPairFromSeedPhrase', () => {
   it('Should correctly derive a master key pair given a seedphrase', () => {
     const seedphrase = testData.testSeedPhrase
-    const result = deriveMasterKeyPairFromSeedPhrase(seedphrase)
+    const result = deriveMasterKeyPairFromMnemonic(seedphrase)
     const wif = result.keyPair.toWIF()
     expect(JSON.stringify(result)).to.equal(testData.testMasterKeyPairString)
     expect(wif).to.equal(testData.testMasterKeyPairWIF)
