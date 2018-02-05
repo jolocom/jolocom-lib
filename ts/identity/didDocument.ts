@@ -11,8 +11,10 @@ export default class DidDocument {
 
   constructor(publicKey: string) {
     this.id = new Did(publicKey)
-    this.authenticationCredential = AuthenticationCredential.ecdsaCredentials(publicKey.toString(), this.id)
-    this.created = new Date(Date.now())
+    this.authenticationCredential = AuthenticationCredential
+      .ecdsaCredentials(publicKey.toString(), this.id)
+
+    this.created = new Date()
   }
 
   public static reviver(key: string, value: any): any {

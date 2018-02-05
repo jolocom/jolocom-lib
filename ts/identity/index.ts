@@ -1,7 +1,7 @@
-import IdentityConfig from './identityConfig'
-import * as keyDerivation from './identity/keyDerivation'
+import IdentityConfig from './types'
+import * as keyDerivation from './keyDerivation'
 import * as bitcoinjs from 'bitcoinjs-lib'
-import DidDocument from './identity/didDocument'
+import DidDocument from './didDocument'
 
 export default class Identity {
   public config: IdentityConfig
@@ -12,7 +12,7 @@ export default class Identity {
     return identity
   }
 
-  public static create(randomStringFromEntropy: string): any {
+  create(randomStringFromEntropy: string): any {
     const mnemonic = keyDerivation.generateMnemonic(randomStringFromEntropy)
     const masterKeyPair = keyDerivation.deriveMasterKeyPairFromMnemonic(mnemonic)
     const genericSigningKey = keyDerivation.deriveGenericSigningKeyPair(masterKeyPair)

@@ -3,15 +3,17 @@ import * as bitcoin from 'bitcoinjs-lib'
 
 /* @summary - Generates a seed phrase based on provided entropy
  * @param {string} randomStringFromEntropy - a random string generated from entropy.
- * @returns {string} - a BIP39 compliant mnemonic
+ * @returns {string} - a BIP39 compliant 12 word mnemonic
  */
 export function generateMnemonic(randomStringFromEntropy: string) {
   return bip39.entropyToMnemonic(randomStringFromEntropy)
 }
 
 /* @summary - Generates a keypair based on provided entropy
- * @param {string} mnemonic - a BIP39 compliant mnemonic generated from hashed entropy.
- * @returns {HDNode} - an instance containing a master keypair and a default Bitcoin network object.
+ * @param {string} mnemonic - a BIP39 compliant 12 word mnemonic generated from
+ * hashed entropy.
+ * @returns {HDNode} - an instance containing a master keypair and a default
+ * Bitcoin network object.
  */
 export function deriveMasterKeyPairFromMnemonic(mnemonic: string) {
   const seed = bip39.mnemonicToSeed(mnemonic)

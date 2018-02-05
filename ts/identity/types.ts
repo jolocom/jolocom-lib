@@ -15,3 +15,8 @@ export interface IDidDocumentAttrs {
   authenticationCredential: string;
   created: string;
 }
+
+export default interface IdentityConfig {
+  providerUrl: string
+  ethereumAddress: string
+}
