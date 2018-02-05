@@ -5,7 +5,11 @@ export default class JolocomLib {
   private identity: any
   public config: IdentityConfig
 
-  constructor(config: IdentityConfig) {
-    this.identity = Identity.initialize(config)
+  constructor(config: IConfig) {
+    this.identity = Identity.initialize(config.identity)
   }
+}
+
+interface IConfig = {
+  identity: IdentityConfig
 }
