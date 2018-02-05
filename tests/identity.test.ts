@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import testData from './data/identity'
-import Identity from '../ts/identity'
+import Identity from '../ts/identity/index'
 import IdentityConfig from '../ts/identityConfig'
 import * as lolex from 'lolex'
 
@@ -15,7 +15,7 @@ describe('Identity', () => {
   })
 
   it('Should return mnemonic, master key, generic signing key and ethereum key in WIF', () => {
-    const identity = Identity.create(testData.randomStringFromEntropy)
+    const identity = (new Identity()).create(testData.randomStringFromEntropy)
 
     expect(identity).to.deep.equal({
       ethereumKeyWIF: "L17covSN3DaequjaB8GBYYNnza8nNvgiyJtspVdC7SVrdkLRmGU8",
