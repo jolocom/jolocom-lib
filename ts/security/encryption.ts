@@ -27,12 +27,12 @@ export function respondSecretExchange({prime} : {prime: string}) {
 }
 
 
-export function getEncryptionSecret({party, pubKey} : {party: any, pubKey: any}) {
+export function getEncryptionSecret({party, pubKey} : {party: any, pubKey: string}) {
   return party.computeSecret(pubKey, 'hex')
 }
 
 
-export function encrypt({key, plainText} : {key: any, plainText: any}) {
+export function encrypt({key, plainText} : {key: any, plainText: any}) : string {
   const cipher = crypto.createCipher('aes-128-ctr', key)
   let cipherText = cipher.update(JSON.stringify(plainText),'utf8','hex')
   cipherText += cipher.final('hex')
@@ -40,7 +40,7 @@ export function encrypt({key, plainText} : {key: any, plainText: any}) {
   return cipherText
 }
 
-export function decrypt({key, cipherText} : {key: any, cipherText: any}) {
+export function decrypt({key, cipherText} : {key: any, cipherText: string}) {
   var decipher = crypto.createDecipher('aes-128-ctr', key)
   var plainText = decipher.update(cipherText,'hex','utf8')
   plainText += decipher.final('utf8')

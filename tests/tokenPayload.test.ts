@@ -2,12 +2,13 @@ import { expect } from 'chai'
 import TokenPayload from '../ts/sso/tokenPayload'
 import testAuth from './data/authentication'
 
-describe.only('Token payload', () => {
+describe('Token payload', () => {
   const tokenPayload = new TokenPayload({
     iss: testAuth.mockDIDISS,
     pubKeyIss: testAuth.rawPublicKey,
     reqClaims: ['name', 'proofOfAge']
   })
+
   it('should correctly instantiate a TokenPayload class', () => {
     expect(tokenPayload).to.have.property('iss')
     expect(tokenPayload).to.have.property('iat')
@@ -18,8 +19,13 @@ describe.only('Token payload', () => {
   })
 
   it('should correctly assemble response token payload', () => {
+    const token = {
+      hader: 'lalala',
+      payload: tokenPayload,
+      sig: 'jehbrkegnj'
+    }
     const resTokenPayload = TokenPayload.generateResponse({
-      tokenData: tokenPayload,
+      tokenData: token,
       sub: testAuth.mockDIDSUB,
       pubKeySub: testAuth.rawPublicKey
     })

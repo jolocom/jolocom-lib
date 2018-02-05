@@ -12,16 +12,16 @@ import {
   decrypt
 } from '../security/encryption'
 
-let initiatorParty
 
-export async function createQRCode({did, claims, IPFSroom, WIF, encrypt} :
+export async function initiateRequest({did, claims, IPFSroom, WIF, encrypt} :
   {did : string, claims : Array<string>, IPFSroom : string, WIF : string, encrypt: boolean}) : Promise<any> {
 
+  let response = {}
   let encryptOptions
+
   if(encrypt) {
-    console.log('encrypt true')
-    encryptOptions = initiateSecretExchange() // the initiator object MUST be stored by service
-    initiatorParty = encryptOptions.initiator // mock storage of initiator
+    encryptOptions = initiateSecretExchange()
+    response['initiator'] = encryptOptions.initiator
   }
   const keys = _getSigningKeysFromWIF({WIF: WIF})
   const tokenPayload = new TokenPayload({
@@ -33,66 +33,51 @@ export async function createQRCode({did, claims, IPFSroom, WIF, encrypt} :
     IPFSroom: IPFSroom
   })
   const token = new TokenSigner('ES256k', keys.privKey).sign(tokenPayload)
-
-  authenticateRequest({token: token, WIF: testAuth.WIF}) // for test only
-
-  QRCode.toDataURL(token, (err, url) => {
-    if(err) { return err }
-    return url
-  })
+  response['qrCode'] = await _createQRCode({token: token})
+  response['token'] = token
+  return response
 }
 
 
-createQRCode({
-  did: 'kfjnrej',
-  claims: ['name'],
-  IPFSroom: 'kfernnwrklgmlemgkm',
-  WIF: testAuth.WIF,
-  encrypt: true
-})
-
-
-export async function authenticateRequest({token, WIF} :
-  {token : string, WIF : string}) {
+export function authenticateRequest({token} : {token : string}) {
   const tokenData = decodeToken(token)
   const isTokenVerified = new TokenVerifier('ES256k', tokenData.payload.pubKeyIss).verify(token)
-  const isDataEncrypted = tokenData.payload.encryptPrime && tokenData.payload.encryptPubKeyIss
-
   if(isTokenVerified) {
-    let claimsEncrypted
-    let encryptPubKeySub
-
-    if(isDataEncrypted !== 'undefined' && isDataEncrypted.length > 1) {
-      console.log('DATA ENCRYPTED IN REQ')
-      const result = _handleEncryption({tokenData: tokenData})
-      claimsEncrypted = result.cipherText
-      encryptPubKeySub = result.encryptPubKeySub
-    }
-
-    const did = _getDID()
-    const keys = _getSigningKeysFromWIF({WIF: WIF})
-    const tokenPayload = TokenPayload.generateResponse({
-      tokenData: tokenData,
-      sub: did,
-      pubKeySub: keys.pubKey,
-      encryptPubKeySub: encryptPubKeySub ? encryptPubKeySub : '',
-      claims: claimsEncrypted ? claimsEncrypted : {name: 'Natascha'}
-    })
-
-    const token = new TokenSigner('ES256K', keys.privKey).sign(tokenPayload)
-    authenticateResponse({token: token, secretExchangeParty: initiatorParty}) // for test only
-
-    return 'OK'
-
+    return tokenData
   } else {
     return new Error('Web Token Not Valid')
   }
 }
 
 
+export async function initiateResponse({tokenData, WIF, did, claims} :
+  {tokenData: any, WIF: string, did: string, claims: Array<any>}) : Promise<any> {
+    const isDataEncrypted = tokenData.payload.encryptPrime && tokenData.payload.encryptPubKeyIss
+    let claimsEncrypted
+    let encryptPubKeySub
+
+    if(isDataEncrypted !== 'undefined' && isDataEncrypted.length > 1) {
+      const enc = _handleEncryption({tokenData: tokenData, claims: claims})
+      claimsEncrypted = enc.cipherText
+      encryptPubKeySub = enc.encryptPubKeySub
+    }
+
+    const keys = _getSigningKeysFromWIF({WIF: WIF})
+    const tokenPayload = TokenPayload.generateResponse({
+      tokenData: tokenData,
+      sub: did,
+      pubKeySub: keys.pubKey,
+      encryptPubKeySub: encryptPubKeySub ? encryptPubKeySub : '',
+      claims: claimsEncrypted ? claimsEncrypted : claims
+    })
+
+    const token = new TokenSigner('ES256K', keys.privKey).sign(tokenPayload)
+    return token
+}
+
 
 export async function authenticateResponse({token, secretExchangeParty} :
-  {token : string, secretExchangeParty: any}) {
+  {token : string, secretExchangeParty?: any}) : Promise<any> {
 
   const tokenData = decodeToken(token)
   const isTokenVerified = new TokenVerifier('ES256k', tokenData.payload.pubKeySub).verify(token)
@@ -100,21 +85,18 @@ export async function authenticateResponse({token, secretExchangeParty} :
 
   if(isTokenVerified) {
     if(isDataEncrypted !== 'undefined' && isDataEncrypted.length > 1) {
-      console.log('CLAIMS IN RESPONSE ENCRYPTED')
       const claims = _handleDecryption({
         tokenData: tokenData,
         secretExchangeParty: secretExchangeParty
       })
-      console.log('CLAIMS RETURN: ', claims)
       return claims
     }
-    console.log('CLAIMS RETURN: ', tokenData.payload.claims)
+
     return tokenData.payload.claims
   } else {
     return new Error('Web Token Not Valid')
   }
 }
-
 
 
 function _getSigningKeysFromWIF({WIF} : {WIF : string}) {
@@ -139,16 +121,13 @@ function _handleDecryption({tokenData, secretExchangeParty} :
   return plainText
 }
 
-
-function _handleEncryption({tokenData} : {tokenData :any}) {
+function _handleEncryption({tokenData, claims} : {tokenData :any, claims: any}) {
   const encryptOptions = respondSecretExchange({prime: tokenData.payload.encryptPrime})
   const secret = getEncryptionSecret({
     party: encryptOptions.responder,
     pubKey: tokenData.payload.encryptPubKeyIss
   })
-
-  const mockClaims = {name: 'Natascha', hobbie: 'day trading'}
-  const cipherText = encrypt({key: secret, plainText: mockClaims})
+  const cipherText = encrypt({key: secret, plainText: claims})
   const result = {
     encryptPubKeySub: encryptOptions.responderKey,
     cipherText: cipherText
@@ -156,7 +135,11 @@ function _handleEncryption({tokenData} : {tokenData :any}) {
   return result
 }
 
-
-function _getDID() {
-  return 'did:jolo:f3ern3prgkpernn' // mock
+async function _createQRCode({token} : {token: string}) : Promise<any> {
+  return new Promise((resolve, reject) => {
+    QRCode.toDataURL(token, (err, url) => {
+      if(err) { reject(err) }
+      resolve(url)
+    })
+  })
 }
