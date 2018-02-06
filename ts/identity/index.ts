@@ -17,9 +17,7 @@ export default class Identity {
     const masterKeyPair = keyDerivation.deriveMasterKeyPairFromMnemonic(mnemonic)
     const genericSigningKey = keyDerivation.deriveGenericSigningKeyPair(masterKeyPair)
     const ethereumKey = keyDerivation.deriveEthereumKeyPair(masterKeyPair)
-
-    const genericSigningKeyHex = genericSigningKey.getPublicKeyBuffer().toString('hex')
-    const ddo = new DidDocument(genericSigningKeyHex)
+    const ddo = new DidDocument(genericSigningKey.getPublicKeyBuffer())
 
     return {
       mnemonic: mnemonic,

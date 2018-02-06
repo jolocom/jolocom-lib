@@ -8,6 +8,8 @@ export default class AuthenticationCredential {
   public curve: string
   public publicKeyBase64: string
 
+  constructor() {}
+
   public static ecdsaCredentials(publicKey: string, did: Did): any {
     return {
       id: this.generateGenericKeyId(did),
