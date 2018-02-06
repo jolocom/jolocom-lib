@@ -13,8 +13,11 @@ describe('Did Document', () => {
     expect(JSON.stringify(ddo)).to.contain('https://w3id.org/did/v1')
   })
 
-  it('Should include properly formatted authentication credentials of ecdsa key', () => {
-    expect(JSON.stringify(ddo)).to.equal(JSON.stringify(testData.expectedDdoJson))
+  it('Parse to JSON should result in DID/DDO compliant format', () => {
+    console.log('======DDO TEST================================')
+    console.log(JSON.stringify(ddo))
+    console.log(testData.expectedDdoJson)
+    expect(JSON.stringify(ddo)).to.equal(testData.expectedDdoJson)
   })
 
   it('Should be parsed back to DdoDocument correctly', () => {

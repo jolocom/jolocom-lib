@@ -18,7 +18,7 @@ describe('Authentication credential' , () => {
 
   it('Should stringify to a correct DDO specified format', () => {
     expect(JSON.stringify(authCredential))
-      .to.equal(JSON.stringify(testData.expectedDdoJson.authenticationCredential))
+      .to.equal(JSON.stringify(testData.expectedDdoObject.authenticationCredential))
   })
 
   it('AuthenticationCredential JSON should be parsed back to the same AuthenticationCredential object', () => {

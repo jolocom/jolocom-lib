@@ -12,8 +12,7 @@ export default class DidDocument {
   constructor(publicKey: string) {
     this.id = new Did(publicKey)
     this.authenticationCredential = AuthenticationCredential
-      .ecdsaCredentials(publicKey.toString(), this.id)
-
+      .ecdsaCredentials(publicKey, this.id)
     this.created = new Date()
   }
 

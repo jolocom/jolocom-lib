@@ -35,4 +35,11 @@ export default class AuthenticationCredential {
       owner: Did.fromJSON(json.owner),
     })
   }
+
+  public toJSON(): IAuthenticationCredentialAttrs {
+    return Object.assign({} as IAuthenticationCredentialAttrs, this, {
+      id: this.id.toJSON(),
+      owner: this.owner.toJSON()
+    })
+  }
 }

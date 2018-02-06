@@ -23,6 +23,7 @@ export default class Identity {
 
     return {
       mnemonic: mnemonic,
+      didDocument: JSON.stringify(ddo),
       masterKeyWIF: masterKeyPair.keyPair.toWIF(),
       genericSigningKeyWIF: genericSigningKey.keyPair.toWIF(),
       ethereumKeyWIF: ethereumKey.keyPair.toWIF()
