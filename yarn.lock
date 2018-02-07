@@ -1243,6 +1243,23 @@ istanbul@^0.4.5:
     which "^1.1.1"
     wordwrap "^1.0.0"
 
+isurl@^1.0.0-alpha5:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/isurl/-/isurl-1.0.0.tgz#b27f4f49f3cdaa3ea44a0a5b7f3462e6edc39d67"
+  dependencies:
+    has-to-string-tag-x "^1.2.0"
+    is-object "^1.0.1"
+
+jolocom-registry-contract@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/jolocom-registry-contract/-/jolocom-registry-contract-0.0.2.tgz#4e302fb6b4b61eec656b23083db6e1de2791c4b4"
+  dependencies:
+    chai "^4.1.2"
+    chai-as-promised "^7.1.1"
+    ts-node "^4.1.0"
+    typescript "^2.6.2"
+    web3 "^1.0.0-beta.29"
+
 js-sha3@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.6.1.tgz#5b89f77a7477679877f58c4a075240934b1f95c0"
