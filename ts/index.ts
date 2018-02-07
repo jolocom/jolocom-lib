@@ -4,11 +4,9 @@ import Identity from './identity/index'
 
 export default class JolocomLib {
   private identity: any
-  private ipfs: any
 
   constructor(config: IConfig) {
-    this.identity = Identity.initialize(config.identity)
-    this.ipfs = new IpfsStorageAgent(config.ipfs)
+    this.identity = new Identity(config)
   }
 }
 

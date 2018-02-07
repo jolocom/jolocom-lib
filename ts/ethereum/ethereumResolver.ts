@@ -6,7 +6,7 @@ export default class EthResolver{
   constructor(address: string, providerUri: string) {
     this.ethResolver = new EthereumResolver(address, providerUri)
   }
-  
+
   resolveDID(did: string): Promise<string> {
     return this.ethResolver.resolveDID(did)
   }
