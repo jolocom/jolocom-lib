@@ -18,5 +18,5 @@ export interface IDidDocumentAttrs {
 
 export default interface IdentityConfig {
   providerUrl: string
-  ethereumAddress: string
+  contractAddress: string
 }

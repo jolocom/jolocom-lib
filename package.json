@@ -37,7 +37,7 @@
     "bitcoinjs-lib": "^3.3.2",
     "colors": "^1.1.2",
     "ipfs-api": "^17.5.0",
-    "jolocom-registry-contract": "^0.0.2"
+    "jolocom-registry-contract": "^0.1.2"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.43",

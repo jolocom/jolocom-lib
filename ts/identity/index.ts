@@ -28,19 +28,19 @@ export default class Identity {
     }
   }
 
-  store(ddo: Object) {
+  store(ddo: object) {
     const ipfsAgent = new IpfsStorageAgent(this.config.ipfs)
-    return ipfsAgent.storeJSON(ddo)
-              .then((result) => { return result })
-              .catch((err) => {
-                throw new Error("Did document could not be saved. " + err.message)
-              })
+
+    return ipfsAgent.storeJSON(ddo).catch(err => {
+      throw new Error(`Did document could not be saved. ${err.message}`)
+    })
   }
 
-  register(sender, did, ipfsHash) {
-    const identityConfig = this.config.identity
-    const ethereumResolver = new EthResolver(identityConfig.ethereumAddress, identityConfig.providerUrl)
-    return ethereumResolver.updateDIDRecord(sender, did, ipfsHash)
-              .catch((error) => { throw new Error("Could not update Did record. " + error.message) })
+  register(ethereumKey: object, did: string, ipfsHash: string) {
+    const { contractAddress, providerUrl } = this.config.identity
+    const ethereumResolver = new EthResolver(contractAddress, providerUrl)
+
+    return ethereumResolver.updateDIDRecord(ethereumKey, did, ipfsHash)
+      .catch(error => { throw new Error(`Could not update Did record. ${error.message}`)})
   }
 }
