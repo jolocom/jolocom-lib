@@ -3,6 +3,7 @@ import * as keyDerivation from './keyDerivation'
 import * as bitcoinjs from 'bitcoinjs-lib'
 import DidDocument from './didDocument'
 import IpfsStorageAgent from '../storage/ipfsStorageAgent'
+import EthResolver from '../ethereum/ethereumResolver'
 
 export default class Identity {
   public config: IConfig
@@ -36,5 +37,10 @@ export default class Identity {
               })
   }
 
-  register() {}
+  register(sender, did, ipfsHash) {
+    const identityConfig = this.config.identity
+    const ethereumResolver = new EthResolver(identityConfig.ethereumAddress, identityConfig.providerUrl)
+    return ethereumResolver.updateDIDRecord(sender, did, ipfsHash)
+              .catch((error) => { throw new Error("Could not update Did record. " + error.message) })
+  }
 }
