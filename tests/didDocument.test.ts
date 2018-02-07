@@ -18,8 +18,6 @@ describe('Did Document', () => {
 
   it('Should be parsed back to DdoDocument correctly', () => {
 		const parsed = JSON.parse(JSON.stringify(ddo), DidDocument.reviver)
-    console.log(parsed)
-    console.log(ddo)
-    expect(parsed).to.deep.include(ddo)
+    expect(parsed).to.deep.equal(ddo)
   })
 })

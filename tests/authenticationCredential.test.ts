@@ -23,7 +23,7 @@ describe('Authentication credential' , () => {
 
   it('AuthenticationCredential JSON should be parsed back to the same AuthenticationCredential object', () => {
     const parsed = JSON.parse(JSON.stringify(authCredential), AuthenticationCredential.reviver)
-    expect(parsed).to.deep.include(authCredential)
+    expect(parsed).to.deep.equal(authCredential)
   })
 })
 

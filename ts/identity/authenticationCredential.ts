@@ -11,13 +11,13 @@ export default class AuthenticationCredential {
   constructor() {}
 
   public static ecdsaCredentials(publicKey: string, did: Did): any {
-    return {
-      id: this.generateGenericKeyId(did),
-      type: ['CryptographicKey', 'EcDsaSAKey'],
-      owner: did,
-      curve: 'secp256k1',
-      publicKeyBase64: publicKey,
-    } as AuthenticationCredential
+    const authCredential = new AuthenticationCredential()
+    authCredential.id = this.generateGenericKeyId(did)
+    authCredential.type = ['CryptographicKey', 'EcDsaSAKey']
+    authCredential.owner = did
+    authCredential.curve = 'secp256k1'
+    authCredential.publicKeyBase64 = publicKey
+    return authCredential
   }
 
   public static generateGenericKeyId(did: Did): Did {
