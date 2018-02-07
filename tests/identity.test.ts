@@ -1,18 +1,21 @@
 import { expect } from 'chai'
 import testData from './data/identity'
 import Identity from '../ts/identity/index'
-import IConfig from '../ts/index'
+import { IConfig } from '../ts/index'
 import * as lolex from 'lolex'
 
-describe('Identity', () => {
+describe('Identity index', () => {
   const config = {
-    identity: {},
+    identity: {
+      ethereumAddress: '',
+      providerUrl: ''
+    },
     ipfs: {
       host: 'localhost',
       port: 5001,
       protocol: 'http'
     }
-  }
+  } as IConfig
 
 
   it('Should initialize Identity class with a correct config', () => {
@@ -20,7 +23,7 @@ describe('Identity', () => {
   })
 
   it('Should return mnemonic, master key, generic signing key and ethereum key in WIF', () => {
-    const identity = (new Identity()).create(testData.randomStringFromEntropy)
+    const identity = (new Identity(config)).create(testData.randomStringFromEntropy)
 
     expect(identity).to.deep.equal({
       ethereumKeyWIF: "L17covSN3DaequjaB8GBYYNnza8nNvgiyJtspVdC7SVrdkLRmGU8",
