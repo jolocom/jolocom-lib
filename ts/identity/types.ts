@@ -9,6 +9,9 @@ export interface IAuthenticationCredentialAttrs {
   publicKeyBase64: string;
 }
 
+export interface IDidAttrs {
+  identifier: string;
+}
 export interface IDidDocumentAttrs {
   '@context': string;
   id: string;
@@ -25,4 +28,13 @@ export interface IpfsConfig {
   host: string;
   port: number;
   protocol: string;
+}
+
+export interface IVerifiableCredentialAttrs {
+  '@context': string;
+  id: string;
+  "type": string[];
+  issuer: string;
+  issued: string;
+  claim: { id: string; [x:string]:any };
 }
