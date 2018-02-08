@@ -28,6 +28,7 @@ export interface IpfsConfig {
   host: string;
   port: number;
   protocol: string;
+}
 
 export interface IVerifiableCredentialAttrs {
   '@context': string;
@@ -36,5 +37,4 @@ export interface IVerifiableCredentialAttrs {
   issuer: string;
   issued: string;
   claim: { id: string; [x:string]:any };
-  proof: string;
 }

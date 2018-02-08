@@ -1,9 +1,8 @@
 {
-    "version": "2.5",
+    "version": "2.7.1",
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
-        "noImplicitAny": false,
         "removeComments": true,
         "lib": ["es2015", "es2017"],
         "noLib": false,
