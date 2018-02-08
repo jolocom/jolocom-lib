@@ -13,7 +13,6 @@ describe('create QR Code', () => {
     const IPFSroom = 'fekrnkegr'
     const rawPrivateKey = testAuth.rawPrivateKey
 
-
     const token = new TokenSigner('ES256k', rawPrivateKey).sign({
       did: did,
       claims: claims,

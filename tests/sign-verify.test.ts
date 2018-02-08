@@ -1,13 +1,13 @@
 import { expect } from 'chai'
 import testSignVerifyData from './data/sign-verify'
 import * as bitcoinMessage from 'bitcoinjs-message'
-import * as bitcoin from 'bitcoinjs-lib'
+import { ECPair } from 'bitcoinjs-lib'
 
 describe('signMessage', () => {
   it('should produce a valid signed message', () => {
     const message = testSignVerifyData.message
     const WIF = testSignVerifyData.genericSigningKeyWIF
-    const keyPair = bitcoin.ECPair.fromWIF(WIF)
+    const keyPair = ECPair.fromWIF(WIF)
     const privateKey = keyPair.d.toBuffer(32)
 
     const sigBuffer = bitcoinMessage.sign(message, privateKey, keyPair.compressed)

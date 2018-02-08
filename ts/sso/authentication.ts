@@ -3,7 +3,6 @@ import TokenPayload from './tokenPayload'
 import testAuth from '../../tests/data/authentication'
 import * as QRCode from 'qrcode'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
-import * as bitcoin from 'bitcoinjs-lib'
 import {
   initiateSecretExchange,
   respondSecretExchange,
@@ -11,7 +10,7 @@ import {
   encrypt,
   decrypt
 } from '../security/encryption'
-
+import { getSigningKeysFromWIF } from '../utils/keysEncoding'
 
 export async function initiateRequest({did, claims, IPFSroom, WIF, encrypt} :
   {did : string, claims : Array<string>, IPFSroom : string, WIF : string, encrypt: boolean}) : Promise<any> {
@@ -23,7 +22,7 @@ export async function initiateRequest({did, claims, IPFSroom, WIF, encrypt} :
     encryptOptions = initiateSecretExchange()
     response['initiator'] = encryptOptions.initiator
   }
-  const keys = _getSigningKeysFromWIF({WIF: WIF})
+  const keys = getSigningKeysFromWIF({WIF: WIF})
   const tokenPayload = new TokenPayload({
     iss: did,
     pubKeyIss: keys.pubKey,
@@ -62,7 +61,7 @@ export async function initiateResponse({tokenData, WIF, did, claims} :
       encryptPubKeySub = enc.encryptPubKeySub
     }
 
-    const keys = _getSigningKeysFromWIF({WIF: WIF})
+    const keys = getSigningKeysFromWIF({WIF: WIF})
     const tokenPayload = TokenPayload.generateResponse({
       tokenData: tokenData,
       sub: did,
@@ -96,16 +95,6 @@ export async function authenticateResponse({token, secretExchangeParty} :
   } else {
     return new Error('Web Token Not Valid')
   }
-}
-
-
-function _getSigningKeysFromWIF({WIF} : {WIF : string}) {
-  const keyPair = bitcoin.ECPair.fromWIF(WIF)
-  let keys = {
-    pubKey: keyPair.getPublicKeyBuffer().toString('hex'),
-    privKey: keyPair.d.toBuffer(32).toString('hex')
-  }
-  return keys
 }
 
 
