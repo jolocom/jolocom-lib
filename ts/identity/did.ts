@@ -2,7 +2,7 @@ import { IDidAttrs } from './types'
 import VerifiableCredential from './verifiableCredential'
 import * as bitcoin from 'bitcoinjs-lib'
 const Web3 = require('web3')
-import { sign, verify } from '../utils/utils'
+import { sign, verify } from '../utils/signature'
 
 
 export default class Did implements IDidAttrs{
