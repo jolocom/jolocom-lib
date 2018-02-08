@@ -8,14 +8,16 @@ export default class AuthenticationCredential {
   public curve: string
   public publicKeyBase64: string
 
+  constructor() {}
+
   public static ecdsaCredentials(publicKey: string, did: Did): any {
-    return {
-      id: this.generateGenericKeyId(did),
-      type: ['CryptographicKey', 'EcDsaSAKey'],
-      owner: did,
-      curve: 'secp256k1',
-      publicKeyBase64: publicKey,
-    } as AuthenticationCredential
+    const authCredential = new AuthenticationCredential()
+    authCredential.id = this.generateGenericKeyId(did)
+    authCredential.type = ['CryptographicKey', 'EcDsaSAKey']
+    authCredential.owner = did
+    authCredential.curve = 'secp256k1'
+    authCredential.publicKeyBase64 = publicKey
+    return authCredential
   }
 
   public static generateGenericKeyId(did: Did): Did {
@@ -33,6 +35,13 @@ export default class AuthenticationCredential {
     return Object.assign(authCredential, json, {
       id: Did.fromJSON(json.id),
       owner: Did.fromJSON(json.owner),
+    })
+  }
+
+  public toJSON(): IAuthenticationCredentialAttrs {
+    return Object.assign({} as IAuthenticationCredentialAttrs, this, {
+      id: this.id.toJSON(),
+      owner: this.owner.toJSON()
     })
   }
 }

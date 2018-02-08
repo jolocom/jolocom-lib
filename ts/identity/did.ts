@@ -3,7 +3,7 @@ const Web3 = require('web3')
 export default class Did {
   public identifier: string
 
-  constructor(publicKey: Buffer) {
+  constructor(publicKey: string) {
     const prefix = 'did:jolo:'
     const suffix = Web3.utils.soliditySha3(publicKey)
     this.identifier = prefix + suffix
