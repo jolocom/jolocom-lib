@@ -20,3 +20,9 @@ export default interface IdentityConfig {
   providerUrl: string
   contractAddress: string
 }
+
+export interface IpfsConfig {
+  host: string;
+  port: number;
+  protocol: string;
+}
