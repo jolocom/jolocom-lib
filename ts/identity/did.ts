@@ -1,6 +1,7 @@
+import { IDidAttrs } from './types'
 const Web3 = require('web3')
 
-export default class Did {
+export default class Did implements IDidAttrs{
   public identifier: string
 
   constructor(publicKey: string) {
