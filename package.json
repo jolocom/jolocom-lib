@@ -45,14 +45,10 @@
     "qrcode": "^1.2.0",
     "superagent": "^3.8.2",
     "superagent-es6-promise": "^1.0.0",
-<<<<<<< HEAD
     "colors": "^1.1.2",
     "ipfs-api": "^17.5.0",
     "jolocom-registry-contract": "^0.1.2",
-=======
-    "jolocom-registry-contract": "^0.1.2",
     "secp256k1": "^3.5.0",
->>>>>>> Sign and verify credentials, related tests
     "sjcl": "^1.0.7",
     "web3": "^1.0.0-beta.29"
   },
