@@ -10,9 +10,11 @@ export default class DidDocument {
   public created: Date
 
   constructor(publicKey: Buffer) {
-    this.id = new Did(publicKey)
-    this.authenticationCredential = AuthenticationCredential.ecdsaCredentials(publicKey.toString(), this.id)
-    this.created = new Date(Date.now())
+    const pubKeyHex = publicKey.toString('hex')
+    this.id = new Did(pubKeyHex)
+    this.authenticationCredential = AuthenticationCredential
+      .ecdsaCredentials(publicKey.toString('base64'), this.id)
+    this.created = new Date()
   }
 
   public static reviver(key: string, value: any): any {
@@ -23,7 +25,7 @@ export default class DidDocument {
     const did = Object.create(DidDocument.prototype)
     const parsedAuthCredentials = JSON.parse(
       JSON.stringify(json.authenticationCredential), AuthenticationCredential.reviver,
-    )
+    ) as AuthenticationCredential
 
     return Object.assign(did, json, {
       id: Did.fromJSON(json.id),

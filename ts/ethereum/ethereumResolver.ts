@@ -6,12 +6,12 @@ export default class EthResolver{
   constructor(address: string, providerUri: string) {
     this.ethResolver = new EthereumResolver(address, providerUri)
   }
-  
+
   resolveDID(did: string): Promise<string> {
     return this.ethResolver.resolveDID(did)
   }
 
-  updateDIDRecord(sender: string, did: string, newHash: string): Promise<string> {
-    return this.ethResolver.updateDIDRecord(sender, did, newHash)
+  updateDIDRecord(ethereumKey: object, did: string, newHash: string): Promise<string> {
+    return this.ethResolver.updateDIDRecord(ethereumKey, did, newHash)
   }
 }

@@ -4,9 +4,9 @@ import AuthenticationCredential from '../ts/identity/authenticationCredential'
 import testData from './data/identity'
 
 describe('Authentication credential' , () => {
-  const publicKey = Buffer.from(testData.testUserPublicKey, 'utf8')
-  const did = new Did(publicKey)
-  const authCredential = AuthenticationCredential.ecdsaCredentials(testData.testUserPublicKey, did)
+  const did = new Did(testData.testPublicKeyHex)
+  const base64Key = Buffer.from(testData.testPublicKeyHex, 'hex').toString('base64')
+  const authCredential = AuthenticationCredential.ecdsaCredentials(base64Key, did)
 
   it('Should include owners Did', () => {
     expect(authCredential.owner).to.equal(did)
@@ -18,7 +18,7 @@ describe('Authentication credential' , () => {
 
   it('Should stringify to a correct DDO specified format', () => {
     expect(JSON.stringify(authCredential))
-      .to.equal(JSON.stringify(testData.expectedDdoJson.authenticationCredential))
+      .to.equal(JSON.stringify(testData.expectedDdoObject.authenticationCredential))
   })
 
   it('AuthenticationCredential JSON should be parsed back to the same AuthenticationCredential object', () => {
