@@ -30,7 +30,7 @@ describe('Identity index', () => {
       didDocument: testData.expectedDdoObject,
       genericSigningKeyWIF: "KzxmDGkhpYSUQNaYAZxQWMCffre9WSRiGxHxoGmCLUbJksxjc7jU",
       masterKeyWIF: "L2y7adEkWadF2QBjxs9M2R7rqM1XbcAvdB5rcEJUG3kvACLZnGP4",
-      mnemonic: "bean matrix move giraffe island depth canal time air divorce town duck",
+      mnemonic: "bean matrix move giraffe island depth canal time air divorce town duck"
     })
   })
 })
