@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import testSignVerifyData from './data/sign-verify'
 import testAuth from './data/authentication'
-import Authentication from '../ts/sso/authentication'
+import Authentication from '../ts/sso/index'
 import * as QRCode from 'qrcode'
 import * as bitcoin from 'bitcoinjs-lib'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
