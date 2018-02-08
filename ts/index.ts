@@ -1,4 +1,5 @@
 import IdentityConfig from './identity/types'
+import { IpfsConfig } from './identity/types'
 import IpfsStorageAgent from './storage/ipfsStorageAgent'
 import Identity from './identity/index'
 
@@ -12,9 +13,5 @@ export default class JolocomLib {
 
 export interface IConfig {
   identity: IdentityConfig;
-  ipfs: {
-    host: string;
-    port: number;
-    protocol: string;
-  }
+  ipfs: IpfsConfig;
 }
