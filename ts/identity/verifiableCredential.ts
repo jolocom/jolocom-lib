@@ -18,12 +18,9 @@ export default class VerifiableCredential implements IVerifiableCredentialAttrs 
   }
 
 	private generateVerifiableCredentialID() : string {
-    const result = Buffer.allocUnsafe(8)
-    sjcl.random.randomWords(2).forEach((el, index) => {
-      result.writeInt32LE(el, index * 4)
-    })
-
-    return result.toString('hex')
+		const UintArray = new Uint32Array(sjcl.random.randomWords(2))
+    const buf = Buffer.from(UintArray.buffer)
+    return buf.toString('hex')
 	}
 
 	private dateIssued() : string {
