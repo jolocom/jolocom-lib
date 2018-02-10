@@ -9,21 +9,24 @@ export default class VerifiableCredential implements IVerifiableCredentialAttrs 
   public issued: string
   public claim: { id: string; [x:string]:any }
 
-	constructor(credentialType: string[], issuerID: string, claim: { id: string; [x:string]:any }) {
-		this.id =  (this as any).generateVerifiableCredentialID()
-		this.type = credentialType
-		this.issuer = issuerID
-		this.issued = (this as any).dateIssued()
-		this.claim = claim
+  constructor(credentialType: string[], issuerID: string, claim: { id: string; [x:string]:any }) {
+    this.id =  (this as any).generateVerifiableCredentialID()
+    this.type = credentialType
+    this.issuer = issuerID
+    this.issued = (this as any).dateIssued()
+    this.claim = claim
   }
 
-	private generateVerifiableCredentialID() : string {
-		const UintArray = new Uint32Array(sjcl.random.randomWords(2))
-    const buf = Buffer.from(UintArray.buffer)
-    return buf.toString('hex')
-	}
+  private generateVerifiableCredentialID() : string {
+    const result = Buffer.allocUnsafe(8)
+    sjcl.random.randomWords(2).forEach((el, index) => {
+      result.writeInt32LE(el, index * 4)
+    })
 
-	private dateIssued() : string {
-		return new Date(Date.now()).toString()
-	}
+    return result.toString('hex')
+  }
+
+  private dateIssued() : string {
+    return new Date(Date.now()).toString()
+  }
 }
