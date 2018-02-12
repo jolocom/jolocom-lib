@@ -1,3 +1,5 @@
+import VerifiableCredential from './verifiableCredential'
+
 export interface IVerifiableCredentialAttrs {
   '@context': string;
   id: string;
@@ -9,5 +11,10 @@ export interface IVerifiableCredentialAttrs {
 
 export interface IClaim {
   id: string;
-  [x:string]: any
+  [x:string]: any;
+}
+
+export interface IVerifiedCredential {
+  credential: VerifiableCredential;
+  signature: string;
 }

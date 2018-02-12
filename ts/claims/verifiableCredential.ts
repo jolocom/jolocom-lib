@@ -3,6 +3,7 @@ import * as sjcl from 'sjcl'
 import * as bitcoin from 'bitcoinjs-lib'
 const Web3 = require('web3')
 import { IClaim } from './types'
+import { IVerifiedCredential } from './types'
 import { sign, verify } from '../utils/signature'
 
 export default class VerifiableCredential implements IVerifiableCredentialAttrs {
@@ -21,23 +22,24 @@ export default class VerifiableCredential implements IVerifiableCredentialAttrs 
     this.claim = claim
   }
 
-  public static create(issuer, credentialType, claim, privateKeyWIF) {
+  public static createVerified(issuer: string, credentialType: string[], claim: IClaim, privateKeyWIF: string) :
+  IVerifiedCredential {
     const unsignedCredential = new VerifiableCredential(credentialType, issuer, claim)
     return unsignedCredential.signCredential(privateKeyWIF)
   }
 
-  private signCredential(privateKeyWIF) {
+  public verifySignedCredential(signature: string, publicKeyOfIssuer: string) : boolean {
+    const buffer = Buffer.from(signature, 'hex')
+    return verify(this, publicKeyOfIssuer, buffer)
+  }
+
+  private signCredential(privateKeyWIF: string) : IVerifiedCredential {
     const keyPair = bitcoin.ECPair.fromWIF(privateKeyWIF)
     const privateKey = keyPair.d.toBuffer(32)
     const signature = sign(this, privateKey, keyPair.compressed)
     const signatureHex = signature.toString('hex')
-    const signedCredential = {credential: this, signature: signatureHex}
-    return signedCredential
-  }
-
-  public verifySignedCredential(signature, publicKeyOfIssuer) {
-    const buffer = Buffer.from(signature, 'hex')
-    return verify(this, publicKeyOfIssuer, buffer)
+    const verifiedCredential = {credential: this, signature: signatureHex} as IVerifiedCredential
+    return verifiedCredential
   }
 
   private generateVerifiableCredentialID() : string {
