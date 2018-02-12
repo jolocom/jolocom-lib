@@ -2,7 +2,7 @@
   "name": "jolocom-lib",
   "version": "0.1.1",
   "description": "Unified library for interacting with the Jolocom identity solution",
-  "main": "js/index.js",
+  "main": "js/ts/index.js",
   "typings": "js/index",
   "scripts": {
     "prepare": "./node_modules/.bin/tsc -p ./ts",
