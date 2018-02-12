@@ -6,3 +6,8 @@ export interface IVerifiableCredentialAttrs {
   issued: string;
   claim: { id: string; [x:string]:any };
 }
+
+export interface IClaim {
+  id: string;
+  [x:string]: any
+}

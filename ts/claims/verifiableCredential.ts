@@ -2,6 +2,7 @@ import { IVerifiableCredentialAttrs } from './types'
 import * as sjcl from 'sjcl'
 import * as bitcoin from 'bitcoinjs-lib'
 const Web3 = require('web3')
+import { IClaim } from './types'
 import { sign, verify } from '../utils/signature'
 
 export default class VerifiableCredential implements IVerifiableCredentialAttrs {
@@ -10,14 +11,14 @@ export default class VerifiableCredential implements IVerifiableCredentialAttrs 
   public 'type': string[]
   public issuer: string
   public issued: string
-  public claim: { id: string; [x:string]:any }
+  public claim: IClaim
 
-	constructor(credentialType: string[], issuerID: string, claim: { id: string; [x:string]:any }) {
-		this.id =  (this as any).generateVerifiableCredentialID()
-		this.type = credentialType
-		this.issuer = issuerID
-		this.issued = (this as any).dateIssued()
-		this.claim = claim
+  constructor(credentialType: string[], issuerID: string, claim: IClaim) {
+    this.id =  (this as any).generateVerifiableCredentialID()
+    this.type = credentialType
+    this.issuer = issuerID
+    this.issued = (this as any).dateIssued()
+    this.claim = claim
   }
 
   public static create(issuer, credentialType, claim, privateKeyWIF) {
@@ -48,7 +49,7 @@ export default class VerifiableCredential implements IVerifiableCredentialAttrs 
     return result.toString('hex')
   }
 
-	private dateIssued() : string {
-		return new Date(Date.now()).toString()
-	}
+  private dateIssued() : string {
+    return new Date(Date.now()).toString()
+  }
 }
