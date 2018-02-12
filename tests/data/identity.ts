@@ -38,5 +38,15 @@ export default {
       ageOver: 21
     }
   },
-  expectedSignedCredential:{"credential":{"@context":"https://w3id.org/credentials/v1","id":"11111","type":["Credential"],"issuer":"did:jolo:0x189b1ce641c167e8219e7d2c7a7833011f82b4630cbc3e9fe68d100b88dfc5b2","issued":"Wed Jan 24 2018 16:42:15 GMT+0100 (CET)","claim":{"id":"did:jolo:0xd0ae58da9f72c48767b04f339a1a0142bb8e86b521d008ca65f7e3983b03d32b","ageOver":21}},"signature":"106500c4ebd41cbc42f7818512394995eb0a80b736f6d830e2d7e9fff844180b52c500bb4cafb9e5a38c81ae22ce5586c259f165b7e8846f3ad8057af8f562e7"}
+  expectedSignedCredential: {
+    "credential": {
+      "@context":"https://w3id.org/credentials/v1",
+      "id":"11111",
+      "type":["Credential"],
+      "issuer":"did:jolo:0xf334484858571199b681f6dfdd9ecd2f01df5b38f8379b3aaa89436c61fd1955",
+      "issued":"Wed Jan 24 2018 16:42:15 GMT+0100 (CET)",
+      "claim":{"id":"did:jolo:0xd0ae58da9f72c48767b04f339a1a0142bb8e86b521d008ca65f7e3983b03d32b","ageOver":21}
+    },
+    "signature":"db5b35fd89c232674ac3bcc2036edc9721db9f142ae3985cb0cce8cd0b23647677797f01fa090967973ddd437affb6774ef792583a3687006e380ce6864651ca"
+  }
 }
