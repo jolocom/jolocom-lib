@@ -114,7 +114,11 @@ const config = {
   protocol: 'http'
 }
 
-const data = {
+const data0 = {
+  data: Buffer.alloc(0),
+  dagLinks:[]
+}
+const data1 = {
   data: new Buffer(JSON.stringify(testData.expectedSignedCredential)),
   dagLinks: []
 }
@@ -123,32 +127,20 @@ const data2 = {
   data: new Buffer(JSON.stringify(testData.expectedVerifiedCredential)),
   dagLinks: []
 }
-//dagCBOR.util.cid(data, (err, cid) => {
-  //console.log(cid, 'cid')
-//})
+
 const ipfs = new IpfsStorageAgent(config)
-
-//dagCBOR.util.serialize(data, (err, serialized) => {
-  //ipfs.ipldNode = serialized
-//})
-
-//ipfs.createCredentialObject(data)
-  //.then(node1 => {
-    //dagPB.resolver.tree(node1._serialized, (result) => {
-      //console.log(result)
-    //})
-  //})
 
 const wrapper = async () => {
 
-  const node1 = await ipfs.createCredentialObject(data)
-  const headNode = node1
-
+  const node1 = await ipfs.createCredentialObject(data0)
+  console.log('node1', node1)
   const node2 = await ipfs.createCredentialObject(data2)
+  const node3 = await ipfs.createCredentialObject(data1)
 
-  const modifiedHeadNode = await ipfs.addLink({headNode: headNode, linkName:'claimID', linkNode: node2})
+  const modifiedHead = await ipfs.addLink({headNode: node1, linkName:'claimID', linkNode: node2})
+  const modifiedHeadNode = await ipfs.addLink({headNode: modifiedHead, linkName: 'claimID2', linkNode: node3})
   const hash = modifiedHeadNode.toJSON().multihash
-  console.log(hash, 'hash')
+  console.log(modifiedHeadNode.toJSON().links, hash)
   const result = await ipfs.resolveLinkPath({headNodeMultihash: hash, claimID: 'claimID'})
   console.log(result)
 }
