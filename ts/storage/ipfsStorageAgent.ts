@@ -72,7 +72,6 @@ export default class IpfsStorageAgent {
 
   getCredentialObject({multihash: multihash, getData: enabled}) : Promise<object> {
     return new Promise((resolve, reject) => {
-      console.log('insidefunction getCred')
       return this.ipfs.object.get(multihash, (err, node) => {
         if (err) {
           return reject (err)
@@ -99,7 +98,6 @@ export default class IpfsStorageAgent {
   }
 
   async resolveLinkPath({headNodeMultihash: headNodeMultihash, claimID: claimID}) : Promise<object> {
-    console.log('pre-hang10', headNodeMultihash, claimID)
       const modifiedHeadNode = await this.getCredentialObject({multihash: headNodeMultihash, getData: false})
       const linkPath = 'Links/'+ claimID
       console.log(modifiedHeadNode)
@@ -150,6 +148,7 @@ const wrapper = async () => {
 
   const modifiedHeadNode = await ipfs.addLink({headNode: headNode, linkName:'claimID', linkNode: node2})
   const hash = modifiedHeadNode.toJSON().multihash
+  console.log(hash, 'hash')
   const result = await ipfs.resolveLinkPath({headNodeMultihash: hash, claimID: 'claimID'})
   console.log(result)
 }
