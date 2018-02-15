@@ -5,6 +5,7 @@ const Web3 = require('web3')
 import { IClaim } from './types'
 import { IVerifiedCredential } from './types'
 import { sign, verify } from '../utils/signature'
+import { isExpirationDateValid } from '../utils/dateHandling'
 import * as moment from 'moment'
 
 export default class VerifiableCredential implements IVerifiableCredentialAttrs {
@@ -23,39 +24,46 @@ export default class VerifiableCredential implements IVerifiableCredentialAttrs 
     this.issuer = issuer
     this.issued = (this as any).dateIssued()
     this.claim = claim
-    this.expires = expires
+    if (expires != null) {
+      this.expires = expires
+    }
   }
 
   public static createVerified({issuer, credentialType, claim, privateKeyWIF, expires} :
     {issuer: string, credentialType: string[], claim: IClaim, privateKeyWIF: string, expires?: string}) :
   IVerifiedCredential {
+    let unsignedCredential
     if (expires) {
-      const now = moment.utc()
       const expiry = moment.utc(expires, moment.ISO_8601)
       const validFormat = expiry.isValid()
-      const validExpiryDate = moment.duration(expiry.diff(now)).asHours()
+      const validExpiryDate = isExpirationDateValid({expires: expires})
 
-      if (validExpiryDate > 1 && validFormat) {
-        const unsignedCredential = new VerifiableCredential({credentialType, issuer, claim, expires})
-        return unsignedCredential.signCredential({privateKeyWIF})
-      } else {
+      if (!validExpiryDate || !validFormat) {
         throw new Error(`The provided expiry date of ${expires} is not valid or the format you pass in is not compliant to ISO_8601.`)
       }
+      unsignedCredential = new VerifiableCredential({
+        credentialType,
+        issuer,
+        claim,
+        expires
+      })
+    } else {
+      unsignedCredential = new VerifiableCredential({credentialType, issuer, claim})
     }
 
-    const unsignedCredential = new VerifiableCredential({
-      credentialType,
-      issuer,
-      claim,
-      expires
-    })
     return unsignedCredential.signCredential({privateKeyWIF})
   }
 
   public verifySignedCredential({signature, publicKeyOfIssuer} :
     {signature: string, publicKeyOfIssuer: string}) : boolean {
     const buffer = Buffer.from(signature, 'hex')
-    return verify(this, publicKeyOfIssuer, buffer)
+    const verified = verify(this, publicKeyOfIssuer, buffer)
+
+    if(this.expires) {
+      const valid = isExpirationDateValid({expires: this.expires})
+      return valid && verified
+    }
+    return verified
   }
 
   private signCredential({privateKeyWIF} : {privateKeyWIF: string}) : IVerifiedCredential {

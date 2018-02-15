@@ -8,7 +8,7 @@ import * as sinon from 'sinon'
 import * as bitcoin from 'bitcoinjs-lib'
 import * as moment from 'moment'
 
-describe.only('VerifiableCredential', () => {
+describe('VerifiableCredential', () => {
   const did = new Did(testDataIdentity.testUserPublicKey)
   const unixEpoch = moment.utc('2018-01-24T15:42:15Z', moment.ISO_8601).valueOf()
   const clock = lolex.install({now: unixEpoch})
@@ -48,6 +48,7 @@ describe.only('VerifiableCredential', () => {
       issuer: did.identifier,
       credentialType,
       claim,
+      expires: '2018-10-24T15:42:15Z',
       privateKeyWIF: testDataKeys.testGenericKeyPairWIF
     })
     const result = signed.credential.verifySignedCredential({
@@ -83,7 +84,6 @@ describe.only('VerifiableCredential', () => {
       privateKeyWIF: testDataKeys.testGenericKeyPairWIF,
       expires: expires
     })
-
     expect(JSON.stringify(result)).to.equal(JSON.stringify(testDataIdentity.expectedSignedCredentialWithExpiry))
   })
 })
