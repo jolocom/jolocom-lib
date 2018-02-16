@@ -38,7 +38,7 @@ describe('IpfsStorageAgent', () => {
         add: (data, callback) => {
           return callback('error', null)
         }
-      } 
+      }
     }
 
     await expect(StorageAgent.storeJSON(testData))
@@ -73,5 +73,16 @@ describe('IpfsStorageAgent', () => {
 
     await expect(StorageAgent.catJSON(testDataHash))
       .to.be.rejected
+  })
+
+  it('Should create a credential object from credential passed in as a buffer', async () => {
+    StorageAgent.ipfs = {
+      object: {
+        put: (credential, dagLinks, callback) => {
+
+
+        }
+      }
+    }
   })
 })
