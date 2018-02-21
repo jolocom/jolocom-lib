@@ -30,25 +30,26 @@ export default class Authentication {
   }) : Promise<any> {
     let response = {}
 
-    const {pubKey, privKey} = getSigningKeysFromWIF({WIF})
+    const { pubKey, privKey } = getSigningKeysFromWIF({WIF})
     const args = {
       iss: did,
       reqClaims: claims,
       pubKeyIss: pubKey,
+      callbackUrl: callbackUrl
     }
 
     if(encrypt) {
       const { prime, initiatorKey, initiator } = initiateSecretExchange()
-      args.encryptPrime = prime
-      args.encryptPubKeyIss = initiatorKey
-      response.initiator = initiator
+      args['encryptPrime'] = prime
+      args['encryptPubKeyIss'] = initiatorKey
+      response['initiator'] = initiator
     }
 
     const tokenPayload = new TokenPayload(args)
     const token = new TokenSigner('ES256k', privKey).sign(tokenPayload)
 
-    response.qrCode = await this.createQRCode({token})
-    response.token = token
+    response['qrCode'] = await this.createQRCode({token})
+    response['token']= token
     return response
   }
 
@@ -56,7 +57,6 @@ export default class Authentication {
     const tokenData = decodeToken(token)
     const { pubKeyIss } = tokenData.payload
     const isValid = new TokenVerifier('ES256k', pubKeyIss).verify(token)
-
     if(!isValid) {
       throw new Error('Web Token Not Valid')
     }
@@ -75,7 +75,7 @@ export default class Authentication {
     did: string,
     claims: Array<any>
   }) : Promise<any> {
-    const {encryptPrime, encryptPubKeyIss} = tokenData.payload
+    const { encryptPrime, encryptPubKeyIss } = tokenData.payload
     const isEncrypted = encryptPrime && encryptPubKeyIss
 
     let claimsEncrypted
@@ -109,15 +109,15 @@ export default class Authentication {
     const isDataEncrypted = tokenData.payload.encryptPrime && tokenData.payload.encryptPubKeyIss
 
     if(isTokenVerified) {
-      if(isDataEncrypted !== 'undefined' && isDataEncrypted.length > 1) {
+      if (isDataEncrypted !== undefined) {
         const claims = this.handleDecryption({
           tokenData: tokenData,
           secretExchangeParty: secretExchangeParty
         })
         return claims
       }
-      return tokenData.payload.claims
 
+      return tokenData.payload.claims
     } else {
       return new Error('Web Token Not Valid')
     }

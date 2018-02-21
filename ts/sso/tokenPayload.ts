@@ -1,16 +1,19 @@
 export default class TokenPayload {
   public iss: string
-  public pubKeyIss: string
-  public pubkeyPrime: string
-  public reqClaims: string
-  public callbackUrl: string
   public sub: string
   public iat: Date
   public exp: Date
   public jti: string
   public reqClaims: string[]
-  public IPFSroom: string
+  public clientId: string
+  public callbackUrl: string
+  public pubKeyIss: string
+  public pubKeySub: string
+  public claims: any
+  public encryptPrime: string
+  public encryptPubKeyIss: string
   public encryptPubKeySub: string
+
 
   constructor({
     iss,
@@ -31,12 +34,11 @@ export default class TokenPayload {
   }) {
     this.iss = iss
     this.pubKeyIss = pubKeyIss
-    this.encryptPrime = encryptPrime
-    this.encryptPubKeyIss = encryptPubKeyIss
-    this.reqClaims = reqClaims
-    this.clientId = clientId
     this.callbackUrl = callbackUrl
-
+    this.reqClaims = reqClaims
+    if (encryptPrime) { this.encryptPrime = encryptPrime }
+    if (encryptPubKeyIss) { this.encryptPubKeyIss = encryptPubKeyIss }
+    if (clientId) { this.clientId = clientId }
     this.iat = new Date(Date.now())
     this.exp = new Date(Date.now() + 3000000)
     this.jti = clientId ? clientId : Math.random().toString(32)

@@ -61,7 +61,7 @@ describe('authentication process SSO', () => {
     authentication.initiateRequest({
       did: 'kfjnrej',
       claims: ['name'],
-      IPFSroom: 'kfernnwrklgmlemgkm',
+      callbackUrl: 'www.test.de/callback',
       WIF: testAuth.WIF,
       encrypt: true
     })
@@ -80,7 +80,7 @@ describe('authentication process SSO', () => {
     authentication.initiateRequest({
       did: 'kfjnrej',
       claims: ['name'],
-      IPFSroom: 'kfernnwrklgmlemgkm',
+      callbackUrl: 'www.test.de/callback',
       WIF: testAuth.WIF,
       encrypt: false
     })
@@ -100,8 +100,9 @@ describe('authentication process SSO', () => {
   })
 
   it('authenticateRequest should return an ERROR when token is not verified ', () => {
-    const res = authentication.authenticateRequest({token: testAuth.tokenWrong})
-    expect(res).to.be.an('error')
+    expect(authentication.authenticateRequest.bind(
+      authentication, {token: testAuth.tokenWrong}
+    )).to.throw('Web Token Not Valid')
   })
 
   it('initiateResponse should return a token ', (done) => {
@@ -127,7 +128,6 @@ describe('authentication process SSO', () => {
 
   it('authenticationResponse should return claims array when token is authenticated (data not encrypted)', (done) => {
     const tokenData = authentication.authenticateRequest({token: tokenRequestNoEncryption})
-
     authentication.initiateResponse({tokenData: tokenData, WIF: testAuth.WIF, did: testAuth.mockDIDSUB, claims: [{name: 'warren'}]})
       .then((res) => {
         return authentication.authenticateResponse({token: res})
