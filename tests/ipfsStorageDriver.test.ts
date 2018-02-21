@@ -9,7 +9,7 @@ import data from '../tests/data/identity'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-describe.only('IpfsStorageAgent', () => {
+describe('IpfsStorageAgent', () => {
   let StorageAgent
   const testData = {value: 'test'}
   const testDataHash = 'QmTEST'
