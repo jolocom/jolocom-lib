@@ -63,4 +63,11 @@ export default class Identity {
     return ethereumResolver.updateDIDRecord(ethereumKey, did, ipfsHash)
       .catch(error => { throw new Error(`Could not update Did record. ${error.message}`)})
   }
+
+  /* Stores a publically accessible verifiable claim on IPLD, updates the DDO endpoint
+   * and the Ethereum Registry Contract Record with the new DID/DDO mapping
+   * @param {object} ethereumKey - ethereum key associated with the DDO
+   * @param {string} did - did string identifying the ddo
+   * @param {string} ipfsHash - where the DDO is stored
+   */
 }

@@ -17,6 +17,7 @@ export default {
   },
   expectedDdoJson: '{' +
     '"@context":"https://w3id.org/did/v1",' +
+    '"credentialsEndpoint":"",' +
     '"id":"did:jolo:0x28434a594dc0f9885dcbc797dc34f993f7dda463fc21d333c797dd5e75d7845f",' +
     '"authenticationCredential":{' +
       '"id":"did:jolo:0x28434a594dc0f9885dcbc797dc34f993f7dda463fc21d333c797dd5e75d7845f#keys/generic/1",' +
