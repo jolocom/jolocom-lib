@@ -9,9 +9,8 @@ import data from '../tests/data/identity'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-describe.only('IpfsStorageAgent', () => {
+describe('IpfsStorageAgent', () => {
   let StorageAgent
-  let resolver
   const testData = {value: 'test'}
   const testDataHash = 'QmTEST'
   const testCredentialData = {value: Buffer.from(JSON.stringify(data.expectedSignedCredential))}
@@ -19,10 +18,13 @@ describe.only('IpfsStorageAgent', () => {
   const testCredentialNode = {data: Buffer.from('{"testCredData": 1111}'), size: 10, links: [], multihash: 'QmNode'}
   const testClaimID = '1111'
   const testLinkNode = {data: Buffer.from('data'), size: 10, links: [], multihash: 'QmLink'}
+  const resolvedHash = {value: 'QmResolvedHash', remainderPath: ''}
+  const resolvedData = {testCredData: 1111}
+  const resolver = dagPB.resolver
 
-    testLinkNode.toJSON = sinon.stub().returns(testLinkNode)
-    testCredentialNode.toJSON = sinon.stub().returns(testCredentialNode)
-    testCredentialNode.serialized = sinon.stub().returns('serializedTestCredentialNode')
+  testLinkNode.toJSON = sinon.stub().returns(testLinkNode)
+  testCredentialNode.toJSON = sinon.stub().returns(testCredentialNode)
+  testCredentialNode.serialized = 'serializedTestCredentialNode'
 
     beforeEach(() => {
       StorageAgent = new IpfsStorageAgent({
@@ -30,7 +32,6 @@ describe.only('IpfsStorageAgent', () => {
         port: 5001,
         protocol: 'http'
       })
-      resolver = dagPB.resolver
     })
 
     it('Should attempt to store the data', async () => {
@@ -103,6 +104,19 @@ describe.only('IpfsStorageAgent', () => {
       expect(await StorageAgent.createCredentialObject({credential: testCredentialData})).to.equal(testCredentialNode)
     })
 
+    it('Should throw error if creating credential object failed', async () => {
+        StorageAgent.ipfs = {
+          object: {
+            put: (credential, dagLinks, callback) => {
+              return callback('error', null)
+          }
+        }
+      }
+
+      await expect(StorageAgent.createCredentialObject({credential: testCredentialData}))
+        .to.be.rejected
+    })
+
     it('Should retrieve a credential object from multihash passed in as a string', async () => {
       StorageAgent.ipfs = {
         object: {
@@ -114,10 +128,19 @@ describe.only('IpfsStorageAgent', () => {
         }
       }
       expect(await StorageAgent.getCredentialObject({multihash: testCredentialHash, getData: false})).to.equal(testCredentialNode)
-      expect(await StorageAgent.getCredentialObject({multihash: testCredentialHash, getData: true})).to.equal(JSON.parse(testCredentialNode.data))
+      expect(await StorageAgent.getCredentialObject({multihash: testCredentialHash, getData: true})).to.deep.equal(JSON.parse(testCredentialNode.data))
     })
 
-    //test getData = true
+    it('Should throw error if retrieving a credential object failed', async () => {
+      StorageAgent.ipfs = {
+        object: {
+          get: (multihash, callback) => {
+            return callback('error', null)
+          }
+        }
+      }
+      await expect(StorageAgent.getCredentialObject({multihash: testCredentialHash, getData: true})).to.be.rejected
+    })
 
     it('Should add a new link to a Credential Object by passing in the head and link nodes as well as a claim ID to be the link name', async () => {
       StorageAgent.ipfs = {
@@ -127,7 +150,6 @@ describe.only('IpfsStorageAgent', () => {
               expect(multihash).to.equal(testCredentialNode.multihash)
               expect(link.name).to.equal(testClaimID)
               expect(link.size).to.equal(testLinkNode.size)
-              //expect(link.multihash).to.equal(testLinkNode.multihash)
               const result = testCredentialNode
               return callback(null, result)
             }
@@ -137,26 +159,48 @@ describe.only('IpfsStorageAgent', () => {
       expect(await StorageAgent.addLink({headNode: testCredentialNode, claimID: testClaimID, linkNode: testLinkNode})).to.equal(testCredentialNode)
     })
 
+    it('Should throw error if adding link failed', async () => {
+      StorageAgent.ipfs = {
+        object: {
+          patch: {
+            addLink: (multihash, link, callback) => {
+              return callback('error', null)
+            }
+          }
+        }
+      }
+      await expect(StorageAgent.addLink({headNode: testCredentialNode, claimID: testClaimID, linkNode: testLinkNode})).to.be.rejected
+    })
+
     it('Should resolve a link path from passed-in multihash of the head object and the name of the claim (claimID) to be retrieved', async () => {
 
       StorageAgent.ipfs = {
         object: {
           get: (multihash, callback) => {
-            expect(multihash).to.equal(testCredentialHash)
+            const result = testCredentialNode
+            return callback(null, result)
+          }
+        }
+      }
+      const resolver = sinon.stub(dagPB.resolver, 'resolve').yields(null, 'resolvedHash')
+
+      expect(await StorageAgent.resolveLinkPath({headNodeMultihash: testCredentialHash, claimID: testClaimID})).to.deep.equal(resolvedData)
+      resolver.restore()
+    })
+
+    it('Should throw error if resolving link failed', async () => {
+
+      StorageAgent.ipfs = {
+        object: {
+          get: (multihash, callback) => {
             const result = testCredentialNode
             return callback(null, result)
           }
         }
       }
 
-      resolver = {
-          resolve: (serialized, linkPath, callback) => {
-            console.log(serialized, linkPath)
-            const result = testCredentialData
-            console.log(result)
-            return callback(null, result)
-          }
-      }
-      await expect(StorageAgent.resolveLinkPath({headNodeMultihash: testCredentialHash, claimID: testClaimID})).to.equal(testCredentialData)
+      sinon.stub(dagPB.resolver, 'resolve').yields(Error(), null)
+
+      await expect(StorageAgent.resolveLinkPath({headNodeMultihash: testCredentialHash, claimID: testClaimID})).to.be.rejected
     })
   })

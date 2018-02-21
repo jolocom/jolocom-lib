@@ -82,9 +82,11 @@ export default class IpfsStorageAgent {
   resolveLinkPath({ headNodeMultihash, claimID } : { headNodeMultihash: string, claimID: string }) : Promise<object> {
    return new Promise( async (resolve, reject) => {
       const modifiedHeadNode = await this.getCredentialObject({multihash: headNodeMultihash, getData: false})
-      console.log('here')
       const linkPath = 'Links/'+ claimID
-      return dagPB.resolver.resolve(modifiedHeadNode.serialized, linkPath, async (error, result) => {
+      return dagPB.resolver.resolve(modifiedHeadNode.serialized, linkPath, async (err, result) => {
+        if (err) {
+          return reject(err)
+        }
         const data = await this.getCredentialObject({multihash: result.value, getData: true})
         return resolve(data)
       })

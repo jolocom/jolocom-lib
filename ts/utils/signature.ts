@@ -1,6 +1,5 @@
 import * as createHash from 'create-hash'
-import { sign, verify } from 'secp256k1'
-
+import * as secp256k1 from 'secp256k1'
 export function sha256 (buffer) {
   return createHash('sha256').update(buffer).digest()
 }
