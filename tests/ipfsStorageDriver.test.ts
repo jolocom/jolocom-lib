@@ -157,6 +157,6 @@ describe.only('IpfsStorageAgent', () => {
             return callback(null, result)
           }
       }
-      expect(await StorageAgent.resolveLinkPath({headNodeMultihash: testCredentialHash, claimID: testClaimID})).to.equal(testCredentialData)
+      await expect(StorageAgent.resolveLinkPath({headNodeMultihash: testCredentialHash, claimID: testClaimID})).to.equal(testCredentialData)
     })
   })
