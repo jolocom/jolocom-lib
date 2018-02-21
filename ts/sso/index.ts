@@ -13,64 +13,92 @@ import {
 import { getSigningKeysFromWIF } from '../utils/keysEncoding'
 
 export default class Authentication {
-  async initiateRequest({did, claims, IPFSroom, WIF, encrypt} :
-    {did : string, claims : Array<string>, IPFSroom : string, WIF : string, encrypt: boolean}) : Promise<any> {
-
+  async initiateRequest({
+    did,
+    claims,
+    clientId,
+    WIF,
+    encrypt,
+    callbackUrl
+  } : {
+    did : string,
+    claims : Array<string>,
+    clientId? : string,
+    WIF : string,
+    encrypt: boolean,
+    callbackUrl: string
+  }) : Promise<any> {
     let response = {}
-    let encryptOptions
+
+    const {pubKey, privKey} = getSigningKeysFromWIF({WIF})
+    const args = {
+      iss: did,
+      reqClaims: claims,
+      pubKeyIss: pubKey,
+    }
 
     if(encrypt) {
-      encryptOptions = initiateSecretExchange()
-      response['initiator'] = encryptOptions.initiator
+      const { prime, initiatorKey, initiator } = initiateSecretExchange()
+      args.encryptPrime = prime
+      args.encryptPubKeyIss = initiatorKey
+      response.initiator = initiator
     }
-    const keys = getSigningKeysFromWIF({WIF: WIF})
-    const tokenPayload = new TokenPayload({
-      iss: did,
-      pubKeyIss: keys.pubKey,
-      encryptPrime: encrypt ? encryptOptions.prime : '',
-      encryptPubKeyIss: encrypt ? encryptOptions.initiatorKey : '',
-      reqClaims: claims,
-      IPFSroom: IPFSroom
-    })
-    const token = new TokenSigner('ES256k', keys.privKey).sign(tokenPayload)
-    response['qrCode'] = await this.createQRCode({token: token})
-    response['token'] = token
+
+    const tokenPayload = new TokenPayload(args)
+    const token = new TokenSigner('ES256k', privKey).sign(tokenPayload)
+
+    response.qrCode = await this.createQRCode({token})
+    response.token = token
     return response
   }
 
   authenticateRequest({token} : {token : string}) {
     const tokenData = decodeToken(token)
-    const isTokenVerified = new TokenVerifier('ES256k', tokenData.payload.pubKeyIss).verify(token)
-    if(isTokenVerified) {
-      return tokenData
-    } else {
-      return new Error('Web Token Not Valid')
+    const { pubKeyIss } = tokenData.payload
+    const isValid = new TokenVerifier('ES256k', pubKeyIss).verify(token)
+
+    if(!isValid) {
+      throw new Error('Web Token Not Valid')
     }
+
+    return tokenData
   }
 
-  async initiateResponse({tokenData, WIF, did, claims} :
-    {tokenData: any, WIF: string, did: string, claims: Array<any>}) : Promise<any> {
-      const isDataEncrypted = tokenData.payload.encryptPrime && tokenData.payload.encryptPubKeyIss
-      let claimsEncrypted
-      let encryptPubKeySub
+  async initiateResponse({
+    tokenData,
+    WIF,
+    did,
+    claims
+  } : {
+    tokenData: any,
+    WIF: string,
+    did: string,
+    claims: Array<any>
+  }) : Promise<any> {
+    const {encryptPrime, encryptPubKeyIss} = tokenData.payload
+    const isEncrypted = encryptPrime && encryptPubKeyIss
 
-      if(isDataEncrypted !== 'undefined' && isDataEncrypted.length > 1) {
-        const enc = this.handleEncryption({tokenData: tokenData, claims: claims})
-        claimsEncrypted = enc.cipherText
-        encryptPubKeySub = enc.encryptPubKeySub
-      }
+    let claimsEncrypted
+    let encryptPubKeySub
 
-      const keys = getSigningKeysFromWIF({WIF: WIF})
-      const tokenPayload = TokenPayload.generateResponse({
-        tokenData: tokenData,
-        sub: did,
-        pubKeySub: keys.pubKey,
-        encryptPubKeySub: encryptPubKeySub ? encryptPubKeySub : '',
-        claims: claimsEncrypted ? claimsEncrypted : claims
-      })
+    if(isEncrypted) {
+      const enc = this.handleEncryption({tokenData, claims})
+      claimsEncrypted = enc.cipherText
+      encryptPubKeySub = enc.encryptPubKeySub
+    }
 
-      const token = new TokenSigner('ES256K', keys.privKey).sign(tokenPayload)
-      return token
+    const keys = getSigningKeysFromWIF({WIF})
+
+    const tokenPayload = TokenPayload.generateResponse({
+      tokenData: tokenData,
+      sub: did,
+      pubKeySub: keys.pubKey,
+      encryptPubKeySub: encryptPubKeySub ? encryptPubKeySub : '',
+      claims: claimsEncrypted ? claimsEncrypted : claims
+    })
+
+    const token = new TokenSigner('ES256K', keys.privKey).sign(tokenPayload)
+    return token
   }
 
   async authenticateResponse({token, secretExchangeParty} :

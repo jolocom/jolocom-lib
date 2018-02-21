@@ -24,11 +24,14 @@ describe('Token payload', () => {
       payload: tokenPayload,
       sig: 'jehbrkegnj'
     }
+
     const resTokenPayload = TokenPayload.generateResponse({
       tokenData: token,
       sub: testAuth.mockDIDSUB,
       pubKeySub: testAuth.rawPublicKey
     })
+
+    console.log(resTokenPayload)
     expect(resTokenPayload.iss).to.equal(tokenPayload.iss)
     expect(resTokenPayload.jti).to.equal(tokenPayload.jti)
     expect(resTokenPayload.pubKeyIss).to.equal(tokenPayload.pubKeyIss)
