@@ -42,6 +42,11 @@ export default class IpfsStorageAgent {
     })
   }
 
+  //setCredentialObjectData({ multihash, data } : {multihash: string, data: Buffer ]) : Promise<object> {
+    //return new Promise((resolve, reject) => {
+    //})
+  //}
+
   createCredentialObject({ credential, dagLinks = [] } : { credential: Buffer, dagLinks: any }) : Promise<object> {
     return new Promise((resolve, reject) => {
       return this.ipfs.object.put(credential, dagLinks, (err,node) => {
@@ -64,13 +69,12 @@ export default class IpfsStorageAgent {
     })
   }
 
-  //update DDO with link information
-  addLink({ headNode, claimID, linkNode } : { headNode : any,  claimID : string, linkNode : any }) : Promise<object> {
+  addLink({ headNodeMultihash, claimID, linkNode } : { headNodeMultihash: string,  claimID : string, linkNode : any }) : Promise<object> {
     return new Promise((resolve, reject) => {
       const linkNodeSize = linkNode.toJSON().size
       const linkNodeMultihash = linkNode.toJSON().multihash
       const link = new dagPB.DAGLink(claimID, linkNodeSize, linkNodeMultihash)
-      return this.ipfs.object.patch.addLink(headNode.toJSON().multihash, link, (err, modifiedHeadNode) => {
+      return this.ipfs.object.patch.addLink(headNodeMultihash, link, (err, modifiedHeadNode) => {
         if (err) {
           return reject(err)
         }
