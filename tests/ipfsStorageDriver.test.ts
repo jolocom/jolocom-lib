@@ -156,7 +156,7 @@ describe('IpfsStorageAgent', () => {
           }
         }
       }
-      expect(await StorageAgent.addLink({headNode: testCredentialHash, claimID: testClaimID, linkNode: testLinkNode})).to.equal(testCredentialNode)
+      expect(await StorageAgent.addLink({headNodeMultihash: testCredentialHash, claimID: testClaimID, linkNode: testLinkNode})).to.equal(testCredentialNode)
     })
 
     it('Should throw error if adding link failed', async () => {
