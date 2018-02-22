@@ -147,7 +147,7 @@ describe('IpfsStorageAgent', () => {
         object: {
           patch: {
             addLink: (multihash, link, callback) => {
-              expect(multihash).to.equal(testCredentialNode.multihash)
+              expect(multihash).to.equal(testCredentialHash)
               expect(link.name).to.equal(testClaimID)
               expect(link.size).to.equal(testLinkNode.size)
               const result = testCredentialNode
@@ -156,7 +156,7 @@ describe('IpfsStorageAgent', () => {
           }
         }
       }
-      expect(await StorageAgent.addLink({headNode: testCredentialNode, claimID: testClaimID, linkNode: testLinkNode})).to.equal(testCredentialNode)
+      expect(await StorageAgent.addLink({headNode: testCredentialHash, claimID: testClaimID, linkNode: testLinkNode})).to.equal(testCredentialNode)
     })
 
     it('Should throw error if adding link failed', async () => {
