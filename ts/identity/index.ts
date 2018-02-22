@@ -75,7 +75,7 @@ export default class Identity {
 
   //what do we want to place in this data string?
 
-  initPublicCredentialsDirectory async ({ data, ddo, ethereumKey} : { data: string, ddo: object, ethereumKey: object}) {
+  async initPublicCredentialsDirectory ({ data, ddo, ethereumKey} : { data: string, ddo: object, ethereumKey: object}) {
     const directoryData = Buffer.from(data)
     const ipfsAgent = new IpfsStorageAgent(this.config.ipfs)
     const directoryNode = await ipfsAgent.createCredentialObject({credential: directoryData}).catch(err => {
@@ -90,18 +90,17 @@ export default class Identity {
    * @param {object} ddo - DDO associated with the identity
    * @param {any} credential - verifiable credential object
    */
-  storePublicCredential async ({ credential, ddo, ethereumKey } : { credential: any, ddo: object, ethereumKey: object}) {
+  async storePublicCredential ({ credential, ddo, ethereumKey } : { credential: any, ddo: object, ethereumKey: object}) {
     const credentialBuffer = Buffer.from(JSON.stringify(credential))
     const newClaimID = credential.id
     const endpoint = ddo.credentialsEndpoint
     const ipfsAgent = new IpfsStorageAgent(this.config.ipfs)
     const credentialNode = await ipfsAgent.createCredentialObject({credential: credentialBuffer}).catch(err => {
       throw new Error(`Could not create credentials object. ${err.message}`)
-    }
+    })
     const newCredentialsDirectory = await ipfsAgent.addLink({headNodeMultihash: endpoint, claimID: newClaimID, linkNode: credentialNode}).catch(err => {
       throw new Error(`Link could not be added. ${err.message}`)
-    }
-
+    })
     this.updateAndStoreUtil(newCredentialsDirectory, ddo, ethereumKey)
   }
 
