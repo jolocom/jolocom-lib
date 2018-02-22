@@ -42,11 +42,6 @@ export default class IpfsStorageAgent {
     })
   }
 
-  //setCredentialObjectData({ multihash, data } : {multihash: string, data: Buffer ]) : Promise<object> {
-    //return new Promise((resolve, reject) => {
-    //})
-  //}
-
   createCredentialObject({ credential, dagLinks = [] } : { credential: Buffer, dagLinks: any }) : Promise<object> {
     return new Promise((resolve, reject) => {
       return this.ipfs.object.put(credential, dagLinks, (err,node) => {
