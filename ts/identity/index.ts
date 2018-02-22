@@ -78,10 +78,8 @@ export default class Identity {
   async initPublicCredentialsDirectory ({ data, ddo, ethereumKey} : { data: string, ddo: object, ethereumKey: object}) {
     const directoryData = Buffer.from(data)
     const ipfsAgent = new IpfsStorageAgent(this.config.ipfs)
-    const directoryNode = await ipfsAgent.createCredentialObject({credential: directoryData}).catch(err => {
-      throw new Error(`Could not create credentials directory. ${error.message}`)
-    })
-    this.updateAndStoreUtil(directoryNode, ddo, ethereumKey)
+    const directoryNode = await ipfsAgent.createCredentialObject({credential: directoryData})
+    this._updateAndStore(directoryNode, ddo, ethereumKey)
   }
 
   /* Stores a publically accessible verifiable credential on IPLD, updates the DDO endpoint
@@ -95,13 +93,9 @@ export default class Identity {
     const newClaimID = credential.id
     const endpoint = ddo.credentialsEndpoint
     const ipfsAgent = new IpfsStorageAgent(this.config.ipfs)
-    const credentialNode = await ipfsAgent.createCredentialObject({credential: credentialBuffer}).catch(err => {
-      throw new Error(`Could not create credentials object. ${err.message}`)
-    })
-    const newCredentialsDirectory = await ipfsAgent.addLink({headNodeMultihash: endpoint, claimID: newClaimID, linkNode: credentialNode}).catch(err => {
-      throw new Error(`Link could not be added. ${err.message}`)
-    })
-    this.updateAndStoreUtil(newCredentialsDirectory, ddo, ethereumKey)
+    const credentialNode = await ipfsAgent.createCredentialObject({credential: credentialBuffer})
+    const newCredentialsDirectory = await ipfsAgent.addLink({headNodeMultihash: endpoint, claimID: newClaimID, linkNode: credentialNode})
+    this._updateAndStore(newCredentialsDirectory, ddo, ethereumKey)
   }
 
   /* Retrieves a verifiable credential associated with a DID
@@ -121,7 +115,7 @@ export default class Identity {
   * @param {object} ddo - DDO associated with the identity
   * @param {object} ethereumKey - ethereum key associated with the identity
   */
-  updateAndStoreUtil(newNode: any, ddo: object, ethereumKey: object) {
+  _updateAndStore(newNode: any, ddo: object, ethereumKey: object) {
     const ipldHash = newNode.toJSON().multihash
     ddo.credentialsEndpoint = ipldHash
 
