@@ -121,7 +121,7 @@ describe('authentication process SSO', () => {
   it('authenticateResponse should return claims array when token is authenticated (data encrypted)', (done) => {
     authentication.authenticateResponse({token: tokenResponse, secretExchangeParty: initiatorSecret})
       .then((res) => {
-        expect(res).to.deep.equal([{name: 'Natascha'}, {hobby: 'day trading'}])
+        expect(res.payload.claims).to.deep.equal([{name: 'Natascha'}, {hobby: 'day trading'}])
         done()
       })
   }).timeout(10000)
@@ -133,7 +133,7 @@ describe('authentication process SSO', () => {
         return authentication.authenticateResponse({token: res})
       })
       .then((res) => {
-        expect(res).to.deep.equal([{name: 'warren'}])
+        expect(res.payload.claims).to.deep.equal([{name: 'warren'}])
         done()
       })
   })

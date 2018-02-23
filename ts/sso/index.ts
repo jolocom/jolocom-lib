@@ -114,10 +114,11 @@ export default class Authentication {
           tokenData: tokenData,
           secretExchangeParty: secretExchangeParty
         })
-        return claims
+        tokenData.payload.claims = claims
+        return tokenData
       }
 
-      return tokenData.payload.claims
+      return tokenData
     } else {
       return new Error('Web Token Not Valid')
     }
