@@ -38,6 +38,10 @@ export default class Authentication {
       callbackUrl: callbackUrl
     }
 
+    if(clientId) {
+      args['clientId'] = clientId
+    }
+
     if(encrypt) {
       const { prime, initiatorKey, initiator } = initiateSecretExchange()
       args['encryptPrime'] = prime
