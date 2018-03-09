@@ -13,7 +13,7 @@ export default {
       curve:'secp256k1',
       publicKeyBase64:'Awx3BzwGgktBPC4Iv1/Scc+j/dRjLsbohptT5ceTlbho'
     },
-      created:'2018-01-24T15:42:15.882Z'
+      created:'2018-01-24T15:42:15.000Z'
   },
   expectedDdoJson: '{' +
     '"@context":"https://w3id.org/did/v1",' +
@@ -32,7 +32,7 @@ export default {
     id: '11111',
     'type': ["Credential"],
 		issuer: 'did:jolo:0x0aecaae09eb4b6433a4136fbac29a5ea93dd3593dd120e16a314744d3945d119',
- 		issued:'Wed Jan 24 2018 16:42:15 GMT+0100 (CET)',
+ 		issued:'2018-01-24T15:42:15Z',
     claim: {
       id:'did:jolo:0xd0ae58da9f72c48767b04f339a1a0142bb8e86b521d008ca65f7e3983b03d32b',
       ageOver: 21
@@ -44,9 +44,22 @@ export default {
       "id":"11111",
       "type":["Credential"],
       "issuer":"did:jolo:0xf334484858571199b681f6dfdd9ecd2f01df5b38f8379b3aaa89436c61fd1955",
-      "issued":"Wed Jan 24 2018 16:42:15 GMT+0100 (CET)",
+      "issued":"2018-01-24T15:42:15Z",
       "claim":{"id":"did:jolo:0xd0ae58da9f72c48767b04f339a1a0142bb8e86b521d008ca65f7e3983b03d32b","ageOver":21}
     },
-    "signature":"db5b35fd89c232674ac3bcc2036edc9721db9f142ae3985cb0cce8cd0b23647677797f01fa090967973ddd437affb6774ef792583a3687006e380ce6864651ca"
+    "signature":"9a6318fb202524cfd28b8a593209357bdb27c68c468bf09bb78928e9657ea6630a6538fc8d5d6fbc167d7107efb92f587d061c28ce37220e5544149d4455f776"
+  },
+  expectedSignedCredentialWithExpiry:  {
+    "credential": {
+      "@context": "https://w3id.org/credentials/v1",
+      "id": "11111",
+      "type": ["Credential"],
+      "issuer": "did:jolo:0xf334484858571199b681f6dfdd9ecd2f01df5b38f8379b3aaa89436c61fd1955",
+      "issued": "2018-01-24T15:42:15Z",
+      "claim":{"id":"did:jolo:0xd0ae58da9f72c48767b04f339a1a0142bb8e86b521d008ca65f7e3983b03d32b","ageOver":21},
+      "expires": "2018-10-24T15:42:15Z"
+    },
+  "signature": "26f1096e286f82955c7ca84fc9ecbbb2b9524577c735b08551134a4091df74563b1d2fdc1f5c304c6e9c9209794ff7cc78fe6bec1ceef1275220f8b4a0a81e6a"
   }
+
 }
