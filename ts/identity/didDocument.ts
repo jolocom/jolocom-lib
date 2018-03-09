@@ -8,6 +8,7 @@ export default class DidDocument {
   public id: Did
   public authenticationCredential: AuthenticationCredential
   public created: Date
+  public credentialsEndpoint: string = ''
 
   constructor(publicKey: Buffer) {
     const pubKeyHex = publicKey.toString('hex')
@@ -31,6 +32,7 @@ export default class DidDocument {
       id: Did.fromJSON(json.id),
       authenticationCredential: parsedAuthCredentials,
       created: new Date(json.created),
+      credentialsEndpoint: json.credentialsEndpoint
     })
   }
 }

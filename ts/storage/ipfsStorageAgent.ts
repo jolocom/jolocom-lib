@@ -1,8 +1,9 @@
 import * as ipfsAPI from 'ipfs-api'
+import * as dagPB from 'ipld-dag-pb'
+import testData from '../../tests/data/identity'
 
 export default class IpfsStorageAgent {
   ipfs: any
-  bla: string
 
   constructor(config : {
     host: string,
@@ -35,9 +36,63 @@ export default class IpfsStorageAgent {
         if (err) {
           return reject(err)
         }
-
         const parsed = JSON.parse(data.toString('utf8'))
         return resolve(parsed)
+      })
+    })
+  }
+
+  //setCredentialObjectData({ multihash, data } : {multihash: string, data: Buffer ]) : Promise<object> {
+    //return new Promise((resolve, reject) => {
+    //})
+  //}
+
+  createCredentialObject({ credential, dagLinks = [] } : { credential: Buffer, dagLinks: any }) : Promise<object> {
+    return new Promise((resolve, reject) => {
+      return this.ipfs.object.put(credential, dagLinks, (err,node) => {
+        if (err) {
+          return reject (err)
+        }
+        return resolve(node)
+        })
+    })
+  }
+
+  getCredentialObject({ multihash, getData } : { multihash: string, getData: boolean}) : Promise<object> {
+    return new Promise((resolve, reject) => {
+      return this.ipfs.object.get(multihash, (err, node) => {
+        if (err) {
+          return reject (err)
+        }
+        return getData ? resolve (JSON.parse(node.toJSON().data.toString())) : resolve(node)
+      })
+    })
+  }
+
+  addLink({ headNodeMultihash, claimID, linkNode } : { headNodeMultihash: string,  claimID : string, linkNode : any }) : Promise<object> {
+    return new Promise((resolve, reject) => {
+      const linkNodeSize = linkNode.toJSON().size
+      const linkNodeMultihash = linkNode.toJSON().multihash
+      const link = new dagPB.DAGLink(claimID, linkNodeSize, linkNodeMultihash)
+      return this.ipfs.object.patch.addLink(headNodeMultihash, link, (err, modifiedHeadNode) => {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(modifiedHeadNode)
+      })
+    })
+  }
+
+  resolveLinkPath({ headNodeMultihash, claimID } : { headNodeMultihash: string, claimID: string }) : Promise<object> {
+   return new Promise( async (resolve, reject) => {
+      const modifiedHeadNode = await this.getCredentialObject({multihash: headNodeMultihash, getData: false})
+      const linkPath = 'Links/'+ claimID
+      return dagPB.resolver.resolve(modifiedHeadNode.serialized, linkPath, async (err, result) => {
+        if (err) {
+          return reject(err)
+        }
+        const data = await this.getCredentialObject({multihash: result.value, getData: true})
+        return resolve(data)
       })
     })
   }

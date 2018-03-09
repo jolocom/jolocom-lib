@@ -63,4 +63,64 @@ export default class Identity {
     return ethereumResolver.updateDIDRecord(ethereumKey, did, ipfsHash)
       .catch(error => { throw new Error(`Could not update Did record. ${error.message}`)})
   }
+
+  /* Creates initial credentials object as directory for further linking
+   * of verifiable credentials, updates the DDO credentialsEndpoint with the
+   * resulting IPLD hash, updates the Ethereum Registry Contract Record
+   * with the new DID/DDO mapping
+   * @param {string} data: data that is associated with the identity's credential directory
+   * @param {object} ddo: DDO associated with the identity
+   * @param {object} ethereumKey -  ethereum key associated with the DDO
+   */
+
+  //what do we want to place in this data string?
+
+  async initPublicCredentialsDirectory ({ data, ddo, ethereumKey} : { data: string, ddo: object, ethereumKey: object}) {
+    const directoryData = Buffer.from(data)
+    const ipfsAgent = new IpfsStorageAgent(this.config.ipfs)
+    const directoryNode = await ipfsAgent.createCredentialObject({credential: directoryData})
+    this._updateAndStore(directoryNode, ddo, ethereumKey)
+  }
+
+  /* Stores a publically accessible verifiable credential on IPLD, updates the DDO endpoint
+   * and the Ethereum Registry Contract Record with the new DID/DDO mapping
+   * @param {object} ethereumKey - ethereum key associated with the DDO
+   * @param {object} ddo - DDO associated with the identity
+   * @param {any} credential - verifiable credential object
+   */
+  async storePublicCredential ({ credential, ddo, ethereumKey } : { credential: any, ddo: object, ethereumKey: object}) {
+    const credentialBuffer = Buffer.from(JSON.stringify(credential))
+    const newClaimID = credential.id
+    const endpoint = ddo.credentialsEndpoint
+    const ipfsAgent = new IpfsStorageAgent(this.config.ipfs)
+    const credentialNode = await ipfsAgent.createCredentialObject({credential: credentialBuffer})
+    const newCredentialsDirectory = await ipfsAgent.addLink({headNodeMultihash: endpoint, claimID: newClaimID, linkNode: credentialNode})
+    this._updateAndStore(newCredentialsDirectory, ddo, ethereumKey)
+  }
+
+  /* Retrieves a verifiable credential associated with a DID
+   * @param {object} ddo - DDO associated with the identity
+   * @param {string} claimID - ID associated with the credential to be retrieved
+   * @returns {any} a verified credential which has been retrieved
+   */
+  retrievePublicCredential ({ddo, claimID} : { ddo: object, claimID: string }) {
+    const endpoint = ddo.credentialsEndpoints
+    const ipfsAgent = new IpfsStorageAgent(this.config.ipfs)
+    return ipfsAgent.resolveLinkPath({headNodeMultihash: endpoint, claimID: claimID})
+  }
+
+ /* Updates a DDO with a new endpoint, stores the DDO, updates the Ethereum Registry
+  * Contract Record with the new DID/DDO mapping
+  * @param {any} newNode - node containing the multihash/new endpoint
+  * @param {object} ddo - DDO associated with the identity
+  * @param {object} ethereumKey - ethereum key associated with the identity
+  */
+  _updateAndStore(newNode: any, ddo: object, ethereumKey: object) {
+    const ipldHash = newNode.toJSON().multihash
+    ddo.credentialsEndpoint = ipldHash
+
+    return this.store(ddo).then(hash => {
+      this.register(ethereumKey, ddo.id, hash)
+    })
+  }
 }

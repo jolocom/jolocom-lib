@@ -13,10 +13,12 @@ export default {
       curve:'secp256k1',
       publicKeyBase64:'Awx3BzwGgktBPC4Iv1/Scc+j/dRjLsbohptT5ceTlbho'
     },
-      created:'2018-01-24T15:42:15.882Z'
+    created:'2018-01-24T15:42:15.882Z',
+    credentialsEndpoint: ''
   },
   expectedDdoJson: '{' +
     '"@context":"https://w3id.org/did/v1",' +
+    '"credentialsEndpoint":"",' +
     '"id":"did:jolo:0x28434a594dc0f9885dcbc797dc34f993f7dda463fc21d333c797dd5e75d7845f",' +
     '"authenticationCredential":{' +
       '"id":"did:jolo:0x28434a594dc0f9885dcbc797dc34f993f7dda463fc21d333c797dd5e75d7845f#keys/generic/1",' +

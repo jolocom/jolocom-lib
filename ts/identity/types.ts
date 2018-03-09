@@ -17,6 +17,7 @@ export interface IDidDocumentAttrs {
   id: string;
   authenticationCredential: string;
   created: string;
+  credentialsEndpoint: string;
 }
 
 export default interface IdentityConfig {
