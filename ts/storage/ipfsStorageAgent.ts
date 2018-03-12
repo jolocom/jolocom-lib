@@ -19,12 +19,12 @@ export default class IpfsStorageAgent {
       }
 
       const buffData = Buffer.from(JSON.stringify(data))
-      return this.ipfs.files.add(buffData, (err, fileHash) => {
+      return this.ipfs.files.add(buffData, async (err, fileHash) => {
         if (err) {
           return reject(err)
         }
-
-        return resolve(fileHash[0].hash)
+        const pinned = await this.pinHash(fileHash[0].hash)
+        return resolve(pinned[0].hash)
       })
     })
   }
@@ -38,6 +38,28 @@ export default class IpfsStorageAgent {
 
         const parsed = JSON.parse(data.toString('utf8'))
         return resolve(parsed)
+      })
+    })
+  }
+
+  pinHash(hash: string) : Promise<object> {
+    return new Promise((resolve, reject) => {
+      return this.ipfs.pin.add(hash, (err, filesPinned) => {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(filesPinned)
+      })
+    })
+  }
+
+  removePinnedHash(hash: string) : Promise<object> {
+    return new Promise((resolve, reject) => {
+      return this.ipfs.pin.rm(hash, (err, filesUnpinned) => {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(filesUnpinned)
       })
     })
   }
