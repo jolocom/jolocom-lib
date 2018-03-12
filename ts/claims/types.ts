@@ -6,6 +6,7 @@ export interface IVerifiableCredentialAttrs {
   "type": string[];
   issuer: string;
   issued: string;
+  expires?: string;
   claim: { id: string; [x:string]:any };
 }
 
