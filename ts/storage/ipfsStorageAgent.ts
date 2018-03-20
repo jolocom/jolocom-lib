@@ -11,55 +11,48 @@ export default class IpfsStorageAgent {
     this.ipfs = new ipfsAPI(config)
   }
 
-  storeJSON(data : object) : Promise<string> {
-    return new Promise((resolve, reject) => {
-      if (typeof data !== 'object' || data === null) {
-        throw new Error(`JSON expected, received ${typeof data}`)
-      }
 
-      const buffData = Buffer.from(JSON.stringify(data))
-      return this.ipfs.files.add(buffData, async (err, fileHash) => {
-        if (err) {
-          return reject(err)
-        }
-        const pinned = await this.pinHash(fileHash[0].hash)
-        return resolve(pinned[0].hash)
-      })
-    })
+  async storeJSON(data : object) : Promise<object> {
+    if (typeof data !== 'object' || data === null) {
+      throw new Error(`JSON expected, received ${typeof data}`)
+    }
+
+    const buffData = Buffer.from(JSON.stringify(data))
+
+    try {
+      const fileHash = await this.ipfs.files.add(buffData)
+      const pinned = await this.pinHash(fileHash[0].hash)
+      return pinned[0].hash
+    } catch(err) {
+      throw new Error(err)
+    }
   }
 
-  catJSON(hash: string) : Promise<object> {
-    return new Promise((resolve, reject) => {
-      return this.ipfs.files.cat(hash, (err, data) => {
-        if (err) {
-          return reject(err)
-        }
-
-        const parsed = JSON.parse(data.toString('utf8'))
-        return resolve(parsed)
-      })
-    })
+  async catJSON(hash: string) : Promise<object> {
+    try {
+      const data = await this.ipfs.files.cat(hash)
+      const parsed = JSON.parse(data.toString('utf8'))
+      return parsed
+    } catch(err) {
+      throw new Error(err)
+    }
   }
 
-  pinHash(hash: string) : Promise<object> {
-    return new Promise((resolve, reject) => {
-      return this.ipfs.pin.add(hash, (err, filesPinned) => {
-        if (err) {
-          return reject(err)
-        }
-        return resolve(filesPinned)
-      })
-    })
+  async pinHash(hash: string) : Promise<object> {
+    try {
+      const filesPinned = await this.ipfs.pin.add(hash)
+      return filesPinned
+    } catch(err) {
+      throw new Error(err)
+    }
   }
 
-  removePinnedHash(hash: string) : Promise<object> {
-    return new Promise((resolve, reject) => {
-      return this.ipfs.pin.rm(hash, (err, filesUnpinned) => {
-        if (err) {
-          return reject(err)
-        }
-        return resolve(filesUnpinned)
-      })
-    })
+  async removePinnedHash(hash: string) : Promise<object> {
+    try {
+      const filesUnpinned = await this.ipfs.pin.rm(hash)
+      return filesUnpinned
+    } catch(err) {
+      throw new Error(err)
+    }
   }
 }

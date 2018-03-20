@@ -21,17 +21,17 @@ describe('IpfsStorageAgent', () => {
   it('Should attempt to store the data', async () => {
     StorageAgent.ipfs = {
       pin: {
-        add: (hash, callback) => {
+        add: async (hash) => {
           const result = [{hash: testDataHash}]
-          return callback(null, result)
+          return result
         }
       },
       files: {
-        add: (data, callback) => {
+        add: async (data) => {
           expect(data).to.deep.equal(Buffer.from(JSON.stringify(testData)))
 
           const result = [{hash: testDataHash}]
-          return callback(null, result)
+          return result
         }
       }
     }
@@ -41,8 +41,8 @@ describe('IpfsStorageAgent', () => {
   it('Should throw error if storing data failed', async () => {
     StorageAgent.ipfs = {
       files: {
-        add: (data, callback) => {
-          return callback('error', null)
+        add: async (data) => {
+          throw new Error()
         }
       }
     }
@@ -59,9 +59,9 @@ describe('IpfsStorageAgent', () => {
   it('Should retrieve data based on hash', async () => {
     StorageAgent.ipfs = {
       files: {
-        cat: (hash, callback) => {
+        cat: async (hash) => {
           expect(hash).to.equal(testDataHash)
-          callback(null, Buffer.from(JSON.stringify(testData)))
+          return Buffer.from(JSON.stringify(testData))
         }
       }
     }
@@ -71,8 +71,8 @@ describe('IpfsStorageAgent', () => {
   it('Should throw error if reading data failed', async () => {
     StorageAgent.ipfs = {
       files: {
-        cat: (hash, callback) => {
-          return callback('error', null)
+        cat: async (hash) => {
+          throw new Error()
         }
       }
     }
@@ -84,9 +84,9 @@ describe('IpfsStorageAgent', () => {
   it('Should attempt to pin the returned hash from storeJSON', async () => {
     StorageAgent.ipfs = {
       pin: {
-        add: (hash, callback) => {
+        add: async (hash) => {
           expect(hash).to.equal(testDataHash)
-          return callback(null, testDataHash)
+          return testDataHash
         }
       }
     }
@@ -96,8 +96,8 @@ describe('IpfsStorageAgent', () => {
   it('Should throw error if reading data failed', async () => {
     StorageAgent.ipfs = {
       pin: {
-        add: (hash, callback) => {
-          return callback('error', null)
+        add: async (hash) => {
+          throw new Error()
         }
       }
     }
@@ -109,10 +109,10 @@ describe('IpfsStorageAgent', () => {
   it('Should attempt to remove a pinned hash from the IPFS repo', async () => {
     StorageAgent.ipfs = {
       pin: {
-        rm: (hash, callback) => {
+        rm: async (hash) => {
           expect(hash).to.equal(testDataHash)
           const result = [{hash: testDataHash}]
-          return callback(null, result)
+          return result
         }
       }
     }
@@ -123,14 +123,12 @@ describe('IpfsStorageAgent', () => {
   it('Should throw error if reading data failed', async () => {
     StorageAgent.ipfs = {
       pin: {
-        rm: (hash, callback) => {
-          return callback('error', null)
+        rm: async (hash) => {
+          throw new Error()
         }
       }
     }
-
     await expect(StorageAgent.removePinnedHash(testDataHash))
       .to.be.rejected
   })
-
 })
