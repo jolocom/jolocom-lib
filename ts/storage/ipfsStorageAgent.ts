@@ -2,7 +2,6 @@ import * as ipfsAPI from 'ipfs-api'
 
 export default class IpfsStorageAgent {
   ipfs: any
-  bla: string
 
   constructor(config : {
     host: string,
