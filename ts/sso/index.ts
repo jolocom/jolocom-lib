@@ -1,6 +1,5 @@
 import * as superagent from 'superagent-es6-promise'
 import TokenPayload from './tokenPayload'
-import testAuth from '../../tests/data/authentication'
 import * as QRCode from 'qrcode'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import {
