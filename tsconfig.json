@@ -1,7 +1,7 @@
 {
     "version": "2.7.1",
     "compilerOptions": {
-        "target": "es6",
+        "target": "es5",
         "module": "commonjs",
         "removeComments": true,
         "lib": ["es2015", "es2017"],
@@ -10,10 +10,14 @@
         "declaration": true,
         "sourceMap": true,
         "suppressImplicitAnyIndexErrors": true,
-        "outDir": "../js"
+        "outDir": "./js/",
+        "rootDir": "./ts"
     },
     "filesGlob": [
-        "./**/*.ts",
+        "./ts/**/*.ts",
         "!./node_modules/**/*.ts"
+    ],
+    "exclude": [
+        "./tests/**/*"
     ]
 }
