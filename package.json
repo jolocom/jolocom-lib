@@ -5,10 +5,8 @@
   "main": "js/index.js",
   "typings": "js/index.d.ts",
   "scripts": {
-    "prepare": "./node_modules/.bin/tsc -p ./tsconfig.json",
     "test": "./node_modules/.bin/nyc -e 'ts' -r lcov -r text yarn run unitTests",
-    "prepare:watch": "yarn run prepare -- -w",
-    "prepublish": "yarn run prepare",
+    "prepublish": "./node_modules/.bin/tsc -p ./tsconfig.json",
     "cli": "node ./js/cli",
     "unitTests": "mocha tests/*.test.ts -r ts-node/register",
     "test:watch": "mocha  --watch-extensions ts tests/*.test.ts -r ts-node/register -w"
