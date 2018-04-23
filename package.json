@@ -5,7 +5,7 @@
   "main": "js/index.js",
   "typings": "js/index.d.ts",
   "scripts": {
-    "prepare": "./node_modules/.bin/tsc -p ./ts/tsconfig.json",
+    "prepare": "./node_modules/.bin/tsc -p ./tsconfig.json",
     "test": "./node_modules/.bin/nyc -e 'ts' -r lcov -r text yarn run unitTests",
     "prepare:watch": "yarn run prepare -- -w",
     "prepublish": "yarn run prepare",
