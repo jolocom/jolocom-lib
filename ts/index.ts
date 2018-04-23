@@ -1,23 +1,35 @@
-import IdentityConfig from './identity/types'
-import { IpfsConfig } from './identity/types'
-import IpfsStorageAgent from './storage/ipfsStorageAgent'
-import Identity from './identity/index'
-import Authentication from './sso/index'
-import Claims from './claims/index'
+import 'reflect-metadata'
+import { Identity } from './identity'
+import { IdentityWallet } from './wallet'
+import { Credentials } from './credentials'
+import { ILibConfig } from './types'
+import { IDefaultClaimsMetadata } from './credentials/credential/types'
 
-export default class JolocomLib {
-  public identity: Identity;
-  public authentication: Authentication;
-  public claims: Claims;
+export class JolocomLib {
+  public identity: Identity
+  public wallet: IdentityWallet
+  public credentials: Credentials
 
-  constructor(config: IConfig) {
+  // TODO Creation process should be changed.
+  constructor(config: ILibConfig) {
+    this.wallet = new IdentityWallet()
     this.identity = new Identity(config)
-    this.authentication = new Authentication()
-    this.claims = new Claims()
+    this.credentials = new Credentials()
   }
 }
 
-export interface IConfig {
-  identity: IdentityConfig;
-  ipfs: IpfsConfig;
+export const claimsMetadata: IDefaultClaimsMetadata = {
+  emailAddress: {
+    fieldName: 'email',
+    type: ['Credential', 'EmailAddressCredentail']
+  },
+  mobilePhoneNumber: {
+    fieldName: 'telephone',
+    type: ['Credential', 'MobileNumberCredential']
+  }
+}
+
+export enum keyTypes {
+  jolocomIdentityKey = 'm/73\'/0\'/0\'/0',
+  ethereumKey = 'm/44\'/60\'/0\'/0/0'
 }

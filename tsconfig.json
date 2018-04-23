@@ -4,20 +4,22 @@
         "target": "es5",
         "module": "commonjs",
         "removeComments": true,
-        "lib": ["es2015", "es2017"],
+        "lib": ["es2017"],
         "noLib": false,
         "preserveConstEnums": true,
         "declaration": true,
         "sourceMap": true,
         "suppressImplicitAnyIndexErrors": true,
         "outDir": "./js/",
-        "rootDir": "./ts"
+        "rootDir": "./ts",
+        "experimentalDecorators": true
     },
     "filesGlob": [
         "./ts/**/*.ts",
         "!./node_modules/**/*.ts"
     ],
     "exclude": [
+        "./js",
         "./tests/**/*"
     ]
 }
