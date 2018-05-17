@@ -8,9 +8,10 @@ import { IPrivateKey } from '../../wallet/types'
 import { generateRandomID, sign, sha256, verifySignature } from '../../utils/crypto'
 import { IVerifiableCredential } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
+import { defaultContext } from '../../utils/contexts';
 
 export class VerifiableCredential {
-  private '@context': string[]
+  private '@context': string[] | object[]
   private id: string
   private issuer: string
   private type: string[]
@@ -23,7 +24,7 @@ export class VerifiableCredential {
   private expires?: Date
 
   @Type(() => EcdsaLinkedDataSignature)
-  private signature = new EcdsaLinkedDataSignature()
+  private proof = new EcdsaLinkedDataSignature()
 
   public setIssuer(issuer: string) {
     this.issuer = issuer
@@ -43,23 +44,23 @@ export class VerifiableCredential {
   }
 
   public async generateSignature(privateKey: IPrivateKey) {
-    this.signature.created = new Date()
-    this.signature.creator = `${this.issuer}#${privateKey.id}`
-    this.signature.nonce = generateRandomID(8)
+    this.proof.created = new Date()
+    this.proof.creator = `${this.issuer}#${privateKey.id}`
+    this.proof.nonce = generateRandomID(8)
 
     const docDigest = await this.digest()
-    const sigDigest = await this.signature.digest()
+    const sigDigest = await this.proof.digest()
 
-    this.signature.signatureValue = sign(`${sigDigest}${docDigest}`, privateKey.privateKey)
+    this.proof.signatureValue = sign(`${sigDigest}${docDigest}`, privateKey.privateKey)
   }
 
   // TODO If no pubKey passed, fetch from ipfs
   public async verifySignature(pubKey?: Buffer): Promise<boolean> {
     const docDigest = await this.digest()
-    const sigDigest = await this.signature.digest()
+    const sigDigest = await this.proof.digest()
 
     const tbv = sigDigest + docDigest
-    const sig = this.signature.getSigValue()
+    const sig = this.proof.getSigValue()
 
     return verifySignature(tbv, pubKey, sig)
   }
@@ -85,7 +86,10 @@ export class VerifiableCredential {
   // TODO Generic context for normalization.
   private async normalize(): Promise<string> {
     const json = this.toJSON()
-    delete json.signature
+
+    json['@context'] = [defaultContext]
+    delete json.proof
+
     return canonize(json)
   }
 }

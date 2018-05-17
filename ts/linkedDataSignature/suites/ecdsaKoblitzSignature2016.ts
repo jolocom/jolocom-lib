@@ -2,6 +2,7 @@ import { Type, plainToClass, classToPlain } from 'class-transformer'
 import { canonize } from 'jsonld'
 import { ILinkedDataSignature } from '../types'
 import { sha256 } from '../../utils/crypto'
+import { defaultContext } from '../../utils/contexts';
 
 export class EcdsaLinkedDataSignature implements ILinkedDataSignature {
   public type = 'EcdsaKoblitzSignature2016'
@@ -30,12 +31,12 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature {
     return sha256(Buffer.from(normalized)).toString('hex')
   }
 
-  // TODO HAVE A COMMON LARGE NORMALIZATION CONTEXT
   private async normalize(): Promise<string> {
     const json = this.toJSON()
-    json['@context'] = ['https://w3id.org/security/v1']
 
+    json['@context'] = defaultContext
     delete json.signatureValue
+
     return canonize(json)
   }
 }

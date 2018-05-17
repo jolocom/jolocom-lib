@@ -6,5 +6,5 @@ export interface IVerifiableCredential extends ICredential {
   issuer: string
   issued: string
   expires?: string
-  signature: ILinkedDataSignature
+  proof: ILinkedDataSignature
 }
