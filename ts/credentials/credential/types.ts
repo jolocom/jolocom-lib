@@ -4,16 +4,16 @@ export interface IClaim {
 }
 
 export interface ICredential {
-  '@context': string[]
+  '@context': string[] | object[]
   type: string[]
   name?: string
   claim: IClaim
 }
 
 export interface IClaimMetadata {
-  type: string[]
   fieldName: string
-  context?: string[]
+  type: string[]
+  context: string[] | object[]
   name?: string
 }
 

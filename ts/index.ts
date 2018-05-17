@@ -21,11 +21,23 @@ export class JolocomLib {
 export const claimsMetadata: IDefaultClaimsMetadata = {
   emailAddress: {
     fieldName: 'email',
-    type: ['Credential', 'EmailAddressCredentail']
+    type: ['Credential'],
+    context: [
+      'https://w3id.org/identity/v1',
+      'https://w3id.org/security/v1',
+      'https://w3id.org/credentials/v1',
+      'http://schema.org'
+    ]
   },
   mobilePhoneNumber: {
     fieldName: 'telephone',
-    type: ['Credential', 'MobileNumberCredential']
+    type: ['Credential'],
+    context: [
+      'https://w3id.org/identity/v1',
+      'https://w3id.org/security/v1',
+      'https://w3id.org/credentials/v1',
+      'http://schema.org'
+    ]
   }
 }
 
