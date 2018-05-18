@@ -2293,9 +2293,9 @@ isurl@^1.0.0-alpha5:
     has-to-string-tag-x "^1.2.0"
     is-object "^1.0.1"
 
-jolocom-registry-contract@^0.1.2:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/jolocom-registry-contract/-/jolocom-registry-contract-0.1.5.tgz#df36ecfcfbda1eba4c117e058e5af54bd51acdf3"
+jolocom-registry-contract@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/jolocom-registry-contract/-/jolocom-registry-contract-0.1.6.tgz#6093e0932cb7c3b7b757559c9ad74fe053ccf659"
   dependencies:
     chai "^4.1.2"
     chai-as-promised "^7.1.1"

@@ -6,7 +6,7 @@
   "typings": "js/index.d.ts",
   "scripts": {
     "test": "./node_modules/.bin/nyc -e 'ts' -r lcov -r text yarn run unitTests",
-    "prepublish": "./node_modules/.bin/tsc -p ./tsconfig.json",
+    "prepublish": "rm -rf ./js/; ./node_modules/.bin/tsc -p ./tsconfig.json",
     "unitTests": "mocha tests/*.test.ts -r ts-node/register",
     "test:watch": "mocha  --watch-extensions ts tests/*.test.ts -r ts-node/register -w"
   },
