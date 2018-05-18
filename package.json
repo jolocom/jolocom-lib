@@ -35,7 +35,7 @@
     "class-transformer": "^0.1.9",
     "ethereumjs-util": "^5.2.0",
     "form-data": "^2.3.2",
-    "jolocom-registry-contract": "^0.1.2",
+    "jolocom-registry-contract": "^0.1.6",
     "jsonld": "^1.0.1",
     "node-fetch": "^2.1.2",
     "reflect-metadata": "^0.1.12",
