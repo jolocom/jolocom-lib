@@ -6,4 +6,12 @@ export interface ILinkedDataSignature {
   signatureValue: string
   digest: () => Promise<string>
   getSigValue: () => Buffer
+  getProofSectionType: () => string
+  toJSON: () => ILinkedDataSignature
+  fromJSON: (json: ILinkedDataSignature) => ILinkedDataSignature
+}
+
+export enum proofTypes {
+  proofSet = 'proofSet',
+  proofChain = 'proofChain'
 }

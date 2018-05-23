@@ -2,13 +2,14 @@ import 'reflect-metadata'
 import { plainToClass, classToPlain, Type } from 'class-transformer'
 import { keccak256 } from 'ethereumjs-util'
 import { canonize } from 'jsonld'
-import { IClaim } from '../credential/types';
+import { IClaim } from '../credential/types'
 import { Credential } from '../credential'
 import { IPrivateKey } from '../../wallet/types'
 import { generateRandomID, sign, sha256, verifySignature } from '../../utils/crypto'
 import { IVerifiableCredential } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
-import { defaultContext } from '../../utils/contexts';
+import { defaultContext } from '../../utils/contexts'
+import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
 
 export class VerifiableCredential {
   private '@context': string[] | object[]
@@ -35,6 +36,18 @@ export class VerifiableCredential {
     this.issued = issued
   }
 
+  public getProofSection(): ILinkedDataSignature {
+    return this.proof
+  }
+
+  public getSubject(): string {
+    return this.claim.id
+  }
+
+  public getCredentialSection(): IClaim {
+    return this.claim
+  }
+
   public fromCredential(credential: Credential): VerifiableCredential {
     const vc = new VerifiableCredential()
     vc['@context'] = credential.getContext()
@@ -47,6 +60,7 @@ export class VerifiableCredential {
     this.proof.created = new Date()
     this.proof.creator = `${this.issuer}#${privateKey.id}`
     this.proof.nonce = generateRandomID(8)
+    this.proof.proofSectionType = proofTypes.proofSet
 
     const docDigest = await this.digest()
     const sigDigest = await this.proof.digest()
@@ -83,7 +97,6 @@ export class VerifiableCredential {
     return `claimId:${hash.substring(20)}`
   }
 
-  // TODO Generic context for normalization.
   private async normalize(): Promise<string> {
     const json = this.toJSON()
 

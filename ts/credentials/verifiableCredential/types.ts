@@ -1,4 +1,4 @@
-import { ICredential } from '../credential/types'
+import { ICredential, IClaim } from '../credential/types'
 import { ILinkedDataSignature } from '../../linkedDataSignature/types'
 
 export interface IVerifiableCredential extends ICredential {
@@ -7,4 +7,6 @@ export interface IVerifiableCredential extends ICredential {
   issued: string
   expires?: string
   proof: ILinkedDataSignature
+  getProofSection: () => ILinkedDataSignature
+  getCredentialSection: () => IClaim
 }
