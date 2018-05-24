@@ -1,9 +1,15 @@
-import { classToPlain, plainToClass } from 'class-transformer'
+import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { IPublicKeySection } from './types'
 
+@Exclude()
 export class PublicKeySection {
+  @Expose()
   private id: string
+
+  @Expose()
   private 'type': string
+
+  @Expose()
   private publicKeyHex: string
 
   public fromEcdsa(publicKey: Buffer, id: string): PublicKeySection {

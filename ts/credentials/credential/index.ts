@@ -1,9 +1,15 @@
-import { classToPlain, plainToClass } from 'class-transformer'
+import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { IClaim, IClaimMetadata, ICredential } from './types'
 
+@Exclude()
 export class Credential {
+  @Expose()
   private '@context': string[] | object[]
+
+  @Expose()
   private type: string[]
+
+  @Expose()
   private claim: IClaim
 
   public assemble(metadata: IClaimMetadata, value: string, subject: string): Credential {

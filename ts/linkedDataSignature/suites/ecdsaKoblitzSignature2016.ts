@@ -1,20 +1,27 @@
-import { Type, plainToClass, classToPlain, Exclude } from 'class-transformer'
+import { Type, plainToClass, classToPlain, Exclude, Expose } from 'class-transformer'
 import { canonize } from 'jsonld'
 import { ILinkedDataSignature, proofTypes } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
 
+@Exclude()
 export class EcdsaLinkedDataSignature implements ILinkedDataSignature {
+  @Expose()
   public type = 'EcdsaKoblitzSignature2016'
 
   @Type(() => Date)
+  @Expose()
   public created: Date
 
-  @Exclude()
   public proofSectionType: proofTypes
 
+  @Expose()
   public creator: string
+
+  @Expose()
   public nonce: string
+
+  @Expose()
   public signatureValue: string
 
   public getProofSectionType(): string {

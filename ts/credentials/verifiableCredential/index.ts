@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { plainToClass, classToPlain, Type } from 'class-transformer'
+import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { keccak256 } from 'ethereumjs-util'
 import { canonize } from 'jsonld'
 import { IClaim } from '../credential/types'
@@ -11,20 +11,33 @@ import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsa
 import { defaultContext } from '../../utils/contexts'
 import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
 
+@Exclude()
 export class VerifiableCredential {
+  @Expose()
   private '@context': string[] | object[]
+
+  @Expose()
   private id: string
+
+  @Expose()
   private issuer: string
+
+  @Expose()
   private type: string[]
+
+  @Expose()
   private claim: IClaim
 
   @Type(() => Date)
+  @Expose()
   private issued: Date
 
   @Type(() => Date)
+  @Expose()
   private expires?: Date
 
   @Type(() => EcdsaLinkedDataSignature)
+  @Expose()
   private proof = new EcdsaLinkedDataSignature()
 
   public setIssuer(issuer: string) {
