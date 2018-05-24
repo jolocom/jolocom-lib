@@ -4,6 +4,7 @@ import { IdentityWallet } from './wallet'
 import { Credentials } from './credentials'
 import { ILibConfig } from './types'
 import { IDefaultClaimsMetadata } from './credentials/credential/types'
+import { defaultConfig } from './defaultConfig'
 
 export class JolocomLib {
   public identity: Identity
@@ -11,7 +12,7 @@ export class JolocomLib {
   public credentials: Credentials
 
   // TODO Creation process should be changed.
-  constructor(config: ILibConfig) {
+  constructor(config: ILibConfig = defaultConfig) {
     this.wallet = new IdentityWallet()
     this.identity = new Identity(config)
     this.credentials = new Credentials()
