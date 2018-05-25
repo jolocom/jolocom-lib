@@ -1,6 +1,6 @@
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { publicKeyToDID } from '../../utils/crypto'
-import { IDidDocument } from './types'
+import { IDidDocumentAttrs } from './types'
 import { AuthenticationSection } from './sections/authenticationSection'
 import { PublicKeySection } from './sections/publicKeySection'
 
@@ -45,11 +45,11 @@ export class DidDocument  {
     return this.id
   }
 
-  public toJSON(): IDidDocument {
-    return classToPlain(this) as IDidDocument
+  public toJSON(): IDidDocumentAttrs {
+    return classToPlain(this) as IDidDocumentAttrs
   }
 
-  public fromJSON(json: IDidDocument): DidDocument {
+  public fromJSON(json: IDidDocumentAttrs): DidDocument {
     return plainToClass(DidDocument, json)
   }
 }

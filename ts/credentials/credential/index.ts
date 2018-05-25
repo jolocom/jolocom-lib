@@ -1,5 +1,5 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
-import { IClaim, IClaimMetadata, ICredential } from './types'
+import { IClaimAttrs, IClaimMetadata, ICredentialAttrs } from './types'
 
 @Exclude()
 export class Credential {
@@ -10,7 +10,7 @@ export class Credential {
   private type: string[]
 
   @Expose()
-  private claim: IClaim
+  private claim: IClaimAttrs
 
   public assemble(metadata: IClaimMetadata, value: string, subject: string): Credential {
     const cred = new Credential()
@@ -24,7 +24,7 @@ export class Credential {
     return cred
   }
 
-  public getClaim(): IClaim {
+  public getClaim(): IClaimAttrs {
     return this.claim
   }
 
@@ -36,11 +36,11 @@ export class Credential {
     return this['@context']
   }
 
-  public fromJSON(json: ICredential): Credential {
+  public fromJSON(json: ICredentialAttrs): Credential {
     return plainToClass(Credential, json)
   }
 
-  public toJSON(credential: Credential): ICredential {
-    return classToPlain(this) as ICredential
+  public toJSON(credential: Credential): ICredentialAttrs {
+    return classToPlain(this) as ICredentialAttrs
   }
 }

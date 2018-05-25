@@ -1,14 +1,17 @@
 export interface ILinkedDataSignature {
+  digest: () => Promise<string>
+  getSigValue: () => Buffer
+  getProofSectionType: () => string
+  toJSON: () => ILinkedDataSignatureAttrs
+  fromJSON: (json: ILinkedDataSignatureAttrs) => ILinkedDataSignature
+}
+
+export interface ILinkedDataSignatureAttrs {
   type: string
   created: Date
   creator: string
   nonce: string
   signatureValue: string
-  digest: () => Promise<string>
-  getSigValue: () => Buffer
-  getProofSectionType: () => string
-  toJSON: () => ILinkedDataSignature
-  fromJSON: (json: ILinkedDataSignature) => ILinkedDataSignature
 }
 
 export enum proofTypes {

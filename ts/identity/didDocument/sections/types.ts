@@ -1,10 +1,10 @@
-export interface IPublicKeySection {
+export interface IPublicKeySectionAttrs {
   id: string
   'type': string
   publicKeyHex: string
 }
 
-export interface IAuthenticationSection {
+export interface IAuthenticationSectionAttrs {
   id: string
   'type': string[]
 }

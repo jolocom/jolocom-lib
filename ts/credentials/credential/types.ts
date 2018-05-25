@@ -1,13 +1,13 @@
-export interface IClaim {
+export interface IClaimAttrs {
   id: string
   [x: string]: string
 }
 
-export interface ICredential {
+export interface ICredentialAttrs {
   '@context': string[] | object[]
   type: string[]
   name?: string
-  claim: IClaim
+  claim: IClaimAttrs
 }
 
 export interface IClaimMetadata {

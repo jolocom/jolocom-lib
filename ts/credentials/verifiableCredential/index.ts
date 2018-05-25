@@ -2,11 +2,11 @@ import 'reflect-metadata'
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { keccak256 } from 'ethereumjs-util'
 import { canonize } from 'jsonld'
-import { IClaim } from '../credential/types'
+import { IClaimAttrs } from '../credential/types'
 import { Credential } from '../credential'
 import { IPrivateKey } from '../../wallet/types'
 import { generateRandomID, sign, sha256, verifySignature } from '../../utils/crypto'
-import { IVerifiableCredential } from './types'
+import { IVerifiableCredentialAttrs } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { defaultContext } from '../../utils/contexts'
 import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
@@ -26,7 +26,7 @@ export class VerifiableCredential {
   private type: string[]
 
   @Expose()
-  private claim: IClaim
+  private claim: IClaimAttrs
 
   @Type(() => Date)
   @Expose()
@@ -57,7 +57,7 @@ export class VerifiableCredential {
     return this.claim.id
   }
 
-  public getCredentialSection(): IClaim {
+  public getCredentialSection(): IClaimAttrs {
     return this.claim
   }
 
@@ -92,12 +92,12 @@ export class VerifiableCredential {
     return verifySignature(tbv, pubKey, sig)
   }
 
-  public fromJSON(json: IVerifiableCredential): VerifiableCredential {
+  public fromJSON(json: IVerifiableCredentialAttrs): VerifiableCredential {
     return plainToClass(VerifiableCredential, json)
   }
 
-  public toJSON(): IVerifiableCredential {
-    return classToPlain(this) as IVerifiableCredential
+  public toJSON(): IVerifiableCredentialAttrs {
+    return classToPlain(this) as IVerifiableCredentialAttrs
   }
 
   public async digest(): Promise<string> {

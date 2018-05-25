@@ -1,5 +1,5 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
-import { IPublicKeySection } from './types'
+import { IPublicKeySectionAttrs } from './types'
 
 @Exclude()
 export class PublicKeySection {
@@ -29,11 +29,11 @@ export class PublicKeySection {
     return this.type
   }
 
-  public toJSON(): IPublicKeySection {
-    return classToPlain(this) as IPublicKeySection
+  public toJSON(): IPublicKeySectionAttrs {
+    return classToPlain(this) as IPublicKeySectionAttrs
   }
 
-  public fromJSON(json: IPublicKeySection): PublicKeySection {
+  public fromJSON(json: IPublicKeySectionAttrs): PublicKeySection {
     return plainToClass(PublicKeySection, json)
   }
 }

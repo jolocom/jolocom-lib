@@ -1,6 +1,6 @@
 import { Type, plainToClass, classToPlain, Exclude, Expose } from 'class-transformer'
 import { canonize } from 'jsonld'
-import { ILinkedDataSignature, proofTypes } from '../types'
+import { ILinkedDataSignature, proofTypes, ILinkedDataSignatureAttrs } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
 
@@ -28,12 +28,12 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature {
     return this.proofSectionType
   }
 
-  public fromJSON(json: ILinkedDataSignature): EcdsaLinkedDataSignature {
+  public fromJSON(json: ILinkedDataSignatureAttrs): EcdsaLinkedDataSignature {
     return plainToClass(EcdsaLinkedDataSignature, json)
   }
 
-  public toJSON(): ILinkedDataSignature {
-    return classToPlain(this) as ILinkedDataSignature
+  public toJSON(): ILinkedDataSignatureAttrs {
+    return classToPlain(this) as ILinkedDataSignatureAttrs
   }
 
   public getSigValue(): Buffer {
@@ -46,7 +46,7 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature {
   }
 
   private async normalize(): Promise<string> {
-    const json = this.toJSON()
+    const json: ILinkedDataSignatureAttrs = this.toJSON()
 
     json['@context'] = defaultContext
     delete json.signatureValue

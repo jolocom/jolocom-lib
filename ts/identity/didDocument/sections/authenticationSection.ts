@@ -1,5 +1,5 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
-import { IAuthenticationSection } from './types'
+import { IAuthenticationSectionAttrs } from './types'
 import { PublicKeySection } from './publicKeySection'
 
 @Exclude()
@@ -18,11 +18,11 @@ export class AuthenticationSection {
     return authSection
   }
 
-  public toJSON(): IAuthenticationSection {
-    return classToPlain(this) as IAuthenticationSection
+  public toJSON(): IAuthenticationSectionAttrs {
+    return classToPlain(this) as IAuthenticationSectionAttrs
   }
 
-  public fromJSON(json: IAuthenticationSection): AuthenticationSection {
+  public fromJSON(json: IAuthenticationSectionAttrs): AuthenticationSection {
     return plainToClass(AuthenticationSection, json)
   }
 }

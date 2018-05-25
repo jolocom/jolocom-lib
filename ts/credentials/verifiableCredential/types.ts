@@ -1,12 +1,14 @@
-import { ICredential, IClaim } from '../credential/types'
-import { ILinkedDataSignature } from '../../linkedDataSignature/types'
+import { ICredentialAttrs, IClaimAttrs } from '../credential/types'
+import { ILinkedDataSignature, ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
+import { Credential } from '../credential';
+import { VerifiableCredential } from '.';
+import { IPrivateKey } from '../../wallet/types';
 
-export interface IVerifiableCredential extends ICredential {
+export interface IVerifiableCredentialAttrs extends ICredentialAttrs {
   id: string
   issuer: string
   issued: string
   expires?: string
-  proof: ILinkedDataSignature
-  getProofSection: () => ILinkedDataSignature
-  getCredentialSection: () => IClaim
+  claim: IClaimAttrs
+  proof: ILinkedDataSignatureAttrs
 }

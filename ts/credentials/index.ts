@@ -1,6 +1,6 @@
 import { IClaimMetadata } from './credential/types'
 import { Credential } from './credential'
-import { IVerifiableCredential } from './verifiableCredential/types';
+import { IVerifiableCredentialAttrs } from './verifiableCredential/types';
 import { VerifiableCredential } from './verifiableCredential';
 
 export class Credentials {
@@ -14,7 +14,7 @@ export class Credentials {
     }
   }
 
-  private verifiableCredentialFromJSON(json: IVerifiableCredential): VerifiableCredential {
+  private verifiableCredentialFromJSON(json: IVerifiableCredentialAttrs): VerifiableCredential {
     return new VerifiableCredential().fromJSON(json)
   }
 }

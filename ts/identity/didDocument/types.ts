@@ -1,8 +1,8 @@
-import { IAuthenticationSection } from './sections/types'
+import { IAuthenticationSectionAttrs } from './sections/types'
 
-export interface IDidDocument {
+export interface IDidDocumentAttrs {
   '@context': string
   id: string
-  authenticationSection: IAuthenticationSection
+  authenticationSection: IAuthenticationSectionAttrs
   created: Date
 }
