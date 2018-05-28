@@ -89,7 +89,6 @@ export class Identity {
     IpfsConnector.configure(this.config.ipfs)
 
     const ddoHash = await ethereumResolver.resolveDID(did)
-    const ddo =  await IpfsConnector.catJSON(ddoHash)
     return await IpfsConnector.catJSON(ddoHash) as IDidDocumentAttrs
   }
 }
