@@ -3,6 +3,7 @@ import { keyTypes } from '..'
 import { privateKeyToDID } from '../utils/crypto'
 import { Credential } from '../credentials/credential'
 import { VerifiableCredential } from '../credentials/verifiableCredential'
+import { CredentialRequest } from '../credentialRequest'
 
 export class IdentityWallet {
   private did: string
@@ -29,5 +30,9 @@ export class IdentityWallet {
     await vc.generateSignature(this.privateKey)
 
     return vc
+  }
+
+  public createCredentialRequest(): CredentialRequest {
+    return new CredentialRequest()
   }
 }
