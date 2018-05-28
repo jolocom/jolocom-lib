@@ -4,6 +4,7 @@ import { ILibConfig } from '../types'
 import { IIpfsConnector } from '../ipfs/types'
 import { IpfsStorageAgent } from '../ipfs'
 import { EthResolver } from '../ethereum'
+import { IDidDocumentAttrs } from './didDocument/types';
 
 export interface IdentityCreationResponse {
   mnemonic: string,
@@ -50,8 +51,9 @@ export class Identity {
   /* Stores DDO object on IPFS
    * @param {object} ddo - DDO object
    * @returns {string} an IPFS hash under which DDO is stored
-   * */
+  **/
 
+  // TODO IPFS connector should be configured only once
   public async store(ddo: object) {
     const { IpfsConnector:  CustomConnector } = this.config
     const IpfsConnector: IIpfsConnector = CustomConnector ? CustomConnector : new IpfsStorageAgent()
@@ -76,5 +78,17 @@ export class Identity {
     const { ethereumKey, did, ipfsHash } = options
     return ethereumResolver.updateDIDRecord(ethereumKey, did, ipfsHash)
       .catch((error) => { throw new Error(`Could not update Did record. ${error.message}`)})
+  }
+
+  public async lookup(did: string): Promise<IDidDocumentAttrs> {
+    const { contractAddress, providerUrl } = this.config.identity
+    const ethereumResolver = new EthResolver(contractAddress, providerUrl)
+
+    const { IpfsConnector:  CustomConnector } = this.config
+    const IpfsConnector: IIpfsConnector = CustomConnector ? CustomConnector : new IpfsStorageAgent()
+    IpfsConnector.configure(this.config.ipfs)
+
+    const ddoHash = await ethereumResolver.resolveDID(did)
+    return await IpfsConnector.catJSON(ddoHash) as IDidDocumentAttrs
   }
 }
