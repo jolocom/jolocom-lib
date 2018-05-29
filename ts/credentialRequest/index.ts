@@ -37,9 +37,9 @@ export class CredentialRequest {
 
   public applyConstraints(credentials: IVerifiableCredentialAttrs[]): IVerifiableCredentialAttrs[] {
     return credentials.filter((credential) => {
-      const relevantConstraints = this.requestedCredentials.find((section) => {
-        return this.areCredTypesEqual(section.type, credential.type)
-      })
+      const relevantConstraints = this.requestedCredentials.find((section) =>
+        this.areCredTypesEqual(section.type, credential.type)
+      )
 
       if (relevantConstraints) {
         return jsonlogic.apply(relevantConstraints.constraints, credential)
