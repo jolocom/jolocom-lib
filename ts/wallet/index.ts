@@ -4,6 +4,7 @@ import { privateKeyToDID } from '../utils/crypto'
 import { Credential } from '../credentials/credential'
 import { VerifiableCredential } from '../credentials/verifiableCredential'
 import { CredentialRequest } from '../credentialRequest'
+import { constraintFunc, comparableConstraintFunc, ICredentialRequest, IConstraint } from '../credentialRequest/types'
 
 export class IdentityWallet {
   private did: string
@@ -32,7 +33,17 @@ export class IdentityWallet {
     return vc
   }
 
-  public createCredentialRequest(): CredentialRequest {
-    return new CredentialRequest()
+  public createCredentialRequest(args: ICredentialCreationArgs): string {
+    const req = new CredentialRequest()
+    req.setRequesterIdentity(this.did)
+    req.setCallbackURL(args.callbackURL)
+    args.credentials.forEach((c) => req.addRequestedClaim(c.type, c.constraints))
+
+    return req.toJWT(this.privateKey.privateKey)
   }
+}
+
+export interface ICredentialCreationArgs {
+  callbackURL: string
+  credentials: Array<{type: string[], constraints: IConstraint[]}>
 }

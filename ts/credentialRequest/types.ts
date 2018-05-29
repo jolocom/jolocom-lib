@@ -1,16 +1,12 @@
+export interface IConstraint {
+  [operator: string]: [{ var: string }, string | comparable] | boolean[]
+}
+
 export interface ICredentialRequest {
   type: string[]
-  constraints: constraintFunc[]
-}
-
-export interface ICredentialRequestAttrs {
-  requesterIdentity: string
-  callbackURI: string
-  requestedCredentials: ICredentialRequest[]
-}
-
-export interface IConstraint {
-  [operator: string]: [{ var: string }, string | comparable]
+  constraints: {
+    and: IConstraint[]
+  }
 }
 
 export type comparable = number | Date
@@ -22,4 +18,10 @@ export interface IExposedConstraintFunctions {
   not: constraintFunc
   greater: comparableConstraintFunc
   smaller: comparableConstraintFunc
+}
+
+export interface ICredentialRequestAttrs {
+  requesterIdentity: string
+  callbackURI: string
+  requestedCredentials: ICredentialRequest[]
 }
