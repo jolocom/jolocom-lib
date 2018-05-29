@@ -1,4 +1,5 @@
 import { plainToClass, classToPlain } from 'class-transformer'
+import * as jsonlogic from 'json-logic-js'
 import { TokenSigner } from 'jsontokens'
 import {
   ICredentialRequestAttrs,
@@ -8,6 +9,7 @@ import {
   ICredentialRequest,
   IConstraint
 } from './types'
+import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types';
 
 export class CredentialRequest {
   private requesterIdentity: string
@@ -33,6 +35,18 @@ export class CredentialRequest {
     this.requestedCredentials.push({ type, constraints: credConstraints })
   }
 
+  public doesVCredSatisfyConstraints(type: string[], credential: IVerifiableCredentialAttrs): boolean {
+    const relevantConstraints = this.requestedCredentials.find((cred) => {
+      return this.areCredTypesEqual(cred.type, type)
+    })
+
+    if (!relevantConstraints) {
+      return false
+    }
+
+    return jsonlogic.apply(relevantConstraints.constraints, credential)
+  }
+
   public toJWT(privKey: Buffer): string {
     const hexKey = privKey.toString('hex')
 
@@ -40,7 +54,6 @@ export class CredentialRequest {
       iat: Date.now(),
       ...this.toJSON()
     }
-
     return new TokenSigner('ES256K', hexKey).sign(token)
   }
 
@@ -50,6 +63,10 @@ export class CredentialRequest {
 
   public fromJSON(json: ICredentialRequestAttrs): CredentialRequest {
     return plainToClass(CredentialRequest, json)
+  }
+
+  private areCredTypesEqual(first: string[], second: string[]): boolean {
+    return first.every((el, index) => el === second[index])
   }
 }
 
