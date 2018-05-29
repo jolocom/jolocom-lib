@@ -35,16 +35,16 @@ export class CredentialRequest {
     this.requestedCredentials.push({ type, constraints: credConstraints })
   }
 
-  public doesVCredSatisfyConstraints(type: string[], credential: IVerifiableCredentialAttrs): boolean {
-    const relevantConstraints = this.requestedCredentials.find((cred) => {
-      return this.areCredTypesEqual(cred.type, type)
+  public applyConstraints(credentials: IVerifiableCredentialAttrs[]): IVerifiableCredentialAttrs[] {
+    return credentials.filter((credential) => {
+      const relevantConstraints = this.requestedCredentials.find((section) => {
+        return this.areCredTypesEqual(section.type, credential.type)
+      })
+
+      if (relevantConstraints) {
+        return jsonlogic.apply(relevantConstraints.constraints, credential)
+      }
     })
-
-    if (!relevantConstraints) {
-      return false
-    }
-
-    return jsonlogic.apply(relevantConstraints.constraints, credential)
   }
 
   public toJWT(privKey: Buffer): string {
