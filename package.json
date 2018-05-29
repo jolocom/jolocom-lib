@@ -36,6 +36,7 @@
     "ethereumjs-util": "^5.2.0",
     "form-data": "^2.3.2",
     "jolocom-registry-contract": "^0.1.6",
+    "json-logic-js": "^1.2.2",
     "jsonld": "^1.0.1",
     "jsontokens": "^0.7.8",
     "node-fetch": "^2.1.2",
