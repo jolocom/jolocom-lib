@@ -12,10 +12,14 @@ export class Credential {
   @Expose()
   private claim: IClaimAttrs
 
+  @Expose()
+  private name: string
+
   public assemble(metadata: IClaimMetadata, value: string, subject: string): Credential {
     const cred = new Credential()
-    cred.type = metadata.type
     cred['@context'] = metadata.context
+    cred.type = metadata.type
+    cred.name = metadata.name
     cred.claim = {
       id: subject,
       [metadata.fieldName]: value
@@ -30,6 +34,10 @@ export class Credential {
 
   public getType(): string[] {
     return this.type
+  }
+
+  public getName(): string {
+    return this.name
   }
 
   public getContext(): string[] | object[] {

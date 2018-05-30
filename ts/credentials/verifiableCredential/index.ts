@@ -20,6 +20,9 @@ export class VerifiableCredential {
   private id: string
 
   @Expose()
+  private name: string
+
+  @Expose()
   private issuer: string
 
   @Expose()
@@ -61,11 +64,26 @@ export class VerifiableCredential {
     return this.claim
   }
 
+  public getDisplayName(): string {
+    if (this.name) {
+      return this.name
+    }
+
+    const customType = this.type.find((t) => t !== 'Credential')
+
+    if (!customType) {
+      return 'Credential'
+    }
+
+    return customType.replace(/([A-Z])/g, ' $1').trim()
+  }
+
   public fromCredential(credential: Credential): VerifiableCredential {
     const vc = new VerifiableCredential()
     vc['@context'] = credential.getContext()
     vc.type = credential.getType()
     vc.claim = credential.getClaim()
+    vc.name = credential.getName()
     return vc
   }
 

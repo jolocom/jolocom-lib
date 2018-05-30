@@ -26,6 +26,7 @@ export const claimsMetadata: IDefaultClaimsMetadata = {
   emailAddress: {
     fieldName: 'email',
     type: ['Credential', 'ProofOfEmailCredential'],
+    name: 'Email address',
     context: [
       'https://w3id.org/identity/v1',
       'https://identity.jolocom.com/terms',
@@ -37,6 +38,7 @@ export const claimsMetadata: IDefaultClaimsMetadata = {
   mobilePhoneNumber: {
     fieldName: 'telephone',
     type: ['Credential', 'ProofOfMobilePhoneNumber'],
+    name: 'Mobile Phone Number',
     context: [
       'https://w3id.org/identity/v1',
       'https://identity.jolocom.com/terms',
