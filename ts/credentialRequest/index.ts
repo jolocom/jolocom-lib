@@ -24,6 +24,10 @@ export class CredentialRequest {
     this.callbackURL = url
   }
 
+  public getRequestedCredentialTypes(): string[][] {
+    return this.requestedCredentials.map((credential) => credential.type)
+  }
+
   public addRequestedClaim(type: string[], constraints: IConstraint[]) {
     const credConstraints = {
       and: [
