@@ -106,8 +106,8 @@ export class VerifiableCredential {
   }
 
   private generateClaimId(): string {
-    const hash = keccak256(`${this.issuer}${this.type.toString()}`).toString('hex')
-    return `claimId:${hash.substring(20)}`
+    const randomString = generateRandomID(8)
+    return `claimId:${randomString}`
   }
 
   private async normalize(): Promise<string> {
