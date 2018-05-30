@@ -1,6 +1,6 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import * as jsonlogic from 'json-logic-js'
-import { TokenSigner } from 'jsontokens'
+import { TokenSigner, decodeToken } from 'jsontokens'
 import {
   ICredentialRequestAttrs,
   constraintFunc, comparable,
@@ -55,6 +55,11 @@ export class CredentialRequest {
       ...this.toJSON()
     }
     return new TokenSigner('ES256K', hexKey).sign(token)
+  }
+
+  public fromJWT(jwt: string): CredentialRequest {
+    const { payload } = decodeToken(jwt)
+    return this.fromJSON(payload)
   }
 
   public toJSON(): ICredentialRequestAttrs {
