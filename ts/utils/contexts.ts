@@ -18,7 +18,7 @@ export const defaultContext = {
 
   Credential: 'cred:Credential',
   ProofOfEmailCredential: 'jolo:ProofOfEmailCredential',
-  ProofOfMobilePhoneNumberCredential: 'jolo:ProofOfMobilPhoneNumberCredential',
+  ProofOfMobilePhoneNumberCredential: 'jolo:ProofOfMobilePhoneNumberCredential',
   issuer: { '@id': 'cred:issuer', '@type': '@id' },
   issued: { '@id': 'cred:issued', '@type': 'xsd:dateTime' },
 
