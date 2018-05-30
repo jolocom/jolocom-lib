@@ -25,9 +25,10 @@ export class JolocomLib {
 export const claimsMetadata: IDefaultClaimsMetadata = {
   emailAddress: {
     fieldName: 'email',
-    type: ['Credential'],
+    type: ['Credential', 'ProofOfEmailCredential'],
     context: [
       'https://w3id.org/identity/v1',
+      'https://identity.jolocom.com/terms',
       'https://w3id.org/security/v1',
       'https://w3id.org/credentials/v1',
       'http://schema.org'
@@ -35,9 +36,10 @@ export const claimsMetadata: IDefaultClaimsMetadata = {
   },
   mobilePhoneNumber: {
     fieldName: 'telephone',
-    type: ['Credential'],
+    type: ['Credential', 'ProofOfMobilePhoneNumber'],
     context: [
       'https://w3id.org/identity/v1',
+      'https://identity.jolocom.com/terms',
       'https://w3id.org/security/v1',
       'https://w3id.org/credentials/v1',
       'http://schema.org'

@@ -6,6 +6,7 @@ export const defaultContext = {
   sec: 'https://w3id.org/security#',
   dc: 'http://purl.org/dc/terms/',
   xsd: 'http://www.w3.org/2001/XMLSchema#',
+  jolo: 'https://www.identity.jolocom.com/terms/',
 
   proof: { '@id': 'sec:proof', '@type': '@id' },
   EcdsaKoblitzSignature2016: 'sec:EcdsaKoblitzSignature2016',
@@ -16,6 +17,8 @@ export const defaultContext = {
   signatureValue: 'sec:signatureValue',
 
   Credential: 'cred:Credential',
+  ProofOfEmailCredential: 'jolo:ProofOfEmailCredential',
+  ProofOfMobilePhoneNumberCredential: 'jolo:ProofOfMobilPhoneNumberCredential',
   issuer: { '@id': 'cred:issuer', '@type': '@id' },
   issued: { '@id': 'cred:issued', '@type': 'xsd:dateTime' },
 
