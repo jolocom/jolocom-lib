@@ -52,6 +52,22 @@ export class VerifiableCredential {
     this.issued = issued
   }
 
+  public getId(): string {
+    return this.id
+  }
+
+  public getType(): string[] {
+    return this.type
+  }
+
+  public getIssuer(): string {
+    return this.issuer
+  }
+
+  public getExpiryDate(): Date {
+    return this.expires
+  }
+
   public getProofSection(): ILinkedDataSignature {
     return this.proof
   }
