@@ -25,6 +25,14 @@ export class CredentialRequest {
     this.callbackURL = url
   }
 
+  public getCallbackURL(): string {
+    return this.callbackURL
+  }
+
+  public getRequester(): string {
+    return this.requesterIdentity
+  }
+
   public getRequestedCredentialTypes(): string[][] {
     return this.requestedCredentials.map((credential) => credential.type)
   }
