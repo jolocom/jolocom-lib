@@ -37,7 +37,7 @@ export const claimsMetadata: IDefaultClaimsMetadata = {
   },
   mobilePhoneNumber: {
     fieldName: 'telephone',
-    type: ['Credential', 'ProofOfMobilePhoneNumber'],
+    type: ['Credential', 'ProofOfMobilePhoneNumberCredential'],
     name: 'Mobile Phone Number',
     context: [
       'https://w3id.org/identity/v1',

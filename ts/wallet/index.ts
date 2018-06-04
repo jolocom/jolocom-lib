@@ -5,6 +5,8 @@ import { Credential } from '../credentials/credential'
 import { VerifiableCredential } from '../credentials/verifiableCredential'
 import { CredentialRequest } from '../credentialRequest'
 import { constraintFunc, comparableConstraintFunc, ICredentialRequest, IConstraint } from '../credentialRequest/types'
+import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types';
+import { CredentialResponse } from '../credentialResponse';
 
 export class IdentityWallet {
   private did: string
@@ -40,6 +42,12 @@ export class IdentityWallet {
     args.credentials.forEach((c) => req.addRequestedClaim(c.type, c.constraints))
 
     return req.toJWT(this.privateKey.privateKey)
+  }
+
+  public createCredentialResponse(credentials: IVerifiableCredentialAttrs[]): string {
+    const res = new CredentialResponse().create(credentials)
+    res.setIssuer(this.did)
+    return res.toJWT(this.privateKey.privateKey)
   }
 }
 
