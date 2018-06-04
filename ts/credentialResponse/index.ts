@@ -3,7 +3,7 @@ import { TokenSigner, decodeToken } from 'jsontokens'
 import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types'
 import { CredentialRequest } from '../credentialRequest'
 import { ISuppliedCredentialsAttrs, ICredentialResponseAttrs } from './types'
-import { areCredTypesEqual } from '../utils/general'
+import { areCredTypesEqual } from '../utils/credentials'
 
 export class CredentialResponse {
   private iss: string

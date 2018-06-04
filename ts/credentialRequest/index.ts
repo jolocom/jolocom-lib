@@ -10,7 +10,7 @@ import {
   IConstraint
 } from './types'
 import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types'
-import { areCredTypesEqual } from '../utils/general'
+import { areCredTypesEqual } from '../utils/credentials'
 
 export class CredentialRequest {
   private requesterIdentity: string
