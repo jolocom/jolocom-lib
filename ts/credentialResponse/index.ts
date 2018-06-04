@@ -6,15 +6,15 @@ import { ISuppliedCredentialsAttrs, ICredentialResponseAttrs } from './types'
 import { areCredTypesEqual } from '../utils/credentials'
 
 export class CredentialResponse {
-  private iss: string
+  private issuer: string
   private suppliedCredentials: ISuppliedCredentialsAttrs[] = []
 
   public setIssuer(did: string) {
-    this.iss = did
+    this.issuer = did
   }
 
   public getIssuer(): string {
-    return this.iss
+    return this.issuer
   }
 
   public getSuppliedCredentials(): ISuppliedCredentialsAttrs[] {
