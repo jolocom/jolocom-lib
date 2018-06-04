@@ -9,7 +9,8 @@ import {
   ICredentialRequest,
   IConstraint
 } from './types'
-import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types';
+import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types'
+import { areCredTypesEqual } from '../utils/credentials'
 
 export class CredentialRequest {
   private requesterIdentity: string
@@ -42,7 +43,7 @@ export class CredentialRequest {
   public applyConstraints(credentials: IVerifiableCredentialAttrs[]): IVerifiableCredentialAttrs[] {
     return credentials.filter((credential) => {
       const relevantConstraints = this.requestedCredentials.find((section) =>
-        this.areCredTypesEqual(section.type, credential.type)
+        areCredTypesEqual(section.type, credential.type)
       )
 
       if (relevantConstraints) {
@@ -72,10 +73,6 @@ export class CredentialRequest {
 
   public fromJSON(json: ICredentialRequestAttrs): CredentialRequest {
     return plainToClass(CredentialRequest, json)
-  }
-
-  private areCredTypesEqual(first: string[], second: string[]): boolean {
-    return first.every((el, index) => el === second[index])
   }
 }
 
