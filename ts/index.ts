@@ -46,6 +46,18 @@ export const claimsMetadata: IDefaultClaimsMetadata = {
       'https://w3id.org/credentials/v1',
       'http://schema.org'
     ]
+  },
+  name: {
+    fieldName: 'name',
+    type: ['Credential', 'ProofOfNameCredential'],
+    name: 'Name',
+    context: [
+      'https://w3id.org/identity/v1',
+      'https://identity.jolocom.com/terms',
+      'https://w3id.org/security/v1',
+      'https://w3id.org/credentials/v1',
+      'http://schema.org'
+    ]
   }
 }
 

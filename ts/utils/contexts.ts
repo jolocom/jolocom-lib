@@ -17,6 +17,8 @@ export const defaultContext = {
   signatureValue: 'sec:signatureValue',
 
   Credential: 'cred:Credential',
+  // TODO: split name for credential type
+  ProofOfNameCredential: 'jolo:ProofOfNameCredential',
   ProofOfEmailCredential: 'jolo:ProofOfEmailCredential',
   ProofOfMobilePhoneNumberCredential: 'jolo:ProofOfMobilePhoneNumberCredential',
   issuer: { '@id': 'cred:issuer', '@type': '@id' },
@@ -25,4 +27,5 @@ export const defaultContext = {
   claim: { '@id': 'cred:claim', '@type': '@id' },
   telephone: 'schema:telephone',
   email: 'schema:email',
+  name: 'schema:name'
 }

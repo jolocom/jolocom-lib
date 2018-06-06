@@ -20,4 +20,5 @@ export interface IClaimMetadata {
 export interface IDefaultClaimsMetadata {
   emailAddress: IClaimMetadata
   mobilePhoneNumber: IClaimMetadata
+  name: IClaimMetadata
 }
