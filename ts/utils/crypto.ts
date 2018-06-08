@@ -29,11 +29,15 @@ export function privateKeyToDID(privateKey: Buffer): string {
   return publicKeyToDID(pubKey)
 }
 
+// TODO Seed properly, causes issues on RN due to lack of default csrng operations.
 export function generateRandomID(nrOfBytes: number): string {
+  return Math.random().toString(16).substr(2)
+  /*
   const result = Buffer.allocUnsafe(nrOfBytes)
   random.randomWords(nrOfBytes / 4).forEach((el, index) => {
     result.writeInt32LE(el, index * 4)
   })
 
   return result.toString('hex')
+  */
 }
