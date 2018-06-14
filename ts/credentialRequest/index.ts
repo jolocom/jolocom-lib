@@ -70,16 +70,16 @@ export class CredentialRequest {
     return new TokenSigner('ES256K', hexKey).sign(token)
   }
 
-  public fromJWT(jwt: string): CredentialRequest {
-    const { payload } = decodeToken(jwt)
-    return this.fromJSON(payload)
-  }
-
   public toJSON(): ICredentialRequestAttrs {
     return classToPlain(this) as ICredentialRequestAttrs
   }
 
-  public fromJSON(json: ICredentialRequestAttrs): CredentialRequest {
+  public static fromJWT(jwt: string): CredentialRequest {
+    const { payload } = decodeToken(jwt)
+    return CredentialRequest.fromJSON(payload)
+  }
+
+  public static fromJSON(json: ICredentialRequestAttrs): CredentialRequest {
     return plainToClass(CredentialRequest, json)
   }
 }
