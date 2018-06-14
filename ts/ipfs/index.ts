@@ -41,4 +41,37 @@ export class IpfsStorageAgent implements IIpfsConnector {
       throw new Error(`Removing pinned hash ${hash} failed, status code: ${res.status}`)
     }
   }
+
+  public async createDagObject(data: string, pin: boolean): Promise<string> {
+
+    if (typeof data !== 'string' || data === null) {
+      throw new Error(`String expected, received ${typeof data}`)
+    }
+
+    const dataToDagObject = {
+        Data: data,
+        Links: []
+    }
+
+    const endpoint = `${this.endpoint}/api/v0/object/put?pin=${pin}`
+    const formData = new FormData()
+
+    formData.append('file', Buffer.from(JSON.stringify(dataToDagObject)))
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      body: formData
+    }).then((result) => result.json())
+
+    return res.Hash
+  }
+
+  public async getDagObjectData(hash: string, getData: boolean): Promise<string> {
+    console.log(hash, 'hash')
+    const endpoint = `${this.endpoint}/api/v0/object/get?arg=${hash}`
+    const res = await fetch(endpoint)
+
+    return res.json()
+  }
+
 }
