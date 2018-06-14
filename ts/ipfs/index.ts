@@ -5,7 +5,7 @@ import { IIpfsConnector, IIpfsConfig } from './types'
 export class IpfsStorageAgent implements IIpfsConnector {
   private endpoint!: string
 
-  public configure({config}: {config: IIpfsConfig}): void {
+  constructor({config}: {config: IIpfsConfig}) {
     this.endpoint = `${config.protocol}://${config.host}:${config.port}`
   }
 
