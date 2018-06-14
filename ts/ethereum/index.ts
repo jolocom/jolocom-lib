@@ -1,7 +1,7 @@
 import EthereumResolver from 'jolocom-registry-contract'
-import { IEthereumResolverConfig } from './types';
+import { IEthereumResolverConfig, IEthereumConnector } from './types';
 
-export class EthResolver {
+export class EthResolver implements IEthereumConnector {
   private ethResolver: any
 
   constructor(config: IEthereumResolverConfig) {
