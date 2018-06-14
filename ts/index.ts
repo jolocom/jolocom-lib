@@ -6,12 +6,14 @@ import { ILibConfig } from './types'
 import { IDefaultClaimsMetadata } from './credentials/credential/types'
 import { defaultConfig } from './defaultConfig'
 import { SSO } from './sso'
+import { Parser } from './parse/parser'
 
 export class JolocomLib {
   public identity: Identity
   public wallet: IdentityWallet
   public credentials: Credentials
   public sso: SSO
+  public static parse = Parser
 
   // TODO Creation process should be changed.
   constructor(config: ILibConfig = defaultConfig) {

@@ -49,7 +49,7 @@ export class Credential {
     return plainToClass(Credential, json)
   }
 
-  public toJSON(credential: Credential): ICredentialAttrs {
+  public toJSON(): ICredentialAttrs {
     return classToPlain(this) as ICredentialAttrs
   }
 }
