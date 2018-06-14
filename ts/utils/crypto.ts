@@ -24,9 +24,12 @@ export function publicKeyToDID(publicKey: Buffer): string {
   return prefix + suffix.toString('hex')
 }
 
+export function privateKeyToPublicKey(privateKey: Buffer): Buffer {
+  return secp256k1.publicKeyCreate(privateKey)
+}
+
 export function privateKeyToDID(privateKey: Buffer): string {
-  const pubKey = secp256k1.publicKeyCreate(privateKey)
-  return publicKeyToDID(pubKey)
+  return publicKeyToDID(privateKeyToPublicKey(privateKey))
 }
 
 export function generateRandomID(nrOfBytes: number): string {

@@ -4,6 +4,6 @@ export interface IEthereumResolverConfig {
 }
 
 export interface IEthereumConnector {
-  resolveDID: (did: string) => Promise<string>
-  updateDIDRecord: (ethereumKey: object, did: string, newHash: string) => Promise<void>
+  resolveDID: ({did}: {did: string}) => Promise<string>
+  updateDIDRecord: ({ethereumKey, did, newHash}: {ethereumKey: object, did: string, newHash: string}) => Promise<void>
 }
