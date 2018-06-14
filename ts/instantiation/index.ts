@@ -1,24 +1,27 @@
-import { CredentialRequest } from '../credentialRequest';
+import { CredentialRequest } from '../credentialRequest'
+import { CredentialResponse } from '../credentialResponse'
+import { Credential } from '../credentials/credential'
+import { VerifiableCredential } from '../credentials/verifiableCredential'
 
 export const instanate = {
   credentialRequest: {
     fromJSON: CredentialRequest.fromJSON
   },
   credentialResponse: {
-    fromJSON: () => {}
+    fromJSON: CredentialResponse.fromJSON
   },
   credential: {
-    fromJSON: () => {}
+    fromJSON: Credential.fromJSON
   },
   signedCredentialRequest: {
-    fromJSON: () => {},
-    fromJWT: () => {}
+    fromJSON: () => CredentialRequest.fromJSON,
+    fromJWT: () => CredentialResponse.fromJWT
   },
   signedCredentialResponse: {
-    fromJSON: () => {},
-    fromJWT: () => {}
+    fromJSON: () => CredentialResponse.fromJSON,
+    fromJWT: () => CredentialResponse.fromJWT
   },
   signedCredential: {
-    fromJSON: () => {}
+    fromJSON: () => VerifiableCredential.fromJSON
   }
 }
