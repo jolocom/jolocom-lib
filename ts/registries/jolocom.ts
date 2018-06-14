@@ -1,6 +1,6 @@
 import { IIpfsConnector } from '../ipfs/types';
 import { IEthereumConnector } from '../ethereum/types';
-import { IdentityWallet } from '../wallet';
+import { IdentityWallet } from '../identityWallet/identityWallet';
 import { privateKeyToPublicKey } from '../utils/crypto'
 import { DidDocument } from '../identity/didDocument'
 
@@ -26,6 +26,15 @@ class Jolocom {
     {privateIdentityKey, privateEthereumKey}:
       { privateIdentityKey: Buffer, privateEthereumKey: Buffer }): Promise<IdentityWallet> {
     const ddo = new DidDocument().fromPublicKey(privateKeyToPublicKey(privateIdentityKey))
+    // TODO: Initialize properly after the IdentityWallet is implemented
+    const identityWallet = new IdentityWallet()
+    this.commit({wallet: identityWallet, privateEthereumKey})
+
+    return identityWallet
+  }
+
+  public async commit({wallet, privateEthereumKey}: {wallet: IdentityWallet, privateEthereumKey: Buffer}) {
+    const ddo = wallet.getDidDocument()
     let ipfsHash = ''
     try {
       ipfsHash = await this.ipfsConnector.storeJSON({data: ddo, pin: true})
@@ -39,8 +48,13 @@ class Jolocom {
     } catch (error) {
       throw new Error(`Could not register DID record on Ethereum. ${error.message}`)
     }
-
-    // TODO: Initialize properly after the IdentityWallet is implemented
-    return new IdentityWallet()
   }
+
+  // public async resolve({did}: {did: string}) {
+  //   try {
+  //     resolvedDid = this.ethereumConnector.resolveDID({did})
+  //   } catch(error) {
+
+  //   }
+  // }
 }
