@@ -11,6 +11,7 @@ import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsa
 import { defaultContext } from '../../utils/contexts'
 import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
 
+// TODO Change to SignedCredential
 @Exclude()
 export class VerifiableCredential {
   @Expose()
@@ -94,6 +95,7 @@ export class VerifiableCredential {
     return customType.replace(/([A-Z])/g, ' $1').trim()
   }
 
+  // TODO remove / modify in favor of identityWallet.sign.credential
   public fromCredential(credential: Credential): VerifiableCredential {
     const vc = new VerifiableCredential()
     vc['@context'] = credential.getContext()
@@ -126,7 +128,7 @@ export class VerifiableCredential {
     return verifySignature(tbv, pubKey, sig)
   }
 
-  public fromJSON(json: IVerifiableCredentialAttrs): VerifiableCredential {
+  public static fromJSON(json: IVerifiableCredentialAttrs): VerifiableCredential {
     return plainToClass(VerifiableCredential, json)
   }
 
