@@ -1,5 +1,6 @@
 import * as FormData from 'form-data'
 import * as fetch from 'node-fetch'
+import * as dagPB from 'ipld-dag-pb'
 import { IIpfsConnector, IIpfsConfig } from './types'
 
 export class IpfsStorageAgent implements IIpfsConnector {
@@ -66,12 +67,32 @@ export class IpfsStorageAgent implements IIpfsConnector {
     return res.Hash
   }
 
-  public async getDagObjectData(hash: string, getData: boolean): Promise<string> {
-    console.log(hash, 'hash')
+  public async getDagObject(hash: string ): Promise<object> {
     const endpoint = `${this.endpoint}/api/v0/object/get?arg=${hash}`
     const res = await fetch(endpoint)
-
     return res.json()
   }
 
+  public async getDagObjectData(hash: string ): Promise<string> {
+    const endpoint = `${this.endpoint}/api/v0/object/data?arg=${hash}`
+    const res = await fetch(endpoint)
+    return res.text()
+  }
+
+  public async getDagObjectLinks(hash: string ): Promise<string> {
+    const endpoint = `${this.endpoint}/api/v0/object/links?arg=${hash}`
+    const res = await fetch(endpoint)
+    const fullRes = res.json()
+    if ( !fullRes.Links ) {
+      return 'No available links on this DAG object.'
+    } else {
+      return fullRes.Links
+    }
+  }
+
+  // TODO: add typing for DAGNode below
+  // tslint:disable-next-line:max-line-length
+  // public async addDagLink({ headNodeHash, claimID, linkNodeHash }: { headNodeHash: string, claimID: string, linkNode: any}): Promise<any> {
+  //   const link = new dagPB.DAGLink()
+  // }
 }
