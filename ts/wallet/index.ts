@@ -1,12 +1,12 @@
 import { IPrivateKey } from './types'
 import { keyTypes } from '..'
 import { privateKeyToDID } from '../utils/crypto'
-import { Credential } from '../credentials/credential'
-import { VerifiableCredential } from '../credentials/verifiableCredential'
 import { CredentialRequest } from '../credentialRequest'
-import { constraintFunc, comparableConstraintFunc, ICredentialRequest, IConstraint } from '../credentialRequest/types'
-import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types';
-import { CredentialResponse } from '../credentialResponse';
+import { IConstraint } from '../credentialRequest/types'
+import { CredentialResponse } from '../credentialResponse'
+import { Credential } from '../credentials/credential'
+import { SignedCredential } from '../credentials/signedCredential'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 export class IdentityWallet {
   private did: string
@@ -25,14 +25,14 @@ export class IdentityWallet {
     return wallet
   }
 
-  public async signCredential(credential: Credential): Promise<VerifiableCredential> {
-    const vc = new VerifiableCredential().fromCredential(credential)
+  public async signCredential(credential: Credential): Promise<SignedCredential> {
+    const signedCred = new SignedCredential().fromCredential(credential)
 
-    vc.setIssuer(this.did)
-    vc.setIssued(new Date())
-    await vc.generateSignature(this.privateKey)
+    signedCred.setIssuer(this.did)
+    signedCred.setIssued(new Date())
+    await signedCred.generateSignature(this.privateKey)
 
-    return vc
+    return signedCred
   }
 
   public createCredentialRequest(args: ICredentialCreationArgs): string {
@@ -44,7 +44,7 @@ export class IdentityWallet {
     return req.toJWT(this.privateKey.privateKey)
   }
 
-  public createCredentialResponse(credentials: IVerifiableCredentialAttrs[]): string {
+  public createCredentialResponse(credentials: ISignedCredentialAttrs[]): string {
     const res = new CredentialResponse().create(credentials)
     res.setIssuer(this.did)
     return res.toJWT(this.privateKey.privateKey)
