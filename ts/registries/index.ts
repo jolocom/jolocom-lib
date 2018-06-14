@@ -1,6 +1,8 @@
+import { JolocomRegistry } from './jolocomRegistry'
+
 class Registries {
 
     public jolocom = {
-          create: Jolocom.create()
+      create: JolocomRegistry.create
     }
 }

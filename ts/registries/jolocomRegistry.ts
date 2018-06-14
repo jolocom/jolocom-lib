@@ -9,18 +9,18 @@ import { IDidDocumentAttrs } from '../identity/didDocument/types';
  *  and Ethereum for registering the indentity and the resolution
  *  mechanism.
  */
-class Jolocom {
-  private ipfsConnector: IIpfsConnector
-  private ethereumConnector: IEthereumConnector
+export class JolocomRegistry {
+  public ipfsConnector: IIpfsConnector
+  public ethereumConnector: IEthereumConnector
 
   public static create(
     {ipfsConnector, ethereumConnector}:
-    {ipfsConnector: IIpfsConnector, ethereumConnector: IEthereumConnector}) {
-    const jolocom = new Jolocom()
-    jolocom.ipfsConnector = ipfsConnector
-    jolocom.ethereumConnector = ethereumConnector
+    {ipfsConnector: IIpfsConnector, ethereumConnector: IEthereumConnector}): JolocomRegistry {
+    const jolocomRegistry = new JolocomRegistry()
+    jolocomRegistry.ipfsConnector = ipfsConnector
+    jolocomRegistry.ethereumConnector = ethereumConnector
 
-    return jolocom
+    return jolocomRegistry
   }
 
   public async create(
@@ -59,12 +59,15 @@ class Jolocom {
       }) as Promise<IDidDocumentAttrs>
   }
 
-  public async authenticate({privateIdentityKey}: {privateIdentityKey: Buffer}): IdentityWallet {
+  public async authenticate({privateIdentityKey}: {privateIdentityKey: Buffer}): Promise<IdentityWallet> {
     const identityWallet = new IdentityWallet()
     const did = privateKeyToDID(privateIdentityKey)
     // TODO: change according to return of resolve
     const ddoAttrs = await this.resolve({did})
     const didDocument = DidDocument.fromJSON(ddoAttrs)
     identityWallet.setDidDocument({didDocument})
+    identityWallet.setPrivateIdentityKey({privateIdentityKey})
+
+    return identityWallet
   }
 }

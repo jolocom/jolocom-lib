@@ -4,7 +4,7 @@ import { IEthereumResolverConfig, IEthereumConnector } from './types'
 export class EthResolver implements IEthereumConnector {
   private ethResolver: any
 
-  constructor(config: IEthereumResolverConfig) {
+  constructor({config}: {config: IEthereumResolverConfig}) {
     this.ethResolver = new EthereumResolver(config.contractAddress, config.providerUrl)
   }
 
