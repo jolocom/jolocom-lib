@@ -15,6 +15,7 @@ export class Credential {
   @Expose()
   private name: string
 
+  // TODO Change to async create for Unsigned issue #84
   public assemble(metadata: IClaimMetadata, value: string, subject: string): Credential {
     const cred = new Credential()
     cred['@context'] = metadata.context
@@ -44,7 +45,7 @@ export class Credential {
     return this['@context']
   }
 
-  public fromJSON(json: ICredentialAttrs): Credential {
+  public static fromJSON(json: ICredentialAttrs): Credential {
     return plainToClass(Credential, json)
   }
 
