@@ -9,8 +9,8 @@ import {
   ICredentialRequest,
   IConstraint
 } from './types'
-import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types'
 import { areCredTypesEqual } from '../utils/credentials'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types';
 
 export class CredentialRequest {
   private requesterIdentity: string
@@ -48,7 +48,7 @@ export class CredentialRequest {
     this.requestedCredentials.push({ type, constraints: credConstraints })
   }
 
-  public applyConstraints(credentials: IVerifiableCredentialAttrs[]): IVerifiableCredentialAttrs[] {
+  public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
     return credentials.filter((credential) => {
       const relevantConstraints = this.requestedCredentials.find((section) =>
         areCredTypesEqual(section.type, credential.type)

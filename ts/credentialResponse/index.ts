@@ -1,9 +1,8 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import { TokenSigner, decodeToken } from 'jsontokens'
-import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types'
 import { CredentialRequest } from '../credentialRequest'
 import { ISuppliedCredentialsAttrs, ICredentialResponseAttrs } from './types'
-import { areCredTypesEqual } from '../utils/credentials'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types';
 
 export class CredentialResponse {
   private issuer: string
@@ -22,7 +21,7 @@ export class CredentialResponse {
   }
 
   // TODO two credentials of the same type
-  public addSuppliedCredentials(credentials: IVerifiableCredentialAttrs[]) {
+  public addSuppliedCredentials(credentials: ISignedCredentialAttrs[]) {
     credentials.forEach((credential) => {
       this.suppliedCredentials.push({
         type: credential.type,
@@ -32,7 +31,7 @@ export class CredentialResponse {
   }
 
   // TODO static as per #84
-  public create(credentials: IVerifiableCredentialAttrs[]): CredentialResponse {
+  public create(credentials: ISignedCredentialAttrs[]): CredentialResponse {
     const CR = new CredentialResponse()
     CR.addSuppliedCredentials(credentials)
     return CR
