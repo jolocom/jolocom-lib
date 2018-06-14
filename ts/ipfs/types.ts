@@ -9,4 +9,6 @@ export interface IIpfsConnector {
   storeJSON: (data: object, pin: boolean) => Promise<string>
   catJSON: (hash: string) => Promise<object>
   removePinnedHash: (hash: string) => Promise<void>
+  createDagObject: (data: string, pin: boolean ) => Promise<string>
+  getDagObjectData: (hash: string, getData: boolean) => Promise<string>
 }
