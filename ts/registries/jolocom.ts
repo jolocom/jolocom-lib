@@ -26,14 +26,18 @@ class Jolocom {
     {privateIdentityKey, privateEthereumKey}:
       { privateIdentityKey: Buffer, privateEthereumKey: Buffer }): Promise<IdentityWallet> {
     const ddo = new DidDocument().fromPublicKey(privateKeyToPublicKey(privateIdentityKey))
-    // TODO: Initialize properly after the IdentityWallet is implemented
+
     const identityWallet = new IdentityWallet()
-    this.commit({wallet: identityWallet, privateEthereumKey})
+    identityWallet.setDidDocument({didDocument: ddo})
+
+    await this.commit({wallet: identityWallet, privateEthereumKey})
 
     return identityWallet
   }
 
-  public async commit({wallet, privateEthereumKey}: {wallet: IdentityWallet, privateEthereumKey: Buffer}) {
+  public async commit(
+    {wallet, privateEthereumKey}: {wallet: IdentityWallet, privateEthereumKey: Buffer}
+  ): Promise<void> {
     const ddo = wallet.getDidDocument()
     let ipfsHash = ''
     try {
@@ -41,20 +45,13 @@ class Jolocom {
     } catch (error) {
       throw new Error(`Could not save DID record on IPFS. ${error.message}`)
     }
-    try {
-      await this.ethereumConnector.updateDIDRecord(
+    return this.ethereumConnector.updateDIDRecord(
         {ethereumKey: privateEthereumKey, did: ddo.getDID(), newHash: ipfsHash}
-      )
-    } catch (error) {
-      throw new Error(`Could not register DID record on Ethereum. ${error.message}`)
-    }
+      ).catch((error) => { throw new Error(`Could not register DID record on Ethereum. ${error.message}`) })
   }
 
-  // public async resolve({did}: {did: string}) {
-  //   try {
-  //     resolvedDid = this.ethereumConnector.resolveDID({did})
-  //   } catch(error) {
-
-  //   }
-  // }
+  public async resolve({did}: {did: string}): Promise<string> {
+     return this.ethereumConnector.resolveDID({did})
+      .catch((error) => { throw new Error(`Could not retrieve DID Document. ${error.message}`) })
+  }
 }
