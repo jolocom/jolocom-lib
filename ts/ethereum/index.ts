@@ -1,10 +1,11 @@
 import EthereumResolver from 'jolocom-registry-contract'
+import { IEthereumResolverConfig } from './types';
 
 export class EthResolver {
   private ethResolver: any
 
-  constructor(address: string, providerUri: string) {
-    this.ethResolver = new EthereumResolver(address, providerUri)
+  constructor(config: IEthereumResolverConfig) {
+    this.ethResolver = new EthereumResolver(config.contractAddress, config.providerUrl)
   }
 
   public async resolveDID(did: string): Promise<string> {
