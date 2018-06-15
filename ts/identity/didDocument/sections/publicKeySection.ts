@@ -1,5 +1,6 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { IPublicKeySectionAttrs } from './types'
+import 'reflect-metadata'
 
 @Exclude()
 export class PublicKeySection {
