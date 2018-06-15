@@ -35,6 +35,7 @@
     "class-transformer": "^0.1.9",
     "ethereumjs-util": "^5.2.0",
     "form-data": "^2.3.2",
+    "ipld-dag-pb": "^0.14.4",
     "jolocom-registry-contract": "^0.1.6",
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.0.1",
