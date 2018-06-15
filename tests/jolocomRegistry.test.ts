@@ -38,9 +38,8 @@ describe.only('JolocomRegistry', () => {
   const testPrivateEthereumKey = keyPairEthereum.d.toBuffer(32)
 
   const ddo = new DidDocument().fromPublicKey(keyPairSigning.getPublicKeyBuffer())
-  const ipfsHash = '4f72333148622e4ae56e9c65d57aee47186cd6910ca080757ab72cc0c650f6bb'
-
   const ddoAttrs: IDidDocumentAttrs = testIdentity.ddoAttrs
+  const ipfsHash = '4f72333148622e4ae56e9c65d57aee47186cd6910ca080757ab72cc0c650f6bb'
 
   const jolocomRegistry = JolocomRegistry.create({ipfsConnector, ethereumConnector})
 
@@ -165,6 +164,27 @@ describe.only('JolocomRegistry', () => {
 
     it('should return proper identityWallet instance on create', () => {
       expect(identityWallet).to.deep.equal(identityWalletMock)
+    })
+  })
+
+  describe('error handling commit', () => {
+    let storeJSONStub
+
+    beforeEach(() => {
+      storeJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
+        .withArgs({data: ddo, pin: true})
+        .throws('Incorrect data submitted')
+        // await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
+    })
+
+    afterEach(() => {
+      sandbox.restore()
+    })
+
+    it('should correctly assemble the thrown error message', async () => {
+      await expect(() => {jolocomRegistry.commit.bind(jolocomRegistry,
+          {wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})})
+      .to.throw(new Error('Could not save DID record on IPFS. Incorrect data submitted'))
     })
   })
 })
