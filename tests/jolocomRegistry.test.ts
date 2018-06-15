@@ -3,6 +3,7 @@ import { EthResolver } from '../ts/ethereum'
 import { JolocomRegistry } from '../ts/registries/jolocomRegistry'
 import { ECPair } from 'bitcoinjs-lib'
 import testKeys from './data/keys'
+import testIdentity from './data/identity'
 import { DidDocument } from '../ts/identity/didDocument'
 import * as sinon from 'sinon'
 import * as lolex from 'lolex'
@@ -39,24 +40,7 @@ describe.only('JolocomRegistry', () => {
   const ddo = new DidDocument().fromPublicKey(keyPairSigning.getPublicKeyBuffer())
   const ipfsHash = '4f72333148622e4ae56e9c65d57aee47186cd6910ca080757ab72cc0c650f6bb'
 
-  const ddoAttrs: IDidDocumentAttrs = {
-    '@context': 'https://w3id.org/did/v1',
-    'id': 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af',
-    'authentication': [
-      {
-        id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#keys-1',
-        type: ['EdDsaSAPublicKeySecp256k1']
-      }
-    ],
-    'publicKey': [
-      {
-        id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#keys-1',
-        type: 'EdDsaSAPublicKeySecp256k1',
-        publicKeyHex: '039ab801fef81ad6928c62ca885b1f62c01a493daf58a0f7c76026d44d1d31f163'
-      }
-    ],
-    'created': clock
-  }
+  const ddoAttrs: IDidDocumentAttrs = testIdentity.ddoAttrs
 
   const jolocomRegistry = JolocomRegistry.create({ipfsConnector, ethereumConnector})
 
@@ -157,6 +141,30 @@ describe.only('JolocomRegistry', () => {
 
     it('should fetch DDO attributes from IPFS', () => {
       sandbox.assert.calledOnce(catJSONStub)
+    })
+  })
+
+  describe('authenticate', () => {
+    let resolveStub
+    let identityWallet
+
+    beforeEach(async () => {
+      resolveStub = sandbox.stub(JolocomRegistry.prototype, 'resolve')
+        .withArgs({did: ddo.getDID()})
+        .resolves(ddoAttrs)
+      identityWallet = await jolocomRegistry.authenticate({privateIdentityKey: testPrivateIdentityKey})
+    })
+
+    afterEach(() => {
+      sandbox.restore()
+    })
+
+    it('should resolve DID to DDO attributes', () => {
+      sandbox.assert.calledOnce(resolveStub)
+    })
+
+    it('should return proper identityWallet instance on create', () => {
+      expect(identityWallet).to.deep.equal(identityWalletMock)
     })
   })
 })
