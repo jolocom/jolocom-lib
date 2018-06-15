@@ -1,16 +1,14 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import * as jsonlogic from 'json-logic-js'
-import { TokenSigner, decodeToken } from 'jsontokens'
 import {
   ICredentialRequestAttrs,
-  constraintFunc, comparable,
-  comparableConstraintFunc,
+  comparable,
   IExposedConstraintFunctions,
   ICredentialRequest,
   IConstraint
 } from './types'
 import { areCredTypesEqual } from '../utils/credentials'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types';
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 export class CredentialRequest {
   private requesterIdentity: string
@@ -60,23 +58,8 @@ export class CredentialRequest {
     })
   }
 
-  public toJWT(privKey: Buffer): string {
-    const hexKey = privKey.toString('hex')
-
-    const token = {
-      iat: Date.now(),
-      ...this.toJSON()
-    }
-    return new TokenSigner('ES256K', hexKey).sign(token)
-  }
-
   public toJSON(): ICredentialRequestAttrs {
     return classToPlain(this) as ICredentialRequestAttrs
-  }
-
-  public static fromJWT(jwt: string): CredentialRequest {
-    const { payload } = decodeToken(jwt)
-    return CredentialRequest.fromJSON(payload)
   }
 
   public static fromJSON(json: ICredentialRequestAttrs): CredentialRequest {
@@ -84,6 +67,7 @@ export class CredentialRequest {
   }
 }
 
+// TODO MOVE
 export const constraintFunctions: IExposedConstraintFunctions = {
   is: (field: string, value: string) => assembleStatement('==', field, value),
   not: (field: string, value: string) => assembleStatement('!=', field, value),
