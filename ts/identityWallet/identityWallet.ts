@@ -1,6 +1,7 @@
 import { DidDocument } from '../identity/didDocument';
+import { IIdentityWallet } from './types'
 
-export class IdentityWallet {
+export class IdentityWallet implements IIdentityWallet {
   private didDocument: DidDocument
   private privateIdentityKey: Buffer
 

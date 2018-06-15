@@ -3,7 +3,7 @@ import { IpfsStorageAgent } from '../ts/ipfs';
 import { EthResolver } from '../ts/ethereum'
 import { JolocomRegistry } from '../ts/registries/jolocomRegistry'
 
-describe('JolocomRegistry', () => {
+describe.only('JolocomRegistry', () => {
   const ipfsConnector = new IpfsStorageAgent({config: {
     host: 'test',
     port: 9090,
