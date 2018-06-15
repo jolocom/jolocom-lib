@@ -1,6 +1,5 @@
 import * as FormData from 'form-data'
 import * as fetch from 'node-fetch'
-import * as dagPB from 'ipld-dag-pb'
 import { IIpfsConnector, IIpfsConfig } from './types'
 
 export class IpfsStorageAgent implements IIpfsConnector {
@@ -79,6 +78,12 @@ export class IpfsStorageAgent implements IIpfsConnector {
     return res.text()
   }
 
+  public async getDagObjectStat(hash: string ): Promise<object> {
+    const endpoint = `${this.endpoint}/api/v0/object/stat?arg=${hash}`
+    const res = await fetch(endpoint)
+    return res.json()
+  }
+
   public async getDagObjectLinks(hash: string ): Promise<string> {
     const endpoint = `${this.endpoint}/api/v0/object/links?arg=${hash}`
     const res = await fetch(endpoint)
@@ -90,9 +95,20 @@ export class IpfsStorageAgent implements IIpfsConnector {
     }
   }
 
-  // TODO: add typing for DAGNode below
-  // tslint:disable-next-line:max-line-length
-  // public async addDagLink({ headNodeHash, claimID, linkNodeHash }: { headNodeHash: string, claimID: string, linkNode: any}): Promise<any> {
-  //   const link = new dagPB.DAGLink()
-  // }
+  public async addDagLink({
+    headNodeHash, claimId, linkNodeHash
+  }: {
+    headNodeHash: string, claimId: string, linkNodeHash: string
+  }): Promise<object> {
+    // tslint:disable-next-line:max-line-length
+    const endpoint = `${this.endpoint}/api/v0/object/patch/add-link?arg=${headNodeHash}&arg=${claimId}&arg=${linkNodeHash}`
+    const newHeadNode = await fetch(endpoint)
+    return newHeadNode.json()
+  }
+
+  public async resolveDagLink({ headNodeHash, claimId }: { headNodeHash: string, claimId: string }): Promise<object> {
+    const endpoint = `${this.endpoint}/api/v0/object/get?arg=${headNodeHash}/${claimId}`
+    const resolvedNode = await fetch(endpoint)
+    return resolvedNode.json()
+  }
 }
