@@ -14,6 +14,8 @@ chai.use(sinonChai)
 const expect = chai.expect
 
 describe.only('JolocomRegistry', () => {
+  const sandbox = sinon.createSandbox()
+
   const ipfsConnector = new IpfsStorageAgent({config: {
     host: 'test',
     port: 9090,
@@ -36,26 +38,38 @@ describe.only('JolocomRegistry', () => {
   const ddo = new DidDocument().fromPublicKey(keyPairSigning.getPublicKeyBuffer())
   const ipfsHash = '4f72333148622e4ae56e9c65d57aee47186cd6910ca080757ab72cc0c650f6bb'
 
-  sinon.stub(IpfsStorageAgent.prototype, 'storeJSON')
-    .withArgs({data: ddo, pin: true})
-    .returns(ipfsHash)
-  sinon.stub(EthResolver.prototype, 'updateDIDRecord')
-    .withArgs({did: ddo.getDID(), ethereumKey: testPrivateEthereumKey, newHash: ipfsHash})
-    .resolves()
-
   const jolocomRegistry = JolocomRegistry.create({ipfsConnector, ethereumConnector})
 
-  describe('static create method', () => {
+  const identityWalletMock = new IdentityWallet()
+  identityWalletMock.setDidDocument({didDocument: ddo})
+  identityWalletMock.setPrivateIdentityKey({privateIdentityKey: testPrivateIdentityKey})
+
+  describe('static created', () => {
     it('should create an instance of JolocomRegistry with correct config', () => {
       expect(jolocomRegistry.ipfsConnector).to.deep.equal(ipfsConnector)
       expect(jolocomRegistry.ethereumConnector).to.deep.equal(ethereumConnector)
     })
   })
 
-  describe('create instance method', async () => {
-    const identityWallet = await jolocomRegistry.create({
-      privateIdentityKey: testPrivateIdentityKey,
-      privateEthereumKey: testPrivateEthereumKey
+  describe('instance create', async () => {
+    let identityWallet
+
+    beforeEach(async () => {
+      sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
+        .withArgs({data: ddo, pin: true})
+        .returns(ipfsHash)
+      sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
+        .withArgs({did: ddo.getDID(), ethereumKey: testPrivateEthereumKey, newHash: ipfsHash})
+        .resolves()
+
+      identityWallet = await jolocomRegistry.create({
+        privateIdentityKey: testPrivateIdentityKey,
+        privateEthereumKey: testPrivateEthereumKey
+      })
+    })
+
+    afterEach(() => {
+        sandbox.restore()
     })
 
     it('should populate ddo on the identity wallet', () => {
@@ -68,10 +82,34 @@ describe.only('JolocomRegistry', () => {
     })
 
     it('should return proper identityWallet instance on create', () => {
-      const identityWalletMock = new IdentityWallet()
-      identityWalletMock.setDidDocument({didDocument: ddo})
-      identityWalletMock.setPrivateIdentityKey({privateIdentityKey: testPrivateIdentityKey})
       expect(identityWallet).to.deep.equal(identityWalletMock)
+    })
+  })
+
+  describe('commit', () => {
+    let storeJSONStub
+    let updateDIDRecordStub
+
+    beforeEach(async () => {
+      storeJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
+        .withArgs({data: ddo, pin: true})
+        .returns(ipfsHash)
+      updateDIDRecordStub = sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
+        .withArgs({did: ddo.getDID(), ethereumKey: testPrivateEthereumKey, newHash: ipfsHash})
+        .resolves()
+      await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
+    })
+
+    afterEach(() => {
+      sandbox.restore()
+    })
+
+    it('should call storeJson on IpfsStorageAgent', async () => {
+      sandbox.assert.calledOnce(storeJSONStub)
+    })
+
+    it('should call updateDIDRecord on EthResolver', async () => {
+      sandbox.assert.calledOnce(updateDIDRecordStub)
     })
   })
 })
