@@ -30,6 +30,7 @@ export class JolocomRegistry {
 
     const identityWallet = new IdentityWallet()
     identityWallet.setDidDocument({didDocument: ddo})
+    identityWallet.setPrivateIdentityKey({privateIdentityKey})
 
     await this.commit({wallet: identityWallet, privateEthereumKey})
 

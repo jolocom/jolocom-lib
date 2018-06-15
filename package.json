@@ -22,7 +22,8 @@
   "contributors": [
     "Eugeniu Rusu <eugeniu@jolocom.com>",
     "Natascha Wittenberg <natascha@jolocom.com>",
-    "Charleen Fei <charleen@jolocom.com>"
+    "Charleen Fei <charleen@jolocom.com>",
+    "Katarzyna Szawan <kasia@jolocom.com>"
   ],
   "bugs": {
     "url": "https://github.com/jolocom/jolocom-lib/issues"
@@ -39,10 +40,12 @@
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.0.1",
     "jsontokens": "^0.7.8",
+    "moment": "^2.22.2",
     "node-fetch": "^2.1.2",
     "qrcode": "^1.2.0",
     "reflect-metadata": "^0.1.12",
     "secp256k1": "^3.5.0",
+    "sinon-chai": "^3.2.0",
     "sjcl": "^1.0.7"
   },
   "devDependencies": {
