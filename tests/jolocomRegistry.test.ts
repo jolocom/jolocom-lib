@@ -9,7 +9,8 @@ import * as lolex from 'lolex'
 import * as moment from 'moment'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import { IdentityWallet } from '../ts/identityWallet/identityWallet';
+import { IdentityWallet } from '../ts/identityWallet/identityWallet'
+import { IDidDocumentAttrs } from '../ts/identity/didDocument/types'
 chai.use(sinonChai)
 const expect = chai.expect
 
@@ -37,6 +38,25 @@ describe.only('JolocomRegistry', () => {
 
   const ddo = new DidDocument().fromPublicKey(keyPairSigning.getPublicKeyBuffer())
   const ipfsHash = '4f72333148622e4ae56e9c65d57aee47186cd6910ca080757ab72cc0c650f6bb'
+
+  const ddoAttrs: IDidDocumentAttrs = {
+    '@context': 'https://w3id.org/did/v1',
+    'id': 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af',
+    'authentication': [
+      {
+        id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#keys-1',
+        type: ['EdDsaSAPublicKeySecp256k1']
+      }
+    ],
+    'publicKey': [
+      {
+        id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#keys-1',
+        type: 'EdDsaSAPublicKeySecp256k1',
+        publicKeyHex: '039ab801fef81ad6928c62ca885b1f62c01a493daf58a0f7c76026d44d1d31f163'
+      }
+    ],
+    'created': clock
+  }
 
   const jolocomRegistry = JolocomRegistry.create({ipfsConnector, ethereumConnector})
 
@@ -110,6 +130,33 @@ describe.only('JolocomRegistry', () => {
 
     it('should call updateDIDRecord on EthResolver', async () => {
       sandbox.assert.calledOnce(updateDIDRecordStub)
+    })
+  })
+
+  describe('resolve', () => {
+    let resolveDIDStub
+    let catJSONStub
+
+    beforeEach(async () => {
+      resolveDIDStub = sandbox.stub(EthResolver.prototype, 'resolveDID')
+        .withArgs({did: ddo.getDID()})
+        .resolves(ipfsHash)
+      catJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'catJSON')
+        .withArgs({hash: ipfsHash})
+        .resolves(ddoAttrs)
+      await jolocomRegistry.resolve({did: ddo.getDID()})
+    })
+
+    afterEach(() => {
+      sandbox.restore()
+    })
+
+    it('should fetch ipfsHash from Ethereum', () => {
+      sandbox.assert.calledOnce(resolveDIDStub)
+    })
+
+    it('should fetch DDO attributes from IPFS', () => {
+      sandbox.assert.calledOnce(catJSONStub)
     })
   })
 })
