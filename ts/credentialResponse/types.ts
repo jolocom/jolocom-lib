@@ -1,4 +1,4 @@
-import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types';
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 export interface ICredentialResponseAttrs {
   iss: string
@@ -7,5 +7,5 @@ export interface ICredentialResponseAttrs {
 
 export interface ISuppliedCredentialsAttrs {
   type: string[]
-  credential: IVerifiableCredentialAttrs
+  credential: ISignedCredentialAttrs
 }

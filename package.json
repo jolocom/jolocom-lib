@@ -7,8 +7,8 @@
   "scripts": {
     "test": "./node_modules/.bin/nyc -e 'ts' -r lcov -r text yarn run unitTests",
     "prepublish": "rm -rf ./js/; ./node_modules/.bin/tsc -p ./tsconfig.json",
-    "unitTests": "mocha tests/*.test.ts -r ts-node/register",
-    "test:watch": "mocha  --watch-extensions ts tests/*.test.ts -r ts-node/register -w"
+    "unitTests": "mocha tests/**/*.test.ts -r ts-node/register",
+    "test:watch": "mocha  --watch-extensions ts tests/**/*.test.ts -r ts-node/register -w"
   },
   "repository": {
     "type": "git",
@@ -46,6 +46,7 @@
     "sjcl": "^1.0.7"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.4",
     "@types/mocha": "^2.2.43",
     "@types/node": "^9.4.0",
     "chai": "^4.1.2",

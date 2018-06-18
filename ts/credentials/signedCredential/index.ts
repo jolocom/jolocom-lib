@@ -1,19 +1,18 @@
 import 'reflect-metadata'
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
-import { keccak256 } from 'ethereumjs-util'
 import { canonize } from 'jsonld'
 import { IClaimAttrs } from '../credential/types'
 import { Credential } from '../credential'
 import { IPrivateKey } from '../../wallet/types'
 import { generateRandomID, sign, sha256, verifySignature } from '../../utils/crypto'
-import { IVerifiableCredentialAttrs } from './types'
+import { ISignedCredentialAttrs } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { defaultContext } from '../../utils/contexts'
 import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
 
 // TODO Change to SignedCredential
 @Exclude()
-export class VerifiableCredential {
+export class SignedCredential {
   @Expose()
   private '@context': string[] | object[]
 
@@ -96,13 +95,13 @@ export class VerifiableCredential {
   }
 
   // TODO remove / modify in favor of identityWallet.sign.credential
-  public fromCredential(credential: Credential): VerifiableCredential {
-    const vc = new VerifiableCredential()
-    vc['@context'] = credential.getContext()
-    vc.type = credential.getType()
-    vc.claim = credential.getClaim()
-    vc.name = credential.getName()
-    return vc
+  public fromCredential(credential: Credential): SignedCredential {
+    const signedCred = new SignedCredential()
+    signedCred['@context'] = credential.getContext()
+    signedCred.type = credential.getType()
+    signedCred.claim = credential.getClaim()
+    signedCred.name = credential.getName()
+    return signedCred
   }
 
   public async generateSignature(privateKey: IPrivateKey) {
@@ -128,12 +127,12 @@ export class VerifiableCredential {
     return verifySignature(tbv, pubKey, sig)
   }
 
-  public static fromJSON(json: IVerifiableCredentialAttrs): VerifiableCredential {
-    return plainToClass(VerifiableCredential, json)
+  public static fromJSON(json: ISignedCredentialAttrs): SignedCredential {
+    return plainToClass(SignedCredential, json)
   }
 
-  public toJSON(): IVerifiableCredentialAttrs {
-    return classToPlain(this) as IVerifiableCredentialAttrs
+  public toJSON(): ISignedCredentialAttrs {
+    return classToPlain(this) as ISignedCredentialAttrs
   }
 
   public async digest(): Promise<string> {

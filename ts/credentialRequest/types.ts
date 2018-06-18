@@ -1,5 +1,5 @@
 export interface IConstraint {
-  [operator: string]: [{ var: string }, string | comparable] | boolean[]
+  [operator: string]: boolean[] | Array<{ var: string } | string | comparable >
 }
 
 export interface ICredentialRequest {
@@ -21,7 +21,6 @@ export interface IExposedConstraintFunctions {
 }
 
 export interface ICredentialRequestAttrs {
-  requesterIdentity: string
-  callbackURI: string
+  callbackURL: string
   requestedCredentials: ICredentialRequest[]
 }
