@@ -21,7 +21,6 @@ export interface IExposedConstraintFunctions {
 }
 
 export interface ICredentialRequestAttrs {
-  requesterIdentity: string
-  callbackURI: string
+  callbackURL: string
   requestedCredentials: ICredentialRequest[]
 }

@@ -1,5 +1,7 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import * as jsonlogic from 'json-logic-js'
+import { areCredTypesEqual } from '../utils/credentials'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import {
   ICredentialRequestAttrs,
   comparable,
@@ -7,17 +9,10 @@ import {
   ICredentialRequest,
   IConstraint
 } from './types'
-import { areCredTypesEqual } from '../utils/credentials'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 export class CredentialRequest {
-  private requesterIdentity: string
   private callbackURL: string
   private requestedCredentials: ICredentialRequest[] = []
-
-  public setRequesterIdentity(requesterIdentity: string) {
-    this.requesterIdentity = requesterIdentity
-  }
 
   public setCallbackURL(url: string) {
     this.callbackURL = url
@@ -27,23 +22,19 @@ export class CredentialRequest {
     return this.callbackURL
   }
 
-  public getRequester(): string {
-    return this.requesterIdentity
-  }
-
   public getRequestedCredentialTypes(): string[][] {
     return this.requestedCredentials.map((credential) => credential.type)
   }
 
-  public addRequestedClaim(type: string[], constraints: IConstraint[]) {
-    const credConstraints = {
-      and: [
-        { '==': [true, true] },
-        ...constraints
-      ]
-    }
-
-    this.requestedCredentials.push({ type, constraints: credConstraints })
+  // TODO INTERFACE
+  public static create(args: {
+    callbackURL: string,
+    requestedCredentials: Array<{type: string[], constraints: IConstraint[]}>
+  }): CredentialRequest {
+    const cr = new CredentialRequest()
+    cr.setCallbackURL(args.callbackURL)
+    args.requestedCredentials.forEach((req) => cr.addRequestedClaim(req))
+    return cr
   }
 
   public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
@@ -64,6 +55,17 @@ export class CredentialRequest {
 
   public static fromJSON(json: ICredentialRequestAttrs): CredentialRequest {
     return plainToClass(CredentialRequest, json)
+  }
+
+  private addRequestedClaim({constraints, type}: {type: string[], constraints: IConstraint[]}) {
+    const credConstraints = {
+      and: [
+        { '==': [true, true] },
+        ...constraints
+      ]
+    }
+
+    this.requestedCredentials.push({ type, constraints: credConstraints })
   }
 }
 

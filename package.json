@@ -46,6 +46,7 @@
     "sjcl": "^1.0.7"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.4",
     "@types/mocha": "^2.2.43",
     "@types/node": "^9.4.0",
     "chai": "^4.1.2",
