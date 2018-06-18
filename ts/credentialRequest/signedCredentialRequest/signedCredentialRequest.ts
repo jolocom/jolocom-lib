@@ -13,11 +13,12 @@ export class SignedCredentialRequest {
   private payload: CredentialRequest
   private signature: string
 
+  public static create(json: ISignedCredentialRequestAttrs) {
+    return SignedCredentialRequest.fromJSON(json)
+  }
+
   public getCallbackURL(): string {
     return this.payload.getCallbackURL()
-  }
-  public static create(json: ISignedCredentialRequestAttrs): SignedCredentialRequest {
-    return SignedCredentialRequest.fromJSON(json)
   }
 
   public getRequestedCredentialTypes(): string[][] {

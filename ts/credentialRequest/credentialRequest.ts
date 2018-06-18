@@ -14,6 +14,17 @@ export class CredentialRequest {
   private callbackURL: string
   private requestedCredentials: ICredentialRequest[] = []
 
+  // TODO INTERFACE
+  public static create(args: {
+    callbackURL: string,
+    requestedCredentials: Array<{type: string[], constraints: IConstraint[]}>
+  }): CredentialRequest {
+    const cr = new CredentialRequest()
+    cr.setCallbackURL(args.callbackURL)
+    args.requestedCredentials.forEach((req) => cr.addRequestedClaim(req))
+    return cr
+  }
+
   public setCallbackURL(url: string) {
     this.callbackURL = url
   }
@@ -24,17 +35,6 @@ export class CredentialRequest {
 
   public getRequestedCredentialTypes(): string[][] {
     return this.requestedCredentials.map((credential) => credential.type)
-  }
-
-  // TODO INTERFACE
-  public static create(args: {
-    callbackURL: string,
-    requestedCredentials: Array<{type: string[], constraints: IConstraint[]}>
-  }): CredentialRequest {
-    const cr = new CredentialRequest()
-    cr.setCallbackURL(args.callbackURL)
-    args.requestedCredentials.forEach((req) => cr.addRequestedClaim(req))
-    return cr
   }
 
   public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
