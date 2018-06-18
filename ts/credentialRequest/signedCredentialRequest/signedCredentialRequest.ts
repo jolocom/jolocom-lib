@@ -1,22 +1,23 @@
-import { CredentialRequest } from '..'
+import 'reflect-metadata'
+import { CredentialRequest } from '../credentialRequest'
+import base64url from 'base64url'
 import { IJWTHeader, ISignedCredentialRequestAttrs } from './types'
 import { decodeToken } from 'jsontokens'
-import { classToPlain, plainToClass } from 'class-transformer'
+import { classToPlain, plainToClass, Type } from 'class-transformer'
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
 export class SignedCredentialRequest {
   private header: IJWTHeader
+
+  @Type(() => CredentialRequest)
   private payload: CredentialRequest
   private signature: string
-
-  // CREATE method?
 
   public getCallbackURL(): string {
     return this.payload.getCallbackURL()
   }
-
-  public getRequester(): string {
-    return this.payload.getRequester()
+  public static create(json: ISignedCredentialRequestAttrs): SignedCredentialRequest {
+    return SignedCredentialRequest.fromJSON(json)
   }
 
   public getRequestedCredentialTypes(): string[][] {
@@ -31,9 +32,14 @@ export class SignedCredentialRequest {
     return this.payload.applyConstraints(credentials)
   }
 
-  // TODO implement
   public toJWT(): string {
-    return 'TODO'
+    const jwtParts = []
+
+    jwtParts.push(base64url.encode(JSON.stringify(this.header)))
+    jwtParts.push(base64url.encode(JSON.stringify(this.payload)))
+    jwtParts.push(this.signature)
+
+    return jwtParts.join('.')
   }
 
   public static fromJWT(jwt: string): SignedCredentialRequest {
