@@ -12,6 +12,7 @@ import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../ts/identityWallet/identityWallet'
 import { IDidDocumentAttrs } from '../ts/identity/didDocument/types'
+
 chai.use(sinonChai)
 const expect = chai.expect
 
@@ -169,22 +170,67 @@ describe.only('JolocomRegistry', () => {
 
   describe('error handling commit', () => {
     let storeJSONStub
-
-    beforeEach(() => {
-      storeJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
-        .withArgs({data: ddo, pin: true})
-        .throws('Incorrect data submitted')
-        // await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
-    })
-
+    let updateDIDRecordStub
     afterEach(() => {
       sandbox.restore()
     })
 
-    it('should correctly assemble the thrown error message', async () => {
-      await expect(() => {jolocomRegistry.commit.bind(jolocomRegistry,
-          {wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})})
-      .to.throw(new Error('Could not save DID record on IPFS. Incorrect data submitted'))
+    it('should correctly assemble the thrown error message on storeJSON', async () => {
+      storeJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
+      .withArgs({data: ddo, pin: true})
+      .throws(new Error('Incorrect data submitted'))
+
+      try {
+        await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
+      } catch (err) {
+        expect(err.message).to.equal(`Could not save DID record on IPFS. Incorrect data submitted`)
+      }
+    })
+
+    it('should correctly assemble the thrown error message on updateDIDRecord', async () => {
+      storeJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
+        .withArgs({data: ddo, pin: true})
+        .returns(ipfsHash)
+
+      updateDIDRecordStub = sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
+        .withArgs( {ethereumKey: testPrivateEthereumKey, did: ddo.getDID(), newHash: ipfsHash})
+        .throws(new Error('Connection failed.'))
+
+      try {
+        await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
+      } catch (err) {
+        expect(err.message).to.equal(`Could not register DID record on Ethereum. Connection failed.`)
+      }
+    })
+  })
+
+  describe('error handling resolve', () => {
+    let resolveDIDStub
+    let catJSONStub
+    afterEach(() => {
+      sandbox.restore()
+    })
+
+    it('should correctly assemble the thrown error on failed resolveDID', async () => {
+      resolveDIDStub = sandbox.stub(EthResolver.prototype, 'resolveDID')
+        .throws(new Error('DID not existing.'))
+      try {
+        await jolocomRegistry.resolve({did: ddo.getDID()})
+      } catch (err) {
+        expect(err.message).to.equal(`Could not retrieve DID Document. DID not existing.`)
+      }
+    })
+
+    it('should correctly assemble the thrown error on failed catJSNO', async () => {
+      resolveDIDStub = sandbox.stub(EthResolver.prototype, 'resolveDID')
+        .returns(ddo.getDID)
+      catJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'catJSON')
+        .throws(new Error('No DDO.'))
+      try {
+        await jolocomRegistry.resolve({did: ddo.getDID()})
+      } catch (err) {
+        expect(err.message).to.equal(`Could not retrieve DID Document. No DDO.`)
+      }
     })
   })
 })
