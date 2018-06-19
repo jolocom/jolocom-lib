@@ -1,7 +1,7 @@
 export const credentialRequestCreationArgs = {
   callbackURL: 'http://test.com',
   requestedCredentials: [{
-    type: ['Credential', 'ProofOfNameCredential'],
+    type: ['Credential', 'MockCredential'],
     constraints: [{'==': [{var: 'issuer'}, 'did:jolo:issuer']}]
   }]
 }
@@ -17,31 +17,13 @@ export const credentialRequestJson = {
     },
     type: [
       'Credential',
-      'ProofOfNameCredential'
+      'MockCredential'
     ]
   }]
 }
 
-export const firstMockCredential = {
-  '@context': [],
-  'id': '',
-  'issuer': 'did:jolo:issuer',
-  'claim': { id: '' },
-  'issued': '',
-  'type': ['Credential', 'ProofOfNameCredential'],
-  'proof': {
-    created: new Date(),
-    creator: '',
-    nonce: '',
-    signatureValue: '',
-    type: ''
-  }
-}
-
-export const secondMockCredential = Object.assign({}, firstMockCredential, {issuer: 'did:jolo:different'})
-
 export const expectedRequestedCredentials = {
-  type: ['Credential', 'ProofOfNameCredential'],
+  type: ['Credential', 'MockCredential'],
   constraints: {
     and: [
       { '==': [ true, true ] },
@@ -49,3 +31,26 @@ export const expectedRequestedCredentials = {
     ]
   }
 }
+
+export const firstMockCredential = {
+  '@context': ['http://schema.org/'],
+  'id': 'claim:id:test',
+  'issuer': 'did:jolo:issuer',
+  'claim': {
+    id: 'did:jolo:subject',
+    mock: 'value'
+  },
+  'issued': '',
+  'type': ['Credential', 'MockCredential'],
+  'proof': {
+    created: new Date(),
+    creator: 'did:jolo:issuer/keys#1',
+    nonce: '00000',
+    signatureValue: 'invalidMockSignature',
+    type: 'mockType'
+  }
+}
+
+export const secondMockCredential = Object.assign({}, firstMockCredential, {
+  issuer: 'did:jolo:different'
+})

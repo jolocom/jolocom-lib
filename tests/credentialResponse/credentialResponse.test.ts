@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { CredentialResponse } from '../../ts/credentialResponse/credentialResponse'
-import { mockSuppliedCredentials } from '../data/credentialResponse/signedCredentialResponse'
+import { mockSuppliedCredentials } from '../data/credentialResponse/credentialResponse'
 import { CredentialRequest } from '../../ts/credentialRequest/credentialRequest'
 import {
   firstMockCredential,
@@ -11,24 +11,24 @@ import {
 describe('CredentialResponse', () => {
   it('Should implement static create method', () => {
     const credentialResponse = CredentialResponse.create([firstMockCredential])
-    expect(credentialResponse.getSuppliedCredentials()).to.deep.equal(mockSuppliedCredentials.suppliedCredentials)
+    expect(credentialResponse.getSuppliedCredentials()).to.deep.equal(mockSuppliedCredentials)
   })
 
   it('Should implement static fromJSON method', () => {
-    const credentialResponse = CredentialResponse.fromJSON(mockSuppliedCredentials)
+    const credentialResponse = CredentialResponse.fromJSON({suppliedCredentials: mockSuppliedCredentials})
     const expectedCredentialResponse = CredentialResponse.create([firstMockCredential])
     expect(credentialResponse).to.deep.equal(expectedCredentialResponse)
   })
 
   it('Should implement toJSON method', () => {
     const credentialResponse = CredentialResponse.create([firstMockCredential])
-    expect(credentialResponse.toJSON()).to.deep.equal(mockSuppliedCredentials)
+    expect(credentialResponse.toJSON()).to.deep.equal({suppliedCredentials: mockSuppliedCredentials})
   })
 
   it('Should implement all getter methods', () => {
     const credentialResponse = CredentialResponse.create([firstMockCredential])
     expect(credentialResponse.getSuppliedCredentials().length).to.equal(1)
-    expect(credentialResponse.getSuppliedCredentials()).to.deep.equal(mockSuppliedCredentials.suppliedCredentials)
+    expect(credentialResponse.getSuppliedCredentials()).to.deep.equal(mockSuppliedCredentials)
   })
 
   it('Should implement a satisfiesRequest method', () => {
