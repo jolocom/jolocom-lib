@@ -69,73 +69,28 @@ export class IpfsStorageAgent implements IIpfsConnector {
     return res.json()
   }
 
-  public async createDagObject(data: string, pin: boolean): Promise<string> {
+  public async createDagObject(data: object, pin: boolean): Promise<string> {
 
-    if (typeof data !== 'string' || data === null) {
-      throw new Error(`String expected, received ${typeof data}`)
+    if (typeof data !== 'object' || data === null) {
+      throw new Error(`Object expected, received ${typeof data}`)
     }
 
-    const dataToDagObject = {
-        Data: data,
-        Links: []
-    }
-
-    const endpoint = `${this.endpoint}/api/v0/object/put?pin=${pin}`
+    const endpoint = `${this.endpoint}/api/v0/dag/put?pin=${pin}`
     const formData = new FormData()
 
-    formData.append('file', Buffer.from(JSON.stringify(dataToDagObject)))
-
+    formData.append('file', Buffer.from(JSON.stringify(data)))
     const res = await fetch(endpoint, {
       method: 'POST',
       body: formData
     }).then((result) => result.json())
-
-    return res.Hash
+    const cid = res.Cid
+    return cid['/']
   }
 
-  public async getDagObject(hash: string ): Promise<object> {
-    const endpoint = `${this.endpoint}/api/v0/object/get?arg=${hash}`
+  public async resolveIpldPath(pathToResolve: string): Promise<object> {
+    const endpoint = `${this.endpoint}/api/v0/dag/get?arg=${pathToResolve}`
     const res = await fetch(endpoint)
     return res.json()
   }
 
-  public async getDagObjectData(hash: string ): Promise<string> {
-    const endpoint = `${this.endpoint}/api/v0/object/data?arg=${hash}`
-    const res = await fetch(endpoint)
-    return res.text()
-  }
-
-  public async getDagObjectStat(hash: string ): Promise<object> {
-    const endpoint = `${this.endpoint}/api/v0/object/stat?arg=${hash}`
-    const res = await fetch(endpoint)
-    return res.json()
-  }
-
-  public async getDagObjectLinks(hash: string ): Promise<string> {
-    const endpoint = `${this.endpoint}/api/v0/object/links?arg=${hash}`
-    const res = await fetch(endpoint)
-    const fullRes = res.json()
-    if ( !fullRes.Links ) {
-      return 'No available links on this DAG object.'
-    } else {
-      return fullRes.Links
-    }
-  }
-
-  public async addDagLink({
-    headNodeHash, claimId, linkNodeHash
-  }: {
-    headNodeHash: string, claimId: string, linkNodeHash: string
-  }): Promise<object> {
-    // tslint:disable-next-line:max-line-length
-    const endpoint = `${this.endpoint}/api/v0/object/patch/add-link?arg=${headNodeHash}&arg=${claimId}&arg=${linkNodeHash}`
-    const newHeadNode = await fetch(endpoint)
-    return newHeadNode.json()
-  }
-
-  public async resolveDagLink({ headNodeHash, claimId }: { headNodeHash: string, claimId: string }): Promise<object> {
-    const endpoint = `${this.endpoint}/api/v0/object/get?arg=${headNodeHash}/${claimId}`
-    const resolvedNode = await fetch(endpoint)
-    return resolvedNode.json()
-  }
 }
