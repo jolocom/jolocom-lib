@@ -24,3 +24,8 @@ export interface ICredentialRequestAttrs {
   callbackURL: string
   requestedCredentials: ICredentialRequest[]
 }
+
+export interface ICredentialRequestCreationArgs {
+  callbackURL: string
+  requestedCredentials: Array<{type: string[], constraints: IConstraint[]}>
+}

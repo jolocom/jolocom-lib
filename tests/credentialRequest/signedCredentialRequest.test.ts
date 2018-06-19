@@ -45,7 +45,7 @@ describe('SignedCredentialRequest', () => {
   })
 
   it('Should implement an applyConstraints method', () => {
-    const signedCR = SignedCredentialRequest.fromJSON(signedCredReqJson)
+    const signedCR = SignedCredentialRequest.create(signedCredReqJson)
     // tslint:disable-next-line:no-unused-expression
     expect(signedCR.applyConstraints).to.exist
   })
