@@ -8,7 +8,7 @@ import {
   expectedRequestedCredentials
 } from '../data/credentialRequest/credentialRequest'
 
-describe.only('CredentialRequest', () => {
+describe('CredentialRequest', () => {
   it('Should implement static create method', () => {
     const cr = CredentialRequest.create(credentialRequestCreationArgs)
     expect(cr.getCallbackURL()).to.equal(credentialRequestCreationArgs.callbackURL)

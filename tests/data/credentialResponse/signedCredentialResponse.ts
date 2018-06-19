@@ -1,5 +1,12 @@
 import { firstMockCredential } from '../credentialRequest/credentialRequest'
 
+export const mockSuppliedCredentials = {
+  suppliedCredentials: [{
+    type: firstMockCredential.type,
+    credential: firstMockCredential
+  }]
+}
+
 export const signedCredentialResponseCreationArgs = {
   header: {
     typ: 'JWT',
