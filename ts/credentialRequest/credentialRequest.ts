@@ -7,22 +7,30 @@ import {
   comparable,
   IExposedConstraintFunctions,
   ICredentialRequest,
-  IConstraint
+  IConstraint,
+  ICredentialRequestCreationArgs
 } from './types'
 
 export class CredentialRequest {
   private callbackURL: string
   private requestedCredentials: ICredentialRequest[] = []
 
-  // TODO INTERFACE
-  public static create(args: {
-    callbackURL: string,
-    requestedCredentials: Array<{type: string[], constraints: IConstraint[]}>
-  }): CredentialRequest {
+  public static create(args: ICredentialRequestCreationArgs): CredentialRequest {
     const cr = new CredentialRequest()
     cr.setCallbackURL(args.callbackURL)
     args.requestedCredentials.forEach((req) => cr.addRequestedClaim(req))
     return cr
+  }
+
+  private addRequestedClaim({constraints, type}: {type: string[], constraints: IConstraint[]}) {
+    const credConstraints = {
+      and: [
+        { '==': [true, true] },
+        ...constraints
+      ]
+    }
+
+    this.requestedCredentials.push({ type, constraints: credConstraints })
   }
 
   public setCallbackURL(url: string) {
@@ -55,17 +63,6 @@ export class CredentialRequest {
 
   public static fromJSON(json: ICredentialRequestAttrs): CredentialRequest {
     return plainToClass(CredentialRequest, json)
-  }
-
-  private addRequestedClaim({constraints, type}: {type: string[], constraints: IConstraint[]}) {
-    const credConstraints = {
-      and: [
-        { '==': [true, true] },
-        ...constraints
-      ]
-    }
-
-    this.requestedCredentials.push({ type, constraints: credConstraints })
   }
 }
 
