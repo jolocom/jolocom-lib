@@ -1,52 +1,100 @@
-// import { expect } from 'chai'
-// import { decodeToken } from 'jsontokens'
-// import { SignedCredentialRequest } from '../../ts/credentialRequest/signedCredentialRequest/signedCredentialRequest'
-// import { signedCredReqJson, signedCredReqJWT } from '../data/credentialRequest/signedCredentialRequest';
+import * as lolex from 'lolex'
+import { expect } from 'chai'
+import { SignedCredentialRequest } from '../../ts/credentialRequest/signedCredentialRequest/signedCredentialRequest'
+import { CredentialRequest } from '../../ts/credentialRequest/credentialRequest'
+import { credentialRequestCreationArgs } from '../data/credentialRequest/credentialRequest'
+import {
+  signedCredReqJson,
+  signedCredReqJWT,
+  mockPrivKey,
+} from '../data/credentialRequest/signedCredentialRequest'
 
-// describe('SignedCredentialRequest', () => {
-//   it('Should implement static create method', () => {
-//     const signedCR = SignedCredentialRequest.create(signedCredReqJson)
-//     expect(signedCR.toJSON()).to.deep.equal(signedCredReqJson)
-//   })
+describe('SignedCredentialRequest', () => {
+  let clock
 
-//   it('Should implement static fromJSON method', () => {
-//     const signedCR = SignedCredentialRequest.fromJSON(signedCredReqJson)
-//     expect(signedCR.toJSON()).to.deep.equal(signedCredReqJson)
-//   })
+  const mockCredentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
+  const signedCredReqCreationArgs = {
+    privateKey: Buffer.from(mockPrivKey, 'hex'),
+    credentialRequest: mockCredentialRequest
+  }
 
-//   it('Should implement toJSON method', () => {
-//     const signedCR = SignedCredentialRequest.create(signedCredReqJson)
-//     expect(signedCR.toJSON()).to.deep.equal(signedCredReqJson)
-//   })
+  before(() => {
+    clock = lolex.install()
+  })
 
-//   it('Should implement static fromJWT method', () => {
-//     const signedCR = SignedCredentialRequest.fromJWT(signedCredReqJWT)
-//     expect(signedCR.toJSON()).to.deep.equal(signedCredReqJson)
-//   })
+  after(() => {
+    clock.uninstall()
+  })
 
-//   it('Should implement toJWT method', () => {
-//     const signedCR = SignedCredentialRequest.fromJSON(signedCredReqJson)
-//     const jwt = signedCR.toJWT()
-//     expect(decodeToken(jwt)).to.deep.equal(signedCredReqJson)
-//   })
+  // TODO with issuer
+  it('Should implement static create method', () => {
+    const credentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
+    const signedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)
 
-//   it('Should implement all getter methods', () => {
-//     const signedCR = SignedCredentialRequest.fromJSON(signedCredReqJson)
-//     expect(signedCR.getCallbackURL()).to.equal(signedCredReqJson.payload.callbackURL)
-//     expect(signedCR.getRequestedCredentialTypes().length).to.equal(2)
-//     expect(signedCR.getRequestedCredentialTypes()).to.deep.equal([
-//       ['Credential', 'ProofOfEmailCredential'],
-//       ['Credential', 'ProofOfNameCredential']
-//     ])
-//   })
+    expect(signedCR.getCallbackURL()).to.equal(credentialRequestCreationArgs.callbackURL)
+    expect(signedCR.getCredentialRequest()).to.deep.equal(credentialRequest)
+    expect(signedCR.getIssueTime()).to.equal(0)
+    expect(signedCR.getRequestedCredentialTypes().length).to.equal(1)
+    expect(signedCR.getRequestedCredentialTypes()).to.deep.equal([
+      credentialRequestCreationArgs.requestedCredentials[0].type
+    ])
+  })
 
-//   it('Should implement a validateSignature method', () => {
-//     expect(false).to.equal(true)
-//   })
+  it('Should implement static fromJSON method', () => {
+    const signedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)
+    const signedCRfromJSON = SignedCredentialRequest.fromJSON(signedCredReqJson)
 
-//   it('Should implement an applyConstraints method', () => {
-//     const signedCR = SignedCredentialRequest.create(signedCredReqJson)
-//     // tslint:disable-next-line:no-unused-expression
-//     expect(signedCR.applyConstraints).to.exist
-//   })
-// })
+    expect(signedCR).to.deep.equal(signedCRfromJSON)
+  })
+
+  it('Should implement toJSON method', () => {
+    const signedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)
+    expect(signedCR.toJSON()).to.deep.equal(signedCredReqJson)
+  })
+
+  it('Should implement static fromJWT method', () => {
+    const signedCRfromJWT = SignedCredentialRequest.fromJWT(signedCredReqJWT)
+
+    const credentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
+    const args = {
+      privateKey: Buffer.from(mockPrivKey, 'hex'),
+      credentialRequest
+    }
+
+    const signedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)
+    expect(signedCRfromJWT).to.deep.equal(signedCR)
+  })
+
+  it('Should implement toJWT method', () => {
+    const signedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)
+    expect(signedCR.toJWT()).to.deep.equal(signedCredReqJWT)
+  })
+
+  it('Should implement all getter methods', () => {
+    const signedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)
+
+    expect(signedCR.getIssueTime()).to.equal(0)
+    expect(signedCR.getCredentialRequest()).to.deep.equal(mockCredentialRequest)
+    expect(signedCR.getCallbackURL()).to.equal(credentialRequestCreationArgs.callbackURL)
+    expect(signedCR.getRequestedCredentialTypes().length).to.equal(1)
+    expect(signedCR.getRequestedCredentialTypes()).to.deep.equal([
+      credentialRequestCreationArgs.requestedCredentials[0].type
+    ])
+  })
+
+  // TODO
+  it('Should implement a validateSignature method', () => {
+    expect(false).to.equal(true)
+  })
+
+  it('Should implement an applyConstraints method', () => {
+    const credentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
+    const args = {
+      privateKey: Buffer.from(mockPrivKey, 'hex'),
+      credentialRequest
+    }
+    const signedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)
+    // tslint:disable-next-line:no-unused-expression
+    expect(signedCR.applyConstraints).to.exist
+  })
+})

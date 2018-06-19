@@ -1,26 +1,28 @@
+export const mockPrivKey = '3a1076bf45ab87712ad64ccb3b10217737f7faacbf2872e88fdd9a537d8fe266'
 export const signedCredReqJson = {
-  header: { typ: 'JWT', alg:  'ES256K' },
+  header: { alg: 'ES256K', typ: 'JWT' },
   payload: {
-    iat: 1529328409377,
-    requestedCredentials: [{
-      type: ['Credential', 'ProofOfEmailCredential' ],
-      constraints: { and: [ { '==': [ true, true ] } ] }
-    }, {
-      type: ['Credential', 'ProofOfNameCredential' ],
-      constraints: { and: [ { '==': [ true, true ] } ] }
-    }],
-    requesterIdentity: 'did:jolo:b310d293aeac8a5ca680232b96901fe85988fde2860a1a5db69b49762923cc88',
-    callbackURL: 'https://demo-sso.jolocom.com/proxy/authentication/xjnhu'
+    iat: 0,
+    iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
+    credentialRequest: {
+      callbackURL: 'http://test.com',
+      requestedCredentials: [{
+        type: ['Credential', 'MockCredential'],
+        constraints: {
+          and: [
+            { '==': [true, true] },
+            { '==': [ { var: 'issuer' }, 'did:jolo:issuer' ] }
+          ]
+        }
+      }]
+    }
   },
-  signature: '3usVd3dBc8opy-pSfq07nq1RFUsf5qEi5Tw0C-9RdgF5L7UOUEQGc_AuvlB6OwtjwKrgab-Rk6YevKkIWSB2aw'
+  signature: 'rrkhCHtJ1vqQqVK_VzcVDFL1fa_YVXEKa8CRIuYcvSzSqDdcQv-lBq2wcFf--8tn0xGyB6HzfhzLNy5fwoOaeA'
 }
-
-export const signedCredReqJWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.\
-eyJpYXQiOjE1MjkzMjg0MDkzNzcsInJlcXVlc3RlZENyZWRlbnRpYWxzIjpbeyJ0eXBlIjpbIkNyZWRlb\
-nRpYWwiLCJQcm9vZk9mRW1haWxDcmVkZW50aWFsIl0sImNvbnN0cmFpbnRzIjp7ImFuZCI6W3siPT0iOl\
-t0cnVlLHRydWVdfV19fSx7InR5cGUiOlsiQ3JlZGVudGlhbCIsIlByb29mT2ZOYW1lQ3JlZGVudGlhbCJ\
-dLCJjb25zdHJhaW50cyI6eyJhbmQiOlt7Ij09IjpbdHJ1ZSx0cnVlXX1dfX1dLCJyZXF1ZXN0ZXJJZGVu\
-dGl0eSI6ImRpZDpqb2xvOmIzMTBkMjkzYWVhYzhhNWNhNjgwMjMyYjk2OTAxZmU4NTk4OGZkZTI4NjBhM\
-WE1ZGI2OWI0OTc2MjkyM2NjODgiLCJjYWxsYmFja1VSTCI6Imh0dHBzOi8vZGVtby1zc28uam9sb2NvbS\
-5jb20vcHJveHkvYXV0aGVudGljYXRpb24veGpuaHUifQ.3usVd3dBc8opy-pSfq07nq1RFUsf5qEi5Tw0\
-C-9RdgF5L7UOUEQGc_AuvlB6OwtjwKrgab-Rk6YevKkIWSB2aw'
+export const signedCredReqJWT = 'eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJpYXQiOjAsImlzcyI6ImRpZDpqb2xvOjhmOTc3Z\
+TUwYjdlNWNiZGZlYjUzYTAzYzgxMjkxM2I3Mjk3OGNhMzVjOTM1NzFmODVlODYyODYyYmFjOGNkZWIiL\
+CJjcmVkZW50aWFsUmVxdWVzdCI6eyJyZXF1ZXN0ZWRDcmVkZW50aWFscyI6W3sidHlwZSI6WyJDcmVkZ\
+W50aWFsIiwiTW9ja0NyZWRlbnRpYWwiXSwiY29uc3RyYWludHMiOnsiYW5kIjpbeyI9PSI6W3RydWUsd\
+HJ1ZV19LHsiPT0iOlt7InZhciI6Imlzc3VlciJ9LCJkaWQ6am9sbzppc3N1ZXIiXX1dfX1dLCJjYWxsY\
+mFja1VSTCI6Imh0dHA6Ly90ZXN0LmNvbSJ9fQ.rrkhCHtJ1vqQqVK_VzcVDFL1fa_YVXEKa8CRIuYcvS\
+zSqDdcQv-lBq2wcFf--8tn0xGyB6HzfhzLNy5fwoOaeA'
