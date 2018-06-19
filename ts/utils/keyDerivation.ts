@@ -70,3 +70,16 @@ export function deriveEthereumKeyPair(masterKeyPair: any, path?: string): IKeyRe
     path
   }
 }
+
+// TODO: add doc
+export function deriveChildKeyPair({masterKeyPair, path}: {masterKeyPair: any, path: string}): IKeyResponse {
+  const derived = masterKeyPair.derivePath(path).keyPair
+
+  return {
+    wif: derived.toWIF(),
+    publicKey: derived.getPublicKeyBuffer(),
+    keyType: 'ECDSA secp256k1',
+    path
+  }
+}
+
