@@ -41,6 +41,10 @@ export class CredentialRequest {
     return this.callbackURL
   }
 
+  public getRequestedCredentials(): ICredentialRequest[] {
+    return this.requestedCredentials
+  }
+
   public getRequestedCredentialTypes(): string[][] {
     return this.requestedCredentials.map((credential) => credential.type)
   }

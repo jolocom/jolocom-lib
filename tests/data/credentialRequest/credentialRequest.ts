@@ -39,3 +39,13 @@ export const firstMockCredential = {
 }
 
 export const secondMockCredential = Object.assign({}, firstMockCredential, {issuer: 'did:jolo:different'})
+
+export const expectedRequestedCredentials = {
+  type: ['Credential', 'ProofOfNameCredential'],
+  constraints: {
+    and: [
+      { '==': [ true, true ] },
+      { '==': [ { var: 'issuer' }, 'did:jolo:issuer' ] }
+    ]
+  }
+}
