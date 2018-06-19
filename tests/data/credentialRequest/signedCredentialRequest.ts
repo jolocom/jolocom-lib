@@ -1,4 +1,6 @@
 export const mockPrivKey = '3a1076bf45ab87712ad64ccb3b10217737f7faacbf2872e88fdd9a537d8fe266'
+export const privKeyDID = 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
+
 export const signedCredReqJson = {
   header: { alg: 'ES256K', typ: 'JWT' },
   payload: {

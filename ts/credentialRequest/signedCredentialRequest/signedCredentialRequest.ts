@@ -70,6 +70,10 @@ export class SignedCredentialRequest {
     return this.payload.credentialRequest.getRequestedCredentialTypes()
   }
 
+  public getIssuer(): string {
+    return this.payload.iss
+  }
+
   public static create(args: ISignedCredRequestCreationArgs): SignedCredentialRequest {
     const { privateKey, credentialRequest } = args
     let { issuer } = args
