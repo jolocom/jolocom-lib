@@ -1,6 +1,5 @@
-import { CredentialResponse } from '.'
+import { CredentialResponse } from './credentialResponse'
 
 export class CredentialResponseParser {
-  public static fromJWT = CredentialResponse.fromJWT
   public static fromJSON = CredentialResponse.fromJSON
 }

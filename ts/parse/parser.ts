@@ -5,12 +5,15 @@ import { CredentialRequestParser } from '../credentialRequest/credentialRequestP
 import {
   SignedCredentialRequestParser
 } from '../credentialRequest/signedCredentialRequest/signedCredentialRequestParser'
+import {
+  SignedCredentialResponseParser
+} from '../credentialResponse/signedCredentialResponse/signedCredentialResponseParser'
 
 export class Parser {
   public static credentialRequest = CredentialRequestParser
-  public static credentialResponse
+  public static credentialResponse = CredentialResponseParser
   public static credential = CredentialParser
   public static signedCredentialRequest = SignedCredentialRequestParser
-  public static signedCredentialResponse = CredentialResponseParser
+  public static signedCredentialResponse = SignedCredentialResponseParser
   public static signedCredential = VerifiableCredentialParser
 }
