@@ -13,7 +13,7 @@ import {
 } from './types'
 
 export class SignedCredentialRequest {
-  private header: IJWTHeader =  {
+  private header: IJWTHeader = {
     alg: 'ES256K',
     typ: 'JWT'
   }
@@ -70,6 +70,14 @@ export class SignedCredentialRequest {
     return this.payload.credentialRequest.getRequestedCredentialTypes()
   }
 
+  public getIssuer(): string {
+    return this.payload.iss
+  }
+
+  public getSignature(): string {
+    return this.signature
+  }
+
   public static create(args: ISignedCredRequestCreationArgs): SignedCredentialRequest {
     const { privateKey, credentialRequest } = args
     let { issuer } = args
@@ -94,7 +102,7 @@ export class SignedCredentialRequest {
   }
 
   public toJWT(): string {
-    if (!this.payload.credentialRequest || !this.header || this.signature) {
+    if (!this.payload.credentialRequest || !this.header || !this.signature) {
       throw new Error('The JWT is not complete, header / payload / signature are missing')
     }
 
@@ -117,6 +125,8 @@ export class SignedCredentialRequest {
   }
 
   public static fromJSON(json: ISignedCredentialRequestAttrs): SignedCredentialRequest {
-    return plainToClass(SignedCredentialRequest, json)
+    const signedCredentialReq = plainToClass(SignedCredentialRequest, json)
+    signedCredentialReq.setCredentialRequest(CredentialRequest.fromJSON(json.payload.credentialRequest))
+    return signedCredentialReq
   }
 }

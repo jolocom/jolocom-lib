@@ -4,7 +4,8 @@ import {
   credentialRequestCreationArgs,
   firstMockCredential,
   secondMockCredential,
-  credentialRequestJson
+  credentialRequestJson,
+  expectedRequestedCredentials
 } from '../data/credentialRequest/credentialRequest'
 
 describe('CredentialRequest', () => {
@@ -28,6 +29,7 @@ describe('CredentialRequest', () => {
   it('Should implement all getter methods', () => {
     const credentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
     expect(credentialRequest.getCallbackURL()).to.equal(credentialRequestCreationArgs.callbackURL)
+    expect(credentialRequest.getRequestedCredentials()).to.deep.equal([expectedRequestedCredentials])
     expect(credentialRequest.getRequestedCredentialTypes().length).to.equal(1)
     expect(credentialRequest.getRequestedCredentialTypes()[0])
       .to.deep.equal(credentialRequestCreationArgs.requestedCredentials[0].type)

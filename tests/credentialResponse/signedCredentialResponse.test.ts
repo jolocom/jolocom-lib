@@ -1,34 +1,73 @@
 import { expect } from 'chai'
+import * as lolex from 'lolex'
 import { SignedCredentialResponse } from '../../ts/credentialResponse/signedCredentialResponse/signedCredentialResponse'
-import { signedCredentialResponseCreationArgs } from '../data/credentialResponse/signedCredentialResponse';
-
-// tslint:disable-next-line:max-line-length
-const mockJWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJpYXQiOjE1Mjg3MjI3NDk2NDcsInN1cHBsaWVkQ3JlZGVudGlhbHMiOlt7InR5cGUiOlsiQ3JlZGVudGlhbCIsIlByb29mT2ZNb2JpbGVQaG9uZU51bWJlckNyZWRlbnRpYWwiXSwiY3JlZGVudGlhbCI6eyJAY29udGV4dCI6WyJodHRwczovL3czaWQub3JnL2lkZW50aXR5L3YxIiwiaHR0cHM6Ly9pZGVudGl0eS5qb2xvY29tLmNvbS90ZXJtcyIsImh0dHBzOi8vdzNpZC5vcmcvc2VjdXJpdHkvdjEiLCJodHRwczovL3czaWQub3JnL2NyZWRlbnRpYWxzL3YxIiwiaHR0cDovL3NjaGVtYS5vcmciXSwiaWQiOiJjbGFpbUlkOjJjZDA4YTc4IiwibmFtZSI6Ik1vYmlsZSBQaG9uZSBOdW1iZXIiLCJpc3N1ZXIiOiJkaWQ6am9sbzoxOGNlOTU3MjdjMGY0ZTczYTBhMDI3YWZlMTE5YmQwNzc2ZjM3ZTYwNWNmMjM3Y2Q2YWY2NzU3MzlmOWYwZmZjIiwidHlwZSI6WyJDcmVkZW50aWFsIiwiUHJvb2ZPZk1vYmlsZVBob25lTnVtYmVyQ3JlZGVudGlhbCJdLCJjbGFpbSI6eyJpZCI6ImRpZDpqb2xvOjE4Y2U5NTcyN2MwZjRlNzNhMGEwMjdhZmUxMTliZDA3NzZmMzdlNjA1Y2YyMzdjZDZhZjY3NTczOWY5ZjBmZmMiLCJ0ZWxlcGhvbmUiOiIwMTk4Nzc3In0sImlzc3VlZCI6IjIwMTgtMDYtMTFUMTM6MDE6MjQuMDY3WiIsInByb29mIjp7InR5cGUiOiJFY2RzYUtvYmxpdHpTaWduYXR1cmUyMDE2IiwiY3JlYXRlZCI6IjIwMTgtMDYtMTFUMTM6MDE6MjQuMDY3WiIsImNyZWF0b3IiOiJkaWQ6am9sbzoxOGNlOTU3MjdjMGY0ZTczYTBhMDI3YWZlMTE5YmQwNzc2ZjM3ZTYwNWNmMjM3Y2Q2YWY2NzU3MzlmOWYwZmZjI2tleXMtMSIsIm5vbmNlIjoiMjY4ZDNkNDEiLCJzaWduYXR1cmVWYWx1ZSI6ImJSQzBmSVpLWThEbFBtZ1pHVTBDdDMza3pkMnVyMXRWaGZYbnpFZk9FaUZZb1hvNU1mOVIvd1pKbzZQN29lbHdZcmxSZEZwZGJmR0llUHNmbU9DZCtRPT0ifX19LHsidHlwZSI6WyJDcmVkZW50aWFsIiwiUHJvb2ZPZkVtYWlsQ3JlZGVudGlhbCJdLCJjcmVkZW50aWFsIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vdzNpZC5vcmcvaWRlbnRpdHkvdjEiLCJodHRwczovL2lkZW50aXR5LmpvbG9jb20uY29tL3Rlcm1zIiwiaHR0cHM6Ly93M2lkLm9yZy9zZWN1cml0eS92MSIsImh0dHBzOi8vdzNpZC5vcmcvY3JlZGVudGlhbHMvdjEiLCJodHRwOi8vc2NoZW1hLm9yZyJdLCJpZCI6ImNsYWltSWQ6ZjUxZjk5YmEiLCJuYW1lIjoiRW1haWwgYWRkcmVzcyIsImlzc3VlciI6ImRpZDpqb2xvOjE4Y2U5NTcyN2MwZjRlNzNhMGEwMjdhZmUxMTliZDA3NzZmMzdlNjA1Y2YyMzdjZDZhZjY3NTczOWY5ZjBmZmMiLCJ0eXBlIjpbIkNyZWRlbnRpYWwiLCJQcm9vZk9mRW1haWxDcmVkZW50aWFsIl0sImNsYWltIjp7ImlkIjoiZGlkOmpvbG86MThjZTk1NzI3YzBmNGU3M2EwYTAyN2FmZTExOWJkMDc3NmYzN2U2MDVjZjIzN2NkNmFmNjc1NzM5ZjlmMGZmYyIsImVtYWlsIjoiTmF0YXNjaEBnbXguZGVoIn0sImlzc3VlZCI6IjIwMTgtMDYtMTFUMTM6MDE6MTcuNTcxWiIsInByb29mIjp7InR5cGUiOiJFY2RzYUtvYmxpdHpTaWduYXR1cmUyMDE2IiwiY3JlYXRlZCI6IjIwMTgtMDYtMTFUMTM6MDE6MTcuNTcxWiIsImNyZWF0b3IiOiJkaWQ6am9sbzoxOGNlOTU3MjdjMGY0ZTczYTBhMDI3YWZlMTE5YmQwNzc2ZjM3ZTYwNWNmMjM3Y2Q2YWY2NzU3MzlmOWYwZmZjI2tleXMtMSIsIm5vbmNlIjoiMDQ3ZmJkOGMiLCJzaWduYXR1cmVWYWx1ZSI6Ilkwc2F1cHdRdzhnVE5xdHlrUHVHK3pZV2Nmd2dodGRkV1pMVDh0dEZxNU5Qeno4YTlEdlRiM20xWHN6TDF4SFdPU1h3NlJrSjZ4aDFUVVBvUVM3aDFBPT0ifX19LHsidHlwZSI6WyJDcmVkZW50aWFsIiwiUHJvb2ZPZk5hbWVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWwiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93M2lkLm9yZy9pZGVudGl0eS92MSIsImh0dHBzOi8vaWRlbnRpdHkuam9sb2NvbS5jb20vdGVybXMiLCJodHRwczovL3czaWQub3JnL3NlY3VyaXR5L3YxIiwiaHR0cHM6Ly93M2lkLm9yZy9jcmVkZW50aWFscy92MSIsImh0dHA6Ly9zY2hlbWEub3JnIl0sImlkIjoiY2xhaW1JZDplZWMwNDMwMSIsIm5hbWUiOiJOYW1lIiwiaXNzdWVyIjoiZGlkOmpvbG86MThjZTk1NzI3YzBmNGU3M2EwYTAyN2FmZTExOWJkMDc3NmYzN2U2MDVjZjIzN2NkNmFmNjc1NzM5ZjlmMGZmYyIsInR5cGUiOlsiQ3JlZGVudGlhbCIsIlByb29mT2ZOYW1lQ3JlZGVudGlhbCJdLCJjbGFpbSI6eyJpZCI6ImRpZDpqb2xvOjE4Y2U5NTcyN2MwZjRlNzNhMGEwMjdhZmUxMTliZDA3NzZmMzdlNjA1Y2YyMzdjZDZhZjY3NTczOWY5ZjBmZmMiLCJuYW1lIjoiTmEsaGdoaPCfmIAsZGQifSwiaXNzdWVkIjoiMjAxOC0wNi0xMVQxMzoxMTo1MS41MDRaIiwicHJvb2YiOnsidHlwZSI6IkVjZHNhS29ibGl0elNpZ25hdHVyZTIwMTYiLCJjcmVhdGVkIjoiMjAxOC0wNi0xMVQxMzoxMTo1MS41MDVaIiwiY3JlYXRvciI6ImRpZDpqb2xvOjE4Y2U5NTcyN2MwZjRlNzNhMGEwMjdhZmUxMTliZDA3NzZmMzdlNjA1Y2YyMzdjZDZhZjY3NTczOWY5ZjBmZmMja2V5cy0xIiwibm9uY2UiOiI1OTBlYjBiZCIsInNpZ25hdHVyZVZhbHVlIjoiWTBaTDVubEZMVkxoRXM1SmdBb3IvaGVBNUFxWHpuU0RncHVhUzdmV3ZwY0lveE9LNWtmL3V6YTdGYngxUXVjNmVCNVFRK201d1dTRk4zTk5nV0RYWEE9PSJ9fX1dLCJpc3N1ZXIiOiJkaWQ6am9sbzoxOGNlOTU3MjdjMGY0ZTczYTBhMDI3YWZlMTE5YmQwNzc2ZjM3ZTYwNWNmMjM3Y2Q2YWY2NzU3MzlmOWYwZmZjIn0.dgR_0UpMcds4AmTw0_01Xj0-'
+import { CredentialResponse } from '../../ts/credentialResponse/credentialResponse'
+import {
+  mockPrivKey,
+  mockSignedCredResponseJson,
+  signedCredRespJWT
+} from '../data/credentialResponse/signedCredentialResponse'
+import { firstMockCredential } from '../data/credentialRequest/credentialRequest'
 
 describe('SignedCredentialResponse', () => {
+  let clock
+
+  const mockCredentialResponse = CredentialResponse.create([firstMockCredential])
+  const mockSignedCredRespCreationArgs = {
+    privateKey: Buffer.from(mockPrivKey, 'hex'),
+    credentialResponse: mockCredentialResponse
+  }
+
+  before(() => {
+    clock = lolex.install()
+  })
+
+  after(() => {
+    clock.uninstall()
+  })
+
   it('Should implement static create method', () => {
-    expect(false).to.equal(true)
+    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
+    expect(signedCredentialResponse.toJSON()).to.deep.equal(mockSignedCredResponseJson)
+  })
+
+  it('Should implement static create method with passed issuer', () => {
+    const modifiedCreationArgs = Object.assign({}, mockSignedCredRespCreationArgs, { issuer: 'did:jolo:test' })
+    const modifiedPayload = {...mockSignedCredResponseJson.payload, iss: 'did:jolo:test'}
+    const signedCredentialResponse = SignedCredentialResponse.create(modifiedCreationArgs)
+
+    expect(signedCredentialResponse.toJSON()).to.deep.equal({...mockSignedCredResponseJson, payload: modifiedPayload})
   })
 
   it('Should implement static fromJWT method', () => {
-    const signedCredentialResponse = SignedCredentialResponse.fromJWT(mockJWT)
-    const expectedSignedCredResponse = SignedCredentialResponse.create(signedCredentialResponseCreationArgs)
-    expect(false).to.equal(true)
+    const signedCredentialResponseFromJWT = SignedCredentialResponse.fromJWT(signedCredRespJWT)
+    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
+    expect(signedCredentialResponseFromJWT).to.deep.equal(signedCredentialResponse)
   })
 
   it('Should implement toJWT method', () => {
-    expect(false).to.equal(true)
+    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
+    expect(signedCredentialResponse.toJWT()).to.equal(signedCredRespJWT)
   })
+
   it('Should implement static fromJSON method', () => {
-    expect(false).to.equal(true)
+    const signedCredRespFromJson = SignedCredentialResponse.fromJSON(mockSignedCredResponseJson)
+    const signedCredResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
+    expect(signedCredRespFromJson).to.deep.equal(signedCredResponse)
   })
+
   it('Should implement toJSON method', () => {
-    expect(false).to.equal(true)
+    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
+    expect(signedCredentialResponse.toJSON()).to.deep.equal(mockSignedCredResponseJson)
   })
+
   it('Should implement validateSignature method', () => {
     expect(false).to.equal(true)
   })
+
   it('Should implement satisfiesRequirements method', () => {
-    expect(false).to.equal(true)
+    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
+    // tslint:disable-next-line:no-unused-expression
+    expect(signedCredentialResponse.satisfiesRequest).to.exist
   })
 })

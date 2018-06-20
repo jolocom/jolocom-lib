@@ -1,4 +1,5 @@
 import { CredentialRequest } from '../credentialRequest';
+import { ICredentialRequestAttrs } from '../types';
 
 export interface IJWTHeader {
   alg: string
@@ -10,8 +11,7 @@ export interface ISignedCredentialRequestAttrs {
   payload: {
     iat: number
     iss: string
-    callbackURL: string
-    credentialRequest: CredentialRequest
+    credentialRequest: ICredentialRequestAttrs
   }
   signature: string
 }
