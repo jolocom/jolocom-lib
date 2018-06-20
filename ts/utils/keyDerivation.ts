@@ -10,11 +10,11 @@ export interface IKeyResponse {
 }
 
 /* @summary - Generates a seed phrase based on provided entropy
- * @param {string} randomStringFromEntropy - a random string generated from entropy.
+ * @param {Buffer} seed - a random Buffer generated from entropy.
  * @returns {string} - a BIP39 compliant 12 word mnemonic
  */
-export function generateMnemonic(randomStringFromEntropy: string) {
-  return bip39.entropyToMnemonic(randomStringFromEntropy)
+export function generateMnemonic({seed}: {seed: Buffer}) {
+  return bip39.entropyToMnemonic(seed)
 }
 
 /* @summary - Generates a keypair based on provided entropy
@@ -23,18 +23,18 @@ export function generateMnemonic(randomStringFromEntropy: string) {
  * @returns {HDNode} - an instance containing a master keypair and a default
  * Bitcoin network object.
  */
-export function deriveMasterKeyPairFromMnemonic(mnemonic: string) {
+export function deriveMasterKeyPairFromMnemonic({mnemonic}: {mnemonic: string}) {
   const seed = bip39.mnemonicToSeed(mnemonic)
   return bitcoin.HDNode.fromSeedBuffer(seed)
 }
 
+// TODO: remove
 /* @summary - Generate a generic signing key according to BIP32 specification
  * @param {HDNode} masterKeyPair - the master keypair used to
  *        derive the child key.
  * @param {string} path - the path to traverse for HD derivation
  * @returns {object} - the wif of the key and the path
  */
-
 export function deriveGenericSigningKeyPair(masterKeyPair: any, path?: string): IKeyResponse {
   if (!path) {
     path = keyTypes.jolocomIdentityKey
@@ -50,6 +50,7 @@ export function deriveGenericSigningKeyPair(masterKeyPair: any, path?: string): 
   }
 }
 
+// TODO: remove
 /* @summary - Generate an Ethereum keypair according to BIP44
  * @param {HDNode} masterKeyPair - the master keypair used to
  *        derive the child key.
@@ -82,4 +83,3 @@ export function deriveChildKeyPair({masterKeyPair, path}: {masterKeyPair: any, p
     path
   }
 }
-

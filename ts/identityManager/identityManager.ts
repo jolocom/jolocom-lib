@@ -32,7 +32,7 @@ export class IdentityManager implements IIdentityManager {
 
   public deriveChildKeys({path}: {path: string}): IKeyResponse {
     const masterKeyPair = keyDerivation
-    .deriveMasterKeyPairFromMnemonic(this.deriveMnemonicFromSeed())
+    .deriveMasterKeyPairFromMnemonic({mnemonic: this.deriveMnemonicFromSeed()})
 
     return keyDerivation.deriveChildKeyPair({masterKeyPair, path})
   }
