@@ -8,20 +8,20 @@ export const signedCredReqJson = {
     iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
     credentialRequest: {
       callbackURL: 'http://test.com',
-      requestedCredentials: [{
-        type: ['Credential', 'MockCredential'],
-        constraints: {
-          and: [
-            { '==': [true, true] },
-            { '==': [ { var: 'issuer' }, 'did:jolo:issuer' ] }
-          ]
+      requestedCredentials: [
+        {
+          type: ['Credential', 'MockCredential'],
+          constraints: {
+            and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
+          }
         }
-      }]
+      ]
     }
   },
   signature: 'rrkhCHtJ1vqQqVK_VzcVDFL1fa_YVXEKa8CRIuYcvSzSqDdcQv-lBq2wcFf--8tn0xGyB6HzfhzLNy5fwoOaeA'
 }
-export const signedCredReqJWT = 'eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJpYXQiOjAsImlzcyI6ImRpZDpqb2xvOjhmOTc3Z\
+export const signedCredReqJWT =
+  'eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJpYXQiOjAsImlzcyI6ImRpZDpqb2xvOjhmOTc3Z\
 TUwYjdlNWNiZGZlYjUzYTAzYzgxMjkxM2I3Mjk3OGNhMzVjOTM1NzFmODVlODYyODYyYmFjOGNkZWIiL\
 CJjcmVkZW50aWFsUmVxdWVzdCI6eyJyZXF1ZXN0ZWRDcmVkZW50aWFscyI6W3sidHlwZSI6WyJDcmVkZ\
 W50aWFsIiwiTW9ja0NyZWRlbnRpYWwiXSwiY29uc3RyYWludHMiOnsiYW5kIjpbeyI9PSI6W3RydWUsd\

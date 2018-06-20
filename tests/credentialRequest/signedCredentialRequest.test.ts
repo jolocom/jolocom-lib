@@ -7,7 +7,7 @@ import {
   signedCredReqJson,
   signedCredReqJWT,
   mockPrivKey,
-  privKeyDID,
+  privKeyDID
 } from '../data/credentialRequest/signedCredentialRequest'
 
 describe('SignedCredentialRequest', () => {
@@ -27,7 +27,6 @@ describe('SignedCredentialRequest', () => {
     clock.uninstall()
   })
 
-  // TODO with issuer
   it('Should implement static create method with no issuer provided', () => {
     const credentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
     const signedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)

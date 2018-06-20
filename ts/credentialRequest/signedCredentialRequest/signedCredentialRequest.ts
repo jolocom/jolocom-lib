@@ -13,7 +13,7 @@ import {
 } from './types'
 
 export class SignedCredentialRequest {
-  private header: IJWTHeader =  {
+  private header: IJWTHeader = {
     alg: 'ES256K',
     typ: 'JWT'
   }
@@ -72,6 +72,10 @@ export class SignedCredentialRequest {
 
   public getIssuer(): string {
     return this.payload.iss
+  }
+
+  public getSignature(): string {
+    return this.signature
   }
 
   public static create(args: ISignedCredRequestCreationArgs): SignedCredentialRequest {

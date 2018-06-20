@@ -47,6 +47,10 @@ export class SignedCredentialResponse {
     return this.payload.credentialResponse
   }
 
+  public getSignature(): string {
+    return this.signature
+  }
+
   private computeSignature(privateKey: Buffer) {
     this.setIssueTime(Date.now())
 
@@ -87,7 +91,7 @@ export class SignedCredentialResponse {
   }
 
   public toJWT(): string {
-    if (!this.payload.credentialResponse || !this.header || this.signature) {
+    if (!this.payload.credentialResponse || !this.header || !this.signature) {
       throw new Error('The JWT is not complete, header / payload / signature are missing')
     }
 
@@ -104,7 +108,9 @@ export class SignedCredentialResponse {
   }
 
   public static fromJSON(json: ISignedCredentialResponseAttrs): SignedCredentialResponse {
-    return plainToClass(SignedCredentialResponse, json)
+    const signedCredentialResponse = plainToClass(SignedCredentialResponse, json)
+    signedCredentialResponse.setCredentialResponse(CredentialResponse.fromJSON(json.payload.credentialResponse))
+    return signedCredentialResponse
   }
 
   public static fromJWT(jwt: string): SignedCredentialResponse {
