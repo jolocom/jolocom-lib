@@ -11,5 +11,4 @@ export interface IIpfsConnector {
   removePinnedHash: (hash: string) => Promise<void>
   createDagObject: (data: object, pin: boolean ) => Promise<string>
   resolveIpldPath: (pathToResolve: string) => Promise<object>
-  resolveIpldBlock: (pathToResolve: string) => Promise<object>
 }

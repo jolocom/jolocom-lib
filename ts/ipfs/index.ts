@@ -68,29 +68,4 @@ export class IpfsStorageAgent implements IIpfsConnector {
     const res = await fetch(endpoint)
     return res.json()
   }
-
-  public async createDagObject(data: object, pin: boolean): Promise<string> {
-
-    if (typeof data !== 'object' || data === null) {
-      throw new Error(`Object expected, received ${typeof data}`)
-    }
-
-    const endpoint = `${this.endpoint}/api/v0/dag/put?pin=${pin}`
-    const formData = new FormData()
-
-    formData.append('file', Buffer.from(JSON.stringify(data)))
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      body: formData
-    }).then((result) => result.json())
-    const cid = res.Cid
-    return cid['/']
-  }
-
-  public async resolveIpldPath(pathToResolve: string): Promise<object> {
-    const endpoint = `${this.endpoint}/api/v0/dag/get?arg=${pathToResolve}`
-    const res = await fetch(endpoint)
-    return res.json()
-  }
-
 }
