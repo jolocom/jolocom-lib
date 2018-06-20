@@ -9,7 +9,7 @@ import {
 } from '../data/credentialResponse/signedCredentialResponse'
 import { firstMockCredential } from '../data/credentialRequest/credentialRequest'
 
-describe.only('SignedCredentialResponse', () => {
+describe('SignedCredentialResponse', () => {
   let clock
 
   const mockCredentialResponse = CredentialResponse.create([firstMockCredential])
