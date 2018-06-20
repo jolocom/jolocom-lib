@@ -34,7 +34,7 @@ export function privateKeyToDID(privateKey: Buffer): string {
   return publicKeyToDID(pubKey)
 }
 
-type jwtPayload = ISignedCredRequestPayload | ISignedCredResponsePayload
+export type jwtPayload = ISignedCredRequestPayload | ISignedCredResponsePayload
 export function encodeAsJWT(header: IJWTHeader, payload: jwtPayload, signature: string): string {
   const jwtParts = []
   jwtParts.push(base64url.encode(JSON.stringify(header)))
