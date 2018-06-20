@@ -1,20 +1,23 @@
 import { IClaimMetadata } from './credential/types'
 import { Credential } from './credential'
-import { IVerifiableCredentialAttrs } from './verifiableCredential/types';
-import { VerifiableCredential } from './verifiableCredential';
+import { ISignedCredentialAttrs } from './signedCredential/types';
+import { SignedCredential } from './signedCredential';
 
+// Change in favor of instantiate / unsigned as per issues #85, #84
 export class Credentials {
   public createCredential(metadata: IClaimMetadata, value: string, subject: string) {
     return new Credential().assemble(metadata, value, subject)
   }
 
+  // TODO Depricate in favor of Parser / Unsigned modules
   public createVerifiableCredential() {
     return {
       fromJSON: this.verifiableCredentialFromJSON
     }
   }
 
-  private verifiableCredentialFromJSON(json: IVerifiableCredentialAttrs): VerifiableCredential {
-    return new VerifiableCredential().fromJSON(json)
+  // TODO Depricate in favor of Parser / Unsigned modules
+  private verifiableCredentialFromJSON(json: ISignedCredentialAttrs): SignedCredential {
+    return SignedCredential.fromJSON(json)
   }
 }
