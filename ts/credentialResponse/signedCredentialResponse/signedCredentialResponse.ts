@@ -1,11 +1,11 @@
 import 'reflect-metadata'
-import { TokenSigner, decodeToken } from 'jsontokens'
+import { decodeToken } from 'jsontokens'
 import { classToPlain, plainToClass } from 'class-transformer'
 import { IJWTHeader } from '../../credentialRequest/signedCredentialRequest/types'
 import { ISuppliedCredentialsAttrs } from '../types'
 import { CredentialRequest } from '../../credentialRequest/credentialRequest'
 import { ISignedCredResponsePayload, ISignedCredResponseCreationArgs, ISignedCredentialResponseAttrs } from './types'
-import { privateKeyToDID, encodeAsJWT } from '../../utils/crypto'
+import { privateKeyToDID, encodeAsJWT, computeJWTSignature } from '../../utils/crypto'
 import { CredentialResponse } from '../credentialResponse'
 
 export class SignedCredentialResponse {
@@ -52,14 +52,7 @@ export class SignedCredentialResponse {
 
   private computeSignature(privateKey: Buffer) {
     this.setIssueTime(Date.now())
-
-    const payload = {
-      iat: this.getIssueTime(),
-      credentialRequest: this.getCredentialResponse().toJSON()
-    }
-
-    const signed = new TokenSigner('ES256K', privateKey.toString('hex')).sign(payload)
-    return decodeToken(signed).signature
+    return computeJWTSignature(this.payload, privateKey)
   }
 
   public static create(args: ISignedCredResponseCreationArgs): SignedCredentialResponse {

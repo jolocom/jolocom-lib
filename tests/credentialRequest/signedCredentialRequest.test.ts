@@ -73,13 +73,6 @@ describe('SignedCredentialRequest', () => {
 
   it('Should implement static fromJWT method', () => {
     const signedCRfromJWT = SignedCredentialRequest.fromJWT(signedCredReqJWT)
-
-    const credentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
-    const args = {
-      privateKey: Buffer.from(mockPrivKey, 'hex'),
-      credentialRequest
-    }
-
     const signedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)
     expect(signedCRfromJWT).to.deep.equal(signedCR)
   })
