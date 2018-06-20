@@ -7,6 +7,7 @@ import { IDefaultClaimsMetadata } from './credentials/credential/types'
 import { defaultConfig } from './defaultConfig'
 import { SSO } from './sso'
 import { Parser } from './parse/parser'
+import { UnsignedCreator } from './unsigned/UnsignedCreator'
 
 export class JolocomLib {
   public identity: Identity
@@ -14,6 +15,7 @@ export class JolocomLib {
   public credentials: Credentials
   public sso: SSO
   public static parse = Parser
+  public static unsigned = UnsignedCreator
 
   // TODO Creation process should be changed.
   constructor(config: ILibConfig = defaultConfig) {
