@@ -11,9 +11,11 @@ import {
 
 export class Parser {
   public static credentialRequest = CredentialRequestParser
-  public static credentialResponse = CredentialResponseParser
-  public static credential = CredentialParser
   public static signedCredentialRequest = SignedCredentialRequestParser
+
+  public static credentialResponse = CredentialResponseParser
   public static signedCredentialResponse = SignedCredentialResponseParser
+
+  public static credential = CredentialParser
   public static signedCredential = VerifiableCredentialParser
 }
