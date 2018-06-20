@@ -72,7 +72,12 @@ export function deriveEthereumKeyPair(masterKeyPair: any, path?: string): IKeyRe
   }
 }
 
-// TODO: add doc
+/* @summary - Generate a child key pair according to BIP32 specification
+ * @param {HDNode} masterKeyPair - the master keypair used to
+ *        derive the child key.
+ * @param {string} path - the path to traverse for HD derivation
+ * @returns {object} - the wif of the key and the path
+ */
 export function deriveChildKeyPair({masterKeyPair, path}: {masterKeyPair: any, path: string}): IKeyResponse {
   const derived = masterKeyPair.derivePath(path).keyPair
 
