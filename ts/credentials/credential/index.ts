@@ -16,7 +16,7 @@ export class Credential {
   private name: string
 
   // TODO Change to async create for Unsigned issue #84
-  public assemble(metadata: IClaimMetadata, value: string, subject: string): Credential {
+  public static create(metadata: IClaimMetadata, value: string, subject: string): Credential {
     const cred = new Credential()
     cred['@context'] = metadata.context
     cred.type = metadata.type
