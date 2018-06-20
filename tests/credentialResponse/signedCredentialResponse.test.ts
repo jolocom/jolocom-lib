@@ -33,10 +33,14 @@ describe('SignedCredentialResponse', () => {
 
   it('Should implement static create method with passed issuer', () => {
     const modifiedCreationArgs = Object.assign({}, mockSignedCredRespCreationArgs, { issuer: 'did:jolo:test' })
-    const modifiedPayload = {...mockSignedCredResponseJson.payload, iss: 'did:jolo:test'}
+    const modifiedPayload = { ...mockSignedCredResponseJson.payload, iss: 'did:jolo:test' }
     const signedCredentialResponse = SignedCredentialResponse.create(modifiedCreationArgs)
 
-    expect(signedCredentialResponse.toJSON()).to.deep.equal({...mockSignedCredResponseJson, payload: modifiedPayload})
+    expect(signedCredentialResponse.toJSON()).to.deep.equal({
+      ...mockSignedCredResponseJson,
+      payload: modifiedPayload,
+      signature: signedCredentialResponse.getSignature()
+    })
   })
 
   it('Should implement static fromJWT method', () => {

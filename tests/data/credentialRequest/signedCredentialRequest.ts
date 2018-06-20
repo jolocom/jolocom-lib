@@ -7,7 +7,6 @@ export const signedCredReqJson = {
     iat: 0,
     iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
     credentialRequest: {
-      callbackURL: 'http://test.com',
       requestedCredentials: [
         {
           type: ['Credential', 'MockCredential'],
@@ -15,16 +14,18 @@ export const signedCredReqJson = {
             and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
           }
         }
-      ]
+      ],
+      callbackURL: 'http://test.com'
     }
   },
-  signature: 'rrkhCHtJ1vqQqVK_VzcVDFL1fa_YVXEKa8CRIuYcvSzSqDdcQv-lBq2wcFf--8tn0xGyB6HzfhzLNy5fwoOaeA'
+  signature: 'OqOTe76beHWwAchs7BAAVApdz54NK1u6uxig0Gsih9ucsLgYKlq5lK6tpKhzj3P6c3E1Kuaqe7Ok-FM8TtO3-A'
 }
-export const signedCredReqJWT =
-  'eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJpYXQiOjAsImlzcyI6ImRpZDpqb2xvOjhmOTc3Z\
-TUwYjdlNWNiZGZlYjUzYTAzYzgxMjkxM2I3Mjk3OGNhMzVjOTM1NzFmODVlODYyODYyYmFjOGNkZWIiL\
-CJjcmVkZW50aWFsUmVxdWVzdCI6eyJyZXF1ZXN0ZWRDcmVkZW50aWFscyI6W3sidHlwZSI6WyJDcmVkZ\
-W50aWFsIiwiTW9ja0NyZWRlbnRpYWwiXSwiY29uc3RyYWludHMiOnsiYW5kIjpbeyI9PSI6W3RydWUsd\
-HJ1ZV19LHsiPT0iOlt7InZhciI6Imlzc3VlciJ9LCJkaWQ6am9sbzppc3N1ZXIiXX1dfX1dLCJjYWxsY\
-mFja1VSTCI6Imh0dHA6Ly90ZXN0LmNvbSJ9fQ.rrkhCHtJ1vqQqVK_VzcVDFL1fa_YVXEKa8CRIuYcvS\
-zSqDdcQv-lBq2wcFf--8tn0xGyB6HzfhzLNy5fwoOaeA'
+
+export const signedCredReqJWT = 'eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.\
+eyJpYXQiOjAsImlzcyI6ImRpZDpqb2xvOjhmOTc3ZTUwYjdlNWNiZGZlYjUzYTAzYzgxMjkxM2I3Mjk3\
+OGNhMzVjOTM1NzFmODVlODYyODYyYmFjOGNkZWIiLCJjcmVkZW50aWFsUmVxdWVzdCI6eyJyZXF1ZXN0\
+ZWRDcmVkZW50aWFscyI6W3sidHlwZSI6WyJDcmVkZW50aWFsIiwiTW9ja0NyZWRlbnRpYWwiXSwiY29u\
+c3RyYWludHMiOnsiYW5kIjpbeyI9PSI6W3RydWUsdHJ1ZV19LHsiPT0iOlt7InZhciI6Imlzc3VlciJ9\
+LCJkaWQ6am9sbzppc3N1ZXIiXX1dfX1dLCJjYWxsYmFja1VSTCI6Imh0dHA6Ly90ZXN0LmNvbSJ9fQ.O\
+qOTe76beHWwAchs7BAAVApdz54NK1u6uxig0Gsih9ucsLgYKlq5lK6tpKhzj3P6c3E1Kuaqe7Ok-FM8T\
+tO3-A'
