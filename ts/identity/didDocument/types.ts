@@ -5,6 +5,6 @@ export interface IDidDocumentAttrs {
   id: string
   authentication: IAuthenticationSectionAttrs
   publicKey: IPublicKeySectionAttrs
-  service: IServiceEndpointSectionAttrs
+  serviceEndpoints: IServiceEndpointSectionAttrs
   created: Date
 }
