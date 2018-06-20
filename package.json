@@ -7,7 +7,7 @@
   "scripts": {
     "test": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts",
     "prepublish": "rm -rf ./js/; ./node_modules/.bin/tsc -p ./tsconfig.json",
-    "test:watch": "mocha  --watch-extensions ts tests/**/*.test.ts -r ts-node/register -w"
+    "test:watch": "./node_modules/.bin/mocha --opts ./mocha.opts -w"
   },
   "nyc": {
     "include": [
