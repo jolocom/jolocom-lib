@@ -4,7 +4,7 @@ import { TokenSigner, decodeToken } from 'jsontokens'
 import { classToPlain, plainToClass, Type } from 'class-transformer'
 import { CredentialRequest } from '../credentialRequest'
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
-import { privateKeyToDID } from '../../utils/crypto'
+import { privateKeyToDID, encodeAsJWT } from '../../utils/crypto'
 import {
   IJWTHeader,
   ISignedCredentialRequestAttrs,
@@ -106,13 +106,7 @@ export class SignedCredentialRequest {
       throw new Error('The JWT is not complete, header / payload / signature are missing')
     }
 
-    const jwtParts = []
-
-    jwtParts.push(base64url.encode(JSON.stringify(this.header)))
-    jwtParts.push(base64url.encode(JSON.stringify(this.payload)))
-    jwtParts.push(this.signature)
-
-    return jwtParts.join('.')
+    return encodeAsJWT(this.header, this.payload, this.signature)
   }
 
   public static fromJWT(jwt: string): SignedCredentialRequest {

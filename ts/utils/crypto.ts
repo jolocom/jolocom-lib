@@ -1,7 +1,9 @@
-import { random } from 'sjcl'
+import base64url from 'base64url'
 import * as createHash from 'create-hash'
 import * as secp256k1 from 'secp256k1'
 import { keccak256 } from 'ethereumjs-util'
+import { IJWTHeader, ISignedCredRequestPayload } from '../credentialRequest/signedCredentialRequest/types';
+import { ISignedCredResponsePayload } from '../credentialResponse/signedCredentialResponse/types';
 
 export function sha256(data: Buffer): Buffer {
   return createHash('sha256').update(data).digest()
@@ -29,6 +31,14 @@ export function privateKeyToDID(privateKey: Buffer): string {
   return publicKeyToDID(pubKey)
 }
 
+type jwtPayload = ISignedCredRequestPayload | ISignedCredResponsePayload
+export function encodeAsJWT(header: IJWTHeader, payload: jwtPayload, signature: string): string {
+  const jwtParts = [];
+  jwtParts.push(base64url.encode(JSON.stringify(header)));
+  jwtParts.push(base64url.encode(JSON.stringify(payload)));
+  jwtParts.push(signature);
+  return jwtParts.join('.');
+}
 // TODO Seed properly, causes issues on RN due to lack of default csrng operations.
 export function generateRandomID(nrOfBytes: number): string {
   return Math.random().toString(16).substr(2)
