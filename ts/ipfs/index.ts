@@ -41,6 +41,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
     if (!res.ok) {
       throw new Error(`Removing pinned hash ${hash} failed, status code: ${res.status}`)
     }
+    return res.ok
   }
 
   public async createDagObject(data: object, pin: boolean): Promise<string> {
@@ -56,7 +57,8 @@ export class IpfsStorageAgent implements IIpfsConnector {
     const res = await fetch(endpoint, {
       method: 'POST',
       body: formData
-    }).then((result) => result.json())
+    })
+    .then((result) => result.json())
     const cid = res.Cid
     return cid['/']
   }
@@ -66,5 +68,4 @@ export class IpfsStorageAgent implements IIpfsConnector {
     const res = await fetch(endpoint)
     return res.json()
   }
-
 }
