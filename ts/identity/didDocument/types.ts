@@ -1,8 +1,9 @@
-import { IAuthenticationSectionAttrs } from './sections/types'
+import { IPublicKeySectionAttrs, IAuthenticationSectionAttrs } from './sections/types'
 
 export interface IDidDocumentAttrs {
   '@context': string
   id: string
-  authenticationSection: IAuthenticationSectionAttrs
+  authentication: IAuthenticationSectionAttrs
+  publicKey: IPublicKeySectionAttrs
   created: Date
 }
