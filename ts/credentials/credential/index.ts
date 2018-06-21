@@ -1,5 +1,5 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
-import { IClaimAttrs, IClaimMetadata, ICredentialAttrs } from './types'
+import { IClaimAttrs, IClaimMetadata, ICredentialAttrs, ICredentialCreateAttrs } from './types'
 
 @Exclude()
 export class Credential {
@@ -15,18 +15,18 @@ export class Credential {
   @Expose()
   private name: string
 
-  // TODO Change to async create for Unsigned issue #84
-  public static create(metadata: IClaimMetadata, value: string, subject: string): Credential {
-    const cred = new Credential()
-    cred['@context'] = metadata.context
-    cred.type = metadata.type
-    cred.name = metadata.name
-    cred.claim = {
-      id: subject,
-      [metadata.fieldName]: value
+  public static create(attrs: ICredentialCreateAttrs): Credential {
+    const credential = new Credential()
+    const metadata = attrs.metadata
+    credential['@context'] = metadata.context
+    credential.type = metadata.type
+    credential.name = metadata.name
+    credential.claim = {
+      id: attrs.subject,
+      [metadata.fieldName]: attrs.value
     }
 
-    return cred
+    return credential
   }
 
   public getClaim(): IClaimAttrs {
