@@ -4,8 +4,8 @@ import { privateKeyToDID } from '../utils/crypto'
 import { CredentialRequest } from '../credentialRequest'
 import { IConstraint } from '../credentialRequest/types'
 import { CredentialResponse } from '../credentialResponse'
-import { Credential } from '../credentials/credential'
-import { SignedCredential } from '../credentials/signedCredential'
+import { Credential } from '../credentials/credential/credential'
+import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 export class IdentityWallet {
