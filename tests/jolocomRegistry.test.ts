@@ -1,8 +1,6 @@
 import { IpfsStorageAgent } from '../ts/ipfs';
 import { EthResolver } from '../ts/ethereum'
 import { JolocomRegistry } from '../ts/registries/jolocomRegistry'
-import { ECPair } from 'bitcoinjs-lib'
-import testKeys from './data/keys'
 import testIdentity from './data/identity'
 import { DidDocument } from '../ts/identity/didDocument'
 import * as sinon from 'sinon'
@@ -12,41 +10,32 @@ import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../ts/identityWallet/identityWallet'
 import { IDidDocumentAttrs } from '../ts/identity/didDocument/types'
-
+import { testIpfsHash, testEthereumConfig, testIpfsConfig } from './data/registry'
+import {
+  testPrivateIdentityKey,
+  testPrivateEthereumKey,
+  testPublicIdentityKey
+} from './data/keys'
 chai.use(sinonChai)
 const expect = chai.expect
 
 describe.only('JolocomRegistry', () => {
   const sandbox = sinon.createSandbox()
 
-  const ipfsConnector = new IpfsStorageAgent({config: {
-    host: 'test',
-    port: 9090,
-    protocol: 'testprotocol'
-  }})
-
-  const ethereumConnector = new EthResolver({config: {
-    providerUrl: 'testEthereumURL',
-    contractAddress: '0x8389B5a24a1c56aFAD7309EF3b8e04bBadC935c4'
-  }})
+  const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
+  const ethereumConnector = new EthResolver(testEthereumConfig)
 
   const unixEpoch = moment.utc('2018-01-24T15:42:15Z', moment.ISO_8601).valueOf()
   const clock = lolex.install({now: unixEpoch})
 
-  const keyPairSigning = ECPair.fromWIF(testKeys.testGenericKeyPairWIF)
-  const keyPairEthereum = ECPair.fromWIF(testKeys.testEthereumKeyPairWIF)
-  const testPrivateIdentityKey = keyPairSigning.d.toBuffer(32)
-  const testPrivateEthereumKey = keyPairEthereum.d.toBuffer(32)
-
-  const ddo = new DidDocument().fromPublicKey(keyPairSigning.getPublicKeyBuffer())
+  const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
   const ddoAttrs: IDidDocumentAttrs = testIdentity.ddoAttrs
-  const ipfsHash = '4f72333148622e4ae56e9c65d57aee47186cd6910ca080757ab72cc0c650f6bb'
 
   const jolocomRegistry = JolocomRegistry.create({ipfsConnector, ethereumConnector})
 
   const identityWalletMock = new IdentityWallet()
-  identityWalletMock.setDidDocument({didDocument: ddo})
-  identityWalletMock.setPrivateIdentityKey({privateIdentityKey: testPrivateIdentityKey})
+  identityWalletMock.setDidDocument(ddo)
+  identityWalletMock.setPrivateIdentityKey(testPrivateIdentityKey)
 
   describe('static created', () => {
     it('should create an instance of JolocomRegistry with correct config', () => {
@@ -61,9 +50,9 @@ describe.only('JolocomRegistry', () => {
     beforeEach(async () => {
       sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
         .withArgs({data: ddo, pin: true})
-        .returns(ipfsHash)
+        .returns(testIpfsHash)
       sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
-        .withArgs({did: ddo.getDID(), ethereumKey: testPrivateEthereumKey, newHash: ipfsHash})
+        .withArgs({did: ddo.getDID(), ethereumKey: testPrivateEthereumKey, newHash: testIpfsHash})
         .resolves()
 
       identityWallet = await jolocomRegistry.create({
@@ -97,9 +86,9 @@ describe.only('JolocomRegistry', () => {
     beforeEach(async () => {
       storeJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
         .withArgs({data: ddo, pin: true})
-        .returns(ipfsHash)
+        .returns(testIpfsHash)
       updateDIDRecordStub = sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
-        .withArgs({did: ddo.getDID(), ethereumKey: testPrivateEthereumKey, newHash: ipfsHash})
+        .withArgs({did: ddo.getDID(), ethereumKey: testPrivateEthereumKey, newHash: testIpfsHash})
         .resolves()
       await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
     })
@@ -123,12 +112,12 @@ describe.only('JolocomRegistry', () => {
 
     beforeEach(async () => {
       resolveDIDStub = sandbox.stub(EthResolver.prototype, 'resolveDID')
-        .withArgs({did: ddo.getDID()})
-        .resolves(ipfsHash)
+        .withArgs(ddo.getDID())
+        .resolves(testIpfsHash)
       catJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'catJSON')
-        .withArgs({hash: ipfsHash})
+        .withArgs(testIpfsHash)
         .resolves(ddoAttrs)
-      await jolocomRegistry.resolve({did: ddo.getDID()})
+      await jolocomRegistry.resolve(ddo.getDID())
     })
 
     afterEach(() => {
@@ -150,9 +139,9 @@ describe.only('JolocomRegistry', () => {
 
     beforeEach(async () => {
       resolveStub = sandbox.stub(JolocomRegistry.prototype, 'resolve')
-        .withArgs({did: ddo.getDID()})
+        .withArgs(ddo.getDID())
         .resolves(ddoAttrs)
-      identityWallet = await jolocomRegistry.authenticate({privateIdentityKey: testPrivateIdentityKey})
+      identityWallet = await jolocomRegistry.authenticate(testPrivateIdentityKey)
     })
 
     afterEach(() => {
@@ -190,10 +179,10 @@ describe.only('JolocomRegistry', () => {
     it('should correctly assemble the thrown error message on updateDIDRecord', async () => {
       storeJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
         .withArgs({data: ddo, pin: true})
-        .returns(ipfsHash)
+        .returns(testIpfsHash)
 
       updateDIDRecordStub = sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
-        .withArgs( {ethereumKey: testPrivateEthereumKey, did: ddo.getDID(), newHash: ipfsHash})
+        .withArgs( {ethereumKey: testPrivateEthereumKey, did: ddo.getDID(), newHash: testIpfsHash})
         .throws(new Error('Connection failed.'))
 
       try {
