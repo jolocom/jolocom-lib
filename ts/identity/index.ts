@@ -33,7 +33,7 @@ export class Identity {
    * encoded in WIF format
    * */
 
-  public create(randomStringFromEntropy: string): IdentityCreationResponse {
+  public create(randomStringFromEntropy: Buffer): IdentityCreationResponse {
     const mnemonic = keyDerivation.generateMnemonic(randomStringFromEntropy)
     const masterKeyPair = keyDerivation.deriveMasterKeyPairFromMnemonic(mnemonic)
     const genericSigningKey = keyDerivation.deriveGenericSigningKeyPair(masterKeyPair)
