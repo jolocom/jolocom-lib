@@ -3,14 +3,12 @@ import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transfo
 import { canonize } from 'jsonld'
 import { IClaimAttrs, ICredentialCreateAttrs } from '../credential/types'
 import { Credential } from '../credential'
-import { IPrivateKey } from '../../wallet/types'
 import { generateRandomID, sign, sha256, verifySignature } from '../../utils/crypto'
 import { ISignedCredentialAttrs } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { defaultContext } from '../../utils/contexts'
 import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
 
-// TODO Change to SignedCredential
 @Exclude()
 export class SignedCredential {
   @Expose()
@@ -98,21 +96,20 @@ export class SignedCredential {
     {credentialAttrs, privateIdentityKey}: {credentialAttrs: ICredentialCreateAttrs, privateIdentityKey: Buffer}
   ): Promise<SignedCredential> {
     const credential = Credential.create(credentialAttrs)
-    let signedCredential = new SignedCredential()
-    signedCredential = signedCredential.fromCredential(credential)
+    const signedCredential = SignedCredential.fromCredential(credential)
 
     await signedCredential.generateSignature(privateIdentityKey)
 
     return signedCredential
   }
 
-  // TODO remove / modify in favor of identityWallet.sign.credential
-  public fromCredential(credential: Credential): SignedCredential {
+  public static fromCredential(credential: Credential): SignedCredential {
     const signedCredential = new SignedCredential()
     signedCredential['@context'] = credential.getContext()
     signedCredential.type = credential.getType()
     signedCredential.claim = credential.getClaim()
     signedCredential.name = credential.getName()
+
     return signedCredential
   }
 
