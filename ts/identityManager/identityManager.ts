@@ -1,18 +1,12 @@
 import * as keyDerivation from '../utils/keyDerivation'
 import { IKeyResponse } from '../utils/keyDerivation'
-import { IIdentityManager } from './types';
-
-// TODO: remove double from index.ts
-export enum DefaultKeyTypes {
-  jolocomIdentityKey = 'm/73\'/0\'/0\'/0',
-  ethereumKey = 'm/44\'/60\'/0\'/0/0'
-}
+import { keyTypes } from '../'
 
 export interface IKeyDerivationSchema {
   [key: string]: string
 }
 
-export class IdentityManager implements IIdentityManager {
+export class IdentityManager {
   private seed: Buffer
   private schema: IKeyDerivationSchema
 
@@ -20,19 +14,15 @@ export class IdentityManager implements IIdentityManager {
     const identityManager = new IdentityManager()
     identityManager.seed = seed
     identityManager.schema = {
-      ...DefaultKeyTypes
+      ...keyTypes
     }
 
     return identityManager
   }
 
-  private deriveMnemonicFromSeed(): string {
-    return keyDerivation.generateMnemonic(this.seed)
-  }
-
-  public deriveChildKeys(path: string): IKeyResponse {
-    const masterKeyPair = keyDerivation
-    .deriveMasterKeyPairFromMnemonic(this.deriveMnemonicFromSeed())
+  public deriveChildKey(path: string): IKeyResponse {
+    const mnemonic = keyDerivation.generateMnemonic(this.seed)
+    const masterKeyPair = keyDerivation.deriveMasterKeyPairFromMnemonic(mnemonic)
 
     return keyDerivation.deriveChildKeyPair({masterKeyPair, path})
   }

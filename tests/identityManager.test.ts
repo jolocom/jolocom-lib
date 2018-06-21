@@ -2,41 +2,36 @@ import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import * as testKeys from './data/keys'
 import { IdentityManager } from '../ts/identityManager/identityManager'
+import { keyTypes } from '../'
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe('IdentityManager', () => {
+describe.only('IdentityManager', () => {
   const identityManager = IdentityManager.create(testKeys.default.testSeed)
 
   describe('static create', () => {
     it('should create an instance of IdentityManager with correct default keys schema', () => {
       const keySchema = identityManager.getSchema()
 
-      expect(keySchema).to.have.property('jolocomIdentityKey')
-      expect(keySchema).to.have.property('ethereumKey')
-      expect(keySchema.jolocomIdentityKey).to.equal('m/73\'/0\'/0\'/0')
-      expect(keySchema.ethereumKey).to.equal('m/44\'/60\'/0\'/0/0')
+      expect(keySchema.jolocomIdentityKey).to.equal(keyTypes.jolocomIdentityKey)
+      expect(keySchema.ethereumKey).to.equal(keyTypes.ethereumKey)
     })
   })
 
   describe('deriveChildKeys', () => {
     it('should return a correct child key according to path', () => {
       const keySchema = identityManager.getSchema()
-      const childKeys = identityManager.deriveChildKeys(keySchema.jolocomIdentityKey)
+      const childKey = identityManager.deriveChildKey(keySchema.jolocomIdentityKey)
 
-      expect(childKeys.path).to.be.equal(keySchema.jolocomIdentityKey)
+      expect(childKey.path).to.be.equal(keySchema.jolocomIdentityKey)
     })
   })
 
   describe('getSchema', () => {
     it('should return the schema object', () => {
-      const mockKeySchema = {
-        jolocomIdentityKey: 'm/73\'/0\'/0\'/0',
-        ethereumKey: 'm/44\'/60\'/0\'/0/0'
-      }
       const keySchema = identityManager.getSchema()
 
-      expect(keySchema).to.deep.equal(mockKeySchema)
+      expect(keySchema).to.deep.equal(keyTypes)
     })
   })
 
@@ -45,7 +40,6 @@ describe('IdentityManager', () => {
       identityManager.addSchemaEntry({name: 'gov', path: 'm/73\'/0\'/0\'/1'})
       const keySchema = identityManager.getSchema()
 
-      expect(keySchema).to.have.property('gov')
       expect(keySchema.gov).to.equal('m/73\'/0\'/0\'/1')
     })
   })
