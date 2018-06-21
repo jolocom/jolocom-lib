@@ -22,17 +22,14 @@ const expect = chai.expect
 describe.only('JolocomRegistry', () => {
   const sandbox = sinon.createSandbox()
 
-  const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
-  const ethereumConnector = new EthResolver(testEthereumConfig)
-
   const unixEpoch = moment.utc('2018-01-24T15:42:15Z', moment.ISO_8601).valueOf()
   const clock = lolex.install({now: unixEpoch})
 
+  const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
+  const ethereumConnector = new EthResolver(testEthereumConfig)
   const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
   const ddoAttrs: IDidDocumentAttrs = testIdentity.ddoAttrs
-
   const jolocomRegistry = JolocomRegistry.create({ipfsConnector, ethereumConnector})
-
   const identityWalletMock = new IdentityWallet()
   identityWalletMock.setDidDocument(ddo)
   identityWalletMock.setPrivateIdentityKey(testPrivateIdentityKey)
@@ -44,8 +41,9 @@ describe.only('JolocomRegistry', () => {
     })
   })
 
-  describe('instance create', async () => {
+  describe('instance create', () => {
     let identityWallet
+    let commit
 
     beforeEach(async () => {
       sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
@@ -54,7 +52,7 @@ describe.only('JolocomRegistry', () => {
       sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
         .withArgs({did: ddo.getDID(), ethereumKey: testPrivateEthereumKey, newHash: testIpfsHash})
         .resolves()
-
+      commit = sandbox.spy(JolocomRegistry.prototype, 'commit')
       identityWallet = await jolocomRegistry.create({
         privateIdentityKey: testPrivateIdentityKey,
         privateEthereumKey: testPrivateEthereumKey
@@ -69,9 +67,8 @@ describe.only('JolocomRegistry', () => {
       expect(identityWallet.getDidDocument()).to.deep.equal(ddo)
     })
 
-    it('should call commit method once with proper params', async () => {
-      const commit = sinon.spy(JolocomRegistry.prototype, 'commit')
-      commit.calledWith({wallet: identityWallet, privateEthereumKey: testPrivateEthereumKey})
+    it('should call commit method once with proper params', () => {
+      expect(commit).to.be.calledWith({wallet: identityWallet, privateEthereumKey: testPrivateEthereumKey})
     })
 
     it('should return proper identityWallet instance on create', () => {
@@ -97,11 +94,11 @@ describe.only('JolocomRegistry', () => {
       sandbox.restore()
     })
 
-    it('should call storeJson on IpfsStorageAgent', async () => {
+    it('should call storeJson on IpfsStorageAgent', () => {
       sandbox.assert.calledOnce(storeJSONStub)
     })
 
-    it('should call updateDIDRecord on EthResolver', async () => {
+    it('should call updateDIDRecord on EthResolver', () => {
       sandbox.assert.calledOnce(updateDIDRecordStub)
     })
   })
@@ -223,3 +220,4 @@ describe.only('JolocomRegistry', () => {
     })
   })
 })
+        
