@@ -1,6 +1,6 @@
 export const credentialRequestCreationArgs = {
   callbackURL: 'http://test.com',
-  requestedCredentials: [
+  credentialRequirements: [
     {
       type: ['Credential', 'MockCredential'],
       constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
@@ -10,7 +10,7 @@ export const credentialRequestCreationArgs = {
 
 export const credentialRequestJson = {
   callbackURL: 'http://test.com',
-  requestedCredentials: [
+  credentialRequirements: [
     {
       constraints: {
         and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]

@@ -1,5 +1,6 @@
+export type constraintStatement = boolean[] | Array<{ var: string } | string | comparable >
 export interface IConstraint {
-  [operator: string]: boolean[] | Array<{ var: string } | string | comparable >
+  [operator: string]: constraintStatement
 }
 
 export interface ICredentialRequest {
@@ -22,10 +23,11 @@ export interface IExposedConstraintFunctions {
 
 export interface ICredentialRequestAttrs {
   callbackURL: string
-  requestedCredentials: ICredentialRequest[]
+  credentialRequirements: ICredentialRequest[]
 }
 
+export type requestedCredentialArgs = Array<{type: string[], constraints: IConstraint[]}>
 export interface ICredentialRequestCreationArgs {
   callbackURL: string
-  requestedCredentials: Array<{type: string[], constraints: IConstraint[]}>
+  credentialRequirements: requestedCredentialArgs
 }

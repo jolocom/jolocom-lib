@@ -17,32 +17,11 @@ export class SignedCredentialRequest {
     typ: 'JWT'
   }
 
-  private payload: ISignedCredRequestPayload = {
-    iat: null,
-    iss: null,
-    credentialRequest: null
-  }
+  private payload: ISignedCredRequestPayload
 
   private signature: string
 
-  private setIssueTime(timestamp: number) {
-    this.payload.iat = timestamp
-  }
-
-  private setCredentialRequest(credentialRequest: CredentialRequest) {
-    this.payload.credentialRequest = credentialRequest
-  }
-
-  private setSignature(signature: string) {
-    this.signature = signature
-  }
-
-  private setIssuer(issuer: string) {
-    this.payload.iss = issuer
-  }
-
   private computeSignature(privateKey: Buffer) {
-    this.setIssueTime(Date.now())
     return computeJWTSignature(this.payload, privateKey)
   }
 
@@ -79,9 +58,13 @@ export class SignedCredentialRequest {
     }
 
     const signedCr = new SignedCredentialRequest()
-    signedCr.setIssuer(issuer)
-    signedCr.setCredentialRequest(credentialRequest)
-    signedCr.setSignature(signedCr.computeSignature(privateKey))
+    signedCr.payload = {
+      iat: Date.now(),
+      iss: issuer,
+      credentialRequest
+    }
+
+    signedCr.signature = signedCr.computeSignature(privateKey)
     return signedCr
   }
 
@@ -112,7 +95,7 @@ export class SignedCredentialRequest {
 
   public static fromJSON(json: ISignedCredentialRequestAttrs): SignedCredentialRequest {
     const signedCredentialReq = plainToClass(SignedCredentialRequest, json)
-    signedCredentialReq.setCredentialRequest(CredentialRequest.fromJSON(json.payload.credentialRequest))
+    signedCredentialReq.payload.credentialRequest = CredentialRequest.fromJSON(json.payload.credentialRequest)
     return signedCredentialReq
   }
 }

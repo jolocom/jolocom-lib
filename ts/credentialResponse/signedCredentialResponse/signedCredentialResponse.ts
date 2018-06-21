@@ -14,29 +14,9 @@ export class SignedCredentialResponse {
     typ: 'JWT'
   }
 
-  private payload: ISignedCredResponsePayload = {
-    iss: null,
-    iat: null,
-    credentialResponse: null
-  }
+  private payload: ISignedCredResponsePayload
 
   private signature: string
-
-  private setIssueTime(timestamp: number) {
-    this.payload.iat = timestamp
-  }
-
-  private setCredentialResponse(credentialResponse: CredentialResponse) {
-    this.payload.credentialResponse = credentialResponse
-  }
-
-  private setSignature(signature: string) {
-    this.signature = signature
-  }
-
-  private setIssuer(issuer: string) {
-    this.payload.iss = issuer
-  }
 
   public getIssueTime(): number {
     return this.payload.iat
@@ -51,7 +31,6 @@ export class SignedCredentialResponse {
   }
 
   private computeSignature(privateKey: Buffer) {
-    this.setIssueTime(Date.now())
     return computeJWTSignature(this.payload, privateKey)
   }
 
@@ -64,9 +43,13 @@ export class SignedCredentialResponse {
     }
 
     const signedCr = new SignedCredentialResponse()
-    signedCr.setIssuer(issuer)
-    signedCr.setCredentialResponse(credentialResponse)
-    signedCr.setSignature(signedCr.computeSignature(privateKey))
+    signedCr.payload = {
+      iss: issuer,
+      iat: Date.now(),
+      credentialResponse
+    }
+
+    signedCr.signature = signedCr.computeSignature(privateKey)
     return signedCr
   }
 
@@ -96,7 +79,7 @@ export class SignedCredentialResponse {
 
   public static fromJSON(json: ISignedCredentialResponseAttrs): SignedCredentialResponse {
     const signedCredentialResponse = plainToClass(SignedCredentialResponse, json)
-    signedCredentialResponse.setCredentialResponse(CredentialResponse.fromJSON(json.payload.credentialResponse))
+    signedCredentialResponse.payload.credentialResponse = CredentialResponse.fromJSON(json.payload.credentialResponse)
     return signedCredentialResponse
   }
 
