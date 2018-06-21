@@ -16,7 +16,7 @@ export class IdentityManager implements IIdentityManager {
   private seed: Buffer
   private schema: IKeyDerivationSchema
 
-  public static create({seed}: {seed: Buffer}) {
+  public static create(seed: Buffer) {
     const identityManager = new IdentityManager()
     identityManager.seed = seed
     identityManager.schema = {
@@ -27,12 +27,12 @@ export class IdentityManager implements IIdentityManager {
   }
 
   private deriveMnemonicFromSeed(): string {
-    return keyDerivation.generateMnemonic({seed: this.seed})
+    return keyDerivation.generateMnemonic(this.seed)
   }
 
-  public deriveChildKeys({path}: {path: string}): IKeyResponse {
+  public deriveChildKeys(path: string): IKeyResponse {
     const masterKeyPair = keyDerivation
-    .deriveMasterKeyPairFromMnemonic({mnemonic: this.deriveMnemonicFromSeed()})
+    .deriveMasterKeyPairFromMnemonic(this.deriveMnemonicFromSeed())
 
     return keyDerivation.deriveChildKeyPair({masterKeyPair, path})
   }

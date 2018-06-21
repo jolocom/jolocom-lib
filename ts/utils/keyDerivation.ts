@@ -13,7 +13,7 @@ export interface IKeyResponse {
  * @param {Buffer} seed - a random Buffer generated from entropy.
  * @returns {string} - a BIP39 compliant 12 word mnemonic
  */
-export function generateMnemonic({seed}: {seed: Buffer}) {
+export function generateMnemonic(seed: Buffer) {
   return bip39.entropyToMnemonic(seed)
 }
 
@@ -23,7 +23,7 @@ export function generateMnemonic({seed}: {seed: Buffer}) {
  * @returns {HDNode} - an instance containing a master keypair and a default
  * Bitcoin network object.
  */
-export function deriveMasterKeyPairFromMnemonic({mnemonic}: {mnemonic: string}) {
+export function deriveMasterKeyPairFromMnemonic(mnemonic: string) {
   const seed = bip39.mnemonicToSeed(mnemonic)
   return bitcoin.HDNode.fromSeedBuffer(seed)
 }

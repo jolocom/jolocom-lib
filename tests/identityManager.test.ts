@@ -1,12 +1,12 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
+import * as testKeys from './data/keys'
 import { IdentityManager } from '../ts/identityManager/identityManager'
 chai.use(sinonChai)
 const expect = chai.expect
 
 describe('IdentityManager', () => {
-  const testSeed = Buffer.from('316AF5B648D7E1DF31B73729E8E6628AEB8060CC4389C2B2A81BD56E92E9228D', 'hex')
-  const identityManager = IdentityManager.create({seed: testSeed})
+  const identityManager = IdentityManager.create(testKeys.default.testSeed)
 
   describe('static create', () => {
     it('should create an instance of IdentityManager with correct default keys schema', () => {
@@ -22,7 +22,7 @@ describe('IdentityManager', () => {
   describe('deriveChildKeys', () => {
     it('should return a correct child key according to path', () => {
       const keySchema = identityManager.getSchema()
-      const childKeys = identityManager.deriveChildKeys({path: keySchema.jolocomIdentityKey})
+      const childKeys = identityManager.deriveChildKeys(keySchema.jolocomIdentityKey)
 
       expect(childKeys.path).to.be.equal(keySchema.jolocomIdentityKey)
     })
@@ -35,6 +35,7 @@ describe('IdentityManager', () => {
         ethereumKey: 'm/44\'/60\'/0\'/0/0'
       }
       const keySchema = identityManager.getSchema()
+
       expect(keySchema).to.deep.equal(mockKeySchema)
     })
   })
