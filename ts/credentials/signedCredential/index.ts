@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { canonize } from 'jsonld'
-import { IClaimAttrs } from '../credential/types'
+import { IClaimAttrs, ICredentialCreateAttrs } from '../credential/types'
 import { Credential } from '../credential'
 import { IPrivateKey } from '../../wallet/types'
 import { generateRandomID, sign, sha256, verifySignature } from '../../utils/crypto'
@@ -94,26 +94,38 @@ export class SignedCredential {
     return customType.replace(/([A-Z])/g, ' $1').trim()
   }
 
-  // TODO remove / modify in favor of identityWallet.sign.credential
-  public fromCredential(credential: Credential): SignedCredential {
-    const vc = new SignedCredential()
-    vc['@context'] = credential.getContext()
-    vc.type = credential.getType()
-    vc.claim = credential.getClaim()
-    vc.name = credential.getName()
-    return vc
+  public static async create(
+    {credentialAttrs, privateIdentityKey}: {credentialAttrs: ICredentialCreateAttrs, privateIdentityKey: Buffer}
+  ): Promise<SignedCredential> {
+    const credential = Credential.create(credentialAttrs)
+    let signedCredential = new SignedCredential()
+    signedCredential = signedCredential.fromCredential(credential)
+
+    await signedCredential.generateSignature(privateIdentityKey)
+
+    return signedCredential
   }
 
-  public async generateSignature(privateKey: IPrivateKey) {
+  // TODO remove / modify in favor of identityWallet.sign.credential
+  public fromCredential(credential: Credential): SignedCredential {
+    const signedCredential = new SignedCredential()
+    signedCredential['@context'] = credential.getContext()
+    signedCredential.type = credential.getType()
+    signedCredential.claim = credential.getClaim()
+    signedCredential.name = credential.getName()
+    return signedCredential
+  }
+
+  public async generateSignature(privateKey: Buffer) {
     this.proof.created = new Date()
-    this.proof.creator = `${this.issuer}#${privateKey.id}`
+    this.proof.creator = `${this.issuer}#${this.id}`
     this.proof.nonce = generateRandomID(8)
     this.proof.proofSectionType = proofTypes.proofSet
 
     const docDigest = await this.digest()
     const sigDigest = await this.proof.digest()
 
-    this.proof.signatureValue = sign(`${sigDigest}${docDigest}`, privateKey.privateKey)
+    this.proof.signatureValue = sign(`${sigDigest}${docDigest}`, privateKey)
   }
 
   // TODO If no pubKey passed, fetch from ipfs

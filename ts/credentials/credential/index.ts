@@ -15,15 +15,14 @@ export class Credential {
   @Expose()
   private name: string
 
-  public static create(attrs: ICredentialCreateAttrs): Credential {
+  public static create({metadata, value, subject}: ICredentialCreateAttrs): Credential {
     const credential = new Credential()
-    const metadata = attrs.metadata
     credential['@context'] = metadata.context
     credential.type = metadata.type
     credential.name = metadata.name
     credential.claim = {
-      id: attrs.subject,
-      [metadata.fieldName]: attrs.value
+      id: subject,
+      [metadata.fieldName]: value
     }
 
     return credential
