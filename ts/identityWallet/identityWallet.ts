@@ -1,7 +1,8 @@
 import { DidDocument } from '../identity/didDocument';
 import { Credential } from '../credentials/credential/credential';
 import { SignedCredential } from '../credentials/signedCredential/signedCredential';
-import { CredentialRequest } from '../credentialRequest';
+import { SignedCredentialRequest } from '../credentialRequest/signedCredentialRequest/signedCredentialRequest';
+import { CredentialRequest } from '../credentialRequest/credentialRequest';
 
 export class IdentityWallet {
   private privateIdentityKey: Buffer
@@ -16,11 +17,12 @@ export class IdentityWallet {
 
   public create = {
     credential: Credential.create,
+    credentialRequest: CredentialRequest.create,
     signedCredential: (credentialAttrs) => SignedCredential.create({
       credentialAttrs,
       privateIdentityKey: this.privateIdentityKey
     }),
-    credentialRequest: CredentialRequest // include the method after credential request PR is merged
+    signedCredentialRequest: SignedCredentialRequest.create
   }
 
   public sign = {
