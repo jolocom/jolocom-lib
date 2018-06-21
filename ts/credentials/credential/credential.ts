@@ -15,15 +15,17 @@ export class Credential {
   @Expose()
   private name: string
 
-  public static create({metadata, value, subject}: ICredentialCreateAttrs): Credential {
+  public static create({metadata, claim}: ICredentialCreateAttrs): Credential {
+    const allPresent = metadata.fieldNames.every((field) => !!claim[field])
+    if (!allPresent) {
+      throw new Error(`Missing claims, expected keys are: ${metadata.fieldNames.toString()}`)
+    }
+
     const credential = new Credential()
     credential['@context'] = metadata.context
     credential.type = metadata.type
     credential.name = metadata.name
-    credential.claim = {
-      id: subject,
-      [metadata.fieldName]: value
-    }
+    credential.claim = claim
 
     return credential
   }
@@ -48,7 +50,7 @@ export class Credential {
     return plainToClass(Credential, json)
   }
 
-  public toJSON(credential: Credential): ICredentialAttrs {
+  public toJSON(): ICredentialAttrs {
     return classToPlain(this) as ICredentialAttrs
   }
 }

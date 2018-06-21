@@ -12,12 +12,11 @@ export interface ICredentialAttrs {
 
 export interface ICredentialCreateAttrs {
   metadata: IClaimMetadata
-  value: string
-  subject: string
+  claim: IClaimAttrs
 }
 
 export interface IClaimMetadata {
-  fieldName: string
+  fieldNames: string[]
   type: string[]
   context: string[] | object[]
   name?: string
