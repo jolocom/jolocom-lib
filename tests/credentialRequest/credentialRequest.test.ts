@@ -12,7 +12,9 @@ describe('CredentialRequest', () => {
   it('Should implement static create method', () => {
     const cr = CredentialRequest.create(credentialRequestCreationArgs)
     expect(cr.getCallbackURL()).to.equal(credentialRequestCreationArgs.callbackURL)
-    expect(cr.getRequestedCredentialTypes()).to.deep.equal([credentialRequestCreationArgs.requestedCredentials[0].type])
+    expect(cr.getRequestedCredentialTypes()).to.deep.equal([
+      credentialRequestCreationArgs.credentialRequirements[0].type
+    ])
   })
 
   it('Should implement an applyConstraints method', () => {
@@ -31,8 +33,9 @@ describe('CredentialRequest', () => {
     expect(credentialRequest.getCallbackURL()).to.equal(credentialRequestCreationArgs.callbackURL)
     expect(credentialRequest.getRequestedCredentials()).to.deep.equal([expectedRequestedCredentials])
     expect(credentialRequest.getRequestedCredentialTypes().length).to.equal(1)
-    expect(credentialRequest.getRequestedCredentialTypes()[0])
-      .to.deep.equal(credentialRequestCreationArgs.requestedCredentials[0].type)
+    expect(credentialRequest.getRequestedCredentialTypes()[0]).to.deep.equal(
+      credentialRequestCreationArgs.credentialRequirements[0].type
+    )
   })
 
   it('Should implement all setter methods', () => {

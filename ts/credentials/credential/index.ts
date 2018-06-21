@@ -15,16 +15,18 @@ export class Credential {
   @Expose()
   private name: string
 
-  // TODO Change to async create for Unsigned issue #84
-  public assemble(metadata: IClaimMetadata, value: string, subject: string): Credential {
+  public static create(metadata: IClaimMetadata, claim: IClaimAttrs): Credential {
+    const allPresent = metadata.fieldNames.every((field) => !!claim[field])
+
+    if (!allPresent) {
+      throw new Error(`Missing claims, expected keys are: ${metadata.fieldNames.toString()}`)
+    }
+
     const cred = new Credential()
     cred['@context'] = metadata.context
     cred.type = metadata.type
     cred.name = metadata.name
-    cred.claim = {
-      id: subject,
-      [metadata.fieldName]: value
-    }
+    cred.claim = claim
 
     return cred
   }

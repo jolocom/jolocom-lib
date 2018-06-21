@@ -13,16 +13,16 @@ import {
 
 export class CredentialRequest {
   private callbackURL: string
-  private requestedCredentials: ICredentialRequest[] = []
+  private credentialRequirements: ICredentialRequest[] = []
 
   public static create(args: ICredentialRequestCreationArgs): CredentialRequest {
-    const cr = new CredentialRequest()
-    cr.setCallbackURL(args.callbackURL)
-    args.requestedCredentials.forEach((req) => cr.addRequestedClaim(req))
-    return cr
+    const credentialRequest = new CredentialRequest()
+    credentialRequest.setCallbackURL(args.callbackURL)
+    args.credentialRequirements.forEach((req) => credentialRequest.addCredentialRequirement(req))
+    return credentialRequest
   }
 
-  private addRequestedClaim({constraints, type}: {type: string[], constraints: IConstraint[]}) {
+  private addCredentialRequirement({constraints, type}: {type: string[], constraints: IConstraint[]}) {
     const credConstraints = {
       and: [
         { '==': [true, true] },
@@ -30,7 +30,7 @@ export class CredentialRequest {
       ]
     }
 
-    this.requestedCredentials.push({ type, constraints: credConstraints })
+    this.credentialRequirements.push({ type, constraints: credConstraints })
   }
 
   public setCallbackURL(url: string) {
@@ -42,16 +42,16 @@ export class CredentialRequest {
   }
 
   public getRequestedCredentials(): ICredentialRequest[] {
-    return this.requestedCredentials
+    return this.credentialRequirements
   }
 
   public getRequestedCredentialTypes(): string[][] {
-    return this.requestedCredentials.map((credential) => credential.type)
+    return this.credentialRequirements.map((credential) => credential.type)
   }
 
   public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
     return credentials.filter((credential) => {
-      const relevantConstraints = this.requestedCredentials.find((section) =>
+      const relevantConstraints = this.credentialRequirements.find((section) =>
         areCredTypesEqual(section.type, credential.type)
       )
 

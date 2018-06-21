@@ -13,9 +13,9 @@ export interface ISignedCredentialResponseAttrs {
 }
 
 export interface ISignedCredResponsePayload {
-  iat: number | null
-  iss: string | null
-  credentialResponse: CredentialResponse | null
+  iat: number
+  iss: string
+  credentialResponse: CredentialResponse
 }
 
 export interface ISignedCredResponseCreationArgs {

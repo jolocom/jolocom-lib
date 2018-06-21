@@ -37,7 +37,7 @@ describe('SignedCredentialRequest', () => {
     expect(signedCR.getIssueTime()).to.equal(0)
     expect(signedCR.getRequestedCredentialTypes().length).to.equal(1)
     expect(signedCR.getRequestedCredentialTypes()).to.deep.equal([
-      credentialRequestCreationArgs.requestedCredentials[0].type
+      credentialRequestCreationArgs.credentialRequirements[0].type
     ])
   })
 
@@ -55,7 +55,7 @@ describe('SignedCredentialRequest', () => {
     expect(signedCR.getIssueTime()).to.equal(0)
     expect(signedCR.getRequestedCredentialTypes().length).to.equal(1)
     expect(signedCR.getRequestedCredentialTypes()).to.deep.equal([
-      credentialRequestCreationArgs.requestedCredentials[0].type
+      credentialRequestCreationArgs.credentialRequirements[0].type
     ])
   })
 
@@ -91,7 +91,7 @@ describe('SignedCredentialRequest', () => {
     expect(signedCR.getCallbackURL()).to.equal(credentialRequestCreationArgs.callbackURL)
     expect(signedCR.getRequestedCredentialTypes().length).to.equal(1)
     expect(signedCR.getRequestedCredentialTypes()).to.deep.equal([
-      credentialRequestCreationArgs.requestedCredentials[0].type
+      credentialRequestCreationArgs.credentialRequirements[0].type
     ])
   })
 

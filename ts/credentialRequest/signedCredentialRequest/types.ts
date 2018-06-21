@@ -17,9 +17,9 @@ export interface ISignedCredentialRequestAttrs {
 }
 
 export interface ISignedCredRequestPayload {
-  iat: number | null
-  iss: string | null
-  credentialRequest: CredentialRequest | null
+  iat: number
+  iss: string
+  credentialRequest: CredentialRequest
 }
 
 export interface ISignedCredRequestCreationArgs {
