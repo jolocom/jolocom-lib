@@ -4,6 +4,11 @@ import { IdentityWallet } from '../identityWallet/identityWallet';
 import { privateKeyToPublicKey, privateKeyToDID } from '../utils/crypto'
 import { DidDocument } from '../identity/didDocument'
 import { IDidDocumentAttrs } from '../identity/didDocument/types';
+import {
+  IRegistryCommitArgs,
+  IRegistryInstanceCreationArgs,
+  IRegistryStaticCreationArgs
+} from './types'
 
 /** Jolocom specific Registry, which uses IPFS
  *  and Ethereum for registering the indentity and the resolution
@@ -13,9 +18,7 @@ export class JolocomRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
 
-  public static create(
-    {ipfsConnector, ethereumConnector}:
-    {ipfsConnector: IIpfsConnector, ethereumConnector: IEthereumConnector}): JolocomRegistry {
+  public static create({ ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs): JolocomRegistry {
     const jolocomRegistry = new JolocomRegistry()
     jolocomRegistry.ipfsConnector = ipfsConnector
     jolocomRegistry.ethereumConnector = ethereumConnector
@@ -23,23 +26,20 @@ export class JolocomRegistry {
     return jolocomRegistry
   }
 
-  public async create(
-    {privateIdentityKey, privateEthereumKey}:
-      { privateIdentityKey: Buffer, privateEthereumKey: Buffer }): Promise<IdentityWallet> {
+  public async create(args: IRegistryInstanceCreationArgs): Promise<IdentityWallet> {
+    const { privateIdentityKey, privateEthereumKey} = args
     const ddo = new DidDocument().fromPublicKey(privateKeyToPublicKey(privateIdentityKey))
 
     const identityWallet = new IdentityWallet()
     identityWallet.setDidDocument(ddo)
-    identityWallet.setPrivateIdentityKey(privateIdentityKey)
+    identityWallet.setPrivateIdentityKey(args.privateIdentityKey)
 
     await this.commit({wallet: identityWallet, privateEthereumKey})
 
     return identityWallet
   }
 
-  public async commit(
-    {wallet, privateEthereumKey}: {wallet: IdentityWallet, privateEthereumKey: Buffer}
-  ): Promise<void> {
+  public async commit({ wallet, privateEthereumKey }: IRegistryCommitArgs): Promise<void> {
     const ddo = wallet.getDidDocument()
     let ipfsHash
     try {
@@ -62,9 +62,8 @@ export class JolocomRegistry {
   public async resolve(did): Promise<IDidDocumentAttrs> {
     // TODO: return an instance of Identity (which is extended DDO)
     try {
-      return await this.ipfsConnector.catJSON(
-        await this.ethereumConnector.resolveDID(did)
-      ) as Promise<IDidDocumentAttrs>
+      const hash = await this.ethereumConnector.resolveDID(did)
+      return await this.ipfsConnector.catJSON(hash) as Promise<IDidDocumentAttrs>
     } catch (error) {
       throw new Error(`Could not retrieve DID Document. ${error.message}`)
     }

@@ -1,5 +1,9 @@
 import EthereumResolver from 'jolocom-registry-contract'
-import { IEthereumResolverConfig, IEthereumConnector } from './types'
+import {
+  IEthereumResolverConfig,
+  IEthereumConnector,
+  IEthereumResolverUpdateDIDArgs
+} from './types'
 
 export class EthResolver implements IEthereumConnector {
   private ethResolver: any
@@ -12,9 +16,7 @@ export class EthResolver implements IEthereumConnector {
     return this.ethResolver.resolveDID(did)
   }
 
-  public async updateDIDRecord(
-    {ethereumKey, did, newHash}: {ethereumKey: object, did: string, newHash: string}
-  ): Promise<void> {
+  public async updateDIDRecord({ ethereumKey, did, newHash }: IEthereumResolverUpdateDIDArgs): Promise<void> {
     return this.ethResolver.updateDIDRecord(ethereumKey, did, newHash)
   }
 }

@@ -3,7 +3,13 @@ export interface IEthereumResolverConfig {
   contractAddress: string
 }
 
+export interface IEthereumResolverUpdateDIDArgs {
+  ethereumKey: object
+  did: string
+  newHash: string
+}
+
 export interface IEthereumConnector {
   resolveDID: (did: string) => Promise<string>
-  updateDIDRecord: ({ethereumKey, did, newHash}: {ethereumKey: object, did: string, newHash: string}) => Promise<void>
+  updateDIDRecord: (args: IEthereumResolverUpdateDIDArgs) => Promise<void>
 }
