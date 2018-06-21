@@ -9,8 +9,8 @@ import {
   ICredentialRequest,
   IConstraint
 } from './types'
-import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types'
 import { areCredTypesEqual } from '../utils/credentials'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types';
 
 export class CredentialRequest {
   private requesterIdentity: string
@@ -48,7 +48,7 @@ export class CredentialRequest {
     this.requestedCredentials.push({ type, constraints: credConstraints })
   }
 
-  public applyConstraints(credentials: IVerifiableCredentialAttrs[]): IVerifiableCredentialAttrs[] {
+  public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
     return credentials.filter((credential) => {
       const relevantConstraints = this.requestedCredentials.find((section) =>
         areCredTypesEqual(section.type, credential.type)
@@ -70,16 +70,16 @@ export class CredentialRequest {
     return new TokenSigner('ES256K', hexKey).sign(token)
   }
 
-  public fromJWT(jwt: string): CredentialRequest {
-    const { payload } = decodeToken(jwt)
-    return this.fromJSON(payload)
-  }
-
   public toJSON(): ICredentialRequestAttrs {
     return classToPlain(this) as ICredentialRequestAttrs
   }
 
-  public fromJSON(json: ICredentialRequestAttrs): CredentialRequest {
+  public static fromJWT(jwt: string): CredentialRequest {
+    const { payload } = decodeToken(jwt)
+    return CredentialRequest.fromJSON(payload)
+  }
+
+  public static fromJSON(json: ICredentialRequestAttrs): CredentialRequest {
     return plainToClass(CredentialRequest, json)
   }
 }

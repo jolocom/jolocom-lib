@@ -1,9 +1,8 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import { TokenSigner, decodeToken } from 'jsontokens'
-import { IVerifiableCredentialAttrs } from '../credentials/verifiableCredential/types'
 import { CredentialRequest } from '../credentialRequest'
 import { ISuppliedCredentialsAttrs, ICredentialResponseAttrs } from './types'
-import { areCredTypesEqual } from '../utils/credentials'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types';
 
 export class CredentialResponse {
   private issuer: string
@@ -22,7 +21,7 @@ export class CredentialResponse {
   }
 
   // TODO two credentials of the same type
-  public addSuppliedCredentials(credentials: IVerifiableCredentialAttrs[]) {
+  public addSuppliedCredentials(credentials: ISignedCredentialAttrs[]) {
     credentials.forEach((credential) => {
       this.suppliedCredentials.push({
         type: credential.type,
@@ -31,10 +30,17 @@ export class CredentialResponse {
     })
   }
 
-  public create(credentials: IVerifiableCredentialAttrs[]): CredentialResponse {
+  // TODO static as per #84
+  public create(credentials: ISignedCredentialAttrs[]): CredentialResponse {
     const CR = new CredentialResponse()
     CR.addSuppliedCredentials(credentials)
     return CR
+  }
+
+  public satisfiesRequest(cr: CredentialRequest): boolean {
+    const credentials = this.suppliedCredentials.map((section) => section.credential)
+    const validCredentials = cr.applyConstraints(credentials)
+    return credentials.length === validCredentials.length
   }
 
   // TODO Abstract for reuse
@@ -47,24 +53,17 @@ export class CredentialResponse {
     }
     return new TokenSigner('ES256K', hexKey).sign(token)
   }
-
-  // TODO Abstract for reuse
-  public fromJWT(jwt: string): CredentialResponse {
-    const { payload } = decodeToken(jwt)
-    return this.fromJSON(payload)
-  }
-
   public toJSON(): ICredentialResponseAttrs {
     return classToPlain(this) as ICredentialResponseAttrs
   }
 
-  public fromJSON(json: ICredentialResponseAttrs): CredentialResponse {
+  public static fromJSON(json: ICredentialResponseAttrs): CredentialResponse {
     return plainToClass(CredentialResponse, json)
   }
 
-  public satisfiesRequest(cr: CredentialRequest): boolean {
-    const credentials = this.suppliedCredentials.map((section) => section.credential)
-    const validCredentials = cr.applyConstraints(credentials)
-    return credentials.length === validCredentials.length
+  // TODO Abstract for reuse
+  public static fromJWT(jwt: string): CredentialResponse {
+    const { payload } = decodeToken(jwt)
+    return CredentialResponse.fromJSON(payload)
   }
 }
