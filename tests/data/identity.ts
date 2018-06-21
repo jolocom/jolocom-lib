@@ -1,4 +1,9 @@
 export default {
+  localHostStorage: 'http://localhost:5001',
+  pinBoolean: true,
+  testDataObject: { data: 'testData' },
+  testDataString: 'testData',
+  testHash: 'Qm12345',
   randomStringFromEntropy: '13912643311766764847120568039921',
   testPublicKeyHex: '030c77073c06824b413c2e08bf5fd271cfa3fdd4632ec6e8869b53e5c79395b868',
   testUserPublicKey: '04334f990cdc1281c6fed73dcc6de3db520c075a41ce2b93f36f85dbd5e0dc0b05975c51acb0bec9747fb3f52fd0146d1dc39d6077db0be1bd6579fd66ac144442',
@@ -61,5 +66,4 @@ export default {
     },
   "signature": "26f1096e286f82955c7ca84fc9ecbbb2b9524577c735b08551134a4091df74563b1d2fdc1f5c304c6e9c9209794ff7cc78fe6bec1ceef1275220f8b4a0a81e6a"
   }
-
 }

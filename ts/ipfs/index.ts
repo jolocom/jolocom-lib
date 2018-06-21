@@ -11,7 +11,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
   }
 
   public async storeJSON(data: object, pin: boolean): Promise<string> {
-    if (typeof data !== 'object' || data === null) {
+    if (!data || typeof data !== 'object') {
       throw new Error(`JSON expected, received ${typeof data}`)
     }
 
@@ -34,7 +34,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
     return res.json()
   }
 
-  public async removePinnedHash(hash: string): Promise<void> {
+  public async removePinnedHash(hash: string): Promise<boolean> {
     const endpoint = `${this.endpoint}/api/v0/pin/rm?arg=${hash}`
     const res = await fetch(endpoint)
 
@@ -46,7 +46,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
 
   public async createDagObject(data: object, pin: boolean): Promise<string> {
 
-    if (typeof data !== 'object' || data === null) {
+    if (!data || typeof data !== 'object') {
       throw new Error(`Object expected, received ${typeof data}`)
     }
 
