@@ -4,11 +4,11 @@ import { IEthereumResolverConfig, IEthereumConnector } from './types'
 export class EthResolver implements IEthereumConnector {
   private ethResolver: any
 
-  constructor({config}: {config: IEthereumResolverConfig}) {
+  constructor(config: IEthereumResolverConfig) {
     this.ethResolver = new EthereumResolver(config.contractAddress, config.providerUrl)
   }
 
-  public async resolveDID({did}: {did: string}): Promise<string> {
+  public async resolveDID(did: string): Promise<string> {
     return this.ethResolver.resolveDID(did)
   }
 

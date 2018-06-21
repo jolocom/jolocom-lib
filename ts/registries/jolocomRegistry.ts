@@ -29,8 +29,8 @@ export class JolocomRegistry {
     const ddo = new DidDocument().fromPublicKey(privateKeyToPublicKey(privateIdentityKey))
 
     const identityWallet = new IdentityWallet()
-    identityWallet.setDidDocument({didDocument: ddo})
-    identityWallet.setPrivateIdentityKey({privateIdentityKey})
+    identityWallet.setDidDocument(ddo)
+    identityWallet.setPrivateIdentityKey(privateIdentityKey)
 
     await this.commit({wallet: identityWallet, privateEthereumKey})
 
@@ -59,25 +59,25 @@ export class JolocomRegistry {
     }
   }
 
-  public async resolve({did}: {did: string}): Promise<IDidDocumentAttrs> {
+  public async resolve(did): Promise<IDidDocumentAttrs> {
     // TODO: return an instance of Identity (which is extended DDO)
     try {
-      return await this.ipfsConnector.catJSON({
-        hash: await this.ethereumConnector.resolveDID({did})
-      }) as Promise<IDidDocumentAttrs>
+      return await this.ipfsConnector.catJSON(
+        await this.ethereumConnector.resolveDID(did)
+      ) as Promise<IDidDocumentAttrs>
     } catch (error) {
       throw new Error(`Could not retrieve DID Document. ${error.message}`)
     }
   }
 
-  public async authenticate({privateIdentityKey}: {privateIdentityKey: Buffer}): Promise<IdentityWallet> {
+  public async authenticate(privateIdentityKey: Buffer): Promise<IdentityWallet> {
     const identityWallet = new IdentityWallet()
     const did = privateKeyToDID(privateIdentityKey)
     // TODO: change according to return of resolve
-    const ddoAttrs = await this.resolve({did})
+    const ddoAttrs = await this.resolve(did)
     const didDocument = DidDocument.fromJSON(ddoAttrs)
-    identityWallet.setDidDocument({didDocument})
-    identityWallet.setPrivateIdentityKey({privateIdentityKey})
+    identityWallet.setDidDocument(didDocument)
+    identityWallet.setPrivateIdentityKey(privateIdentityKey)
 
     return identityWallet
   }

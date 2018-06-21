@@ -2,7 +2,7 @@ import { DidDocument } from '../identity/didDocument';
 
 export interface IIdentityWallet {
   getDidDocument: () => DidDocument
-  setDidDocument: ({didDocument}: {didDocument: DidDocument}) => void
+  setDidDocument: (didDocument: DidDocument) => void
   getPrivateIdentityKey: () => Buffer
-  setPrivateIdentityKey: ({privateIdentityKey}: {privateIdentityKey: Buffer}) => void
+  setPrivateIdentityKey: (privateIdentityKey: Buffer) => void
 }

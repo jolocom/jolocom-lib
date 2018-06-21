@@ -5,7 +5,7 @@ import { IIpfsConnector, IIpfsConfig } from './types'
 export class IpfsStorageAgent implements IIpfsConnector {
   private endpoint!: string
 
-  constructor({config}: {config: IIpfsConfig}) {
+  constructor(config: IIpfsConfig) {
     this.endpoint = `${config.protocol}://${config.host}:${config.port}`
   }
 
@@ -27,13 +27,13 @@ export class IpfsStorageAgent implements IIpfsConnector {
     return res.Hash
   }
 
-  public async catJSON({hash}: {hash: string}): Promise<object> {
+  public async catJSON(hash: string): Promise<object> {
     const endpoint = `${this.endpoint}/api/v0/cat/${hash}`
     const res = await fetch(endpoint)
     return res.json()
   }
 
-  public async removePinnedHash({hash}: {hash: string}): Promise<void> {
+  public async removePinnedHash(hash: string): Promise<void> {
     const endpoint = `${this.endpoint}/api/v0/pin/rm?arg=${hash}`
     const res = await fetch(endpoint)
 

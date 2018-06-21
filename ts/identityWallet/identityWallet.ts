@@ -9,7 +9,7 @@ export class IdentityWallet implements IIdentityWallet {
     return this.didDocument
   }
 
-  public setDidDocument({didDocument}: {didDocument: DidDocument}): void {
+  public setDidDocument(didDocument: DidDocument): void {
     this.didDocument = didDocument
   }
 
@@ -17,7 +17,7 @@ export class IdentityWallet implements IIdentityWallet {
     return this.privateIdentityKey
   }
 
-  public setPrivateIdentityKey({privateIdentityKey: Buffer}): void {
+  public setPrivateIdentityKey(privateIdentityKey: Buffer): void {
     this.privateIdentityKey = this.privateIdentityKey
   }
 }
