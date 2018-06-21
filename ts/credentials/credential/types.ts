@@ -11,7 +11,7 @@ export interface ICredentialAttrs {
 }
 
 export interface IClaimMetadata {
-  fieldName: string
+  fieldNames: string[]
   type: string[]
   context: string[] | object[]
   name?: string
