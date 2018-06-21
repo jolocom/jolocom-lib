@@ -6,7 +6,7 @@ import { keyTypes } from '../'
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe.only('IdentityManager', () => {
+describe('IdentityManager', () => {
   const identityManager = IdentityManager.create(testKeys.default.testSeed)
 
   describe('static create', () => {
