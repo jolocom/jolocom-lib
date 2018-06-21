@@ -7,7 +7,7 @@
   "scripts": {
     "test": "./node_modules/.bin/nyc -e 'ts' -r lcov -r text yarn run unitTests",
     "prepublish": "rm -rf ./js/; ./node_modules/.bin/tsc -p ./tsconfig.json",
-    "unitTests": "mocha tests/*.test.ts -r ts-node/register",
+    "unitTests": "mocha tests/**/*.test.ts -r ts-node/register",
     "test:watch": "mocha  --watch-extensions ts tests/**/*.test.ts -r ts-node/register -w"
   },
   "repository": {
@@ -46,12 +46,13 @@
     "sjcl": "^1.0.7"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.4",
     "@types/mocha": "^2.2.43",
     "@types/node": "^9.4.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "istanbul": "^0.4.5",
-    "lolex": "^2.3.1",
+    "lolex": "^2.7.0",
     "mocha": "^5.0.0",
     "nyc": "^11.4.1",
     "sinon": "^4.2.2",

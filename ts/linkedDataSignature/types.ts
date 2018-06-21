@@ -8,7 +8,7 @@ export interface ILinkedDataSignature {
 
 export interface ILinkedDataSignatureAttrs {
   type: string
-  created: Date
+  created: string
   creator: string
   nonce: string
   signatureValue: string
