@@ -2580,6 +2580,7 @@ lodash.get@^4.4.2:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 lodash@^4.14.0, lodash@^4.17.5:
 =======
 lodash@^4.14.0, lodash@^4.17.10:
@@ -2587,6 +2588,9 @@ lodash@^4.14.0, lodash@^4.17.10:
 =======
 lodash@^4.14.0, lodash@^4.17.5:
 >>>>>>> methods for putting and getting DAG objects for CBOR encoded objects
+=======
+lodash@^4.14.0, lodash@^4.17.5:
+>>>>>>> 19e853e6a8d59b79abda8bc82223dc8689546045
   version "4.17.10"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
 
@@ -3307,6 +3311,7 @@ process@~0.5.1:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 propagate@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/propagate/-/propagate-1.0.0.tgz#00c2daeedda20e87e3782b344adba1cddd6ad709"
@@ -3335,6 +3340,11 @@ propagate@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/propagate/-/propagate-1.0.0.tgz#00c2daeedda20e87e3782b344adba1cddd6ad709"
 >>>>>>> methods for putting and getting DAG objects for CBOR encoded objects
+=======
+propagate@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/propagate/-/propagate-1.0.0.tgz#00c2daeedda20e87e3782b344adba1cddd6ad709"
+>>>>>>> 19e853e6a8d59b79abda8bc82223dc8689546045
 
 proxy-addr@~2.0.3:
   version "2.0.3"
