@@ -1,7 +1,15 @@
 import { expect } from 'chai'
 import * as nock from 'nock'
 import { IpfsStorageAgent } from '../../ts/ipfs/index'
-import { localHostStorage, pinBoolean, testDataObject, testDataString, testHash, testDDO, expectedCredential } from '../data/ipfs/ipfs'
+import {
+  localHostStorage,
+  pinBoolean,
+  testDataObject,
+  testDataString,
+  testHash,
+  testDDO,
+  expectedCredential
+} from '../data/ipfs/ipfs'
 
 describe('IpfsStorageAgent', () => {
 
