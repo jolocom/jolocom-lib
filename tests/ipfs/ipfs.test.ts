@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import * as nock from 'nock'
 import { IpfsStorageAgent } from '../../ts/ipfs/index'
-import testData from '../data/identity'
+import { localHostStorage, pinBoolean, testDataObject, testDataString, testHash, testDDO, expectedCredential } from '../data/ipfs/ipfs'
 
 describe('IpfsStorageAgent', () => {
 
@@ -18,32 +18,32 @@ describe('IpfsStorageAgent', () => {
 
   it('should attempt to store the data', async () => {
 
-    nock(testData.localHostStorage)
-    .post(`/api/v0/add?pin=${testData.pinBoolean}`)
+    nock(localHostStorage)
+    .post(`/api/v0/add?pin=${pinBoolean}`)
     .reply(200, {
       Name: 'testFile',
-      Hash: testData.testHash,
+      Hash: testHash,
       Bytes: '12345',
       Size: '12345'
     })
 
-    const resultingHash = await storageAgent.storeJSON(testData.expectedDdoObject, testData.pinBoolean)
-    expect(resultingHash).to.equal(testData.testHash)
+    const resultingHash = await storageAgent.storeJSON(testDDO, pinBoolean)
+    expect(resultingHash).to.equal(testHash)
   })
 
   it('should throw an error if submitted data is not an object', async () => {
 
-    nock(testData.localHostStorage)
-    .post(`/api/v0/add?pin=${testData.pinBoolean}`)
+    nock(localHostStorage)
+    .post(`/api/v0/add?pin=${pinBoolean}`)
     .reply(200, {
       Name: 'testFile',
-      Hash: testData.testHash,
+      Hash: testHash,
       Bytes: '12345',
       Size: '12345'
     })
 
     try {
-      await storageAgent.storeJSON(testData.testDataString, testData.pinBoolean)
+      await storageAgent.storeJSON(testDataString, pinBoolean)
     } catch (err) {
       expect(err.message).to.equal('JSON expected, received string')
     }
@@ -51,42 +51,42 @@ describe('IpfsStorageAgent', () => {
 
   it('should attempt to retrieve the data', async () => {
 
-    nock(testData.localHostStorage)
-    .get(`/api/v0/cat/${testData.testHash}`)
+    nock(localHostStorage)
+    .get(`/api/v0/cat/${testHash}`)
     .reply(200, {
-      file: testData.expectedDdoJson
+      file: testDDO
     })
 
-    const resultingFile = await storageAgent.catJSON(testData.testHash)
-    expect(resultingFile).to.deep.equal({file: testData.expectedDdoJson})
+    const resultingFile = await storageAgent.catJSON(testHash)
+    expect(resultingFile).to.deep.equal({file: testDDO})
   })
 
   it('should attempt to remove a pinned hash', async () => {
 
-    nock(testData.localHostStorage)
-    .get(`/api/v0/pin/rm?arg=${testData.testHash}`)
+    nock(localHostStorage)
+    .get(`/api/v0/pin/rm?arg=${testHash}`)
     .reply(200, {
       Pins: [
-        `${testData.testHash}`
+        `${testHash}`
       ]
     })
 
     const removePinnedHashCall = () => {
-      storageAgent.removePinnedHash(testData.testHash)
+      storageAgent.removePinnedHash(testHash)
     }
     await expect(removePinnedHashCall).to.not.throw()
   })
 
   it('should throw an error if removing the pinned hash failed', async () => {
 
-    nock(testData.localHostStorage)
-    .get(`/api/v0/pin/rm?arg=${testData.testHash}`)
+    nock(localHostStorage)
+    .get(`/api/v0/pin/rm?arg=${testHash}`)
     .reply(400, {
       error: 'Error'
     })
 
     try {
-      await storageAgent.removePinnedHash(testData.testHash)
+      await storageAgent.removePinnedHash(testHash)
     } catch (err) {
       expect(err.message).to.equal('Removing pinned hash Qm12345 failed, status code: 400')
     }
@@ -94,26 +94,26 @@ describe('IpfsStorageAgent', () => {
 
   it('should attempt to create a DAG object and put via IPLD', async () => {
 
-    nock(testData.localHostStorage)
-    .post(`/api/v0/dag/put?pin=${testData.pinBoolean}`)
+    nock(localHostStorage)
+    .post(`/api/v0/dag/put?pin=${pinBoolean}`)
     .reply(200, {
-      Cid: { '/': testData.testHash }
+      Cid: { '/': testHash }
     })
 
-    const resultingHash = await storageAgent.createDagObject(testData.testDataObject, testData.pinBoolean)
-    expect(resultingHash).to.deep.equal(testData.testHash)
+    const resultingHash = await storageAgent.createDagObject(testDataObject, pinBoolean)
+    expect(resultingHash).to.deep.equal(testHash)
   })
 
   it('should throw an error if submitted data is not an object', async () => {
 
-    nock(testData.localHostStorage)
-    .post(`/api/v0/dag/put?pin=${testData.pinBoolean}`)
+    nock(localHostStorage)
+    .post(`/api/v0/dag/put?pin=${pinBoolean}`)
     .reply(200, {
-      Cid: { '/': testData.testHash }
+      Cid: { '/': testHash }
     })
 
     try {
-      await storageAgent.createDagObject(testData.testDataString, testData.pinBoolean)
+      await storageAgent.createDagObject(testDataString, pinBoolean)
     } catch (err) {
       expect(err.message).to.equal('Object expected, received string')
     }
@@ -121,21 +121,21 @@ describe('IpfsStorageAgent', () => {
 
   it('should attempt to retrieve the DAG object', async () => {
 
-    nock(testData.localHostStorage)
-    .get(`/api/v0/dag/get?arg=${testData.testHash}`)
-    .reply(200, testData.expectedSignedCredential)
+    nock(localHostStorage)
+    .get(`/api/v0/dag/get?arg=${testHash}`)
+    .reply(200, expectedCredential)
 
-    const resultingFile = await storageAgent.resolveIpldPath(testData.testHash)
-    expect(resultingFile).to.deep.equal(testData.expectedSignedCredential)
+    const resultingFile = await storageAgent.resolveIpldPath(testHash)
+    expect(resultingFile).to.deep.equal(expectedCredential)
   })
 
   it('should resolve nested DAG objects', async () => {
 
-    nock(testData.localHostStorage)
-    .get(`/api/v0/dag/get?arg=${testData.testHash}/credential`)
-    .reply(200, testData.expectedSignedCredential.credential)
+    nock(localHostStorage)
+    .get(`/api/v0/dag/get?arg=${testHash}/claim`)
+    .reply(200, expectedCredential.claim)
 
-    const resultingFile = await storageAgent.resolveIpldPath(`${testData.testHash}/credential`)
-    expect(resultingFile).to.deep.equal(testData.expectedSignedCredential.credential)
+    const resultingFile = await storageAgent.resolveIpldPath(`${testHash}/claim`)
+    expect(resultingFile).to.deep.equal(expectedCredential.claim)
   })
 })
