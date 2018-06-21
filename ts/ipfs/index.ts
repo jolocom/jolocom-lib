@@ -34,7 +34,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
     return res.json()
   }
 
-  public async removePinnedHash(hash: string): Promise<boolean> {
+  public async removePinnedHash(hash: string): Promise<void> {
     const endpoint = `${this.endpoint}/api/v0/pin/rm?arg=${hash}`
     const res = await fetch(endpoint)
 
