@@ -1,4 +1,3 @@
-import { IPrivateKey } from './types'
 import { keyTypes } from '..'
 import { privateKeyToDID } from '../utils/crypto'
 import { CredentialRequest } from '../credentialRequest'
@@ -10,7 +9,7 @@ import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 export class IdentityWallet {
   private did: string
-  private privateKey: IPrivateKey
+  private privateKey: Buffer
 
   // TODO Be smarter
   public fromPrivateKey(privateKey: Buffer, path?: keyTypes | string): IdentityWallet {
@@ -26,7 +25,7 @@ export class IdentityWallet {
   }
 
   public async signCredential(credential: Credential): Promise<SignedCredential> {
-    const signedCred = new SignedCredential().fromCredential(credential)
+    const signedCred = SignedCredential.fromCredential(credential)
 
     signedCred.setIssuer(this.did)
     signedCred.setIssued(new Date())

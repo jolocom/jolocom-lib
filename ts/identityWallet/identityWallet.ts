@@ -23,6 +23,10 @@ export class IdentityWallet {
     credentialRequest: CredentialRequest // include the method after credential request PR is merged
   }
 
+  public sign = {
+    credential: this.signCredential
+  }
+
   // TODO: change to be an instance of Identity class
   public getIdentity(): DidDocument {
     return this.identity
@@ -30,5 +34,15 @@ export class IdentityWallet {
 
   public setIdentity(identity: DidDocument): void {
     this.identity = identity
+  }
+
+  public async signCredential(credential: Credential): Promise<SignedCredential> {
+    const signedCred = SignedCredential.fromCredential(credential)
+
+    signedCred.setIssuer(this.identity.getDID())
+    signedCred.setIssued(new Date())
+    await signedCred.generateSignature(this.privateIdentityKey)
+
+    return signedCred
   }
 }
