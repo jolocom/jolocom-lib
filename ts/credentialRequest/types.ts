@@ -23,11 +23,11 @@ export interface IExposedConstraintFunctions {
 
 export interface ICredentialRequestAttrs {
   callbackURL: string
-  requestedCredentials: ICredentialRequest[]
+  credentialRequirements: ICredentialRequest[]
 }
 
 export type requestedCredentialArgs = Array<{type: string[], constraints: IConstraint[]}>
 export interface ICredentialRequestCreationArgs {
   callbackURL: string
-  requestedCredentials: requestedCredentialArgs
+  credentialRequirements: requestedCredentialArgs
 }
