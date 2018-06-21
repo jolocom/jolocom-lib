@@ -1,24 +1,36 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import * as jsonlogic from 'json-logic-js'
-import { TokenSigner, decodeToken } from 'jsontokens'
+import { areCredTypesEqual } from '../utils/credentials'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import {
   ICredentialRequestAttrs,
-  constraintFunc, comparable,
-  comparableConstraintFunc,
+  comparable,
   IExposedConstraintFunctions,
   ICredentialRequest,
-  IConstraint
+  IConstraint,
+  ICredentialRequestCreationArgs
 } from './types'
-import { areCredTypesEqual } from '../utils/credentials'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types';
 
 export class CredentialRequest {
-  private requesterIdentity: string
   private callbackURL: string
-  private requestedCredentials: ICredentialRequest[] = []
+  private credentialRequirements: ICredentialRequest[] = []
 
-  public setRequesterIdentity(requesterIdentity: string) {
-    this.requesterIdentity = requesterIdentity
+  public static create(args: ICredentialRequestCreationArgs): CredentialRequest {
+    const credentialRequest = new CredentialRequest()
+    credentialRequest.setCallbackURL(args.callbackURL)
+    args.credentialRequirements.forEach((req) => credentialRequest.addCredentialRequirement(req))
+    return credentialRequest
+  }
+
+  private addCredentialRequirement({constraints, type}: {type: string[], constraints: IConstraint[]}) {
+    const credConstraints = {
+      and: [
+        { '==': [true, true] },
+        ...constraints
+      ]
+    }
+
+    this.credentialRequirements.push({ type, constraints: credConstraints })
   }
 
   public setCallbackURL(url: string) {
@@ -29,28 +41,17 @@ export class CredentialRequest {
     return this.callbackURL
   }
 
-  public getRequester(): string {
-    return this.requesterIdentity
+  public getRequestedCredentials(): ICredentialRequest[] {
+    return this.credentialRequirements
   }
 
   public getRequestedCredentialTypes(): string[][] {
-    return this.requestedCredentials.map((credential) => credential.type)
-  }
-
-  public addRequestedClaim(type: string[], constraints: IConstraint[]) {
-    const credConstraints = {
-      and: [
-        { '==': [true, true] },
-        ...constraints
-      ]
-    }
-
-    this.requestedCredentials.push({ type, constraints: credConstraints })
+    return this.credentialRequirements.map((credential) => credential.type)
   }
 
   public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
     return credentials.filter((credential) => {
-      const relevantConstraints = this.requestedCredentials.find((section) =>
+      const relevantConstraints = this.credentialRequirements.find((section) =>
         areCredTypesEqual(section.type, credential.type)
       )
 
@@ -60,23 +61,8 @@ export class CredentialRequest {
     })
   }
 
-  public toJWT(privKey: Buffer): string {
-    const hexKey = privKey.toString('hex')
-
-    const token = {
-      iat: Date.now(),
-      ...this.toJSON()
-    }
-    return new TokenSigner('ES256K', hexKey).sign(token)
-  }
-
   public toJSON(): ICredentialRequestAttrs {
     return classToPlain(this) as ICredentialRequestAttrs
-  }
-
-  public static fromJWT(jwt: string): CredentialRequest {
-    const { payload } = decodeToken(jwt)
-    return CredentialRequest.fromJSON(payload)
   }
 
   public static fromJSON(json: ICredentialRequestAttrs): CredentialRequest {
@@ -84,6 +70,7 @@ export class CredentialRequest {
   }
 }
 
+// TODO MOVE
 export const constraintFunctions: IExposedConstraintFunctions = {
   is: (field: string, value: string) => assembleStatement('==', field, value),
   not: (field: string, value: string) => assembleStatement('!=', field, value),

@@ -1,12 +1,12 @@
-import { IClaimMetadata } from './credential/types'
+import { IClaimMetadata, IClaimAttrs } from './credential/types'
 import { Credential } from './credential'
 import { ISignedCredentialAttrs } from './signedCredential/types';
 import { SignedCredential } from './signedCredential';
 
 // Change in favor of instantiate / unsigned as per issues #85, #84
 export class Credentials {
-  public createCredential(metadata: IClaimMetadata, value: string, subject: string) {
-    return new Credential().assemble(metadata, value, subject)
+  public createCredential(metadata: IClaimMetadata, claim: IClaimAttrs) {
+    return Credential.create(metadata, claim)
   }
 
   // TODO Depricate in favor of Parser / Unsigned modules

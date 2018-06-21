@@ -96,12 +96,12 @@ export class SignedCredential {
 
   // TODO remove / modify in favor of identityWallet.sign.credential
   public fromCredential(credential: Credential): SignedCredential {
-    const vc = new SignedCredential()
-    vc['@context'] = credential.getContext()
-    vc.type = credential.getType()
-    vc.claim = credential.getClaim()
-    vc.name = credential.getName()
-    return vc
+    const signedCred = new SignedCredential()
+    signedCred['@context'] = credential.getContext()
+    signedCred.type = credential.getType()
+    signedCred.claim = credential.getClaim()
+    signedCred.name = credential.getName()
+    return signedCred
   }
 
   public async generateSignature(privateKey: IPrivateKey) {
