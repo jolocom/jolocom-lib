@@ -17,6 +17,7 @@ export class JolocomLib {
   public credentials: Credentials
   public sso: SSO
   public static parse = Parser
+
   public static unsigned = {
     createCredential: Credential.create,
     createCredentialRequest: CredentialRequest.create,
