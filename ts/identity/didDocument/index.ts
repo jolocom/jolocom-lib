@@ -52,6 +52,10 @@ export class DidDocument  {
     return this.id
   }
 
+  public getServiceEndpoints(): ServiceEndpointsSection[] {
+    return this.service
+  }
+
   public toJSON(): IDidDocumentAttrs {
     return classToPlain(this) as IDidDocumentAttrs
   }
