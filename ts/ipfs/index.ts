@@ -5,11 +5,11 @@ import { IIpfsConnector, IIpfsConfig } from './types'
 export class IpfsStorageAgent implements IIpfsConnector {
   private endpoint!: string
 
-  public configure(config: IIpfsConfig): void {
+  constructor(config: IIpfsConfig) {
     this.endpoint = `${config.protocol}://${config.host}:${config.port}`
   }
 
-  public async storeJSON(data: object, pin: boolean): Promise<string> {
+  public async storeJSON({data, pin}: {data: object, pin: boolean}): Promise<string> {
     if (!data || typeof data !== 'object') {
       throw new Error(`JSON expected, received ${typeof data}`)
     }
