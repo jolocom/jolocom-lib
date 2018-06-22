@@ -1,3 +1,8 @@
+export const testSeed = Buffer.from(
+  '316AF5B648D7E1DF31B73729E8E6628AEB8060CC4389C2B2A81BD56E92E9228D',
+  'hex'
+)
+
 export const testPrivateIdentityKey = Buffer.from(
   'f4952882df8c67447ba0955ec8d59fb360dcdc94e114de9949ab8a4d09c0eaf6',
   'hex'

@@ -2,12 +2,12 @@ import { expect } from 'chai'
 import * as lolex from 'lolex'
 import { SignedCredentialResponse } from '../../ts/credentialResponse/signedCredentialResponse/signedCredentialResponse'
 import { CredentialResponse } from '../../ts/credentialResponse/credentialResponse'
+import { firstMockCredential } from '../data/credentialRequest/credentialRequest'
 import {
   mockPrivKey,
   mockSignedCredResponseJson,
   signedCredRespJWT
 } from '../data/credentialResponse/signedCredentialResponse'
-import { firstMockCredential } from '../data/credentialRequest/credentialRequest'
 
 describe('SignedCredentialResponse', () => {
   let clock
