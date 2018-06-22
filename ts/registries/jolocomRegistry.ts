@@ -41,6 +41,8 @@ export class JolocomRegistry {
 
   public async commit({ wallet, privateEthereumKey }: IRegistryCommitArgs): Promise<void> {
     const ddo = wallet.getDidDocument()
+    this.unpin(ddo.getDID())
+
     let ipfsHash
     try {
       ipfsHash = await this.ipfsConnector.storeJSON({data: ddo, pin: true})
@@ -56,6 +58,16 @@ export class JolocomRegistry {
       })
     } catch (error) {
       throw new Error(`Could not register DID record on Ethereum. ${error.message}`)
+    }
+  }
+
+  private async unpin(did): Promise<void> {
+    try {
+      const hash = await this.ethereumConnector.resolveDID(did)
+      await this.ipfsConnector.removePinnedHash(hash)
+    } catch (err) {
+      if (err.message.match('Removing pinned hash')) { throw err }
+      return
     }
   }
 
