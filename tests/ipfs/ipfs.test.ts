@@ -15,8 +15,7 @@ describe('IpfsStorageAgent', () => {
   let storageAgent
 
   beforeEach(() => {
-    storageAgent = new IpfsStorageAgent()
-    storageAgent.configure({
+    storageAgent = new IpfsStorageAgent({
       host: 'localhost',
       port: 5001,
       protocol: 'http'
