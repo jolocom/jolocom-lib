@@ -22,11 +22,23 @@ export class Credential {
       throw new Error(`Missing claims, expected keys are: ${metadata.fieldNames.toString()}`)
     }
 
+    const assembledClaim = {
+      id: claim.id
+    }
+
+    const combinedFieldNames = [...metadata.fieldNames, ...metadata.optionalFieldNames]
+
+    combinedFieldNames.forEach((fieldName) => {
+      if (claim[fieldName]) {
+        assembledClaim[fieldName] = claim[fieldName]
+      }
+    })
+
     const cred = new Credential()
     cred['@context'] = metadata.context
     cred.type = metadata.type
     cred.name = metadata.name
-    cred.claim = claim
+    cred.claim = assembledClaim
 
     return cred
   }

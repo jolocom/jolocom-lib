@@ -12,6 +12,7 @@ export interface ICredentialAttrs {
 
 export interface IClaimMetadata {
   fieldNames: string[]
+  optionalFieldNames: string[]
   type: string[]
   context: string[] | object[]
   name?: string
@@ -21,12 +22,12 @@ export interface IDefaultClaimsMetadata {
   emailAddress: IClaimMetadata
   mobilePhoneNumber: IClaimMetadata
   name: IClaimMetadata
+  publicProfile: IClaimMetadata
 }
 
-export interface IDefaultPublicProfileClaimsMetadata {
-  id: IClaimMetadata
-  name: IClaimMetadata
-  image?: IClaimMetadata
-  about: IClaimMetadata
-  homepage?: IClaimMetadata
-}
+// export interface IDefaultPublicProfileClaimsMetadata {
+//   name: IClaimMetadata
+//   image?: IClaimMetadata
+//   about: IClaimMetadata
+//   url?: IClaimMetadata
+// }
