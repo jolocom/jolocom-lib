@@ -63,8 +63,8 @@ export const claimsMetadata: IDefaultClaimsMetadata = {
     ]
   },
   publicProfile: {
-    fieldNames: ['', ''],
-    optionalFieldNames: [],
+    fieldNames: ['name', 'about'],
+    optionalFieldNames: ['image', 'url'],
     type: ['Credential', 'PublicProfileCredential'],
     name: 'Public Profile',
     context: [
