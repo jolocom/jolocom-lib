@@ -3,8 +3,9 @@ import { Credential } from '../credentials/credential/credential';
 import { SignedCredential } from '../credentials/signedCredential/signedCredential';
 import { SignedCredentialRequest } from '../credentialRequest/signedCredentialRequest/signedCredentialRequest';
 import { CredentialRequest } from '../credentialRequest/credentialRequest';
+import { IIdentityWallet } from './types';
 
-export class IdentityWallet {
+export class IdentityWallet implements IIdentityWallet {
   private privateIdentityKey: Buffer
   // TODO: change to be an instance of Identity class
   private identity: DidDocument

@@ -60,6 +60,24 @@ export default {
       "expires": "2018-10-24T15:42:15Z"
     },
   "signature": "26f1096e286f82955c7ca84fc9ecbbb2b9524577c735b08551134a4091df74563b1d2fdc1f5c304c6e9c9209794ff7cc78fe6bec1ceef1275220f8b4a0a81e6a"
+  },
+  ddoAttrs: {
+    '@context': 'https://w3id.org/did/v1',
+    'id': 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af',
+    'authentication': [
+      {
+        id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#keys-1',
+        type: 'EdDsaSAPublicKeySecp256k1'
+      }
+    ],
+    'publicKey': [
+      {
+        id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#keys-1',
+        type: 'EdDsaSAPublicKeySecp256k1',
+        publicKeyHex: '039ab801fef81ad6928c62ca885b1f62c01a493daf58a0f7c76026d44d1d31f163'
+      }
+    ],
+    'created': new Date('2018-01-24T15:42:15Z')
   }
 
 }
