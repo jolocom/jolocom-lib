@@ -3,7 +3,6 @@ import * as fetch from 'node-fetch'
 import { IIpfsConnector, IIpfsConfig } from './types'
 
 export class IpfsStorageAgent implements IIpfsConnector {
-
   private endpoint!: string
 
   public configure(config: IIpfsConfig): void {
@@ -41,11 +40,9 @@ export class IpfsStorageAgent implements IIpfsConnector {
     if (!res.ok) {
       throw new Error(`Removing pinned hash ${hash} failed, status code: ${res.status}`)
     }
-    return
   }
 
   public async createDagObject(data: object, pin: boolean): Promise<string> {
-
     if (!data || typeof data !== 'object') {
       throw new Error(`Object expected, received ${typeof data}`)
     }
@@ -57,10 +54,8 @@ export class IpfsStorageAgent implements IIpfsConnector {
     const res = await fetch(endpoint, {
       method: 'POST',
       body: formData
-    })
-    .then((result) => result.json())
-    const cid = res.Cid
-    return cid['/']
+    }).then((result) => result.json())
+    return res.Cid['/']
   }
 
   public async resolveIpldPath(pathToResolve: string): Promise<object> {

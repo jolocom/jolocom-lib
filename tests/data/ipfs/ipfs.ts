@@ -23,16 +23,3 @@ export const testDDO = {
   'created': '2018-06-21T09:53:34.857Z',
   'id': 'did:jolo:5e24e1d34301a139f5d3f4a706b7d050738849729317a94a1ed9a30c5ac72787'
 }
-
-export const expectedCredential = {
-  '@context': [
-    'https://w3id.org/identity/v1',
-    'https://identity.jolocom.com/terms',
-    'https://w3id.org/security/v1',
-    'https://w3id.org/credentials/v1',
-    'http://schema.org'
-  ],
-  'type': ['Credential', 'ProofOfEmailCredential'],
-  'claim': { id: 'did:jolo:test', email: 'eugeniu@jolocom.com' },
-  'name': 'Email address'
-}
