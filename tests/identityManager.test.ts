@@ -2,12 +2,13 @@ import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import * as testKeys from './data/keys'
 import { IdentityManager } from '../ts/identityManager/identityManager'
-import { keyTypes } from '../'
+import { keyTypes } from '../ts/index'
+
 chai.use(sinonChai)
 const expect = chai.expect
 
 describe('IdentityManager', () => {
-  const identityManager = IdentityManager.create(testKeys.default.testSeed)
+  const identityManager = IdentityManager.create(testKeys.testSeed)
 
   describe('static create', () => {
     it('should create an instance of IdentityManager with correct default keys schema', () => {

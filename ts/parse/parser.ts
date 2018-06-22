@@ -1,6 +1,5 @@
 import { CredentialResponseParser } from '../credentialResponse/credentialResponseParser'
 import { CredentialParser } from '../credentials/credential/credentialParser'
-import { VerifiableCredentialParser } from '../credentials/verifiableCredential/verifiableCredentialParser'
 import { CredentialRequestParser } from '../credentialRequest/credentialRequestParser'
 import {
   SignedCredentialRequestParser
@@ -8,6 +7,7 @@ import {
 import {
   SignedCredentialResponseParser
 } from '../credentialResponse/signedCredentialResponse/signedCredentialResponseParser'
+import { SignedCredentialParser } from '../credentials/signedCredential/signedCredentialParser';
 
 export class Parser {
   public static credentialRequest = CredentialRequestParser
@@ -17,5 +17,5 @@ export class Parser {
   public static signedCredentialResponse = SignedCredentialResponseParser
 
   public static credential = CredentialParser
-  public static signedCredential = VerifiableCredentialParser
+  public static signedCredential = SignedCredentialParser
 }
