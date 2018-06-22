@@ -27,5 +27,6 @@ export const defaultContext = {
   claim: { '@id': 'cred:claim', '@type': '@id' },
   telephone: 'schema:telephone',
   email: 'schema:email',
-  name: 'schema:name'
+  givenName: 'schema:givenName',
+  familyName: 'schema:familyName'
 }

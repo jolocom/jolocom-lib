@@ -6,12 +6,23 @@ import { ILibConfig } from './types'
 import { IDefaultClaimsMetadata } from './credentials/credential/types'
 import { defaultConfig } from './defaultConfig'
 import { SSO } from './sso'
+import { Parser } from './parse/parser'
+import { Credential } from './credentials/credential'
+import { CredentialRequest } from './credentialRequest/credentialRequest'
+import { CredentialResponse } from './credentialResponse/credentialResponse'
 
 export class JolocomLib {
   public identity: Identity
   public wallet: IdentityWallet
   public credentials: Credentials
   public sso: SSO
+  public static parse = Parser
+
+  public static unsigned = {
+    createCredential: Credential.create,
+    createCredentialRequest: CredentialRequest.create,
+    createCredentialResponse: CredentialResponse.create
+  }
 
   // TODO Creation process should be changed.
   constructor(config: ILibConfig = defaultConfig) {
@@ -24,7 +35,7 @@ export class JolocomLib {
 
 export const claimsMetadata: IDefaultClaimsMetadata = {
   emailAddress: {
-    fieldName: 'email',
+    fieldNames: ['email'],
     type: ['Credential', 'ProofOfEmailCredential'],
     name: 'Email address',
     context: [
@@ -36,7 +47,7 @@ export const claimsMetadata: IDefaultClaimsMetadata = {
     ]
   },
   mobilePhoneNumber: {
-    fieldName: 'telephone',
+    fieldNames: ['telephone'],
     type: ['Credential', 'ProofOfMobilePhoneNumberCredential'],
     name: 'Mobile Phone Number',
     context: [
@@ -48,7 +59,7 @@ export const claimsMetadata: IDefaultClaimsMetadata = {
     ]
   },
   name: {
-    fieldName: 'name',
+    fieldNames: ['givenName', 'familyName'],
     type: ['Credential', 'ProofOfNameCredential'],
     name: 'Name',
     context: [

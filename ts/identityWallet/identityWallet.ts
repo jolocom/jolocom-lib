@@ -1,22 +1,23 @@
 import { DidDocument } from '../identity/didDocument';
+import { IIdentityWallet } from './types'
 
-export class IdentityWallet {
+export class IdentityWallet implements IIdentityWallet {
+  private didDocument: DidDocument
   private privateIdentityKey: Buffer
-  // TODO: change to be an instance of Identity class
-  private identity: DidDocument
 
-  public static create(privateIdentityKey: Buffer): IdentityWallet {
-    const identityWallet = new IdentityWallet()
-    identityWallet.privateIdentityKey = privateIdentityKey
-    return identityWallet
+  public getDidDocument(): DidDocument {
+    return this.didDocument
   }
 
-  // TODO: change to be an instance of Identity class
-  public getIdentity(): DidDocument {
-    return this.identity
+  public setDidDocument(didDocument: DidDocument): void {
+    this.didDocument = didDocument
   }
 
-  public setIdentity(identity: DidDocument): void {
-    this.identity = identity
+  public getPrivateIdentityKey(): Buffer {
+    return this.privateIdentityKey
+  }
+
+  public setPrivateIdentityKey(privateIdentityKey: Buffer): void {
+    this.privateIdentityKey = this.privateIdentityKey
   }
 }
