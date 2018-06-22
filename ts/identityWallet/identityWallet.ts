@@ -10,9 +10,12 @@ export class IdentityWallet implements IIdentityWallet {
   // TODO: change to be an instance of Identity class
   private identity: DidDocument
 
-  public static create(privateIdentityKey: Buffer): IdentityWallet {
+  public static create(
+    {privateIdentityKey, identity}: {privateIdentityKey: Buffer, identity: DidDocument}
+  ): IdentityWallet {
     const identityWallet = new IdentityWallet()
     identityWallet.privateIdentityKey = privateIdentityKey
+    identityWallet.identity = identity
     return identityWallet
   }
 

@@ -8,18 +8,6 @@ export class IdentityWallet {
   private did: string
   private privateKey: Buffer
 
-  public fromPrivateKey(privateKey: Buffer, path?: keyTypes | string): IdentityWallet {
-    const wallet = new IdentityWallet()
-    wallet.did = privateKeyToDID(privateKey)
-    wallet.privateKey = {
-      id: 'keys-1',
-      path: path ? path : keyTypes.jolocomIdentityKey,
-      privateKey
-    }
-
-    return wallet
-  }
-
   public async signCredential(credential: Credential): Promise<SignedCredential> {
     const signedCred = SignedCredential.fromCredential(credential)
 

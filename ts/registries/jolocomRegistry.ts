@@ -29,10 +29,7 @@ export class JolocomRegistry {
   public async create(args: IRegistryInstanceCreationArgs): Promise<IdentityWallet> {
     const { privateIdentityKey, privateEthereumKey} = args
     const ddo = new DidDocument().fromPublicKey(privateKeyToPublicKey(privateIdentityKey))
-
-    const identityWallet = new IdentityWallet()
-    identityWallet.setDidDocument(ddo)
-    identityWallet.setPrivateIdentityKey(args.privateIdentityKey)
+    const identityWallet = IdentityWallet.create({privateIdentityKey: args.privateIdentityKey, identity: ddo})
 
     await this.commit({wallet: identityWallet, privateEthereumKey})
 
@@ -40,7 +37,7 @@ export class JolocomRegistry {
   }
 
   public async commit({ wallet, privateEthereumKey }: IRegistryCommitArgs): Promise<void> {
-    const ddo = wallet.getDidDocument()
+    const ddo = wallet.getIdentity()
     let ipfsHash
     try {
       ipfsHash = await this.ipfsConnector.storeJSON({data: ddo, pin: true})
@@ -70,13 +67,12 @@ export class JolocomRegistry {
   }
 
   public async authenticate(privateIdentityKey: Buffer): Promise<IdentityWallet> {
-    const identityWallet = new IdentityWallet()
     const did = privateKeyToDID(privateIdentityKey)
     // TODO: change according to return of resolve
     const ddoAttrs = await this.resolve(did)
     const didDocument = DidDocument.fromJSON(ddoAttrs)
-    identityWallet.setDidDocument(didDocument)
-    identityWallet.setPrivateIdentityKey(privateIdentityKey)
+
+    const identityWallet = IdentityWallet.create({privateIdentityKey, identity: didDocument})
 
     return identityWallet
   }
