@@ -56,7 +56,7 @@ export class DidDocument  {
     return classToPlain(this) as IDidDocumentAttrs
   }
 
-  public fromJSON(json: IDidDocumentAttrs): DidDocument {
+  public static fromJSON(json: IDidDocumentAttrs): DidDocument {
     return plainToClass(DidDocument, json)
   }
 }

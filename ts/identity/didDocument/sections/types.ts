@@ -6,7 +6,7 @@ export interface IPublicKeySectionAttrs {
 
 export interface IAuthenticationSectionAttrs {
   id: string
-  'type': string[]
+  'type': string
 }
 
 export interface IServiceEndpointSectionAttrs {
