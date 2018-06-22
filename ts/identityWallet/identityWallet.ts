@@ -26,7 +26,8 @@ export class IdentityWallet {
   }
 
   public sign = {
-    credential: this.signCredential
+    credential: this.signCredential,
+    credentialRequest: this.signCredentialRequest
   }
 
   // TODO: change to be an instance of Identity class
@@ -46,5 +47,15 @@ export class IdentityWallet {
     await signedCred.generateSignature(this.privateIdentityKey)
 
     return signedCred
+  }
+
+  public signCredentialRequest(credentialRequest: CredentialRequest): SignedCredentialRequest {
+    const signedCredRequest = SignedCredentialRequest.fromCredentialRequest(
+      {credentialRequest, privateKey: this.privateIdentityKey}
+    )
+
+    signedCredRequest.sign(this.privateIdentityKey)
+
+    return signedCredRequest
   }
 }
