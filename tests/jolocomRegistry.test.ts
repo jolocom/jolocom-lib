@@ -28,7 +28,7 @@ describe('JolocomRegistry', () => {
   const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
   const ethereumConnector = new EthResolver(testEthereumConfig)
   const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
-  const ddoAttrs: IDidDocumentAttrs = testIdentity.ddoAttrs
+  const ddoAttrs = testIdentity.ddoAttrs
   const jolocomRegistry = JolocomRegistry.create({ipfsConnector, ethereumConnector})
   const identityWalletMock = new IdentityWallet()
   identityWalletMock.setDidDocument(ddo)
@@ -223,4 +223,3 @@ describe('JolocomRegistry', () => {
     })
   })
 })
-        

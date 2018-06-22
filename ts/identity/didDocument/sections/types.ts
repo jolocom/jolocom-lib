@@ -15,17 +15,3 @@ export interface IServiceEndpointSectionAttrs {
   serviceEndpoint: string
   description: string
 }
-
-export interface IServiceEndpointSectionAttrs {
-  id: string
-  'type': string[]
-  serviceEndpoint: string
-  description: string
-}
-
-export interface IServiceEndpointSectionAttrs {
-  id: string
-  'type': string[]
-  serviceEndpoint: string
-  description: string
-}
