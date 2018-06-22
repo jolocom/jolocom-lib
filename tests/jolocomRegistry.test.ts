@@ -19,7 +19,7 @@ import {
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe.only('JolocomRegistry', () => {
+describe('JolocomRegistry', () => {
   const sandbox = sinon.createSandbox()
 
   const unixEpoch = moment.utc('2018-01-24T15:42:15Z', moment.ISO_8601).valueOf()
@@ -220,4 +220,3 @@ describe.only('JolocomRegistry', () => {
     })
   })
 })
-        
