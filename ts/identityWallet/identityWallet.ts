@@ -54,7 +54,7 @@ export class IdentityWallet implements IIdentityWallet {
   }
 
   public signCredentialRequest(credentialRequest: CredentialRequest): SignedCredentialRequest {
-    const signedCredRequest = SignedCredentialRequest.fromCredentialRequest(
+    const signedCredRequest = SignedCredentialRequest.create(
       {credentialRequest, privateKey: this.privateIdentityKey}
     )
 

@@ -68,20 +68,6 @@ export class SignedCredentialRequest {
     return signedCr
   }
 
-  public static fromCredentialRequest(
-    {credentialRequest, privateKey}: {credentialRequest: CredentialRequest, privateKey: Buffer}
-  ): SignedCredentialRequest {
-    const signedCredRequest = new SignedCredentialRequest()
-    const issuer = privateKeyToDID(privateKey)
-    signedCredRequest.payload = {
-      iat: Date.now(),
-      iss: issuer,
-      credentialRequest
-    }
-
-    return signedCredRequest
-  }
-
   public validateSignature(): boolean {
     return false
   }
