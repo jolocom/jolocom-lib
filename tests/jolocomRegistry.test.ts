@@ -30,9 +30,7 @@ describe('JolocomRegistry', () => {
   const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
   const ddoAttrs: IDidDocumentAttrs = testIdentity.ddoAttrs
   const jolocomRegistry = JolocomRegistry.create({ipfsConnector, ethereumConnector})
-  const identityWalletMock = new IdentityWallet()
-  identityWalletMock.setDidDocument(ddo)
-  identityWalletMock.setPrivateIdentityKey(testPrivateIdentityKey)
+  const identityWalletMock = IdentityWallet.create({privateIdentityKey: testPrivateIdentityKey, identity: ddo})
 
   describe('static created', () => {
     it('should create an instance of JolocomRegistry with correct config', () => {

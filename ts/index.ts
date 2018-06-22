@@ -5,7 +5,7 @@ import { IDefaultClaimsMetadata } from './credentials/credential/types'
 import { defaultConfig } from './defaultConfig'
 import { SSO } from './sso'
 import { Parser } from './parse/parser'
-import { Credential } from './credentials/credential'
+import { Credential } from './credentials/credential/credential'
 import { CredentialRequest } from './credentialRequest/credentialRequest'
 import { CredentialResponse } from './credentialResponse/credentialResponse'
 
