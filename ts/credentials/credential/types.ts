@@ -22,3 +22,11 @@ export interface IDefaultClaimsMetadata {
   mobilePhoneNumber: IClaimMetadata
   name: IClaimMetadata
 }
+
+export interface IDefaultPublicProfileClaimsMetadata {
+  id: IClaimMetadata
+  name: IClaimMetadata
+  image?: IClaimMetadata
+  about: IClaimMetadata
+  homepage?: IClaimMetadata
+}
