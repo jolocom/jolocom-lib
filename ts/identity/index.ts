@@ -33,20 +33,20 @@ export class Identity {
    * encoded in WIF format
    * */
 
-  public create(randomStringFromEntropy: Buffer): IdentityCreationResponse {
-    const mnemonic = keyDerivation.generateMnemonic(randomStringFromEntropy)
-    const masterKeyPair = keyDerivation.deriveMasterKeyPairFromMnemonic(mnemonic)
-    const genericSigningKey = keyDerivation.deriveGenericSigningKeyPair(masterKeyPair)
-    const ethereumKey = keyDerivation.deriveEthereumKeyPair(masterKeyPair)
-    const ddo = new DidDocument().fromPublicKey(genericSigningKey.publicKey)
+  // public create(randomStringFromEntropy: Buffer): IdentityCreationResponse {
+  //   const mnemonic = keyDerivation.generateMnemonic(randomStringFromEntropy)
+  //   const masterKeyPair = keyDerivation.deriveMasterKeyPairFromMnemonic(mnemonic)
+  //   // const genericSigningKey = keyDerivation.deriveGenericSigningKeyPair(masterKeyPair)
+  //   // const ethereumKey = keyDerivation.deriveEthereumKeyPair(masterKeyPair)
+  //   const ddo = new DidDocument().fromPublicKey(genericSigningKey.publicKey)
 
-    return {
-      didDocument: ddo,
-      ethereumKey,
-      genericSigningKey,
-      mnemonic
-    }
-  }
+  //   return {
+  //     didDocument: ddo,
+  //     ethereumKey,
+  //     genericSigningKey,
+  //     mnemonic
+  //   }
+  // }
 
   /* Stores DDO object on IPFS
    * @param {object} ddo - DDO object
