@@ -2,14 +2,16 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet';
-import { testPrivateIdentityKey, testPublicIdentityKey } from '../data/keys'
+import { testPrivateIdentityKey, testPublicIdentityKey, testPublicIdentityKey2 } from '../data/keys'
 import testIdentity from '../data/identity'
 import { DidDocument } from '../../ts/identity/didDocument'
 import { claimsMetadata } from '../../ts/index'
 import { singleClaimCreationArgs, singleClaimCredentialJSON } from '../data/credential/credential'
 import { Credential } from '../../ts/credentials/credential/credential'
 import { credentialRequestCreationArgs } from '../data/credentialRequest/credentialRequest'
-import { credentialAttr } from '../data/identityWallet'
+import { credentialAttr, testSignedCred, testSignedCredRequest } from '../data/identityWallet'
+import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import { SignedCredentialRequest } from '../../ts/credentialRequest/signedCredentialRequest/signedCredentialRequest';
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -17,41 +19,43 @@ const expect = chai.expect
 describe('IdentityWallet', () => {
   const sandbox = sinon.createSandbox()
   const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
+  const identityWallet = IdentityWallet.create({
+    privateIdentityKey: testPrivateIdentityKey,
+    identity: ddo
+  })
+
+  let clock
+  before(() => {
+    clock = sandbox.useFakeTimers()
+  })
+
+  after(() => {
+    clock.restore()
+  })
 
   describe('static create', () => {
     let create
-    let identityWallet
+    let iWallet
     before(() => {
       create = sandbox.spy(IdentityWallet, 'create')
-      identityWallet = IdentityWallet.create({
-        privateIdentityKey: testPrivateIdentityKey,
-        identity: ddo
-      })
+      iWallet = IdentityWallet.create({ privateIdentityKey: testPrivateIdentityKey, identity: ddo })
     })
 
     after(() => {
       sandbox.restore()
     })
-
-    // it('should be correctly called with correct arguments ', () => {
-    //   sandbox.assert.calledOnce(create)
-    //   sandbox.assert.calledWith(create, {
-    //     privateIdentityKey: testIdentityPrivateKey,
-    //     identity: testIdentity.ddoAttrs
-    //   })
-    // })
+    // TODO: account for identity class as param
+    it('should be correctly called with correct arguments ', () => {
+      sandbox.assert.calledOnce(create)
+      sandbox.assert.calledWith(create, { privateIdentityKey: testPrivateIdentityKey, identity: ddo })
+    })
 
     it('should correctly return an instance of identityWallet', () => {
-      expect(identityWallet).to.be.instanceof(IdentityWallet)
+      expect(iWallet).to.be.instanceof(IdentityWallet)
     })
   })
 
   describe('create', () => {
-    const identityWallet = IdentityWallet.create({
-      privateIdentityKey: testPrivateIdentityKey,
-      identity: ddo
-    })
-
     it('should expose credential, credentialRequest, signedCredential, signedCredentialRequest', () => {
       const mockProps = ['credential', 'credentialRequest', 'signedCredential', 'signedCredentialRequest']
       expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
@@ -71,9 +75,92 @@ describe('IdentityWallet', () => {
         .to.deep.equal([credentialRequestCreationArgs.credentialRequirements[0].type])
     })
 
-    // it('create.signedCredential should retrun a correct signed credential', () => {
-    //   const signedC = identityWallet.create
-    //     .signedCredential({credentialAttr: singleClaimCreationArgs, privateIdentityKey: testPrivateIdentityKey})
+    // it('create.signedCredential should return a correct signed credential', async () => {
+    //   const credAttr = { metadata: claimsMetadata.emailAddress, claim: singleClaimCreationArgs }
+    //   const signedCred = await identityWallet.create.signedCredential(credAttr)
+    //   const mockSignedCred = SignedCredential.fromJSON(testSignedCred)
+
+    //   expect(signedCred.getIssuer()).to.deep.equal(mockSignedCred.getIssuer())
+    //   expect(signedCred.getCredentialSection()).to.deep.equal(mockSignedCred.getCredentialSection())
+    //   expect(signedCred.getType()).to.deep.equal(mockSignedCred.getType())
     // })
+
+    // it('create.signedCredentialRequest should return a correct signed credential request', () => {
+    //   const credRequest = identityWallet.create.credentialRequest(credentialRequestCreationArgs)
+    //   const signedCredRequest = identityWallet.create.signedCredentialRequest(credRequest)
+    //   const mockSignedReq = SignedCredentialRequest.fromJSON(testSignedCredRequest)
+
+    //   expect(signedCredRequest).to.deep.equal(mockSignedReq)
+    // })
+  })
+
+  describe('sign', () => {
+    let signCredential
+    let signCredentialRequest
+    let iWallet
+
+    before(() => {
+      signCredential = sandbox.spy(IdentityWallet.prototype, 'signCredential')
+      signCredentialRequest = sandbox.spy(IdentityWallet.prototype, 'signCredentialRequest')
+      iWallet = IdentityWallet.create({
+        privateIdentityKey: testPrivateIdentityKey,
+        identity: ddo
+      })
+    })
+
+    after(() => {
+      sandbox.restore()
+    })
+
+    it('sign.credential should call signCredential with correct params', () => {
+      const credential = iWallet.create
+        .credential({metadata: claimsMetadata.emailAddress, claim: singleClaimCreationArgs})
+      iWallet.sign.credential(credential)
+
+      sandbox.assert.calledOnce(signCredential)
+      sandbox.assert.calledWith(signCredential, credential)
+    })
+
+    it('sign.credentialRequest should call signCredentialRequest with correct params', () => {
+      const credRequest = iWallet.create.credentialRequest(credentialRequestCreationArgs)
+      iWallet.sign.credentialRequest(credRequest)
+
+      sandbox.assert.calledOnce(signCredentialRequest)
+      sandbox.assert.calledWith(signCredentialRequest, credRequest)
+    })
+  })
+
+  describe('getter and setter for Identity', () => {
+    it('getIdentity should return a correct instance of identity class ', () => {
+      expect(identityWallet.getIdentity()).to.deep.equal(ddo)
+    })
+
+    it('setIdentity should correctly set identity on identityWallet', ()  => {
+      const ddoTest = new DidDocument().fromPublicKey(testPublicIdentityKey2)
+      identityWallet.setIdentity(ddoTest)
+      expect(identityWallet.getIdentity()).to.deep.equal(ddoTest)
+    })
+  })
+
+  describe('signCredential', () => {
+    it('should return a correct signed credential', async () => {
+      const credential = identityWallet.create
+        .credential({metadata: claimsMetadata.emailAddress, claim: singleClaimCreationArgs})
+      const signedCred = await identityWallet.signCredential(credential)
+      const mockSignedCred = SignedCredential.fromJSON(testSignedCred)
+      expect(signedCred.getIssuer()).to.deep.equal(mockSignedCred.getIssuer())
+      expect(signedCred.getCredentialSection()).to.deep.equal(mockSignedCred.getCredentialSection())
+      expect(signedCred.getType()).to.deep.equal(mockSignedCred.getType())
+    })
+  })
+
+  describe('signCredentialRequest', () => {
+    it('should return a correct signCredentialRequest', () => {
+      const credRequest = identityWallet.create.credentialRequest(credentialRequestCreationArgs)
+      const signedCredRequest = identityWallet.signCredentialRequest(credRequest)
+      const mockSignedReq = SignedCredentialRequest.fromJSON(testSignedCredRequest)
+
+      expect(signedCredRequest).to.deep.equal(mockSignedReq)
+    })
   })
 })
