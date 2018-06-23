@@ -17,7 +17,7 @@ export const testSignedCred = {
   ],
   id: 'claimId:bcf70ac9c940e',
   name: 'Email address',
-  issuer: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af',
+  issuer: 'did:jolo:8ed0d21cf51f4a330c0bf660cb5fa81eb5c9d83c9f9e1263272cd2957f6a2029',
   type: [ 'Credential', 'ProofOfEmailCredential' ],
   claim: { id: 'did:jolo:test', email: 'eugeniu@jolocom.com' },
   issued: '1970-01-01T00:00:00.000Z',
