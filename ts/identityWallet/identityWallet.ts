@@ -3,29 +3,25 @@ import { Credential } from '../credentials/credential/credential';
 import { SignedCredential } from '../credentials/signedCredential/signedCredential';
 import { SignedCredentialRequest } from '../credentialRequest/signedCredentialRequest/signedCredentialRequest';
 import { CredentialRequest } from '../credentialRequest/credentialRequest';
-import { IIdentityWallet } from './types';
-
+import { IIdentityWallet, IIdentityWalletCreateArgs } from './types';
+// TODO: change DidDoc to Identity
 export class IdentityWallet implements IIdentityWallet {
   private privateIdentityKey: Buffer
-  // TODO: change to be an instance of Identity class
-  private identity: DidDocument
+  private identity: DidDocument // Identity
 
-  public static create(
-    {privateIdentityKey, identity}: {privateIdentityKey: Buffer, identity: DidDocument}
-  ): IdentityWallet {
+  public static create({ privateIdentityKey, identity }: IIdentityWalletCreateArgs): IdentityWallet {
     const identityWallet = new IdentityWallet()
     identityWallet.privateIdentityKey = privateIdentityKey
     identityWallet.identity = identity
+
     return identityWallet
   }
 
   public create = {
     credential: Credential.create,
     credentialRequest: CredentialRequest.create,
-    signedCredential: (credentialAttrs) => SignedCredential.create({
-      credentialAttrs,
-      privateIdentityKey: this.privateIdentityKey
-    }),
+    signedCredential: (credentialAttrs) =>
+      SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey }),
     signedCredentialRequest: SignedCredentialRequest.create
   }
 
@@ -34,7 +30,6 @@ export class IdentityWallet implements IIdentityWallet {
     credentialRequest: this.signCredentialRequest
   }
 
-  // TODO: change to be an instance of Identity class
   public getIdentity(): DidDocument {
     return this.identity
   }
@@ -45,7 +40,6 @@ export class IdentityWallet implements IIdentityWallet {
 
   public async signCredential(credential: Credential): Promise<SignedCredential> {
     const signedCred = SignedCredential.fromCredential(credential)
-
     signedCred.setIssuer(this.identity.getDID())
     signedCred.setIssued(new Date())
     await signedCred.generateSignature(this.privateIdentityKey)
@@ -54,10 +48,8 @@ export class IdentityWallet implements IIdentityWallet {
   }
 
   public signCredentialRequest(credentialRequest: CredentialRequest): SignedCredentialRequest {
-    const signedCredRequest = SignedCredentialRequest.create(
-      {credentialRequest, privateKey: this.privateIdentityKey}
-    )
-
+    const signedCredRequest = SignedCredentialRequest
+      .create({ credentialRequest, privateKey: this.privateIdentityKey })
     signedCredRequest.sign(this.privateIdentityKey)
 
     return signedCredRequest
