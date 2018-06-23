@@ -4,7 +4,7 @@ import { canonize } from 'jsonld'
 import { IClaimAttrs, ICredentialCreateAttrs } from '../credential/types'
 import { Credential } from '../credential/credential'
 import { generateRandomID, sign, sha256, verifySignature } from '../../utils/crypto'
-import { ISignedCredentialAttrs } from './types'
+import { ISignedCredentialAttrs, ISignedCredentialCreateArgs } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { defaultContext } from '../../utils/contexts'
 import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
@@ -92,13 +92,10 @@ export class SignedCredential {
     return customType.replace(/([A-Z])/g, ' $1').trim()
   }
 
-  public static async create(
-    {credentialAttrs, privateIdentityKey}: {credentialAttrs: ICredentialCreateAttrs, privateIdentityKey: Buffer}
-  ): Promise<SignedCredential> {
-    const credential = Credential.create(credentialAttrs)
+  public static async create(args: ISignedCredentialCreateArgs): Promise<SignedCredential> {
+    const credential = Credential.create(args.credentialAttrs)
     const signedCredential = SignedCredential.fromCredential(credential)
-
-    await signedCredential.generateSignature(privateIdentityKey)
+    await signedCredential.generateSignature(args.privateIdentityKey)
 
     return signedCredential
   }

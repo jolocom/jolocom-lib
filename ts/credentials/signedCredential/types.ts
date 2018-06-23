@@ -1,4 +1,4 @@
-import { ICredentialAttrs, IClaimAttrs } from '../credential/types'
+import { ICredentialAttrs, IClaimAttrs, ICredentialCreateAttrs } from '../credential/types'
 import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
 
 export interface ISignedCredentialAttrs extends ICredentialAttrs {
@@ -8,4 +8,9 @@ export interface ISignedCredentialAttrs extends ICredentialAttrs {
   expires?: string
   claim: IClaimAttrs
   proof: ILinkedDataSignatureAttrs
+}
+
+export interface ISignedCredentialCreateArgs {
+  credentialAttrs: ICredentialCreateAttrs
+  privateIdentityKey: Buffer
 }
