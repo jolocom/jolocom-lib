@@ -22,7 +22,8 @@ export class IdentityWallet implements IIdentityWallet {
     credentialRequest: CredentialRequest.create,
     signedCredential: (credentialAttrs) =>
       SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey }),
-    signedCredentialRequest: SignedCredentialRequest.create
+    signedCredentialRequest: (credentialRequest) =>
+      SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey})
   }
 
   public sign = {
