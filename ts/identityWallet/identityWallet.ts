@@ -1,9 +1,11 @@
 import { DidDocument } from '../identity/didDocument';
 import { Credential } from '../credentials/credential/credential';
+import { ICredentialCreateAttrs } from '../credentials/credential/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential';
 import { SignedCredentialRequest } from '../credentialRequest/signedCredentialRequest/signedCredentialRequest';
 import { CredentialRequest } from '../credentialRequest/credentialRequest';
 import { IIdentityWallet, IIdentityWalletCreateArgs } from './types';
+
 // TODO: change DidDoc to Identity
 export class IdentityWallet implements IIdentityWallet {
   private privateIdentityKey: Buffer
@@ -20,15 +22,15 @@ export class IdentityWallet implements IIdentityWallet {
   public create = {
     credential: Credential.create,
     credentialRequest: CredentialRequest.create,
-    signedCredential: (credentialAttrs) =>
-      SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey }),
-    signedCredentialRequest: (credentialRequest) =>
+    signedCredential: async (credentialAttrs: ICredentialCreateAttrs) =>
+      await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey }),
+    signedCredentialRequest: (credentialRequest: CredentialRequest) =>
       SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey})
   }
 
   public sign = {
-    credential: this.signCredential,
-    credentialRequest: this.signCredentialRequest
+    credential: this.signCredential.bind(this),
+    credentialRequest: this.signCredentialRequest.bind(this)
   }
 
   public getIdentity(): DidDocument {
