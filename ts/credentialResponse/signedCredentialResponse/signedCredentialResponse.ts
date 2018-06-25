@@ -5,9 +5,10 @@ import { IJWTHeader } from '../../credentialRequest/signedCredentialRequest/type
 import { ISuppliedCredentialsAttrs } from '../types'
 import { CredentialRequest } from '../../credentialRequest/credentialRequest'
 import { ISignedCredResponsePayload, ISignedCredResponseCreationArgs, ISignedCredentialResponseAttrs } from './types'
-import { privateKeyToDID, encodeAsJWT, computeJWTSignature } from '../../utils/crypto'
 import { CredentialResponse } from '../credentialResponse'
-import { JolocomRegistry } from '../../registries/jolocomRegistry';
+import { JolocomRegistry } from '../../registries/jolocomRegistry'
+import { validateJWTSignature, computeJWTSignature, encodeAsJWT } from '../../utils/jwt'
+import { privateKeyToDID } from '../../utils/crypto'
 
 export class SignedCredentialResponse {
   private header: IJWTHeader = {
@@ -67,11 +68,7 @@ export class SignedCredentialResponse {
   }
 
   public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
-    if (!pubKey) {
-      throw new Error('Please provide the issuer\'s public key')
-    }
-    const assembledJWT = this.toJWT()
-    return new TokenVerifier(this.header.alg, pubKey.toString('hex')).verify(assembledJWT)
+    return validateJWTSignature(this, pubKey)
   }
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {

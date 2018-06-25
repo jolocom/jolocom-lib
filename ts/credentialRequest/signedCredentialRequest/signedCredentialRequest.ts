@@ -2,14 +2,15 @@ import 'reflect-metadata'
 import { decodeToken, TokenVerifier } from 'jsontokens'
 import { classToPlain, plainToClass } from 'class-transformer'
 import { CredentialRequest } from '../credentialRequest'
-import { privateKeyToDID, encodeAsJWT, computeJWTSignature, verifySignature } from '../../utils/crypto'
+import { privateKeyToDID } from '../../utils/crypto'
 import {
   IJWTHeader,
   ISignedCredentialRequestAttrs,
   ISignedCredRequestPayload,
   ISignedCredRequestCreationArgs
 } from './types'
-import { JolocomRegistry } from '../../registries/jolocomRegistry';
+import { JolocomRegistry } from '../../registries/jolocomRegistry'
+import { validateJWTSignature, computeJWTSignature, encodeAsJWT } from '../../utils/jwt'
 
 export class SignedCredentialRequest {
   private header: IJWTHeader = {
@@ -69,11 +70,7 @@ export class SignedCredentialRequest {
   }
 
   public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
-    if (!pubKey) {
-      throw new Error('Please provide the issuer\'s public key')
-    }
-    const assembledJWT = this.toJWT()
-    return new TokenVerifier(this.header.alg, pubKey.toString('hex')).verify(assembledJWT)
+    return validateJWTSignature(this, pubKey)
   }
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
