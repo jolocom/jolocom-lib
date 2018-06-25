@@ -27,6 +27,7 @@ export function validateJWTSignature(jwtInstance: jwtEnabledClass, pubKey: Buffe
     throw new Error('Please provide the issuer\'s public key')
   }
 
+  // TODO Normalize / have a cannonical json form
   const assembledJWT = jwtInstance.toJWT()
   return new TokenVerifier('ES256K', pubKey.toString('hex')).verify(assembledJWT)
 }
