@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { decodeToken, TokenVerifier } from 'jsontokens'
+import { decodeToken } from 'jsontokens'
 import { classToPlain, plainToClass } from 'class-transformer'
 import { IJWTHeader } from '../../credentialRequest/signedCredentialRequest/types'
 import { ISuppliedCredentialsAttrs } from '../types'
@@ -7,7 +7,12 @@ import { CredentialRequest } from '../../credentialRequest/credentialRequest'
 import { ISignedCredResponsePayload, ISignedCredResponseCreationArgs, ISignedCredentialResponseAttrs } from './types'
 import { CredentialResponse } from '../credentialResponse'
 import { JolocomRegistry } from '../../registries/jolocomRegistry'
-import { validateJWTSignature, computeJWTSignature, encodeAsJWT } from '../../utils/jwt'
+import {
+  validateJWTSignature,
+  computeJWTSignature,
+  encodeAsJWT,
+  validateJWTSignatureWithRegistry
+} from '../../utils/jwt'
 import { privateKeyToDID } from '../../utils/crypto'
 
 export class SignedCredentialResponse {
@@ -72,20 +77,7 @@ export class SignedCredentialResponse {
   }
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
-    if (!registry) {
-      throw new Error('Can not instantiate default registry yet, WIP')
-    }
-
-    const issuerProfile = await registry.resolve(this.payload.iss)
-
-    // TODO Find based on key id
-    const pubKey = issuerProfile.publicKey[0].publicKeyHex
-
-    if (!pubKey) {
-      return false
-    }
-
-    return this.validateSignatureWithPublicKey(Buffer.from(pubKey, 'hex'))
+    return validateJWTSignatureWithRegistry(this, registry)
   }
 
   public toJWT(): string {
