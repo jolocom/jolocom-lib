@@ -9,6 +9,7 @@ import {
   mockPrivKey,
   privKeyDID
 } from '../data/credentialRequest/signedCredentialRequest'
+import { privateKeyToPublicKey } from '../../ts/utils/crypto'
 
 describe('SignedCredentialRequest', () => {
   let clock
@@ -97,7 +98,10 @@ describe('SignedCredentialRequest', () => {
 
   // TODO
   it('Should implement a validateSignature method', () => {
-    expect(false).to.equal(true)
+    const signedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)
+    expect(signedCR.validateSignatureWithPublicKey(privateKeyToPublicKey(Buffer.from(mockPrivKey, 'hex')))).to.equal(
+      true
+    )
   })
 
   it('Should implement an applyConstraints method', () => {

@@ -8,6 +8,7 @@ import {
   mockSignedCredResponseJson,
   signedCredRespJWT
 } from '../data/credentialResponse/signedCredentialResponse'
+import { privateKeyToPublicKey } from '../../ts/utils/crypto'
 
 describe('SignedCredentialResponse', () => {
   let clock
@@ -66,7 +67,10 @@ describe('SignedCredentialResponse', () => {
   })
 
   it('Should implement validateSignature method', () => {
-    expect(false).to.equal(true)
+    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
+    expect(
+      signedCredentialResponse.validateSignatureWithPublicKey(privateKeyToPublicKey(Buffer.from(mockPrivKey, 'hex')))
+    ).to.equal(true)
   })
 
   it('Should implement satisfiesRequirements method', () => {

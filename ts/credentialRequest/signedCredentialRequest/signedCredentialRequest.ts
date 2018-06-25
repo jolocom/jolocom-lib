@@ -16,6 +16,7 @@ import {
   encodeAsJWT,
   validateJWTSignatureWithRegistry
 } from '../../utils/jwt'
+import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
 export class SignedCredentialRequest {
   private header: IJWTHeader = {
@@ -80,6 +81,10 @@ export class SignedCredentialRequest {
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
     return validateJWTSignatureWithRegistry(this, registry)
+  }
+
+  public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
+    return this.payload.credentialRequest.applyConstraints(credentials)
   }
 
   public toJWT(): string {
