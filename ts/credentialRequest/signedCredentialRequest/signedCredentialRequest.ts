@@ -1,20 +1,20 @@
 import 'reflect-metadata'
-import { decodeToken } from 'jsontokens'
-import { classToPlain, plainToClass, Type } from 'class-transformer'
+import { decodeToken, TokenVerifier } from 'jsontokens'
+import { classToPlain, plainToClass } from 'class-transformer'
 import { CredentialRequest } from '../credentialRequest'
-import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
-import { privateKeyToDID, encodeAsJWT, computeJWTSignature } from '../../utils/crypto'
+import { privateKeyToDID, encodeAsJWT, computeJWTSignature, verifySignature } from '../../utils/crypto'
 import {
   IJWTHeader,
   ISignedCredentialRequestAttrs,
   ISignedCredRequestPayload,
   ISignedCredRequestCreationArgs
 } from './types'
+import { JolocomRegistry } from '../../registries/jolocomRegistry';
 
 export class SignedCredentialRequest {
   private header: IJWTHeader = {
-    alg: 'ES256K',
-    typ: 'JWT'
+    typ: 'JWT',
+    alg: 'ES256K'
   }
 
   private payload: ISignedCredRequestPayload
@@ -68,12 +68,29 @@ export class SignedCredentialRequest {
     return signedCr
   }
 
-  public validateSignature(): boolean {
-    return false
+  public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
+    if (!pubKey) {
+      throw new Error('Please provide the issuer\'s public key')
+    }
+    const assembledJWT = this.toJWT()
+    return new TokenVerifier(this.header.alg, pubKey.toString('hex')).verify(assembledJWT)
   }
 
-  public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
-    return this.payload.credentialRequest.applyConstraints(credentials)
+  public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
+    if (!registry) {
+      throw new Error('Can not instantiate default registry yet, WIP')
+    }
+
+    const issuerProfile = await registry.resolve(this.payload.iss)
+
+    // TODO Find based on key id
+    const pubKey = issuerProfile.publicKey[0].publicKeyHex
+
+    if (!pubKey) {
+      return false
+    }
+
+    return this.validateSignatureWithPublicKey(Buffer.from(pubKey, 'hex'))
   }
 
   public toJWT(): string {
