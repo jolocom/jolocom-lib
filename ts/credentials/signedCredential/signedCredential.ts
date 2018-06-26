@@ -1,16 +1,14 @@
 import 'reflect-metadata'
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { canonize } from 'jsonld'
-import { IClaimAttrs } from '../credential/types'
-import { Credential } from '../credential'
-import { IPrivateKey } from '../../wallet/types'
-import { generateRandomID, sign, sha256, verifySignature } from '../../utils/crypto'
-import { ISignedCredentialAttrs } from './types'
+import { IClaimAttrs, ICredentialCreateAttrs } from '../credential/types'
+import { Credential } from '../credential/credential'
+import { generateRandomID, sign, sha256, verifySignature, privateKeyToDID } from '../../utils/crypto'
+import { ISignedCredentialAttrs, ISignedCredentialCreateArgs } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { defaultContext } from '../../utils/contexts'
 import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
 
-// TODO Change to SignedCredential
 @Exclude()
 export class SignedCredential {
   @Expose()
@@ -45,6 +43,9 @@ export class SignedCredential {
 
   public setIssuer(issuer: string) {
     this.issuer = issuer
+  }
+
+  public setId() {
     this.id = this.generateClaimId()
   }
 
@@ -94,26 +95,38 @@ export class SignedCredential {
     return customType.replace(/([A-Z])/g, ' $1').trim()
   }
 
-  // TODO remove / modify in favor of identityWallet.sign.credential
-  public fromCredential(credential: Credential): SignedCredential {
-    const signedCred = new SignedCredential()
-    signedCred['@context'] = credential.getContext()
-    signedCred.type = credential.getType()
-    signedCred.claim = credential.getClaim()
-    signedCred.name = credential.getName()
-    return signedCred
+  public static async create(args: ISignedCredentialCreateArgs): Promise<SignedCredential> {
+    const credential = Credential.create(args.credentialAttrs)
+    const signedCredential = SignedCredential.fromCredential(credential)
+    await signedCredential.generateSignature(args.privateIdentityKey)
+
+    return signedCredential
   }
 
-  public async generateSignature(privateKey: IPrivateKey) {
+  public static fromCredential(credential: Credential): SignedCredential {
+    const signedCredential = new SignedCredential()
+    signedCredential['@context'] = credential.getContext()
+    signedCredential.type = credential.getType()
+    signedCredential.claim = credential.getClaim()
+    signedCredential.name = credential.getName()
+    signedCredential.setId()
+    signedCredential.setIssued(new Date())
+
+    return signedCredential
+  }
+
+  public async generateSignature(privateKey: Buffer) {
     this.proof.created = new Date()
-    this.proof.creator = `${this.issuer}#${privateKey.id}`
+    this.proof.creator = `${this.issuer}#${this.id}`
     this.proof.nonce = generateRandomID(8)
     this.proof.proofSectionType = proofTypes.proofSet
 
     const docDigest = await this.digest()
     const sigDigest = await this.proof.digest()
 
-    this.proof.signatureValue = sign(`${sigDigest}${docDigest}`, privateKey.privateKey)
+    this.proof.signatureValue = sign(`${sigDigest}${docDigest}`, privateKey)
+
+    this.setIssuer(privateKeyToDID(privateKey))
   }
 
   // TODO If no pubKey passed, fetch from ipfs

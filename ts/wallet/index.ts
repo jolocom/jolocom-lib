@@ -1,28 +1,15 @@
-import { IPrivateKey } from './types'
 import { keyTypes } from '..'
 import { privateKeyToDID } from '../utils/crypto'
 import { IConstraint } from '../credentialRequest/types'
-import { Credential } from '../credentials/credential'
-import { SignedCredential } from '../credentials/signedCredential'
+import { Credential } from '../credentials/credential/credential'
+import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 
 export class IdentityWallet {
   private did: string
-  private privateKey: IPrivateKey
-
-  public fromPrivateKey(privateKey: Buffer, path?: keyTypes | string): IdentityWallet {
-    const wallet = new IdentityWallet()
-    wallet.did = privateKeyToDID(privateKey)
-    wallet.privateKey = {
-      id: 'keys-1',
-      path: path ? path : keyTypes.jolocomIdentityKey,
-      privateKey
-    }
-
-    return wallet
-  }
+  private privateKey: Buffer
 
   public async signCredential(credential: Credential): Promise<SignedCredential> {
-    const signedCred = new SignedCredential().fromCredential(credential)
+    const signedCred = SignedCredential.fromCredential(credential)
 
     signedCred.setIssuer(this.did)
     signedCred.setIssued(new Date())
