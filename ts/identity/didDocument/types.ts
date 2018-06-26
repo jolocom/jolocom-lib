@@ -3,8 +3,8 @@ import { IPublicKeySectionAttrs, IAuthenticationSectionAttrs, IServiceEndpointSe
 export interface IDidDocumentAttrs {
   '@context': string
   id: string
-  authentication: IAuthenticationSectionAttrs
-  publicKey: IPublicKeySectionAttrs
-  service: IServiceEndpointSectionAttrs
+  authentication: IAuthenticationSectionAttrs[]
+  publicKey: IPublicKeySectionAttrs[]
+  service: IServiceEndpointSectionAttrs[]
   created: Date
 }
