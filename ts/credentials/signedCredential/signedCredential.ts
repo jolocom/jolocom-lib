@@ -3,7 +3,7 @@ import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transfo
 import { canonize } from 'jsonld'
 import { IClaimAttrs, ICredentialCreateAttrs } from '../credential/types'
 import { Credential } from '../credential/credential'
-import { generateRandomID, sign, sha256, verifySignature } from '../../utils/crypto'
+import { generateRandomID, sign, sha256, verifySignature, privateKeyToDID } from '../../utils/crypto'
 import { ISignedCredentialAttrs, ISignedCredentialCreateArgs } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { defaultContext } from '../../utils/contexts'
@@ -43,6 +43,9 @@ export class SignedCredential {
 
   public setIssuer(issuer: string) {
     this.issuer = issuer
+  }
+
+  public setId() {
     this.id = this.generateClaimId()
   }
 
@@ -106,6 +109,8 @@ export class SignedCredential {
     signedCredential.type = credential.getType()
     signedCredential.claim = credential.getClaim()
     signedCredential.name = credential.getName()
+    signedCredential.setId()
+    signedCredential.setIssued(new Date())
 
     return signedCredential
   }
@@ -120,6 +125,8 @@ export class SignedCredential {
     const sigDigest = await this.proof.digest()
 
     this.proof.signatureValue = sign(`${sigDigest}${docDigest}`, privateKey)
+
+    this.setIssuer(privateKeyToDID(privateKey))
   }
 
   // TODO If no pubKey passed, fetch from ipfs

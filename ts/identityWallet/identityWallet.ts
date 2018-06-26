@@ -43,8 +43,6 @@ export class IdentityWallet implements IIdentityWallet {
 
   public async signCredential(credential: Credential): Promise<SignedCredential> {
     const signedCred = SignedCredential.fromCredential(credential)
-    signedCred.setIssuer(this.identity.getDID())
-    signedCred.setIssued(new Date())
     await signedCred.generateSignature(this.privateIdentityKey)
 
     return signedCred
