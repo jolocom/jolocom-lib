@@ -8,7 +8,7 @@ import {
   testDataString,
   testHash,
   testDDO,
-} from '../data/ipfs/ipfs'
+} from '../data/ipfs'
 import { singleClaimCredentialJSON } from '../data/credential/credential'
 
 describe('IpfsStorageAgent', () => {
@@ -98,7 +98,7 @@ describe('IpfsStorageAgent', () => {
         Cid: { '/': testHash }
       })
 
-    const resultingHash = await storageAgent.createDagObject(testDataObject, pinBoolean)
+    const resultingHash = await storageAgent.createDagObject({data: testDataObject, pin: pinBoolean})
     expect(resultingHash).to.deep.equal(testHash)
   })
 
@@ -110,7 +110,7 @@ describe('IpfsStorageAgent', () => {
       })
 
     try {
-      await storageAgent.createDagObject(testDataString, pinBoolean)
+      await storageAgent.createDagObject({data: testDataString, pin: pinBoolean})
     } catch (err) {
       expect(err.message).to.equal('Object expected, received string')
     }
