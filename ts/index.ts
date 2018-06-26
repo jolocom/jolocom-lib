@@ -1,5 +1,4 @@
 import 'reflect-metadata'
-import { Identity } from './identity'
 import { IdentityWallet } from './wallet'
 import { Credentials } from './credentials'
 import { ILibConfig } from './types'
@@ -12,7 +11,6 @@ import { CredentialRequest } from './credentialRequest/credentialRequest'
 import { CredentialResponse } from './credentialResponse/credentialResponse'
 
 export class JolocomLib {
-  public identity: Identity
   public wallet: IdentityWallet
   public credentials: Credentials
   public sso: SSO
@@ -27,7 +25,6 @@ export class JolocomLib {
   // TODO Creation process should be changed.
   constructor(config: ILibConfig = defaultConfig) {
     this.wallet = new IdentityWallet()
-    this.identity = new Identity(config)
     this.credentials = new Credentials()
     this.sso = new SSO()
   }
