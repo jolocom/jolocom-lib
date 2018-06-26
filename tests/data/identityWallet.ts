@@ -1,6 +1,6 @@
 
 import { claimsMetadata } from '../../ts/index'
-import { singleClaimCreationArgs, singleClaimCredentialJSON } from '../data/credential/credential'
+import { singleClaimCreationArgs } from '../data/credential/credential'
 
 export const credentialAttr = {
   metadata:  claimsMetadata.emailAddress,
@@ -24,7 +24,7 @@ export const testSignedCred = {
   expires: undefined,
   proof: {
     type: 'EcdsaKoblitzSignature2016',
-    created: '1970-01-01T00:00:00.000Z',
+    created: new Date('1970-01-01T00:00:00.000Z'),
     creator: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#claimId:bcf70ac9c940e',
     nonce: '90a6764469fc4',
     signatureValue: 'TlGz5inRY4T7GyvZi3eDq22GCEVoMlhb0mAhz7xc9y1CPe6e8PCLFK3fL4ajSD4pQhK0vFPZ3dUOdDPuopYhKQ=='
