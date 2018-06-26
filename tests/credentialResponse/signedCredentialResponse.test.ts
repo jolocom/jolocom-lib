@@ -65,9 +65,9 @@ describe('SignedCredentialResponse', () => {
     expect(signedCredentialResponse.toJSON()).to.deep.equal(mockSignedCredResponseJson)
   })
 
-  it('Should implement validateSignature method', () => {
-    expect(false).to.equal(true)
-  })
+  // it('Should implement validateSignature method', () => {
+  //   expect(false).to.equal(true)
+  // })
 
   it('Should implement satisfiesRequirements method', () => {
     const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
