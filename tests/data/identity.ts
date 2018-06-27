@@ -25,7 +25,15 @@ export const ddoAttr = {
   'created': new Date('2018-01-24T15:42:15Z')
 }
 
-export const signedCredJSON = {
+export const publicClaimCreationArgs = {
+  id: 'did:jolo:test',
+  name: 'natascha',
+  about: 'test public profile',
+  image: 'https://test.de/image',
+  url: 'https://test.de'
+}
+
+export const publicProfileJSON = {
   '@context': [
     'https://w3id.org/identity/v1',
     'https://identity.jolocom.com/terms',
@@ -33,18 +41,24 @@ export const signedCredJSON = {
     'https://w3id.org/credentials/v1',
     'http://schema.org'
   ],
-  id: 'claimId:60fd4d80915b9',
-  name: 'Email address',
+  id: 'claimId:9867b6e2945a5',
+  name: 'Public Profile',
   issuer: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af',
-  type: [ 'Credential', 'ProofOfEmailCredential' ],
-  claim: { id: 'did:jolo:test', email: 'eugeniu@jolocom.com' },
+  type: [ 'Credential', 'PublicProfileCredential' ],
+  claim: {
+    id: 'did:jolo:test',
+    name: 'natascha',
+    about: 'test public profile',
+    image: 'https://test.de/image',
+    url: 'https://test.de'
+  },
   issued: '1970-01-01T00:00:00.000Z',
   expires: undefined,
   proof: {
     type: 'EcdsaKoblitzSignature2016',
     created: '1970-01-01T00:00:00.000Z',
-    creator: 'undefined#claimId:60fd4d80915b9',
-    nonce: 'cc041f34b7be3',
-    signatureValue: 'dXZ8qJAzhnjrVsxU4joiyMIt00Flzp5RA+flEan7gcN7Qz0K2q0645dr2KQKrfXouOygHKUU9GRL6Ciwm0TnMw=='
+    creator: 'undefined#claimId:9867b6e2945a5',
+    nonce: '98615cd94f376',
+    signatureValue: 'eCNNJ80RY46HkO7qtUbIV0POsumIoCMCrR2EpQvm+F5UQD3cVMzkAlcrzI2Ock7w2TTBkT00rZJrfFwIO0HdoQ=='
   }
 }
