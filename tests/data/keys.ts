@@ -16,3 +16,8 @@ export const testPrivateEthereumKey = Buffer.from(
   'abf82ff96b463e9d82b83cb9bb450fe87e6166d4db6d7021d0c71d7e960d5abe',
   'hex'
 )
+
+export const testPublicIdentityKey2 = Buffer.from(
+  'f4952882df8c67447ba0955ec8d59fb360dcdc94e114de9949ab8a4d09c0eabb',
+  'hex'
+)

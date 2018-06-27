@@ -10,6 +10,11 @@ export interface ICredentialAttrs {
   claim: IClaimAttrs
 }
 
+export interface ICredentialCreateAttrs {
+  metadata: IClaimMetadata
+  claim: IClaimAttrs
+}
+
 export interface IClaimMetadata {
   fieldNames: string[]
   optionalFieldNames?: string[]

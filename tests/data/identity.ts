@@ -6,7 +6,6 @@ export default {
   testHash: 'Qm12345',
   randomStringFromEntropy: '13912643311766764847120568039921',
   testPublicKeyHex: '030c77073c06824b413c2e08bf5fd271cfa3fdd4632ec6e8869b53e5c79395b868',
-  testUserPublicKey: '04334f990cdc1281c6fed73dcc6de3db520c075a41ce2b93f36f85dbd5e0dc0b05975c51acb0bec9747fb3f52fd0146d1dc39d6077db0be1bd6579fd66ac144442',
   testUserDID: 'did:jolo:0x189b1ce641c167e8219e7d2c7a7833011f82b4630cbc3e9fe68d100b88dfc5b2',
   expectedDdoObject: {
     '@context': 'https://w3id.org/did/v1',
