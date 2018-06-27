@@ -1,30 +1,24 @@
-import { expect } from 'chai'
-import * as sinon from 'sinon'
-import { ddoAttr, testSignedCred } from '../data/identity'
+import * as chai from 'chai'
+import { ddoAttr, signedCredJSON } from '../data/identity'
 import { Identity } from '../../ts/identity/identity'
-import { Credential } from '../../ts/credentials/credential'
-import { SignedCredential } from '../../ts/credentials/signedCredential'
-import { claimsMetadata } from '../../ts/index'
-import { singleClaimCreationArgs, singleClaimCredentialJSON } from '../data/credential/credential'
-import { testPrivateIdentityKey } from '../data/keys'
+import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import { DidDocument } from '../../ts/identity/didDocument';
 
-describe.only('Identity', () => {
-  let clock
-  before(() => {
-    clock = sinon.useFakeTimers()
+const expect = chai.expect
+
+describe('Identity', () => {
+  const identity = Identity
+    .create({didDocument: ddoAttr, profile: SignedCredential.fromJSON(signedCredJSON)})
+
+  it('should correctly instantiate Identity class', () => {
+    expect(identity).to.haveOwnProperty('profile')
+    expect(identity.didDocument).to.be.instanceof(DidDocument)
+    expect(identity).to.be.instanceof(Identity)
   })
 
-  after(() => {
-    clock.restore()
-  })
+  it('should return a public profile claim section on publicProfile.get', () => {
+    const publicProfile = identity.publicProfile.get()
 
-  it('should correctly instantiate Identity class', async () => {
-    const credential = Credential.create(claimsMetadata.emailAddress, singleClaimCreationArgs)
-    const sigCred = SignedCredential.fromCredential(credential)
-    await sigCred.generateSignature(testPrivateIdentityKey)
-  })
-
-  it('should return a public profile verifiable credential on publicProfile.get', () => {
-    //
+    expect(publicProfile).to.deep.equal({ id: 'did:jolo:test', email: 'eugeniu@jolocom.com' })
   })
 })

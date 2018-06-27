@@ -1,9 +1,9 @@
 import { DidDocument } from './didDocument'
-import { SignedCredential } from '../credentials/signedCredential'
+import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { IIdentityCreateArgs } from './types'
 
 export class Identity {
-  private didDocument: DidDocument
+  public didDocument: DidDocument
   private profile: SignedCredential
 
   public static create({didDocument, profile}: IIdentityCreateArgs): Identity {
@@ -15,6 +15,10 @@ export class Identity {
   }
 
   public publicProfile = {
-    get: this.profile
+    get: this.getPublicProfile.bind(this)
+  }
+
+  private getPublicProfile() {
+    return this.profile.getCredentialSection()
   }
 }
