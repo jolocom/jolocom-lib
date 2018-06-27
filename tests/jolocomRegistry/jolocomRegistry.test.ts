@@ -1,21 +1,22 @@
-import { IpfsStorageAgent } from '../ts/ipfs';
-import { EthResolver } from '../ts/ethereum'
-import { JolocomRegistry } from '../ts/registries/jolocomRegistry'
-import testIdentity from './data/identity'
-import { DidDocument } from '../ts/identity/didDocument'
+import { IpfsStorageAgent } from '../../ts/ipfs';
+import { EthResolver } from '../../ts/ethereum'
+import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import { ddoAttr } from '../data/identity'
+import { DidDocument } from '../../ts/identity/didDocument'
 import * as sinon from 'sinon'
 import * as lolex from 'lolex'
 import * as moment from 'moment'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import { IdentityWallet } from '../ts/identityWallet/identityWallet'
-import { IDidDocumentAttrs } from '../ts/identity/didDocument/types'
-import { testIpfsHash, testEthereumConfig, testIpfsConfig } from './data/registry'
+import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
+import { IDidDocumentAttrs } from '../../ts/identity/didDocument/types'
+import { testIpfsHash, testEthereumConfig, testIpfsConfig } from '../data/registry'
 import {
   testPrivateIdentityKey,
   testPrivateEthereumKey,
   testPublicIdentityKey
-} from './data/keys'
+} from '../data/keys'
+
 chai.use(sinonChai)
 const expect = chai.expect
 
@@ -28,7 +29,6 @@ describe('JolocomRegistry', () => {
   const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
   const ethereumConnector = new EthResolver(testEthereumConfig)
   const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
-  const ddoAttrs = testIdentity.ddoAttrs
   const jolocomRegistry = JolocomRegistry.create({ipfsConnector, ethereumConnector})
   const identityWalletMock = IdentityWallet.create({privateIdentityKey: testPrivateIdentityKey, identity: ddo})
 
@@ -115,7 +115,7 @@ describe('JolocomRegistry', () => {
         .resolves(testIpfsHash)
       catJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'catJSON')
         .withArgs(testIpfsHash)
-        .resolves(ddoAttrs)
+        .resolves(ddoAttr)
       await jolocomRegistry.resolve(ddo.getDID())
     })
 
@@ -139,7 +139,7 @@ describe('JolocomRegistry', () => {
     beforeEach(async () => {
       resolveStub = sandbox.stub(JolocomRegistry.prototype, 'resolve')
         .withArgs(ddo.getDID())
-        .resolves(ddoAttrs)
+        .resolves(ddoAttr)
       identityWallet = await jolocomRegistry.authenticate(testPrivateIdentityKey)
     })
 
