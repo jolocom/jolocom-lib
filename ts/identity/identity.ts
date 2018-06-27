@@ -19,6 +19,7 @@ export class Identity {
   }
 
   private getPublicProfile() {
+    if ( !this.profile ) { throw new Error('No public Profile available') }
     return this.profile.getCredentialSection()
   }
 }

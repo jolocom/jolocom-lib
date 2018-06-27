@@ -20,4 +20,10 @@ describe('Identity', () => {
 
     expect(publicProfile).to.deep.equal(publicClaimCreationArgs)
   })
+
+  it('should throw Error on publicProfile.get on identity instance without public profile', () => {
+    const i = Identity.create({didDocument: ddoAttr})
+
+    expect(() => i.publicProfile.get()).to.throw()
+  })
 })
