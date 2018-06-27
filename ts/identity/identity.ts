@@ -4,12 +4,15 @@ import { IIdentityCreateArgs } from './types'
 
 export class Identity {
   public didDocument: DidDocument
-  private profile: SignedCredential
+  private profile?: SignedCredential
 
   public static create({didDocument, profile}: IIdentityCreateArgs): Identity {
     const identity = new Identity()
-    identity.profile = profile
     identity.didDocument = DidDocument.fromJSON(didDocument)
+
+    if (profile) {
+      identity.profile = profile
+    }
 
     return identity
   }
