@@ -6,8 +6,9 @@ import { DidDocument } from '../../ts/identity/didDocument';
 const expect = chai.expect
 
 describe('Identity', () => {
+  const publicProfileCredential = SignedCredential.fromJSON(publicProfileJSON)
   const identity = Identity
-    .create({didDocument: ddoAttr, profile: SignedCredential.fromJSON(publicProfileJSON)})
+    .create({didDocument: ddoAttr, profile: publicProfileCredential})
 
   it('should correctly instantiate Identity class', () => {
     expect(identity).to.haveOwnProperty('profile')
@@ -25,5 +26,16 @@ describe('Identity', () => {
     const i = Identity.create({didDocument: ddoAttr})
 
     expect(() => i.publicProfile.get()).to.throw()
+  })
+
+  describe('addPublicProfile', () => {
+    it('should return an identity instance with a new public profile section', () => {
+      const identityWithoutProfile = Identity.create({didDocument: ddoAttr})
+      const identityWithPublicProfile = identityWithoutProfile.publicProfile.add(publicProfileCredential)
+
+      expect(identityWithPublicProfile).to.deep.equal(identity)
+    })
+
+    
   })
 })
