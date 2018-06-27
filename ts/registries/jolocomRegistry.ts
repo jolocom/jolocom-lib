@@ -30,10 +30,7 @@ export class JolocomRegistry {
   public async create(args: IRegistryInstanceCreationArgs): Promise<IdentityWallet> {
     const { privateIdentityKey, privateEthereumKey} = args
     const ddo = new DidDocument().fromPublicKey(privateKeyToPublicKey(privateIdentityKey))
-
-    const identityWallet = new IdentityWallet()
-    identityWallet.setDidDocument(ddo)
-    identityWallet.setPrivateIdentityKey(args.privateIdentityKey)
+    const identityWallet = IdentityWallet.create({privateIdentityKey: args.privateIdentityKey, identity: ddo})
 
     await this.commit({wallet: identityWallet, privateEthereumKey})
 
@@ -96,9 +93,12 @@ export class JolocomRegistry {
   }
 
   public async authenticate(privateIdentityKey: Buffer): Promise<IdentityWallet> {
-    const identityWallet = new IdentityWallet()
     const did = privateKeyToDID(privateIdentityKey)
-    const identity = await this.resolve(did)
+    // TODO: change according to return of resolve
+    const ddoAttrs = await this.resolve(did)
+    const didDocument = DidDocument.fromJSON(ddoAttrs)
+
+    const identityWallet = IdentityWallet.create({privateIdentityKey, identity: didDocument})
 
     return IdentityWallet.create({privateIdentityKey, identity})
   }

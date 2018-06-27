@@ -1,18 +1,14 @@
 import 'reflect-metadata'
-import { IdentityWallet } from './wallet'
-import { Credentials } from './credentials'
 import { ILibConfig } from './types'
 import { IDefaultClaimsMetadata } from './credentials/credential/types'
 import { defaultConfig } from './defaultConfig'
 import { SSO } from './sso'
 import { Parser } from './parse/parser'
-import { Credential } from './credentials/credential'
+import { Credential } from './credentials/credential/credential'
 import { CredentialRequest } from './credentialRequest/credentialRequest'
 import { CredentialResponse } from './credentialResponse/credentialResponse'
-
+// TODO: include IdentityWallet to JolocomLib
 export class JolocomLib {
-  public wallet: IdentityWallet
-  public credentials: Credentials
   public sso: SSO
   public static parse = Parser
 
@@ -24,8 +20,6 @@ export class JolocomLib {
 
   // TODO Creation process should be changed.
   constructor(config: ILibConfig = defaultConfig) {
-    this.wallet = new IdentityWallet()
-    this.credentials = new Credentials()
     this.sso = new SSO()
   }
 }
