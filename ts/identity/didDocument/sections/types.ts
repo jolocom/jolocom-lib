@@ -8,3 +8,10 @@ export interface IAuthenticationSectionAttrs {
   id: string
   'type': string
 }
+
+export interface IServiceEndpointSectionAttrs {
+  id: string
+  'type': string[]
+  serviceEndpoint: string
+  description: string
+}

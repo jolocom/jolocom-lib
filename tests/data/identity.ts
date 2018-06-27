@@ -69,6 +69,7 @@ export default {
   ddoAttrs: {
     '@context': 'https://w3id.org/did/v1',
     'id': 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af',
+    'service': [{}],
     'authentication': [
       {
         id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#keys-1',

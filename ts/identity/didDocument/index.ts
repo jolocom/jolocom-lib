@@ -2,6 +2,7 @@ import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transfo
 import { publicKeyToDID } from '../../utils/crypto'
 import { IDidDocumentAttrs } from './types'
 import { AuthenticationSection } from './sections/authenticationSection'
+import { ServiceEndpointsSection } from './sections/serviceEndpointsSection'
 import { PublicKeySection } from './sections/publicKeySection'
 
 @Exclude()
@@ -13,6 +14,10 @@ export class DidDocument  {
   @Type(() => PublicKeySection)
   @Expose()
   private publicKey: PublicKeySection[] = []
+
+  @Type(() => ServiceEndpointsSection)
+  @Expose()
+  private service: ServiceEndpointsSection[] = []
 
   @Type(() => Date)
   @Expose()
@@ -31,10 +36,12 @@ export class DidDocument  {
     const publicKeySection = new PublicKeySection().fromEcdsa(publicKey, keyId)
     const authenticationSection = new AuthenticationSection()
       .fromEcdsa(publicKeySection)
+    const serviceEndpointsSection = new ServiceEndpointsSection()
 
     const didDocument = new DidDocument()
     didDocument.created = new Date()
     didDocument.id = did
+    didDocument.service.push(serviceEndpointsSection)
     didDocument.publicKey.push(publicKeySection)
     didDocument.authentication.push(authenticationSection)
 
@@ -43,6 +50,10 @@ export class DidDocument  {
 
   public getDID(): string {
     return this.id
+  }
+
+  public getServiceEndpoints(): ServiceEndpointsSection[] {
+    return this.service
   }
 
   public toJSON(): IDidDocumentAttrs {
