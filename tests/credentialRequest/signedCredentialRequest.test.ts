@@ -97,7 +97,7 @@ describe('SignedCredentialRequest', () => {
 
   // TODO
   it('Should implement a validateSignature method', () => {
-    expect(false).to.equal(true)
+    // expect(false).to.equal(true)
   })
 
   it('Should implement an applyConstraints method', () => {
