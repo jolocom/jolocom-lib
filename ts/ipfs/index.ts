@@ -42,7 +42,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
     }
   }
 
-  public async createDagObject(data: object, pin: boolean): Promise<string> {
+  public async createDagObject({data, pin}: {data: object, pin: boolean}): Promise<string> {
     if (!data || typeof data !== 'object') {
       throw new Error(`Object expected, received ${typeof data}`)
     }

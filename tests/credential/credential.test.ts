@@ -25,6 +25,17 @@ describe('Credential', () => {
       expect(credential).to.deep.equal(credentialFromJSON)
     })
 
+    it('Should correctly assemble a custom credential with optional claims', () => {
+      const optionalClaimMetadata = { ... customClaimMetadata, optionalFieldNames: ['optional'] }
+      const optionalCreationArgs = { ...customCredentialCreationArgs, optional: 'optional value' }
+
+      const credWithOptionalClaim = Credential.create(optionalClaimMetadata, optionalCreationArgs)
+      expect(credWithOptionalClaim.getClaim()).to.deep.equal(optionalCreationArgs)
+
+      const credWithoutOptionalClaim = Credential.create(optionalClaimMetadata, customCredentialCreationArgs)
+      expect(credWithoutOptionalClaim.getClaim()).to.deep.equal(customCredentialCreationArgs)
+    })
+
     it('Should correctly assemble a custom credential', () => {
       const customCredential = Credential.create({metadata: customClaimMetadata, claim: customCredentialCreationArgs})
       const customCredentialFromJSON = Credential.fromJSON(customCredentialJSON)
