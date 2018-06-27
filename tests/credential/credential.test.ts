@@ -29,10 +29,12 @@ describe('Credential', () => {
       const optionalClaimMetadata = { ... customClaimMetadata, optionalFieldNames: ['optional'] }
       const optionalCreationArgs = { ...customCredentialCreationArgs, optional: 'optional value' }
 
-      const credWithOptionalClaim = Credential.create(optionalClaimMetadata, optionalCreationArgs)
+      const credWithOptionalClaim = Credential.create({metadata: optionalClaimMetadata, claim: optionalCreationArgs})
       expect(credWithOptionalClaim.getClaim()).to.deep.equal(optionalCreationArgs)
 
-      const credWithoutOptionalClaim = Credential.create(optionalClaimMetadata, customCredentialCreationArgs)
+      const credWithoutOptionalClaim = Credential.create(
+        {metadata: optionalClaimMetadata, claim: customCredentialCreationArgs}
+      )
       expect(credWithoutOptionalClaim.getClaim()).to.deep.equal(customCredentialCreationArgs)
     })
 
