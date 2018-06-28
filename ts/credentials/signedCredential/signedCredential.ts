@@ -8,26 +8,21 @@ import { ISignedCredentialAttrs, ISignedCredentialCreateArgs } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { defaultContext } from '../../utils/contexts'
 import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
+import { JolocomRegistry } from '../../registries/jolocomRegistry'
 
 @Exclude()
 export class SignedCredential {
-  @Expose()
-  private '@context': string[] | object[]
+  @Expose() private '@context': string[] | object[]
 
-  @Expose()
-  private id: string
+  @Expose() private id: string
 
-  @Expose()
-  private name: string
+  @Expose() private name: string
 
-  @Expose()
-  private issuer: string
+  @Expose() private issuer: string
 
-  @Expose()
-  private type: string[]
+  @Expose() private type: string[]
 
-  @Expose()
-  private claim: IClaimAttrs
+  @Expose() private claim: IClaimAttrs
 
   @Type(() => Date)
   @Expose()
@@ -129,8 +124,11 @@ export class SignedCredential {
     this.setIssuer(privateKeyToDID(privateKey))
   }
 
-  // TODO If no pubKey passed, fetch from ipfs
-  public async verifySignature(pubKey?: Buffer): Promise<boolean> {
+  public async validateSignatureWithPublicKey(pubKey: Buffer): Promise<boolean> {
+    if (!pubKey) {
+      throw new Error('Please provide the issuer\'s public key')
+    }
+
     const docDigest = await this.digest()
     const sigDigest = await this.proof.digest()
 
@@ -138,6 +136,22 @@ export class SignedCredential {
     const sig = this.proof.getSigValue()
 
     return verifySignature(tbv, pubKey, sig)
+  }
+
+  public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
+    if (!registry) {
+      throw new Error('Can not instantiate default registry yet, WIP')
+    }
+
+    const issuerProfile = await registry.resolve(this.issuer)
+    const relevantPublicKey = issuerProfile.publicKey.find((keySection) => keySection.id === this.proof.creator)
+
+    if (!relevantPublicKey) {
+      return false
+    }
+
+    const pubKey = Buffer.from(relevantPublicKey.publicKeyHex, 'hex')
+    return this.validateSignatureWithPublicKey(pubKey)
   }
 
   public static fromJSON(json: ISignedCredentialAttrs): SignedCredential {

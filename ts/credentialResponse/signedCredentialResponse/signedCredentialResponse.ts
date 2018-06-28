@@ -5,13 +5,20 @@ import { IJWTHeader } from '../../credentialRequest/signedCredentialRequest/type
 import { ISuppliedCredentialsAttrs } from '../types'
 import { CredentialRequest } from '../../credentialRequest/credentialRequest'
 import { ISignedCredResponsePayload, ISignedCredResponseCreationArgs, ISignedCredentialResponseAttrs } from './types'
-import { privateKeyToDID, encodeAsJWT, computeJWTSignature } from '../../utils/crypto'
 import { CredentialResponse } from '../credentialResponse'
+import { JolocomRegistry } from '../../registries/jolocomRegistry'
+import {
+  validateJWTSignature,
+  computeJWTSignature,
+  encodeAsJWT,
+  validateJWTSignatureWithRegistry
+} from '../../utils/jwt'
+import { privateKeyToDID } from '../../utils/crypto'
 
 export class SignedCredentialResponse {
   private header: IJWTHeader = {
-    alg: 'ES256K',
-    typ: 'JWT'
+    typ: 'JWT',
+    alg: 'ES256K'
   }
 
   private payload: ISignedCredResponsePayload
@@ -63,6 +70,14 @@ export class SignedCredentialResponse {
 
   public satisfiesRequest(cr: CredentialRequest): boolean {
     return this.payload.credentialResponse.satisfiesRequest(cr)
+  }
+
+  public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
+    return validateJWTSignature(this, pubKey)
+  }
+
+  public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
+    return validateJWTSignatureWithRegistry(this, registry)
   }
 
   public toJWT(): string {

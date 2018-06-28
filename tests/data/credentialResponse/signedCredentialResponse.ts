@@ -35,7 +35,7 @@ export const mockSignedCredResponseJson = {
   signature: '8J4ntVxXvJIpt3uGpSkMwUuxWFdLmZH_BVrNbE7KlkCcp65GXE0Q-pG5X2fmgsF2JoXGxogxvrWNykjq4o9joA'
 }
 
-export const signedCredRespJWT = 'eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.\
+export const signedCredRespJWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.\
 eyJpc3MiOiJkaWQ6am9sbzo4Zjk3N2U1MGI3ZTVjYmRmZWI1M2EwM2M4MTI5MTNiNzI5NzhjYTM1Yzkz\
 NTcxZjg1ZTg2Mjg2MmJhYzhjZGViIiwiaWF0IjowLCJjcmVkZW50aWFsUmVzcG9uc2UiOnsic3VwcGxp\
 ZWRDcmVkZW50aWFscyI6W3sidHlwZSI6WyJDcmVkZW50aWFsIiwiTW9ja0NyZWRlbnRpYWwiXSwiY3Jl\

@@ -48,6 +48,7 @@
   "license": "MIT",
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
+    "base64url": "^3.0.0",
     "bip39": "^2.5.0",
     "bitcoinjs-lib": "^3.3.2",
     "class-transformer": "^0.1.9",

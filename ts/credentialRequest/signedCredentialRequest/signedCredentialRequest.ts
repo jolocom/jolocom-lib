@@ -1,20 +1,27 @@
 import 'reflect-metadata'
 import { decodeToken } from 'jsontokens'
-import { classToPlain, plainToClass, Type } from 'class-transformer'
+import { classToPlain, plainToClass } from 'class-transformer'
 import { CredentialRequest } from '../credentialRequest'
-import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
-import { privateKeyToDID, encodeAsJWT, computeJWTSignature } from '../../utils/crypto'
+import { privateKeyToDID } from '../../utils/crypto'
 import {
   IJWTHeader,
   ISignedCredentialRequestAttrs,
   ISignedCredRequestPayload,
   ISignedCredRequestCreationArgs
 } from './types'
+import { JolocomRegistry } from '../../registries/jolocomRegistry'
+import {
+  validateJWTSignature,
+  computeJWTSignature,
+  encodeAsJWT,
+  validateJWTSignatureWithRegistry
+} from '../../utils/jwt'
+import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
 export class SignedCredentialRequest {
   private header: IJWTHeader = {
-    alg: 'ES256K',
-    typ: 'JWT'
+    typ: 'JWT',
+    alg: 'ES256K'
   }
 
   private payload: ISignedCredRequestPayload
@@ -68,8 +75,12 @@ export class SignedCredentialRequest {
     return signedCr
   }
 
-  public validateSignature(): boolean {
-    return false
+  public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
+    return validateJWTSignature(this, pubKey)
+  }
+
+  public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
+    return validateJWTSignatureWithRegistry(this, registry)
   }
 
   public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
