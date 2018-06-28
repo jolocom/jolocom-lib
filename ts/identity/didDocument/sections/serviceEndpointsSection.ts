@@ -17,6 +17,14 @@ export class ServiceEndpointsSection {
   @Expose()
   private description: string
 
+  public getType(): string {
+    return this.type
+  }
+
+  public getServiceEndpoint(): string {
+    return this.serviceEndpoint
+  }
+
   public toJSON(): IServiceEndpointSectionAttrs {
     return classToPlain(this) as IServiceEndpointSectionAttrs
   }
