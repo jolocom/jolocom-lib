@@ -136,16 +136,16 @@ describe('IdentityWallet', () => {
 
   describe('getter and setter for Identity', () => {
     it('getIdentity should return a correct instance of identity class ', () => {
-      expect(identityWallet.getIdentity()).to.deep.equal(ddo)
+      expect(identityWallet.getIdentity()).to.be.instanceof(Identity)
     })
 
-    // it('setIdentity should correctly set identity on identityWallet', ()  => {
-    //   const ddoTest = new DidDocument().fromPublicKey(testPublicIdentityKey2)
-    //   const identityTest = Identity.create({didDocument: ddoTest.toJSON()})
-    //   identityWallet.setIdentity(identityTest)
+    it('setIdentity should correctly set identity on identityWallet', ()  => {
+      const ddoTest = new DidDocument().fromPublicKey(testPublicIdentityKey2)
+      const identityTest = Identity.create({didDocument: ddoTest.toJSON()})
+      identityWallet.setIdentity(identityTest)
 
-    //   expect(identityWallet.getIdentity()).to.deep.equal(identityTest)
-    // })
+      expect(identityWallet.getIdentity()).to.deep.equal(identityTest)
+    })
   })
 
   describe('signCredential', () => {
