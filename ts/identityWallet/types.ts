@@ -1,8 +1,12 @@
 import { DidDocument } from '../identity/didDocument';
+import { Identity } from '../identity/identity';
 
 export interface IIdentityWallet {
-  getDidDocument: () => DidDocument
-  setDidDocument: (didDocument: DidDocument) => void
-  getPrivateIdentityKey: () => Buffer
-  setPrivateIdentityKey: (privateIdentityKey: Buffer) => void
+  getIdentity: () => Identity
+  setIdentity: (identity: Identity) => void
+}
+
+export interface IIdentityWalletCreateArgs {
+  privateIdentityKey: Buffer
+  identity: Identity
 }

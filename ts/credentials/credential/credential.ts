@@ -1,5 +1,5 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
-import { IClaimAttrs, IClaimMetadata, ICredentialAttrs } from './types'
+import { IClaimAttrs, IClaimMetadata, ICredentialAttrs, ICredentialCreateAttrs } from './types'
 
 @Exclude()
 export class Credential {
@@ -15,20 +15,31 @@ export class Credential {
   @Expose()
   private name: string
 
-  public static create(metadata: IClaimMetadata, claim: IClaimAttrs): Credential {
+  public static create({metadata, claim}: ICredentialCreateAttrs): Credential {
     const allPresent = metadata.fieldNames.every((field) => !!claim[field])
-
     if (!allPresent) {
       throw new Error(`Missing claims, expected keys are: ${metadata.fieldNames.toString()}`)
     }
 
-    const cred = new Credential()
-    cred['@context'] = metadata.context
-    cred.type = metadata.type
-    cred.name = metadata.name
-    cred.claim = claim
+    const assembledClaim = {
+      id: claim.id
+    }
 
-    return cred
+    const combinedFieldNames = [...metadata.fieldNames, ...metadata.optionalFieldNames]
+
+    combinedFieldNames.forEach((fieldName) => {
+      if (claim[fieldName]) {
+        assembledClaim[fieldName] = claim[fieldName]
+      }
+    })
+
+    const credential = new Credential()
+    credential['@context'] = metadata.context
+    credential.type = metadata.type
+    credential.name = metadata.name
+    credential.claim = assembledClaim
+
+    return credential
   }
 
   public getClaim(): IClaimAttrs {

@@ -1,20 +1,14 @@
 import 'reflect-metadata'
-import { Identity } from './identity'
-import { IdentityWallet } from './wallet'
-import { Credentials } from './credentials'
 import { ILibConfig } from './types'
 import { IDefaultClaimsMetadata } from './credentials/credential/types'
 import { defaultConfig } from './defaultConfig'
 import { SSO } from './sso'
 import { Parser } from './parse/parser'
-import { Credential } from './credentials/credential'
+import { Credential } from './credentials/credential/credential'
 import { CredentialRequest } from './credentialRequest/credentialRequest'
 import { CredentialResponse } from './credentialResponse/credentialResponse'
-
+// TODO: include IdentityWallet to JolocomLib
 export class JolocomLib {
-  public identity: Identity
-  public wallet: IdentityWallet
-  public credentials: Credentials
   public sso: SSO
   public static parse = Parser
 
@@ -26,9 +20,6 @@ export class JolocomLib {
 
   // TODO Creation process should be changed.
   constructor(config: ILibConfig = defaultConfig) {
-    this.wallet = new IdentityWallet()
-    this.identity = new Identity(config)
-    this.credentials = new Credentials()
     this.sso = new SSO()
   }
 }
@@ -36,6 +27,7 @@ export class JolocomLib {
 export const claimsMetadata: IDefaultClaimsMetadata = {
   emailAddress: {
     fieldNames: ['email'],
+    optionalFieldNames: [],
     type: ['Credential', 'ProofOfEmailCredential'],
     name: 'Email address',
     context: [
@@ -48,6 +40,7 @@ export const claimsMetadata: IDefaultClaimsMetadata = {
   },
   mobilePhoneNumber: {
     fieldNames: ['telephone'],
+    optionalFieldNames: [],
     type: ['Credential', 'ProofOfMobilePhoneNumberCredential'],
     name: 'Mobile Phone Number',
     context: [
@@ -60,8 +53,22 @@ export const claimsMetadata: IDefaultClaimsMetadata = {
   },
   name: {
     fieldNames: ['givenName', 'familyName'],
+    optionalFieldNames: [],
     type: ['Credential', 'ProofOfNameCredential'],
     name: 'Name',
+    context: [
+      'https://w3id.org/identity/v1',
+      'https://identity.jolocom.com/terms',
+      'https://w3id.org/security/v1',
+      'https://w3id.org/credentials/v1',
+      'http://schema.org'
+    ]
+  },
+  publicProfile: {
+    fieldNames: ['name', 'about'],
+    optionalFieldNames: ['image', 'url'],
+    type: ['Credential', 'PublicProfileCredential'],
+    name: 'Public Profile',
     context: [
       'https://w3id.org/identity/v1',
       'https://identity.jolocom.com/terms',

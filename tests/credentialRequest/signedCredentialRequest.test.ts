@@ -96,7 +96,6 @@ describe('SignedCredentialRequest', () => {
     ])
   })
 
-  // TODO
   it('Should implement a validateSignature method', () => {
     const signedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)
     expect(signedCR.validateSignatureWithPublicKey(privateKeyToPublicKey(Buffer.from(mockPrivKey, 'hex')))).to.equal(

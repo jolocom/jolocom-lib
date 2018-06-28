@@ -28,10 +28,6 @@ export class SignedCredentialRequest {
 
   private signature: string
 
-  private computeSignature(privateKey: Buffer) {
-    return computeJWTSignature(this.payload, privateKey)
-  }
-
   public getCredentialRequest(): CredentialRequest {
     return this.payload.credentialRequest
   }
@@ -56,6 +52,10 @@ export class SignedCredentialRequest {
     return this.signature
   }
 
+  public sign(privateKey: Buffer) {
+    return computeJWTSignature(this.payload, privateKey)
+  }
+
   public static create(args: ISignedCredRequestCreationArgs): SignedCredentialRequest {
     const { privateKey, credentialRequest } = args
     let { issuer } = args
@@ -71,7 +71,7 @@ export class SignedCredentialRequest {
       credentialRequest
     }
 
-    signedCr.signature = signedCr.computeSignature(privateKey)
+    signedCr.signature = signedCr.sign(privateKey)
     return signedCr
   }
 

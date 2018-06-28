@@ -12,6 +12,7 @@ export const multipleClaimsCreationArgs = {
 export const customClaimMetadata = {
   context: ['http://test.com'],
   fieldNames: ['test', 'secondTest'],
+  optionalFieldNames: [],
   type: ['Credential', 'MockCredential'],
   name: 'Mock'
 }
