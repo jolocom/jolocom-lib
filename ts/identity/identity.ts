@@ -18,11 +18,34 @@ export class Identity {
   }
 
   public publicProfile = {
-    get: this.getPublicProfile.bind(this)
+    get: this.getPublicProfile.bind(this),
+    add: this.addPublicProfile.bind(this),
+    delete: this.deletePublicProfile.bind(this),
+    update: this.updatePublicProfile.bind(this)
   }
 
   private getPublicProfile() {
     if ( !this.profile ) { throw new Error('No public Profile available') }
     return this.profile.getCredentialSection()
+  }
+
+  private addPublicProfile(publicProfile: SignedCredential) {
+    if ( !this.profile ) { throw new Error('Public Profile already added') }
+    this.profile = publicProfile
+
+    return this
+  }
+
+  private updatePublicProfile(publicProfile: SignedCredential) {
+    this.profile = publicProfile
+
+    return this
+  }
+
+  private deletePublicProfile() {
+    if ( !this.profile ) { throw new Error('Public Profile already added') }
+    this.profile = undefined
+
+    return this
   }
 }
