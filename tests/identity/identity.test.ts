@@ -31,11 +31,8 @@ describe('Identity', () => {
   describe('addPublicProfile', () => {
     it('should return an identity instance with a new public profile section', () => {
       const identityWithoutProfile = Identity.create({didDocument: ddoAttr})
-      const identityWithPublicProfile = identityWithoutProfile.publicProfile.add(publicProfileCredential)
 
-      expect(identityWithPublicProfile).to.deep.equal(identity)
+      expect(() => identityWithoutProfile.publicProfile.add(publicProfileCredential)).to.throw()
     })
-
-    
   })
 })
