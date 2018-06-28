@@ -4,7 +4,7 @@ import { IdentityWallet } from '../identityWallet/identityWallet'
 import { privateKeyToPublicKey, privateKeyToDID } from '../utils/crypto'
 import { DidDocument } from '../identity/didDocument'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
-import { IServiceEndpointSectionAttrs } from '../identity/didDocument/sections/types'
+import { ServiceEndpointsSection } from '../identity/didDocument/sections/serviceEndpointsSection'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
@@ -45,21 +45,18 @@ export class JolocomRegistry {
 
   public async commit({ wallet, privateEthereumKey }: IRegistryCommitArgs): Promise<void> {
     const ddo = wallet.getIdentity().didDocument
-    this.unpin(ddo.getDID())
-
     let ipfsHash
+
     try {
+      await this.unpin(ddo.getDID())
       ipfsHash = await this.ipfsConnector.storeJSON({data: ddo, pin: true})
     } catch (error) {
       throw new Error(`Could not save DID record on IPFS. ${error.message}`)
     }
 
     try {
-      await this.ethereumConnector.updateDIDRecord({
-        ethereumKey: privateEthereumKey,
-        did: ddo.getDID(),
-        newHash: ipfsHash
-      })
+      await this.ethereumConnector
+        .updateDIDRecord({ethereumKey: privateEthereumKey, did: ddo.getDID(), newHash: ipfsHash})
     } catch (error) {
       throw new Error(`Could not register DID record on Ethereum. ${error.message}`)
     }
@@ -77,13 +74,18 @@ export class JolocomRegistry {
 
   public async resolve(did): Promise<Identity> {
     try {
+      let identity
       const hash = await this.ethereumConnector.resolveDID(did)
       const ddo = await this.ipfsConnector.catJSON(hash) as IDidDocumentAttrs
-      const service =  DidDocument.fromJSON(ddo).getServiceEndpoints()
-      const profile = service.map((endpoint) => (endpoint.type === 'PublicProfile') && endpoint)
-      const publicProfile = await this.resolveServiceEndpoint(profile)
 
-      const identity = Identity.create({ didDocument: ddo })
+      const profileSection =  DidDocument.fromJSON(ddo).getServiceEndpoints().map((endpoint) => {
+        const type = endpoint.getType()
+        return (type[0] === 'PublicProfile') && endpoint
+      })
+
+      profileSection[0] ?
+        identity = Identity.create({didDocument: ddo, profile: await this.resolvePublicProfile(profileSection)}) :
+        identity = Identity.create({didDocument: ddo})
 
       return identity
     } catch (error) {
@@ -91,20 +93,17 @@ export class JolocomRegistry {
     }
   }
 
-  public async resolveServiceEndpoint(endpointSection: IServiceEndpointSectionAttrs): Promise<SignedCredential> {
-    const ipfsHash = endpointSection.type.replace('ipfs://', '')
-    const publicProfile =  await this.ipfsConnector.catJSON(ipfsHash) as ISignedCredentialAttrs
+  public async resolvePublicProfile(profileSection: ServiceEndpointsSection[]): Promise<SignedCredential> {
+    const hash = profileSection[0].getServiceEndpoint().replace('ipfs://', '')
+    const publicProfile =  await this.ipfsConnector.catJSON(hash) as ISignedCredentialAttrs
+
     return SignedCredential.fromJSON(publicProfile)
   }
 
-  // public async authenticate(privateIdentityKey: Buffer): Promise<IdentityWallet> {
-  //   const did = privateKeyToDID(privateIdentityKey)
-  //   // TODO: change according to return of resolve
-  //   const ddoAttrs = await this.resolve(did)
-  //   const didDocument = DidDocument.fromJSON(ddoAttrs)
+  public async authenticate(privateIdentityKey: Buffer): Promise<IdentityWallet> {
+    const did = privateKeyToDID(privateIdentityKey)
+    const identity = await this.resolve(did)
 
-  //   const identityWallet = IdentityWallet.create({privateIdentityKey, identity: didDocument})
-
-  //   return IdentityWallet.create({privateIdentityKey, identity})
-  // }
+    return IdentityWallet.create({privateIdentityKey, identity})
+  }
 }
