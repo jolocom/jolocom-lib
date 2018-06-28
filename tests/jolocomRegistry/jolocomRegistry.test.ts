@@ -1,14 +1,13 @@
-import { IpfsStorageAgent } from '../../ts/ipfs';
+import { IpfsStorageAgent } from '../../ts/ipfs'
 import { EthResolver } from '../../ts/ethereum'
 import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { ddoAttr } from '../data/identity'
 import { DidDocument } from '../../ts/identity/didDocument'
 import * as sinon from 'sinon'
-import * as lolex from 'lolex'
-import * as moment from 'moment'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
+import { Identity } from '../../ts/identity/identity'
 import { IDidDocumentAttrs } from '../../ts/identity/didDocument/types'
 import { testIpfsHash, testEthereumConfig, testIpfsConfig } from '../data/registry'
 import {
@@ -20,17 +19,20 @@ import {
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe('JolocomRegistry', () => {
+describe.only('JolocomRegistry', () => {
   const sandbox = sinon.createSandbox()
+  const clock = sinon.useFakeTimers()
 
-  const unixEpoch = moment.utc('2018-01-24T15:42:15Z', moment.ISO_8601).valueOf()
-  const clock = lolex.install({now: unixEpoch})
+  after(() => {
+    clock.restore()
+  })
 
   const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
   const ethereumConnector = new EthResolver(testEthereumConfig)
   const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
+  const identity = Identity.create({didDocument: ddo.toJSON()})
   const jolocomRegistry = JolocomRegistry.create({ipfsConnector, ethereumConnector})
-  const identityWalletMock = IdentityWallet.create({privateIdentityKey: testPrivateIdentityKey, identity: ddo})
+  const identityWalletMock = IdentityWallet.create({privateIdentityKey: testPrivateIdentityKey, identity})
 
   describe('static created', () => {
     it('should create an instance of JolocomRegistry with correct config', () => {
@@ -63,18 +65,16 @@ describe('JolocomRegistry', () => {
         sandbox.restore()
     })
 
-    // TODO
-    // it('should populate ddo on the identity wallet', () => {
-    //   expect(identityWallet.getIdentity()).to.deep.equal(ddo)
-    // })
+    it('should populate identity on the identity wallet', () => {
+      expect(identityWallet.getIdentity()).to.be.instanceof(Identity)
+    })
 
-    // TODO
-    // it('should call commit method once with proper params', () => {
-    //   commit.calledWith({wallet: identityWallet, privateEthereumKey: testPrivateEthereumKey})
-    // })
+    it('should call commit method once with proper params', () => {
+      sandbox.assert.calledWith(commit, {wallet: identityWallet, privateEthereumKey: testPrivateEthereumKey})
+    })
 
     it('should return proper identityWallet instance on create', () => {
-      expect(identityWallet).to.deep.equal(identityWalletMock)
+      expect(identityWallet).to.be.instanceof(IdentityWallet)
     })
   })
 
@@ -156,7 +156,7 @@ describe('JolocomRegistry', () => {
     // })
   })
 
-  describe('error handling commit', () => {
+  describe.only('error handling commit', () => {
     let storeJSONStub
     let updateDIDRecordStub
     afterEach(() => {
@@ -164,7 +164,7 @@ describe('JolocomRegistry', () => {
     })
 
     it('should correctly assemble the thrown error message on storeJSON', async () => {
-      storeJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
+      storeJSONStub = sinon.stub(IpfsStorageAgent.prototype, 'storeJSON')
       .withArgs({data: ddo, pin: true})
       .throws(new Error('Incorrect data submitted'))
 

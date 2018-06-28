@@ -1,15 +1,18 @@
-import { IIpfsConnector } from '../ipfs/types';
-import { IEthereumConnector } from '../ethereum/types';
-import { IdentityWallet } from '../identityWallet/identityWallet';
+import { IIpfsConnector } from '../ipfs/types'
+import { IEthereumConnector } from '../ethereum/types'
+import { IdentityWallet } from '../identityWallet/identityWallet'
 import { privateKeyToPublicKey, privateKeyToDID } from '../utils/crypto'
 import { DidDocument } from '../identity/didDocument'
-import { IDidDocumentAttrs } from '../identity/didDocument/types';
+import { IDidDocumentAttrs } from '../identity/didDocument/types'
+import { IServiceEndpointSectionAttrs } from '../identity/didDocument/sections/types'
+import { SignedCredential } from '../credentials/signedCredential/signedCredential'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
+import { Identity } from '../identity/identity'
 import {
   IRegistryCommitArgs,
   IRegistryInstanceCreationArgs,
   IRegistryStaticCreationArgs
 } from './types'
-import { SignedCredential } from '../credentials/signedCredential';
 
 /** Jolocom specific Registry, which uses IPFS
  *  and Ethereum for registering the indentity and the resolution
@@ -29,16 +32,19 @@ export class JolocomRegistry {
 
   public async create(args: IRegistryInstanceCreationArgs): Promise<IdentityWallet> {
     const { privateIdentityKey, privateEthereumKey} = args
-    const ddo = new DidDocument().fromPublicKey(privateKeyToPublicKey(privateIdentityKey))
-    const identityWallet = IdentityWallet.create({privateIdentityKey: args.privateIdentityKey, identity: ddo})
-
+    const ddoAttr = new DidDocument()
+      .fromPublicKey(privateKeyToPublicKey(privateIdentityKey))
+      .toJSON()
+    const identity = Identity.create({didDocument: ddoAttr})
+    const identityWallet = IdentityWallet
+      .create({privateIdentityKey: args.privateIdentityKey, identity})
     await this.commit({wallet: identityWallet, privateEthereumKey})
 
     return identityWallet
   }
 
   public async commit({ wallet, privateEthereumKey }: IRegistryCommitArgs): Promise<void> {
-    const ddo = wallet.getDidDocument()
+    const ddo = wallet.getIdentity().didDocument
     this.unpin(ddo.getDID())
 
     let ipfsHash
@@ -49,7 +55,7 @@ export class JolocomRegistry {
     }
 
     try {
-      return await this.ethereumConnector.updateDIDRecord({
+      await this.ethereumConnector.updateDIDRecord({
         ethereumKey: privateEthereumKey,
         did: ddo.getDID(),
         newHash: ipfsHash
@@ -72,34 +78,33 @@ export class JolocomRegistry {
   public async resolve(did): Promise<Identity> {
     try {
       const hash = await this.ethereumConnector.resolveDID(did)
-      const ddo = DidDocument.fromJSON(await this.ipfsConnector.catJSON(hash) as IDidDocumentAttrs)
-      const service = ddo.getServiceEndpoints() // implemented?
-      const ppEndpoint = service.map((endpoint) => (endpoint.type === 'PublicProfile') && endpoint)
+      const ddo = await this.ipfsConnector.catJSON(hash) as IDidDocumentAttrs
+      const service =  DidDocument.fromJSON(ddo).getServiceEndpoints()
+      const profile = service.map((endpoint) => (endpoint.type === 'PublicProfile') && endpoint)
+      const publicProfile = await this.resolveServiceEndpoint(profile)
 
-      return new Identity.create({
-        didDocument: ddo,
-        publicProfile: await this.resolveServiceEndpoint(ppEndpoint)
-      })
+      const identity = Identity.create({ didDocument: ddo })
+
+      return identity
     } catch (error) {
       throw new Error(`Could not retrieve DID Document. ${error.message}`)
     }
   }
 
-  // TODO: rename to include public profile indication?
-  public async resolveServiceEndpoint(endpointSection: IServiceEndpointSectionAttrs): SignedCredential {
+  public async resolveServiceEndpoint(endpointSection: IServiceEndpointSectionAttrs): Promise<SignedCredential> {
     const ipfsHash = endpointSection.type.replace('ipfs://', '')
     const publicProfile =  await this.ipfsConnector.catJSON(ipfsHash) as ISignedCredentialAttrs
     return SignedCredential.fromJSON(publicProfile)
   }
 
-  public async authenticate(privateIdentityKey: Buffer): Promise<IdentityWallet> {
-    const did = privateKeyToDID(privateIdentityKey)
-    // TODO: change according to return of resolve
-    const ddoAttrs = await this.resolve(did)
-    const didDocument = DidDocument.fromJSON(ddoAttrs)
+  // public async authenticate(privateIdentityKey: Buffer): Promise<IdentityWallet> {
+  //   const did = privateKeyToDID(privateIdentityKey)
+  //   // TODO: change according to return of resolve
+  //   const ddoAttrs = await this.resolve(did)
+  //   const didDocument = DidDocument.fromJSON(ddoAttrs)
 
-    const identityWallet = IdentityWallet.create({privateIdentityKey, identity: didDocument})
+  //   const identityWallet = IdentityWallet.create({privateIdentityKey, identity: didDocument})
 
-    return IdentityWallet.create({privateIdentityKey, identity})
-  }
+  //   return IdentityWallet.create({privateIdentityKey, identity})
+  // }
 }
