@@ -6,22 +6,21 @@ export class Identity {
   public didDocument: DidDocument
   private profile?: SignedCredential
 
-  public static create({didDocument, profile}: IIdentityCreateArgs): Identity {
-    const identity = new Identity()
-    identity.didDocument = DidDocument.fromJSON(didDocument)
-
-    if (profile) {
-      identity.profile = profile
-    }
-
-    return identity
-  }
-
   public publicProfile = {
     get: this.getPublicProfile.bind(this),
     add: this.addPublicProfile.bind(this),
     delete: this.deletePublicProfile.bind(this),
     update: this.updatePublicProfile.bind(this)
+  }
+
+  public static create({didDocument, profile}: IIdentityCreateArgs): Identity {
+    const identity = new Identity()
+    identity.didDocument = DidDocument.fromJSON(didDocument)
+    if (profile) {
+      identity.profile = profile
+    }
+
+    return identity
   }
 
   private getPublicProfile() {
@@ -47,5 +46,17 @@ export class Identity {
     this.profile = undefined
 
     return this
+  }
+
+  public getDID() {
+    return this.didDocument.getDID()
+  }
+
+  public getServiceEndpoints() {
+    return this.didDocument.getServiceEndpoints()
+  }
+
+  public getPublicKeySection() {
+    this.didDocument.getPublicKeySection()
   }
 }

@@ -56,6 +56,10 @@ export class DidDocument  {
     return this.service
   }
 
+  public getPublicKeySection() {
+    return this.publicKey
+  }
+
   public toJSON(): IDidDocumentAttrs {
     return classToPlain(this) as IDidDocumentAttrs
   }
