@@ -1,26 +1,22 @@
 import 'reflect-metadata'
-import { ILibConfig } from './types'
 import { IDefaultClaimsMetadata } from './credentials/credential/types'
-import { defaultConfig } from './defaultConfig'
-import { SSO } from './sso'
-import { Parser } from './parse/parser'
+import { parse } from './parse/parser'
 import { Credential } from './credentials/credential/credential'
 import { CredentialRequest } from './credentialRequest/credentialRequest'
 import { CredentialResponse } from './credentialResponse/credentialResponse'
-// TODO: include IdentityWallet to JolocomLib
-export class JolocomLib {
-  public sso: SSO
-  public static parse = Parser
+import { registries } from './registries'
+import { IdentityManager } from './identityManager/identityManager';
 
-  public static unsigned = {
+export const JolocomLib = {
+  parse,
+  registry : registries,
+  identityManager : {
+    create: IdentityManager.create
+  },
+  unsigned : {
     createCredential: Credential.create,
     createCredentialRequest: CredentialRequest.create,
     createCredentialResponse: CredentialResponse.create
-  }
-
-  // TODO Creation process should be changed.
-  constructor(config: ILibConfig = defaultConfig) {
-    this.sso = new SSO()
   }
 }
 

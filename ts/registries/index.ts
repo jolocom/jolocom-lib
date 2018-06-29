@@ -1,7 +1,7 @@
 import { JolocomRegistry } from './jolocomRegistry'
 
-class Registries {
-    public jolocom = {
+export const registries = {
+    jolocom: {
       create: JolocomRegistry.create
     }
 }
