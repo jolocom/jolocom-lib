@@ -80,7 +80,7 @@ export class SignedCredentialRequest {
   }
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
-    return validateJWTSignatureWithRegistry(this, registry)
+    return validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
   }
 
   public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
