@@ -9,13 +9,11 @@ import {
 } from '../credentialResponse/signedCredentialResponse/signedCredentialResponseParser'
 import { SignedCredentialParser } from '../credentials/signedCredential/signedCredentialParser';
 
-export class Parser {
-  public static credentialRequest = CredentialRequestParser
-  public static signedCredentialRequest = SignedCredentialRequestParser
-
-  public static credentialResponse = CredentialResponseParser
-  public static signedCredentialResponse = SignedCredentialResponseParser
-
-  public static credential = CredentialParser
-  public static signedCredential = SignedCredentialParser
+export const parse = {
+  credentialRequest : CredentialRequestParser,
+  signedCredentialRequest : SignedCredentialRequestParser,
+  credentialResponse : CredentialResponseParser,
+  signedCredentialResponse : SignedCredentialResponseParser,
+  credential : CredentialParser,
+  signedCredential : SignedCredentialParser
 }

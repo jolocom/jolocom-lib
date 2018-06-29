@@ -1,6 +1,6 @@
 import { SignedCredentialResponse } from './signedCredentialResponse'
 
-export class SignedCredentialResponseParser {
-  public static fromJSON = SignedCredentialResponse.fromJSON
-  public static fromJWT = SignedCredentialResponse.fromJWT
+export const SignedCredentialResponseParser = {
+  fromJSON : SignedCredentialResponse.fromJSON,
+  fromJWT : SignedCredentialResponse.fromJWT
 }
