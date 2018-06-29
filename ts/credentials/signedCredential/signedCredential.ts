@@ -144,7 +144,8 @@ export class SignedCredential {
     }
 
     const issuerProfile = await registry.resolve(this.issuer)
-    const relevantPublicKey = issuerProfile.publicKey.find((keySection) => keySection.id === this.proof.creator)
+    const relevantPublicKey = issuerProfile.getPublicKeySection()[0]
+      .find((keySection) => keySection.id === this.proof.creator)
 
     if (!relevantPublicKey) {
       return false

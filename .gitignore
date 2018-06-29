@@ -4,3 +4,4 @@ coverage
 js
 node_modules
 *.map
+.vs

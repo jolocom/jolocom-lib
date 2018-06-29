@@ -9,6 +9,11 @@ import { JolocomRegistry } from '../registries/jolocomRegistry'
 export type jwtPayload = ISignedCredRequestPayload | ISignedCredResponsePayload
 export type jwtEnabledClass = SignedCredentialRequest | SignedCredentialResponse
 
+export interface IValidateJWTSignatureWithRegistryArgs {
+  jwtInstance: jwtEnabledClass
+  registry: JolocomRegistry
+}
+
 export function computeJWTSignature(payload: jwtPayload, privateKey: Buffer): string {
   const signed = new TokenSigner('ES256K', privateKey.toString('hex')).sign(payload)
   return decodeToken(signed).signature
@@ -33,20 +38,17 @@ export function validateJWTSignature(jwtInstance: jwtEnabledClass, pubKey: Buffe
 }
 
 // TODO Find based on key id
-export async function validateJWTSignatureWithRegistry(
-  jwtInstance: jwtEnabledClass,
-  registry: JolocomRegistry
-): Promise<boolean> {
-    if (!registry) {
-      throw new Error('Can not instantiate default registry yet, WIP')
-    }
+export async function validateJWTSignatureWithRegistry(args: IValidateJWTSignatureWithRegistryArgs): Promise<boolean> {
+  const { jwtInstance, registry } = args
+  if (!registry) {
+    throw new Error('Can not instantiate default registry yet, WIP')
+  }
 
-    const issuerProfile = await registry.resolve(jwtInstance.getIssuer())
-    const pubKey = issuerProfile.publicKey[0].publicKeyHex
+  const issuerProfile = await registry.resolve(jwtInstance.getIssuer())
+  const pubKey = issuerProfile.getPublicKeySection()[0].publicKeyHex
+  if (!pubKey) {
+    return false
+  }
 
-    if (!pubKey) {
-      return false
-    }
-
-    return validateJWTSignature(jwtInstance, Buffer.from(pubKey, 'hex'))
+  return validateJWTSignature(jwtInstance, Buffer.from(pubKey, 'hex'))
 }
