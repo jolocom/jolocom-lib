@@ -1,7 +1,7 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
-import { IdentityWallet } from '../../ts/identityWallet/identityWallet';
+import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { testPrivateIdentityKey, testPublicIdentityKey, testPublicIdentityKey2 } from '../data/keys'
 import { DidDocument } from '../../ts/identity/didDocument'
 import { claimsMetadata } from '../../ts/index'
@@ -10,8 +10,8 @@ import { Credential } from '../../ts/credentials/credential/credential'
 import { credentialRequestCreationArgs } from '../data/credentialRequest/credentialRequest'
 import { testSignedCred, testSignedCredRequest } from '../data/identityWallet'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-import { SignedCredentialRequest } from '../../ts/credentialRequest/signedCredentialRequest/signedCredentialRequest';
-import { Identity } from '../../ts/identity/identity';
+import { SignedCredentialRequest } from '../../ts/credentialRequest/signedCredentialRequest/signedCredentialRequest'
+import { Identity } from '../../ts/identity/identity'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -19,7 +19,7 @@ const expect = chai.expect
 describe('IdentityWallet', () => {
   const sandbox = sinon.createSandbox()
   const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
-  const identity = Identity.create({didDocument: ddo.toJSON()})
+  const identity = Identity.create({ didDocument: ddo.toJSON() })
   const identityWallet = IdentityWallet.create({
     privateIdentityKey: testPrivateIdentityKey,
     identity
@@ -64,8 +64,10 @@ describe('IdentityWallet', () => {
     })
 
     it('create.credential should return a correct credential', () => {
-      const credential = identityWallet.create
-        .credential({metadata: claimsMetadata.emailAddress, claim: singleClaimCreationArgs})
+      const credential = identityWallet.create.credential({
+        metadata: claimsMetadata.emailAddress,
+        claim: singleClaimCreationArgs
+      })
       const credentialFromJSON = Credential.fromJSON(singleClaimCredentialJSON)
 
       expect(credential).to.deep.equal(credentialFromJSON)
@@ -75,8 +77,10 @@ describe('IdentityWallet', () => {
       const credRequest = identityWallet.create.credentialRequest(credentialRequestCreationArgs)
 
       expect(credRequest.getCallbackURL()).to.equal(credentialRequestCreationArgs.callbackURL)
-      expect(credRequest.getRequestedCredentialTypes())
-        .to.deep.equal([credentialRequestCreationArgs.credentialRequirements[0].type])
+      expect(credRequest.getRequestedCredentialTypes().length).to.equal(1)
+      expect(credRequest.getRequestedCredentialTypes()).to.deep.equal([
+        credentialRequestCreationArgs.credentialRequirements[0].type
+      ])
     })
 
     it('create.signedCredential should return a correct signed credential', async () => {
@@ -117,8 +121,10 @@ describe('IdentityWallet', () => {
     })
 
     it('sign.credential should call signCredential with correct params', () => {
-      const credential = iWallet.create
-        .credential({metadata: claimsMetadata.emailAddress, claim: singleClaimCreationArgs})
+      const credential = iWallet.create.credential({
+        metadata: claimsMetadata.emailAddress,
+        claim: singleClaimCreationArgs
+      })
       iWallet.sign.credential(credential)
 
       sandbox.assert.calledOnce(signCredential)
@@ -138,20 +144,14 @@ describe('IdentityWallet', () => {
     it('getIdentity should return a correct instance of identity class ', () => {
       expect(identityWallet.getIdentity()).to.be.instanceof(Identity)
     })
-
-    it('setIdentity should correctly set identity on identityWallet', ()  => {
-      const ddoTest = new DidDocument().fromPublicKey(testPublicIdentityKey2)
-      const identityTest = Identity.create({didDocument: ddoTest.toJSON()})
-      identityWallet.setIdentity(identityTest)
-
-      expect(identityWallet.getIdentity()).to.deep.equal(identityTest)
-    })
   })
 
   describe('signCredential', () => {
     it('should return a correct signed credential', async () => {
-      const credential = identityWallet.create
-        .credential({metadata: claimsMetadata.emailAddress, claim: singleClaimCreationArgs})
+      const credential = identityWallet.create.credential({
+        metadata: claimsMetadata.emailAddress,
+        claim: singleClaimCreationArgs
+      })
       const signedCred = await identityWallet.signCredential(credential)
       const mockSignedCred = SignedCredential.fromJSON(testSignedCred)
 
