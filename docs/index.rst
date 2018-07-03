@@ -9,13 +9,11 @@ Welcome to Jolocom-Lib's documentation!
 We are currently working on this.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+  :maxdepth: 2
+  :caption: Contents:
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+  introduction
+  gettingStarted
+  usage
+  ssoSetUp
+  protocolComponents
