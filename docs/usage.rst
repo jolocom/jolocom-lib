@@ -2,12 +2,13 @@
 Usage
 =====
 
-This section provides an overview of usage patterns that the jolocom lib enables.
+This section provides an overview of possible usage patterns that the Jolocom Protocol enables.
 
 
 ********************************
 Create a Self Sovereign Identity
 ********************************
+**Create an Identity**
 
 First create an Identity Manager. The Identity Manager is initialized with ``seed`` which is of type *Buffer*. The seed 
 represents entropy from which the master key is derived.
@@ -60,17 +61,17 @@ Note that the ``create`` method on registry is asynchronous and is called with t
 
 The returned identityWallet class gives you signing capabilities and access to your identity details.
 
+
 **Initialize IdentityWallet Class**
 
-We can initialize the IdentityWallet class by creating a registry and calling the ``authenticate``
-method on it with the jolocomIdentity private key
+In case you already created an identity with the jolocom lib you can initialize the IdentityWallet class 
+by creating a registry and calling the ``authenticate`` method on it with the jolocomIdentity private key.
 
 .. code-block:: typescript
 
   const registry = JolocomLib.registry.jolocom.create({ipfsConnector, ethereumConnector})
 
   const identityWallet = registry.authenticate(privateIdentityKey)
-
 
 
 *******************
@@ -81,12 +82,9 @@ There are two ways to create a credential with jolocom lib. One way is to use th
 for it. However, since a credential has no signature, it can also be created direcly on JolocomLib without access
 to a private key.
 
-.. note:: Here we assume that a self sovereign identity was already created at some point.
-
 **Create a Credential with IdentityWallet**
 
-First we initialite the identityWallet class by creating a registry and calling the ``authenticate``
-method on it with the jolocomIdentity private key.
+First, initialize the IdentityWallet class as outlined above. Then create the credential.
 
 .. code-block:: typescript
 
@@ -100,14 +98,12 @@ You can make use of default metadata specifics which are provided with the joloc
  email address, name, and mobile phone number. Please check the specific section on credential
  under Protocol Components for more information. 
 
-
 .. code-block:: typescript
 
   import { claimsMetadata } from 'jolocom-lib'
 
   
   const emailMetadata = claimsMetadata.emailAddress
-
 
 
 .. code-block:: typescript
@@ -148,14 +144,13 @@ Create a Signed Credential
 **************************
 
 A signed credential can be created via two ways. You can either create a signed credential
-from scratch or sign an already created credential.
+from scratch or sign an already created or received credential.
 
 **Create a Signed Credential**
 
 .. code-block:: typescript  
 
   const signedCred = await identityWallet.create.signedCredential({metadata, claim})
-
 
 
 **Create a Signed Credential from an existing Credential**
@@ -167,17 +162,116 @@ from scratch or sign an already created credential.
 The ``sign.credential`` method is called with class *Credential* as input param.
 
 
-**************************
-Manage your Public Profile
-**************************
-
-Coming soon.
-
 ****************************
 Validate a Signed Credential
 ****************************
 
-Coming soon.
+We have two ways to validate the signature of a signed credential. 
+
+In case you know the public key of the signing party before starting the signature validation,
+you can use the following way. Note that the ``validateSignatureWithPublicKey`` is called on the instance
+of SignedCredential class.
+
+.. code-block:: typescript
+
+  const valid = await signedCred.validateSignatureWithPublicKey(pubKey)
+
+
+The alternative way is to call ``validateSignature`` on the instance of SignedCredential class.
+
+.. note:: Please note that passing the registry as param will be replaced by a default registry soon.
+
+.. code-block:: typescript
+ 
+  const registry = JolocomLib.registry.jolocom.create({ipfsConnector, ethereumConnector})
+
+  const valid = await signedCred.validateSignature(registry)
+
+
+**************************
+Manage your Public Profile
+**************************
+
+Before you start, initialize the IdentityWallet class as outlined in first section. 
+
+**Add a Public Profile to your Identity**
+
+
+Get the default metadata from the jolocom lib.
+
+.. code-block:: typescript
+
+  import { claimsMetadata } from 'jolocom-lib'
+
+  
+  const pubProfileMetadata = claimsMetadata.publicProfile
+
+
+The default metadata for public profile looks as follows and requires at least
+``name`` and ``about`` fields to be filled out. You can also add ``image`` and ``url``.
+
+.. literalinclude:: ../ts/index.ts
+  :language: typescript
+  :lines: 63-75
+
+Your public profile is essentially a signed credential which is associated with
+your DID. Create the signed credential.
+
+.. code-block:: typescript
+  
+  const myDID = identityWallet.getIdentity().getDID()
+
+  const myPublicProfile = {
+    id: myDID,
+    name: 'Jolocom',
+    about: 'We enable a global identity system'
+  }
+
+    
+  const publicProfileCred = idnentityWallet.create.signedCredential({
+    metadata: publicProfileMetadata,
+    claim: myPublicProfile
+  })
+
+Now add the created public profile to your identity.
+
+.. code-block:: typescript
+
+  identityWallet.identity.publicProfile.add(publicProfileCred)
+
+Up till now you have made the changes to your identity locally.
+Now you can commit the changes to ipfs and ethereum.
+
+.. code-block:: typescript
+  
+  await registry.commit({
+    wallet: identityWallet,
+    ethereumPrivateKey 
+  })
+
+**Update the Public Profile on your Identity**
+
+The update functionality is very similar to the add functionality.
+The only difference is that on add it throws an error if a public profile already exists.
+
+**Delete the Public Profile on your Identity**
+
+.. code-block:: typescript
+
+  identityWallet.identity.publicProfile.delete()
+
+  await registry.commit({
+    wallet: identityWallet,
+    ethereumPrivateKey 
+  })
+
+
+**Get the Public Profile on your Identity**
+
+.. code-block:: typescript
+  
+  const publicProfile = identityWallet.identity.publicProfile.get()
+
 
 **************************
 Create a Credential Request
