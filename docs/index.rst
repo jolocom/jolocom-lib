@@ -9,7 +9,7 @@ Welcome to Jolocom-Lib's documentation!
 We are currently working on this.
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 4
   :caption: Contents:
 
   introduction
