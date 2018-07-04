@@ -8,7 +8,10 @@ This section provides an overview of possible usage patterns that the Jolocom Pr
 ********************************
 Create a Self Sovereign Identity
 ********************************
-**Create an Identity**
+
+##################
+Create an Identity
+##################
 
 First create an Identity Manager. The Identity Manager is initialized with ``seed`` which is of type *Buffer*. The seed 
 represents entropy from which the master key is derived.
@@ -61,8 +64,9 @@ Note that the ``create`` method on registry is asynchronous and is called with t
 
 The returned identityWallet class gives you signing capabilities and access to your identity details.
 
-
-**Initialize IdentityWallet Class**
+###############################
+Initialize IdentityWallet Class
+###############################
 
 In case you already created an identity with the jolocom lib you can initialize the IdentityWallet class 
 by creating a registry and calling the ``authenticate`` method on it with the jolocomIdentity private key.
@@ -74,13 +78,21 @@ by creating a registry and calling the ``authenticate`` method on it with the jo
   const identityWallet = registry.authenticate(privateIdentityKey)
 
 
-*******************
-Create a Credential
-*******************
+********************************
+Credentials & Signed Credentials
+********************************
+
+HERE: short intro to the section
+
+
+#################
+Create Credential
+#################
 
 There are two ways to create a credential with jolocom lib. One way is to use the IdentityWallet class
 for it. However, since a credential has no signature, it can also be created direcly on JolocomLib without access
 to a private key.
+
 
 **Create a Credential with IdentityWallet**
 
@@ -139,9 +151,9 @@ in our example above would return an *Array* that looks like this:
   const credetial = JolocomLib.unsigned.createCredential({metadata, claim})
 
 
-**************************
+##########################
 Create a Signed Credential
-**************************
+##########################
 
 A signed credential can be created via two ways. You can either create a signed credential
 from scratch or sign an already created or received credential.
@@ -162,9 +174,9 @@ from scratch or sign an already created or received credential.
 The ``sign.credential`` method is called with class *Credential* as input param.
 
 
-****************************
+############################
 Validate a Signed Credential
-****************************
+############################
 
 We have two ways to validate the signature of a signed credential. 
 
@@ -189,12 +201,14 @@ The alternative way is to call ``validateSignature`` on the instance of SignedCr
 
 
 **************************
-Manage your Public Profile
+Manage Your Public Profile
 **************************
-
+HERE: SHORT INTRO
 Before you start, initialize the IdentityWallet class as outlined in first section. 
 
-**Add a Public Profile to your Identity**
+######################
+Add the Public Profile
+######################
 
 
 Get the default metadata from the jolocom lib.
@@ -249,12 +263,16 @@ Now you can commit the changes to ipfs and ethereum.
     ethereumPrivateKey 
   })
 
-**Update the Public Profile on your Identity**
+#########################
+Update the Public Profile
+#########################
 
 The update functionality is very similar to the add functionality.
 The only difference is that on add it throws an error if a public profile already exists.
 
-**Delete the Public Profile on your Identity**
+#########################
+Delete the Public Profile
+#########################
 
 .. code-block:: typescript
 
@@ -266,24 +284,117 @@ The only difference is that on add it throws an error if a public profile alread
   })
 
 
-**Get the Public Profile on your Identity**
+######################
+Get the Public Profile
+######################
 
 .. code-block:: typescript
   
   const publicProfile = identityWallet.identity.publicProfile.get()
 
 
-**************************
-Create a Credential Request
-**************************
+************************************
+Credential Based Communication Flows
+************************************
 
+Below you will find the credential based interactions enabled by the Jolocom protocol.
+Note that the whole section addresses both cases:
+
+1) Credential Request and Credential Response
+2) Signed Credential Request and Signed Credential Response
+
+
+
+###########################
+Create a Credential Request
+###########################
+
+A credential request can be created via two ways. The first way is to create the
+request using the IdentityWallet. As no signing is taking place at this stage, we can also
+create the request directly on the JolocomLib.
+
+In both cases the input params are ``callbackURL`` and ``credentialRequirements`` where the latter define
+the specifics of TODO (show explanatory example of this).
+
+**Create a Credential Request with IdentityWallet**
+
+.. code-block:: typescript
+
+  const credRequest = identityWallet.create.credentialRequest({callbackURL, credentialRequirements})
+
+
+**Create a Credential Request using JolocomLib**
+
+.. code-block:: typescript
+
+  const credRequest = JolocomLib.unsigned.createCredentialRequest({callbackURL, credentialRequirements})
+
+############################
+Consume a Credential Request
+############################
+
+Coming soon.
+
+############################
+Create a Credential Response
+############################
+
+
+**Create a Credential Response with IdentityWallet**
+
+
+**Create a Credential Response using JolocomLib**
+
+#############################
+Consume a Credential Response
+#############################
+
+Coming soon.
+
+##################################
+Create a Signed Credential Request
+##################################
+
+We have two ways to create a signed credential request.
+
+**Create Signed Credential Request from Scratch**
+
+.. code-block:: typescript
+
+  const signedCredReq = identityWallet.create.signedCredentialRequest()
+
+
+**Create a Signed Credential Request from a Credential Request**
+
+.. code-block:: typescript
+ 
+  const credRequest = identityWallet.create.credentialRequest({callbackURL, credentialRequirements})
+
+  const signedCredReq = idnetityWallet.sign.credentialRequest(credRequest)
+
+
+###################################
+Consume a Signed Credential Request
+###################################
+
+Coming soon.
+
+###################################
+Create a Signed Credential Response
+###################################
+
+Coming soon.
+
+###################################
+Consume a Signed Credential Response
+###################################
 
 Coming soon.
 
 
-*****************************
-Validate a Credential Response
-*****************************
+**********************************
+Interactions With Other Identities
+**********************************
 
 Coming soon.
 
