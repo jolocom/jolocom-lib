@@ -5,6 +5,8 @@ import { SignedCredentialRequest } from '../credentialRequest/signedCredentialRe
 import { CredentialRequest } from '../credentialRequest/credentialRequest'
 import { IIdentityWalletCreateArgs } from './types'
 import { Identity } from '../identity/identity'
+import { CredentialResponse } from '../credentialResponse/credentialResponse'
+import { SignedCredentialResponse } from '../credentialResponse/signedCredentialResponse/signedCredentialResponse'
 
 export class IdentityWallet {
   private privateIdentityKey: Buffer
@@ -13,10 +15,13 @@ export class IdentityWallet {
   public create = {
     credential: Credential.create,
     credentialRequest: CredentialRequest.create,
+    credentialResponse: CredentialResponse.create,
     signedCredential: async (credentialAttrs: ICredentialCreateAttrs) =>
       await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey }),
     signedCredentialRequest: (credentialRequest: CredentialRequest) =>
-      SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey })
+      SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey }),
+    signedCredentialResponse: (credentialResponse: CredentialResponse) =>
+      SignedCredentialResponse.create({ credentialResponse, privateKey: this.privateIdentityKey })
   }
 
   public sign = {
