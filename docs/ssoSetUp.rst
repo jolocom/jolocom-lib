@@ -65,7 +65,7 @@ The Usage section covers the creation and interaction patterns in more depth; he
 
 
 #############################################################
-Step 2: Create a public profile and attach it to the Identity
+Step 2: Create a Public Profile and attach it to the Identity
 #############################################################
 
 .. code-block:: typescript
@@ -118,15 +118,78 @@ Step 2: Create a public profile and attach it to the Identity
 
 
 
-########################################
-Step 3: Define Your Criteria for Sign On
-########################################
+###############################################
+Step 3: Define Your Criteria for Single Sign On
+###############################################
+
+.. note:: We use `JsonLogic <http://jsonlogic.com/>`_ for constrains definition in credentialRequirements. In the example below
+  the user has to provide a credential which is issued by 'did:jolo:showcase'.
+
+.. code-block:: typescript
+
+  const callbackURL = 'https://www.testSSO.com/myCallbackURL'
+
+  
+  
+  //  define what information you require from user for signing on
+  
+  
+  const credentialRequirements = {
+    
+    type: ['Credential', 'ProofOfEmailCredential']
+    
+    constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:showcase'] }]
+  
+  }  
+  
+  
+  
+  const credRequest = identityWallet.create.credentialRequest({callbackURL, credentialRequirements})
+
+  
+  const signedCredReq = idnetityWallet.sign.credentialRequest(credRequest)
+
+  
+  
+  // encode signed credential request as JWT and send it
+
+  
+  const signedCredReqJWT = signedCredReq.toJWT()
 
 
-####################################
-Step 4: Evaluate Response on Sign On
-####################################
 
+
+############################################
+Step 4: Evaluate Response for Single Sign On
+############################################
+
+This is the last step during the Single Sign On. Here you evaluate the response from a user to your request.
+
+.. code-block:: typescript
+
+  // convert JWT to SignedCredentialResponse instance
+
+  const signedCredResp = JolocomLib.parse.signedCredentialResponse.fromJWT(receivedSignedCredResp)
+
+
+  const validSignature = signedCredResp.validateSignature(registry)
+  
+
+  const satisfiesRequest = signedCredResp.satisfiesRequest(credRequest)
+  
+
+  const receivedCreds = signedCredResp.getSuppliedCredentials()
+
+  
+  
+  // check signature of provided signed ProofOfEmailCredential
+
+  const validCred = await receivedCreds[0].validateSignature(registry)
+
+
+  
+  
+  // user has fulfilled your requirements; redirect to logged in section
 
 
 
