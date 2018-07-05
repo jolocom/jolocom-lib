@@ -122,6 +122,18 @@ Step 2: Create a public profile and attach it to the Identity
 Step 3: Define Your Criteria for Sign On
 ########################################
 
+.. code-block:: typescript
+
+  const callbackURL = 'https://www.me.com/callbacksso'
+  
+  
+  const credRequest = identityWallet.create.credentialRequest({callbackURL, credentialRequirements})
+
+  const signedCredReq = idnetityWallet.sign.credentialRequest(credRequest)
+
+
+
+
 
 ####################################
 Step 4: Evaluate Response on Sign On
