@@ -8,9 +8,9 @@ What is a Self Sovereign Identity?
 
 Coming soon.
 
-###############################
-Protocol Architechture Overview
-###############################
+##############################
+Protocol Architecture Overview
+##############################
 
 Description coming soon.
 
