@@ -2,6 +2,25 @@
 Introduction
 ============
 
-This is the introduction section.
+##################################
+What is a Self Sovereign Identity?
+##################################
 
-Why and how was Jolocom Protocol build
+Coming soon.
+
+###############################
+Protocol Architechture Overview
+###############################
+
+Description coming soon.
+
+.. image:: overview.jpg
+
+
+
+
+#############################
+Philosophy of the jolocom-lib
+#############################
+
+Coming soon.
