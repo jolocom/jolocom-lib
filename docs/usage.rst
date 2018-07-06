@@ -329,7 +329,7 @@ We have two ways to create a signed credential request.
  
   const credRequest = identityWallet.create.credentialRequest({callbackURL, credentialRequirements})
 
-  const signedCredReq = idnetityWallet.sign.credentialRequest(credRequest)
+  const signedCredReq = identityWallet.sign.credentialRequest(credRequest)
 
 
 ###################################
