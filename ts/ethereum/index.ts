@@ -20,3 +20,10 @@ export class EthResolver implements IEthereumConnector {
     return this.ethResolver.updateDIDRecord(ethereumKey, did, newHash)
   }
 }
+
+export const jolocomEthereumResolver = new EthResolver(
+  {
+    providerUrl: 'https://rinkeby.infura.io/',
+    contractAddress: '0xd4351c3f383d79ba378ed1875275b1e7b960f120'
+  }
+)
