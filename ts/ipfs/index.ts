@@ -64,3 +64,12 @@ export class IpfsStorageAgent implements IIpfsConnector {
     return res.json()
   }
 }
+
+export const jolocomIpfsStorageAgent = new IpfsStorageAgent(
+  {
+    host: 'ipfs.jolocom.com',
+    port: 443,
+    protocol: 'https'
+  }
+)
+
