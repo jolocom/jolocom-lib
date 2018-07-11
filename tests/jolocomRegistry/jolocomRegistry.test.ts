@@ -1,5 +1,5 @@
-import { IpfsStorageAgent } from '../../ts/ipfs'
-import { EthResolver } from '../../ts/ethereum'
+import { IpfsStorageAgent, jolocomIpfsStorageAgent } from '../../ts/ipfs'
+import { EthResolver, jolocomEthereumResolver } from '../../ts/ethereum'
 import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { ddoAttr, ddoAttrNoPublicProfile, publicProfileJSON } from '../data/identity'
 import { DidDocument } from '../../ts/identity/didDocument'
@@ -40,6 +40,12 @@ describe('JolocomRegistry', () => {
     it('should create an instance of JolocomRegistry with correct config', () => {
       expect(jolocomRegistry.ipfsConnector).to.deep.equal(ipfsConnector)
       expect(jolocomRegistry.ethereumConnector).to.deep.equal(ethereumConnector)
+    })
+
+    it('should create an instance of JolocomRegistry with correct config', () => {
+      const defaultJolocomRegistry = JolocomRegistry.create()
+      expect(defaultJolocomRegistry.ipfsConnector).to.deep.equal(jolocomIpfsStorageAgent)
+      expect(defaultJolocomRegistry.ethereumConnector).to.deep.equal(jolocomEthereumResolver)
     })
   })
 

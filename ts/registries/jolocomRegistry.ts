@@ -13,6 +13,8 @@ import {
   IRegistryInstanceCreationArgs,
   IRegistryStaticCreationArgs
 } from './types'
+import { jolocomIpfsStorageAgent } from '../ipfs';
+import { jolocomEthereumResolver } from '../ethereum';
 
 /** Jolocom specific Registry, which uses IPFS
  *  and Ethereum for registering the indentity and the resolution
@@ -22,7 +24,10 @@ export class JolocomRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
 
-  public static create({ ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs): JolocomRegistry {
+  public static create(
+    { ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs =
+     {ipfsConnector: jolocomIpfsStorageAgent, ethereumConnector: jolocomEthereumResolver}
+    ): JolocomRegistry {
     const jolocomRegistry = new JolocomRegistry()
     jolocomRegistry.ipfsConnector = ipfsConnector
     jolocomRegistry.ethereumConnector = ethereumConnector
