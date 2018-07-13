@@ -14,12 +14,12 @@ export class PublicKeySection {
   private publicKeyHex: string
 
   public fromEcdsa(publicKey: Buffer, id: string): PublicKeySection {
-    const pKeySection = new PublicKeySection()
-    pKeySection.id = id
-    pKeySection.type = 'EdDsaSAPublicKeySecp256k1'
-    pKeySection.publicKeyHex = publicKey.toString('hex')
+    const publicKeySection = new PublicKeySection()
+    publicKeySection.id = id
+    publicKeySection.type = 'EdDsaSAPublicKeySecp256k1'
+    publicKeySection.publicKeyHex = publicKey.toString('hex')
 
-    return pKeySection
+    return publicKeySection
   }
 
   public getIdentifier(): string {
@@ -28,6 +28,10 @@ export class PublicKeySection {
 
   public getType(): string {
     return this.type
+  }
+
+  public getPublicKeyHex(): string {
+    return this.publicKeyHex
   }
 
   public toJSON(): IPublicKeySectionAttrs {
