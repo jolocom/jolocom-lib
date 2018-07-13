@@ -9,6 +9,7 @@ import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsa
 import { defaultContext } from '../../utils/contexts'
 import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
 import { JolocomRegistry } from '../../registries/jolocomRegistry'
+import { registries } from '../../registries'
 
 @Exclude()
 export class SignedCredential {
@@ -140,7 +141,7 @@ export class SignedCredential {
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
     if (!registry) {
-      throw new Error('Can not instantiate default registry yet, WIP')
+      registry = registries.jolocom.create()      
     }
 
     const issuerProfile = await registry.resolve(this.issuer)

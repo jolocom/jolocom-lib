@@ -45,7 +45,7 @@ export async function validateJWTSignatureWithRegistry(args: IValidateJWTSignatu
   }
 
   const issuerProfile = await registry.resolve(jwtInstance.getIssuer())
-  const pubKey = issuerProfile.getPublicKeySection()[0].publicKeyHex
+  const pubKey = issuerProfile.getPublicKeySection()[0].getPublicKeyHex()
   if (!pubKey) {
     return false
   }
