@@ -9,9 +9,18 @@ import {
   signedCredRespJWT
 } from '../data/credentialResponse/signedCredentialResponse'
 import { privateKeyToPublicKey } from '../../ts/utils/crypto'
+import * as sinon from 'sinon'
+import * as chai from 'chai'
+import * as sinonChai from 'sinon-chai'
+import { ddoAttr } from '../data/credentialRequest/signedCredentialRequest';
+import { Identity } from '../../ts/identity/identity';
+import { JolocomRegistry } from '../../ts/registries/jolocomRegistry';
+chai.use(sinonChai)
+
 
 describe('SignedCredentialResponse', () => {
   let clock
+  const sandbox = sinon.createSandbox()
 
   const mockCredentialResponse = CredentialResponse.create([firstMockCredential])
   const mockSignedCredRespCreationArgs = {
@@ -66,11 +75,37 @@ describe('SignedCredentialResponse', () => {
     expect(signedCredentialResponse.toJSON()).to.deep.equal(mockSignedCredResponseJson)
   })
 
-  it('Should implement validateSignature method', () => {
+  it('Should implement validateSignatureWithPublicKey method', () => {
     const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
     expect(
       signedCredentialResponse.validateSignatureWithPublicKey(privateKeyToPublicKey(Buffer.from(mockPrivKey, 'hex')))
     ).to.equal(true)
+  })
+
+  describe('verification with registry', () => {
+    let resolveStub
+  const mockCredentialResponse = CredentialResponse.create([firstMockCredential])
+  const mockSignedCredRespCreationArgs = {
+    privateKey: Buffer.from(mockPrivKey, 'hex'),
+    credentialResponse: mockCredentialResponse
+  }
+
+    beforeEach( () => {
+      resolveStub = sandbox.stub(JolocomRegistry.prototype, 'resolve')
+        .resolves(Identity.create({ didDocument: ddoAttr }))
+    })
+
+    afterEach(() => {
+      sandbox.restore()
+    })
+
+    it('Should implement a validateSignature method that defaults to using JolocomRegistry', async() => {
+      const incorrectlySignedCR = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
+      
+      expect(await incorrectlySignedCR.validateSignature()).to.equal(
+        false
+      )
+    })
   })
 
   it('Should implement satisfiesRequirements method', () => {
