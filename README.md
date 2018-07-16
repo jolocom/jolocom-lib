@@ -7,7 +7,7 @@ Interested in our vision? Take a look at our [whitepaper](https://jolocom.com/wh
 
 
 ## TSLINT for development
-We use `tslint` for static Typescript code analysis.
-`tslint [file]` running code analysis
+We use `tslint` for static Typescript code analysis.  
+`tslint [file]` running code analysis  
 `tslint [file] --fix` running automatic fix of rule violations (fixes most of the common issues)
 
