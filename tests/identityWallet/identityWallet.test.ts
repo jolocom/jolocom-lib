@@ -58,7 +58,14 @@ describe('IdentityWallet', () => {
 
   describe('create', () => {
     it('should expose credential, credentialRequest, signedCredential, signedCredentialRequest', () => {
-      const mockProps = ['credential', 'credentialRequest', 'signedCredential', 'signedCredentialRequest']
+      const mockProps = [
+        'credential',
+        'credentialRequest',
+        'credentialResponse',
+        'signedCredential',
+        'signedCredentialRequest',
+        'signedCredentialResponse'
+      ]
 
       expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
     })
