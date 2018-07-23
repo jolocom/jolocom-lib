@@ -141,18 +141,18 @@ export class SignedCredential {
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
     if (!registry) {
-      registry = registries.jolocom.create()      
+      registry = registries.jolocom.create()
     }
 
     const issuerProfile = await registry.resolve(this.issuer)
-    const relevantPublicKey = issuerProfile.getPublicKeySection()[0]
-      .find((keySection) => keySection.id === this.proof.creator)
+    const relevantPublicKey = issuerProfile.getPublicKeySection()
+      .find((keySection) => keySection.getIdentifier() === this.proof.creator)
 
     if (!relevantPublicKey) {
       return false
     }
 
-    const pubKey = Buffer.from(relevantPublicKey.publicKeyHex, 'hex')
+    const pubKey = Buffer.from(relevantPublicKey.getPublicKeyHex(), 'hex')
     return this.validateSignatureWithPublicKey(pubKey)
   }
 
