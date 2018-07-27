@@ -1,0 +1,296 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction &mdash; Jolocom-Lib  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting Started" href="gettingStarted.html" />
+    <link rel="prev" title="The Jolocom Protocol - Own Your Digital Self" href="index.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Jolocom-Lib
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Where to go next?</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#jolocom-lib-at-one-glance">Jolocom-lib at One Glance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-a-self-sovereign-identity">What is a Self Sovereign Identity?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gettingStarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ssoSetUp.html">Single Sign On (SSO) with Jolocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="protocolComponents.html">Protocol Components</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Jolocom-Lib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Introduction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/introduction.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>This section gives you a brief overview of the protocol architecture, a fist understanding
+on how to navigate the jolocom-lib and some context on what actually a self sovereign identity is.</p>
+<img alt="_images/overview.jpg" src="_images/overview.jpg" />
+<p><strong>System Architecture</strong></p>
+<p>The Jolocom protocol is build using the following core components:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki">Hierarchical Deterministic Key Derivation</a> to allow for
+context specific interactions &amp; different ledger usage while
+preserving key manageability</li>
+<li><a class="reference external" href="https://w3c-ccg.github.io/did-spec/">Decentralized Identifiers</a> (DIDs) to enable self-sovereign identity creation and management</li>
+<li><a class="reference external" href="https://w3c.github.io/vc-data-model/">Verifiable Credentials</a> as a cryptographically consumable means to attach information to identities thus making them meaningful</li>
+<li><a class="reference external" href="https://jwt.io/">JWT</a> as means to exchange credential requests and responses between identities</li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Please be aware that the jolocom-lib is work in progress. Also, we are currently using
+the Ethereum testnet Rinkeby. Please do not transfer any real ether to your created addresses.</p>
+</div>
+<p><strong>Interaction Flows Visualized</strong></p>
+<p>Coming soon.</p>
+<div class="section" id="jolocom-lib-at-one-glance">
+<h2>Jolocom-lib at One Glance<a class="headerlink" href="#jolocom-lib-at-one-glance" title="Permalink to this headline">¶</a></h2>
+<p>The jolocom-lib exposes a JolocomLib interface with four main entry points:</p>
+<ul class="simple">
+<li>parse</li>
+<li>registry</li>
+<li>identityManager</li>
+<li>unsigned</li>
+</ul>
+<p>Verifiable Credentials and DID/DidDocuments are JSON-LD data types.
+The jolocom-lib exposes methods on respective classes to serialize and deserialize.</p>
+<p>The parse functionality allows to parse <code class="docutils literal notranslate"><span class="pre">fromJSON</span></code> (JSON-LD) or <code class="docutils literal notranslate"><span class="pre">fromJWT</span></code>.</p>
+<p>The registry is used for registering the identity, performing any updates, and as the
+resolution mechanism.</p>
+<p>IdentityManagers’ purpose is to create and manage your keys.</p>
+<p>The unsigned functionality allows you to use the flows which do not require a private key.</p>
+<p>The jolocom-lib also exposes claimsMetadata. Since the verifiable credentials are JSON-LD documents
+you need to provide additional information besides the actual input.</p>
+<p>In the case of an email address, the metadata would be:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span>  <span class="nx">emailAddress</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">fieldNames</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span>
+    <span class="nx">optionalFieldNames</span><span class="o">:</span> <span class="p">[],</span>
+    <span class="nx">type</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;Credential&#39;</span><span class="p">,</span> <span class="s1">&#39;ProofOfEmailCredential&#39;</span><span class="p">],</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Email address&#39;</span><span class="p">,</span>
+    <span class="nx">context</span><span class="o">:</span> <span class="p">[</span>
+      <span class="s1">&#39;https://w3id.org/identity/v1&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;https://identity.jolocom.com/terms&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;https://w3id.org/security/v1&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;https://w3id.org/credentials/v1&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;http://schema.org&#39;</span>
+    <span class="p">]</span>
+  <span class="p">},</span>
+</pre></div>
+</div>
+<p>The actual email claim would be:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+
+  <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af&#39;</span>
+
+  <span class="nx">email</span><span class="o">:</span> <span class="s1">&#39;hello@jolocom.com&#39;</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Jolocom-lib tries to incorporate heavy used credential types in order to make credential creation
+as easy as possible.</p>
+</div>
+<div class="section" id="what-is-a-self-sovereign-identity">
+<h2>What is a Self Sovereign Identity?<a class="headerlink" href="#what-is-a-self-sovereign-identity" title="Permalink to this headline">¶</a></h2>
+<p>Coming soon.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gettingStarted.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="The Jolocom Protocol - Own Your Digital Self" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Jolocom.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
