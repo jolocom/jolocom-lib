@@ -30,14 +30,9 @@ These steps are outlined in detail below.
 **Create an Identity Manager**
 
 To create a self sovereign identity you first create an Identity Manager. This gives you the
-capabilities to add (derive) new child keys which are associated with the respective master key.
+capabilities to derive new child keys from the master key. Because of security, you never use master key directly - all the interactions of your identity are based on child keys.
 
-.. seealso:: In our architechture we use Hierachical Deterministic Key Derivation.
-   Go `here <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ if you want to find out more about this concept.  
-
-
-
-The Identity Manager is called with ``seed`` which is of type *Buffer* and 
+The Identity Manager is initialized with ``seed`` which is a *Buffer* and 
 represents entropy from which the master key is derived.
 
 .. code-block:: typescript
@@ -51,14 +46,17 @@ represents entropy from which the master key is derived.
 Now you can use the ``identityManager`` to derive child keys. For a self sovereign identity
 we need to derive at least two keys. The first one is the identity key which is used for signing.
 The second one is an ethereum key which is used for registering the identity on the ethereum
-blockchain. 
+blockchain.  
 
 .. code-block:: typescript
 
   const identityKey = identityManager.deriveChildKey(path)
 
-``deriveChildKey`` on ``identityManager`` is called with ``path``. Path is of type *string*
-and indicates along which 'path' a child key is derived from the master key. The jolocom lib provides
+.. seealso:: In our architecture we use Hierachical Deterministic Key Derivation. If any of your child keys is compromised, you only lose one key and all the others (including the most important master key) are intact. 
+   Go to `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ if you want to find out more about this concept. 
+
+``deriveChildKey`` on ``identityManager`` is called with ``path``. Path is a *string* and is a concept explored in previously mentioned  BIP 32 -
+it indicates along which 'path' a child key is derived from the master key. The jolocom lib provides
 default key paths which should be used during the creation process. You can use them like so:
 
 .. code-block:: typescript
@@ -71,24 +69,36 @@ default key paths which should be used during the creation process. You can use 
 
   const ethereumKey = identityManager.deriveChildKey(schema.ethereumKey)
 
+``deriveChildKey`` returns the following object: 
+ 
+.. code-block:: typescript 
+
+	{ 
+  		wif: string,
+  		privateKey: Buffer,
+  		publicKey: Buffer,
+  		keyType: string,
+  		path: string
+	}
+  
 Up till now you have created a master key and child keys needed for a self sovereign identity.
 The next step shows how to create your actual identity and register it on ethereum so that it can be used.
 
-**Create the actual Identity**
+**Create the Identity**
 
 The first step is to initialize the registry. The registry takes care of communicating to the 
-outside world which in our case means to ethereum and to IPFS. During the identity creation process,
-the registry takes care of creating and assembling the DidDocument, pushing it to IPFS and registering
-the DID on ethereum.
-
+outside world which in our case means Ethereum and IPFS. During the identity creation process,
+the registry assembles the DidDocument, pushes it to IPFS and registers
+the DID and a reference to the DDO (IPFS hash) on ethereum.
 
 .. code-block:: typescript
 
   const registry = JolocomLib.registry.jolocom.create({ipfsConnector, ethereumConnector})
 
-At the moment the jolocom registry needs to be initialized with an IPFS connector and an Ethereum connector. 
+The Jolocom registry needs to be initialized with an `IPFS connector <https://github.com/jolocom/jolocom-lib/blob/master/ts/ipfs/types.ts#L7>`_ and an `Ethereum connector <https://github.com/jolocom/jolocom-lib/blob/master/ts/ethereum/types.ts#L12>`_, but if you don't provide them, it will be initialized with default Jolocom connectors.
+Before you can finish the registration process, you need to make sure you fuel your Ethereum key with gas. 
 
-.. note:: This will change to be initialized with default params in near future.
+In our Smartwallet and SSO example page, we use our own Fueling service. You're welcome to use it to create your or your service's identity, but please don't put too much load on it. `Here's <https://github.com/jolocom/smartwallet-app/blob/develop/src/lib/ethereum.ts#L21>`_ an example, the ``fueling endpoint`` should be ``https://faucet.jolocom.com/request``. In the next release of the library we will include a wrapper for the Fueling service.
 
 Now you can use the ``registry`` to trigger the last step of identity creation and registration.
 
@@ -96,10 +106,9 @@ Now you can use the ``registry`` to trigger the last step of identity creation a
 
   const identityWallet = await registry.create({privateIdentityKey, privateEthereumKey})
 
-Note that the ``create`` method on registry is asynchronous and is called with the two private keys created with the help of identity manager.
+Note that the ``create`` method on registry is asynchronous and is called with the two private keys created by the identity manager -  make sure you are passing ``privateKey``, not the full object returned by ``deriveKey`` method.
 
-The returned identityWallet class gives you signing capabilities and access to your identity details
-like the DidDocument details.
+The returned identityWallet class gives you signing capabilities and access to your identity details - Identity class with DidDocument object as a member.
 
 .. seealso:: With the Jolocom Protocol we try to use open standards whenever we can.
   The DID/DidDocument approach is a W3C open standard. Find out more about it `here <https://w3c-ccg.github.io/did-spec/>`_.  
