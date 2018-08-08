@@ -2,6 +2,10 @@ import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { IAuthenticationSectionAttrs } from './types'
 import { PublicKeySection } from './publicKeySection'
 
+const typeToAuthType = {
+  Secp256k1VerificationKey2018: 'Secp256k1SignatureAuthentication2018'
+}
+
 @Exclude()
 export class AuthenticationSection {
   @Expose()
@@ -13,7 +17,7 @@ export class AuthenticationSection {
   public fromEcdsa(publicKey: PublicKeySection): AuthenticationSection {
     const authSection = new AuthenticationSection()
     authSection.id = publicKey.getIdentifier()
-    authSection.type = publicKey.getType()
+    authSection.type = typeToAuthType[publicKey.getType()]
 
     return authSection
   }

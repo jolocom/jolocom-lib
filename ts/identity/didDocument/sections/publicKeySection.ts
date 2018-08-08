@@ -16,7 +16,7 @@ export class PublicKeySection {
   public fromEcdsa(publicKey: Buffer, id: string): PublicKeySection {
     const pKeySection = new PublicKeySection()
     pKeySection.id = id
-    pKeySection.type = 'EdDsaSAPublicKeySecp256k1'
+    pKeySection.type = 'Secp256k1VerificationKey2018'
     pKeySection.publicKeyHex = publicKey.toString('hex')
 
     return pKeySection
