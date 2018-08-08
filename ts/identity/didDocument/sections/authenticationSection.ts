@@ -9,14 +9,14 @@ const typeToAuthType = {
 @Exclude()
 export class AuthenticationSection {
   @Expose()
-  private id: string
+  private publicKey: string
 
   @Expose()
   private type: string
 
   public fromEcdsa(publicKey: PublicKeySection): AuthenticationSection {
     const authSection = new AuthenticationSection()
-    authSection.id = publicKey.getIdentifier()
+    authSection.publicKey = publicKey.getIdentifier()
     authSection.type = typeToAuthType[publicKey.getType()]
 
     return authSection
