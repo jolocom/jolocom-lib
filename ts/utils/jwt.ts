@@ -40,9 +40,6 @@ export function validateJWTSignature(jwtInstance: jwtEnabledClass, pubKey: Buffe
 // TODO Find based on key id
 export async function validateJWTSignatureWithRegistry(args: IValidateJWTSignatureWithRegistryArgs): Promise<boolean> {
   const { jwtInstance, registry } = args
-  if (!registry) {
-    throw new Error('Can not instantiate default registry yet, WIP')
-  }
 
   const issuerProfile = await registry.resolve(jwtInstance.getIssuer())
   const pubKey = issuerProfile.getPublicKeySection()[0].getPublicKeyHex()
