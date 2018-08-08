@@ -57,6 +57,6 @@ export class Identity {
   }
 
   public getPublicKeySection() {
-    this.didDocument.getPublicKeySection()
+    return this.didDocument.getPublicKeySection()
   }
 }

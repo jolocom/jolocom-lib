@@ -17,6 +17,7 @@ import {
   validateJWTSignatureWithRegistry
 } from '../../utils/jwt'
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
+import { registries } from '../../registries';
 
 export class SignedCredentialRequest {
   private header: IJWTHeader = {
@@ -80,6 +81,9 @@ export class SignedCredentialRequest {
   }
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
+    if (!registry) {
+      registry = registries.jolocom.create()      
+    }
     return validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
   }
 
