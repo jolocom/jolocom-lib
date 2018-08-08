@@ -29,3 +29,30 @@ b25zdHJhaW50cyI6eyJhbmQiOlt7Ij09IjpbdHJ1ZSx0cnVlXX0seyI9PSI6W3sidmFyIjoiaXNzdWVy
 In0sImRpZDpqb2xvOmlzc3VlciJdfV19fV0sImNhbGxiYWNrVVJMIjoiaHR0cDovL3Rlc3QuY29tIn19\
 .lBcEgnfpORwlZGZ1HanoW2d3Ngm2qox-JI4T0iL-m1fBt5f6ihAvaoj0Z2usZiXwO5UtKXvvcvJTEP6\
 rxI_MDQ'
+
+export const ddoAttr = {
+  '@context': 'https://w3id.org/did/v1',
+  'id': 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
+  'authentication': [
+    {
+      id: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb#keys-1',
+      type: 'EdDsaSAPublicKeySecp256k1'
+    }
+  ],
+  'publicKey': [
+    {
+      id: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb#keys-1',
+      type: 'EdDsaSAPublicKeySecp256k1',
+      publicKeyHex: '039ab801fef81ad6928c62ca885b1f62c01a493daf58a0f7c76026d44d1d31f163'
+    }
+  ],
+  'service': [
+    {
+      id: 'public',
+      type: ['PublicProfile'],
+      serviceEndpoint: 'ipfs://kjnwe6938uj3m2l3h',
+      description: 'my public profile'
+    }
+  ],
+  'created': new Date('2018-01-24T15:42:15Z')
+}
