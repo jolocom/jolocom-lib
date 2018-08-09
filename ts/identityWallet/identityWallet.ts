@@ -20,8 +20,9 @@ export class IdentityWallet {
     credential: Credential.create,
     credentialRequest: CredentialRequest.create,
     credentialResponse: CredentialResponse.create,
-    signedCredential: async (credentialAttrs: ICredentialCreateAttrs) =>
-      await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey.key }),
+    signedCredential: async (credentialAttrs: ICredentialCreateAttrs) => {
+      return await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey })
+    },
     signedCredentialRequest: (credentialRequest: CredentialRequest) =>
       SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey.key }),
     signedCredentialResponse: (credentialResponse: CredentialResponse) =>
@@ -38,7 +39,7 @@ export class IdentityWallet {
   public static create({ privateIdentityKey, identity }: IIdentityWalletCreateArgs): IdentityWallet {
     const identityWallet = new IdentityWallet()
     const pubKey = privateKeyToPublicKey(privateIdentityKey).toString('hex')
-    const entry = identity.getPublicKeySection().find((pubKeySec) => pubKeySec.getKeyHex() === pubKey)
+    const entry = identity.getPublicKeySection().find((pubKeySec) => pubKeySec.getPublicKeyHex() === pubKey)
 
     identityWallet.privateIdentityKey = {
       key: privateIdentityKey,
@@ -72,8 +73,11 @@ export class IdentityWallet {
   }
 
   public signCredentialRequest(credentialRequest: CredentialRequest): SignedCredentialRequest {
-    const signedCredRequest = SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey })
-    signedCredRequest.sign(this.privateIdentityKey)
+    const signedCredRequest = SignedCredentialRequest.create({
+      credentialRequest,
+      privateKey: this.privateIdentityKey.key
+    })
+    signedCredRequest.sign(this.privateIdentityKey.key)
 
     return signedCredRequest
   }
