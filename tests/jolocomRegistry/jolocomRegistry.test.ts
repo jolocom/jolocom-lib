@@ -310,7 +310,7 @@ describe('JolocomRegistry', () => {
       sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
         .resolves()
 
-      await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey}) 
+      await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
     })
 
     afterEach(() => {
@@ -326,23 +326,28 @@ describe('JolocomRegistry', () => {
   })
 
   describe('unpin', () => {
+    let unpin
+
     beforeEach(() => {
+      sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
+        .resolves(testIpfsHash)
+      sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
+        .resolves()
       sandbox.stub(EthResolver.prototype, 'resolveDID')
         .resolves(testIpfsHash)
       sandbox.stub(IpfsStorageAgent.prototype, 'removePinnedHash')
-        .throws('Removing pinned hash')
+        .throws('Removing pinned hash was not successful')
+      unpin = sandbox.stub(JolocomRegistry.prototype, 'unpin')
     })
 
     afterEach(() => {
       sandbox.restore()
     })
 
-    it('should throw error on removePinnedHash failure', async () => {
-      try {
-        await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
-      } catch (err) {
-        expect(err.message).to.contain(`Could not save DID record on IPFS.`)
-      }
+    it('should not throw an error on removePinnedHash failure', async () => {
+      await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
+
+      sandbox.assert.calledOnce(unpin)
     })
   })
 })
