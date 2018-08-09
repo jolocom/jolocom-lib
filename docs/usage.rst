@@ -208,8 +208,7 @@ Now, you can commit the changes to IPFS and Ethereum.
 Update
 ######
 
-The update functionality is very similar to the add functionality.
-The only difference is that on add, an error is thrown if a public profile already exists.
+The update functionality is very similar to the add functionality. The only difference is that on add, an error is thrown if a public profile already exists.
 
 ######
 Delete
@@ -222,10 +221,8 @@ Delete
 
   await registry.commit({wallet: identityWallet, ethereumPrivateKey})
 
-  Please note that due to the way that IPFS handles the concept of deletion, this delete method 
-  simply unpins your public profile from its corresponding pin set, and allows the unpinned data 
-  to be garbage collected in a 24 hour cycle. Accordingly, if the data has been pinned by another 
-  IPFS gateway, complete removal of stored information on the IPFS network cannot be ensured.
+Please note that due to the way that IPFS handles the concept of deletion, this delete method simply unpins your public profile from its corresponding pin set, and allows the unpinned data 
+to be garbage collected in a 24 hour cycle. Accordingly, if the data has been pinned by another IPFS gateway, complete removal of stored information on the IPFS network cannot be ensured.
 
 ###
 Get
