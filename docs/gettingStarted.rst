@@ -43,7 +43,7 @@ represents the entropy from which the master key has been derived.
 
 **Derive Child Keys**
 
-Now you can use the ``identityManager`` to derive child keys. For a self-sovereign identity
+Now you can use the ``identityManager`` to derive child keys. For a self-sovereign identity,
 we need to derive at least two keys. The first one is the identity key which is used for signing.
 The second one is an Ethereum key which is used for registering the identity on the Ethereum
 blockchain.  
