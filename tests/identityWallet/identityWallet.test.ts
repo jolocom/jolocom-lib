@@ -54,6 +54,13 @@ describe('IdentityWallet', () => {
     it('should correctly return an instance of identityWallet', () => {
       expect(iWallet).to.be.instanceof(IdentityWallet)
     })
+
+    it('should expose properties key and id on identityWallet.privateIdentityKey', () => {
+      expect(Object.keys((iWallet as any).privateIdentityKey)).to.deep.equal([
+        'key',
+        'id'
+      ])
+    })
   })
 
   describe('create', () => {

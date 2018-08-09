@@ -111,18 +111,16 @@ export class SignedCredential {
     return signedCredential
   }
 
-  public async generateSignature(privateKey: Buffer) {
+  public async generateSignature({ key, id }: { key: Buffer, id: string }) {
     this.proof.created = new Date()
-    this.proof.creator = `${this.issuer}#${this.id}`
+    this.proof.creator = id
     this.proof.nonce = generateRandomID(8)
-    this.proof.proofSectionType = proofTypes.proofSet
+    this.setIssuer(privateKeyToDID(key))
 
     const docDigest = await this.digest()
     const sigDigest = await this.proof.digest()
 
-    this.proof.signatureValue = sign(`${sigDigest}${docDigest}`, privateKey)
-
-    this.setIssuer(privateKeyToDID(privateKey))
+    this.proof.signatureValue = sign(`${sigDigest}${docDigest}`, key)
   }
 
   public async validateSignatureWithPublicKey(pubKey: Buffer): Promise<boolean> {

@@ -6,22 +6,27 @@ import { CredentialRequest } from '../credentialRequest/credentialRequest'
 import { IIdentityWalletCreateArgs } from './types'
 import { Identity } from '../identity/identity'
 import { CredentialResponse } from '../credentialResponse/credentialResponse'
+import { privateKeyToPublicKey } from '../utils/crypto'
 import { SignedCredentialResponse } from '../credentialResponse/signedCredentialResponse/signedCredentialResponse'
 
 export class IdentityWallet {
-  private privateIdentityKey: Buffer
   private identityDocument: Identity
+  private privateIdentityKey: {
+    key: Buffer
+    id: string
+  }
 
   public create = {
     credential: Credential.create,
     credentialRequest: CredentialRequest.create,
     credentialResponse: CredentialResponse.create,
-    signedCredential: async (credentialAttrs: ICredentialCreateAttrs) =>
-      await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey }),
+    signedCredential: async (credentialAttrs: ICredentialCreateAttrs) => {
+      return await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey })
+    },
     signedCredentialRequest: (credentialRequest: CredentialRequest) =>
-      SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey }),
+      SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey.key }),
     signedCredentialResponse: (credentialResponse: CredentialResponse) =>
-      SignedCredentialResponse.create({ credentialResponse, privateKey: this.privateIdentityKey })
+      SignedCredentialResponse.create({ credentialResponse, privateKey: this.privateIdentityKey.key })
   }
 
   public sign = {
@@ -33,7 +38,13 @@ export class IdentityWallet {
 
   public static create({ privateIdentityKey, identity }: IIdentityWalletCreateArgs): IdentityWallet {
     const identityWallet = new IdentityWallet()
-    identityWallet.privateIdentityKey = privateIdentityKey
+    const pubKey = privateKeyToPublicKey(privateIdentityKey).toString('hex')
+    const entry = identity.getPublicKeySection().find((pubKeySec) => pubKeySec.getPublicKeyHex() === pubKey)
+
+    identityWallet.privateIdentityKey = {
+      key: privateIdentityKey,
+      id: entry.getIdentifier()
+    }
     identityWallet.identityDocument = identity
     identityWallet.setIdentity(identity)
 
@@ -50,6 +61,10 @@ export class IdentityWallet {
     }
   }
 
+  public getIdentityKey(): { key: Buffer, id: string } {
+    return this.privateIdentityKey
+  }
+
   public async signCredential(credential: Credential): Promise<SignedCredential> {
     const signedCredential = SignedCredential.fromCredential(credential)
     await signedCredential.generateSignature(this.privateIdentityKey)
@@ -58,8 +73,11 @@ export class IdentityWallet {
   }
 
   public signCredentialRequest(credentialRequest: CredentialRequest): SignedCredentialRequest {
-    const signedCredRequest = SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey })
-    signedCredRequest.sign(this.privateIdentityKey)
+    const signedCredRequest = SignedCredentialRequest.create({
+      credentialRequest,
+      privateKey: this.privateIdentityKey.key
+    })
+    signedCredRequest.sign(this.privateIdentityKey.key)
 
     return signedCredRequest
   }

@@ -12,5 +12,8 @@ export interface ISignedCredentialAttrs extends ICredentialAttrs {
 
 export interface ISignedCredentialCreateArgs {
   credentialAttrs: ICredentialCreateAttrs
-  privateIdentityKey: Buffer
+  privateIdentityKey: {
+    key: Buffer,
+    id: string
+  }
 }
