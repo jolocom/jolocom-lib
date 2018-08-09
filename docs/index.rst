@@ -28,8 +28,6 @@ and transaction of trustable statements.
 
 In its most simplistic form, the Jolocom Protocol can be used to:
 
-The usage of the Jolocom protocol manifests itself in the following main patterns:
-
 * Create a self-sovereign identity for humans/devices/organizations
 * Attach meaningful information to identities in the form of verifiable credentials
 * Easily request and consume verified information about identities
