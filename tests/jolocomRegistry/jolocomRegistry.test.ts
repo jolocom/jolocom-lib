@@ -60,6 +60,7 @@ describe('JolocomRegistry', () => {
         privateIdentityKey: testPrivateIdentityKey,
         privateEthereumKey: testPrivateEthereumKey
       })
+      console.log(testPrivateEthereumKey)
     })
 
     afterEach(() => {
