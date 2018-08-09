@@ -52,9 +52,9 @@ blockchain.
   const identityKey = identityManager.deriveChildKey(path)
 
 .. seealso:: As mentioned before, multiple personas are enabled through Hierachical Deterministic Key Derivation. 
-If any of your child keys is compromised, you only lose one key. All other derived keys (including the most 
-important master key) remain secure. Go to `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ 
-if you want to find out more about this derivation scheme. 
+  If any of your child keys is compromised, you only lose one key. All other derived keys (including the most 
+  important master key) remain secure. Go to `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ 
+  if you want to find out more about this derivation scheme. 
 
 ``deriveChildKey`` on ``identityManager`` is called with ``path``. Path is a *string* and is a concept explored in previously mentioned  BIP 32 -
 it indicates along which 'path' a child key is derived from the master key. The Jolocom library provides
