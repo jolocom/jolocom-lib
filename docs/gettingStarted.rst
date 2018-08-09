@@ -10,8 +10,7 @@ You can use npm to do this.
   npm install jolocom-lib --save
 
 
-.. warning:: Please be aware that we are still in the alpha stage, and the Jolocom Protocol currently 
-runs on the Ethereum testnet. Do not send any 'real' ether to your address. 
+.. warning:: Please be aware that we are still in the alpha stage, and the Jolocom Protocol currently runs on the Ethereum testnet. Do not send any 'real' ether to your address. 
 
 
 How to create a Self-Sovereign Identity
