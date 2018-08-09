@@ -8,30 +8,29 @@ The Jolocom Protocol - Own Your Digital Self
 **Our Approach**
 
 
-The Jolocom Protocol is a light weight level two protocol which is build on open standards
-and sits on top of a blockchain implementation. The architecture of the protocol revolves around
+The Jolocom Protocol is a lightweight protocol which enables self-sovereign identity, which is built 
+with W3C open standards on top of Ethereum and IPFS. The architecture of the protocol revolves around
 three main concepts: 
 
-* Cryptographic Keys
-* Decentralized Identifiers (DIDs)
+* Pairwise pseudonymous multiple personas
+* Decentralized Identifiers (DIDs) and DID Documents
 * Verifiable Credentials
 
-Cryptographic keys enable context specific interactions and provide identities with signing and
-transaction capabilities. DIDs enable globally unique identifiers which are self issued and can be
-automatically resolved to DidDocuments containing more information about the identifier in question.
-Verifiable Credentials build the third pillar of the protocol. They provide a way to express statements
-about a subject which are cryptographically verifiable. This commoditizes the process of issuing and
-consuming a trustable statement – leaving the consumer of a verifiable credential with only one task:
-the choice to trust the issuer of the statement or not.
+Identities in the Jolocom system are controlled through asymmetric, public/private key cryptography. 
+This provides identities with signing and transaction capabilities, as well as enabling context-specific interactions 
+through child key pairs, which are derived as Hierarchical Deterministic Keys following the BIP-32 specification.
 
-Pillar one and two enable the existence of a self sovereign identity. Pillar one and three provide the
-needed tools to create complex structures on the edges while preserving protocol simplicity (at the core).
-This approach allows Jolocom to keep the protocol generic while account for a vast amount of use cases with
-varying complexity levels.
+DIDs are globally unique, persistent identifiers associated with each key pair, which are self-issued and can be 
+automatically resolved to DidDocuments containing more information about the identifier in question. 
+Verifiable Credentials enable cryptographically verifiable statements about identities. As long as the consumer 
+of the credential trusts the issuer of the statement, the Jolocom protocol provides a secure framework for the creation 
+and transaction of trustable statements.
+
+In its most simplistic form, the Jolocom Protocol can be used to:
 
 The usage of the Jolocom protocol manifests itself in the following main patterns:
 
-* Create a self sovereign identity for humans/devices/organizations
+* Create a self-sovereign identity for humans/devices/organizations
 * Attach meaningful information to identities in the form of verifiable credentials
 * Easily request and consume verified information about identities
 

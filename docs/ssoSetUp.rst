@@ -2,8 +2,8 @@
 Single Sign On (SSO) with Jolocom
 =================================
 
-This section shows how to implement a single sign on with the jolocom-lib.
-This can be relevant for services, dapp developer etc.
+This section shows how to implement a single sign on with the Jolocom library.
+This can be relevant for services, dApp developers, etc.
 
 
 
@@ -11,7 +11,9 @@ This can be relevant for services, dapp developer etc.
 Step 1: Create a Self Sovereign Identity
 ########################################
 
-The Usage section covers the creation and interaction patterns in more depth; here the focus is on a code example:
+The following code snippet shows how to create a self-sovereign identity with the Jolocom Library. 
+For a higher level explanation of identity creation, as well as other usage patterns of the Jolocom 
+Library, please refer to the Usage section.
 
 .. note:: Please note that registry will be refactored to use jolocom connectors as default soon.
 
@@ -28,7 +30,7 @@ The Usage section covers the creation and interaction patterns in more depth; he
   
   // create identity manager & derive keys
 
-  const indetityManager = JolocomLib.identityManager.create(seed)
+  const identityManager = JolocomLib.identityManager.create(seed)
 
   const schema = identityManager.getSchema()
 
@@ -67,7 +69,7 @@ The Usage section covers the creation and interaction patterns in more depth; he
 
 
 #############################################################
-Step 2: Create a Public Profile and attach it to the Identity
+Step 2: Create a Public Profile and attach it to the identity
 #############################################################
 
 .. code-block:: typescript
@@ -124,8 +126,8 @@ Step 2: Create a Public Profile and attach it to the Identity
 Step 3: Define Your Criteria for Single Sign On
 ###############################################
 
-.. note:: We use `JsonLogic <http://jsonlogic.com/>`_ for constrains definition in credentialRequirements. In the example below
-  the user has to provide a credential which is issued by 'did:jolo:showcase'.
+.. note:: We use `JsonLogic <http://jsonlogic.com/>`_ for constraints definition in credentialRequirements. 
+In the example below, the user must provide a credential which is issued by 'did:jolo:showcase'.
 
 .. code-block:: typescript
 
@@ -159,13 +161,12 @@ Step 3: Define Your Criteria for Single Sign On
   const signedCredReqJWT = signedCredReq.toJWT()
 
 
-
-
 ############################################
 Step 4: Evaluate Response for Single Sign On
 ############################################
 
-This is the last step during the Single Sign On. Here you evaluate the response from a user to your request.
+This is the last step of the Single Sign On process. Here, you can evaluate the response from a user 
+to your request.
 
 .. code-block:: typescript
 
@@ -188,11 +189,8 @@ This is the last step during the Single Sign On. Here you evaluate the response 
 
   const validCred = await receivedCreds[0].validateSignature(registry)
 
-
-  
-  
-  // user has fulfilled your requirements; redirect to logged in section
-
+  // If the user has fulfilled the indicated requirements from the request, 
+  they can now be redirected to the logged in section
 
 
 
