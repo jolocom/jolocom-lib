@@ -11,21 +11,16 @@ navigate the Jolocom library, as well as some context on the concept of self-sov
 
 The Jolocom protocol is build using the following core components:
 
-* `Hierarchical Deterministic Key Derivation <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ enables 
-pseudonymous, context specific interactions through the creation of and control over multiple identities
+* `Hierarchical Deterministic Key Derivation <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ enables pseudonymous, context specific interactions through the creation of and control over multiple identities
 
-* `Decentralized Identifiers <https://w3c-ccg.github.io/did-spec/>`_ (DIDs) are associated with each identity 
-and used for the management of these identities
+* `Decentralized Identifiers <https://w3c-ccg.github.io/did-spec/>`_ (DIDs) are associated with each identity and used for the management of these identities
 
-* `Verifiable Credentials <https://w3c.github.io/vc-data-model/>`_ are cryptographically verifiable and 
-allow for an easily consumable way of attaching attribute information to identities
+* `Verifiable Credentials <https://w3c.github.io/vc-data-model/>`_ are cryptographically verifiable and allow for an easily consumable way of attaching attribute information to identities
 
-* A distributed backend architecture (IPFS, Ethereum) provides the Jolocom identity solution with accessibility, 
-resiliency, and immutability
+* A distributed backend architecture (IPFS, Ethereum) provides the Jolocom identity solution with accessibility, resiliency, and immutability
 
 
-.. warning:: Please be aware that the Jolocom library is work in progress. Also, we are currently running on 
-the Ethereum testnet Rinkeby. Please do not transfer any real ether to your created addresses.
+.. warning:: Please be aware that the Jolocom library is work in progress. Also, we are currently running on the Ethereum testnet Rinkeby. Please do not transfer any real ether to your created addresses.
 
 **Interaction Flows Visualized**
 
