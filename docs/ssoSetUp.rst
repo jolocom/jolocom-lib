@@ -189,7 +189,8 @@ to your request.
 
   const validCred = await receivedCreds[0].validateSignature(registry)
 
-  // If the user has fulfilled the indicated requirements from the request, they can now be redirected to the logged in section
+  // If the user has fulfilled the indicated requirements from the request, they can now be redirected 
+  // to the logged in section
 
 
 
