@@ -13,18 +13,20 @@ import { IpfsStorageAgent } from '../../ts/ipfs';
 import { registries } from '../../ts/registries';
 import { IEthereumResolverConfig } from '../../ts/ethereum/types';
 import { EthResolver } from '../../ts/ethereum';
+import { setTimeout } from 'timers';
 
 chai.use(sinonChai)
 const expect = chai.expect
 
 describe('IdentityWallet', () => {
-  before(() => {
-    integrationHelper.init()
+  before(function() {
+    this.timeout(40000)
+    return integrationHelper.init()
   })
 
   const ipfsConfig: IIpfsConfig = {
-    protocol: 'https',
-    port: 43134,
+    protocol: 'http',
+    port: 5001,
     host: '127.0.0.1'
   }
   const ethereumConfig: IEthereumResolverConfig = {
