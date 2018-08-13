@@ -49,7 +49,7 @@ export const ddoAttr = {
   'service': [
     {
       id: 'public',
-      type: ['PublicProfile'],
+      type: 'JolocomPublicProfile',
       serviceEndpoint: 'ipfs://kjnwe6938uj3m2l3h',
       description: 'my public profile'
     }

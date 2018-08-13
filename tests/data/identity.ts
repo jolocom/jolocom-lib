@@ -17,7 +17,7 @@ export const ddoAttr = {
   'service': [
     {
       id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af;public',
-      type: ['PublicProfile'],
+      type: 'JolocomPublicProfile',
       serviceEndpoint: 'ipfs://kjnwe6938uj3m2l3h',
       description: 'my public profile'
     }
@@ -44,7 +44,7 @@ export const ddoAttrNoPublicProfile = {
   'service': [
     {
       id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af;public',
-      type: ['StorageService'],
+      type: 'StorageService',
       serviceEndpoint: 'ipfs://kjnwe6938uj3m2l3h',
       description: 'my sorage service'
     }

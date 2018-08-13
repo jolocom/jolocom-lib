@@ -35,11 +35,12 @@ export class JolocomRegistry {
 
   public async create(args: IRegistryInstanceCreationArgs): Promise<IdentityWallet> {
     const { privateIdentityKey, privateEthereumKey } = args
-    const ddoAttr = new DidDocument().fromPublicKey(privateKeyToPublicKey(privateIdentityKey)).toJSON()
-    const identity = Identity.create({ didDocument: ddoAttr })
-    const identityWallet = IdentityWallet.create({ privateIdentityKey: args.privateIdentityKey, identity })
-    await this.commit({ wallet: identityWallet, privateEthereumKey })
+    const ddo = new DidDocument().fromPrivateKey(privateIdentityKey)
 
+    const identity = Identity.create({ didDocument: ddo.toJSON() })
+    const identityWallet = IdentityWallet.create({ privateIdentityKey: privateIdentityKey, identity })
+
+    await this.commit({ wallet: identityWallet, privateEthereumKey })
     return identityWallet
   }
 
@@ -87,7 +88,7 @@ export class JolocomRegistry {
 
       const publicProfileSection = DidDocument.fromJSON(ddo)
         .getServiceEndpoints()
-        .find(endpoint => endpoint.getType() === 'PublicProfile')
+        .find(endpoint => endpoint.getType() === 'JolocomPublicProfile')
 
       if (publicProfileSection) {
         identityData.profile = await this.fetchPublicProfile(publicProfileSection.getServiceEndpoint())

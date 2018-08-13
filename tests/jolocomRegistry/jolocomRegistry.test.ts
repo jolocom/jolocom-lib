@@ -30,7 +30,7 @@ describe('JolocomRegistry', () => {
   const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
   const ethereumConnector = new EthResolver(testEthereumConfig)
 
-  const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
+  const ddo = new DidDocument().fromPrivateKey(testPrivateIdentityKey)
   const identity = Identity.create({didDocument: ddo.toJSON()})
   const identityWalletMock = IdentityWallet.create({privateIdentityKey: testPrivateIdentityKey, identity})
 
@@ -116,19 +116,22 @@ describe('JolocomRegistry', () => {
     const testDDO = DidDocument.fromJSON(ddoAttr)
     let resolveDIDStub
     let catJSONStub
-    let resolvePublicProfileStub
+    let fetchPublicProfileStub
 
     beforeEach(async () => {
       resolveDIDStub = sandbox.stub(EthResolver.prototype, 'resolveDID')
         .withArgs(ddo.getDID())
         .resolves(testIpfsHash)
+
       catJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'catJSON')
         .withArgs(testIpfsHash)
         .resolves(ddoAttr)
-      resolvePublicProfileStub = sandbox.stub(JolocomRegistry.prototype, 'resolvePublicProfile')
-        .withArgs(testDDO.getServiceEndpoints())
+
+      fetchPublicProfileStub = sandbox.stub(JolocomRegistry.prototype, 'fetchPublicProfile')
+        .withArgs(testDDO.getServiceEndpoints()[0].getServiceEndpoint())
         .resolves(SignedCredential.fromJSON(publicProfileJSON))
-      await jolocomRegistry.resolve(ddo.getDID())
+
+      return await jolocomRegistry.resolve(ddo.getDID())
     })
 
     afterEach(() => {
@@ -143,13 +146,13 @@ describe('JolocomRegistry', () => {
       sandbox.assert.calledOnce(catJSONStub)
     })
 
-    it('should call resolvePublicProfile when public profile on ddo', () => {
-      sandbox.assert.calledOnce(resolvePublicProfileStub)
+    it('should call fetchPublicProfile when public profile on ddo', () => {
+      sandbox.assert.calledOnce(fetchPublicProfileStub)
     })
   })
 
   describe('resolve', () => {
-    let resolvePublicProfileStub
+    let fetchPublicProfileStub
     let resolvedIdentity
 
     beforeEach(async () => {
@@ -159,7 +162,7 @@ describe('JolocomRegistry', () => {
       sandbox.stub(IpfsStorageAgent.prototype, 'catJSON')
         .withArgs(testIpfsHash)
         .resolves(ddoAttrNoPublicProfile)
-      resolvePublicProfileStub = sandbox.stub(JolocomRegistry.prototype, 'resolvePublicProfile')
+      fetchPublicProfileStub = sandbox.stub(JolocomRegistry.prototype, 'fetchPublicProfile')
 
       resolvedIdentity = await jolocomRegistry.resolve(ddo.getDID())
     })
@@ -168,8 +171,8 @@ describe('JolocomRegistry', () => {
       sandbox.restore()
     })
 
-    it('should not call resolvePublicProfile when no public profile on ddo', () => {
-      sandbox.assert.notCalled(resolvePublicProfileStub)
+    it('should not call fetchPublicProfile when no public profile on ddo', () => {
+      sandbox.assert.notCalled(fetchPublicProfileStub)
     })
 
     it('retured identity instance should have no public profile', () => {
@@ -177,7 +180,7 @@ describe('JolocomRegistry', () => {
     })
   })
 
-  describe('resolvePublicProfile', () => {
+  describe('fetchPublicProfile', () => {
     let catJSONStub
     let profile
 
@@ -185,8 +188,7 @@ describe('JolocomRegistry', () => {
       catJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'catJSON')
         .resolves(publicProfileJSON)
 
-      profile = await jolocomRegistry
-        .resolvePublicProfile(DidDocument.fromJSON(ddoAttr).getServiceEndpoints())
+      profile = await jolocomRegistry.fetchPublicProfile(ddoAttr.service[0].serviceEndpoint)
     })
 
     afterEach(() => {
