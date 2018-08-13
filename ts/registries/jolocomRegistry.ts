@@ -8,13 +8,9 @@ import { ServiceEndpointsSection } from '../identity/didDocument/sections/servic
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
-import {
-  IRegistryCommitArgs,
-  IRegistryInstanceCreationArgs,
-  IRegistryStaticCreationArgs
-} from './types'
-import { jolocomIpfsStorageAgent } from '../ipfs';
-import { jolocomEthereumResolver } from '../ethereum';
+import { IRegistryCommitArgs, IRegistryInstanceCreationArgs, IRegistryStaticCreationArgs } from './types'
+import { jolocomIpfsStorageAgent } from '../ipfs'
+import { jolocomEthereumResolver } from '../ethereum'
 
 /** Jolocom specific Registry, which uses IPFS
  *  and Ethereum for registering the indentity and the resolution
@@ -25,9 +21,11 @@ export class JolocomRegistry {
   public ethereumConnector: IEthereumConnector
 
   public static create(
-    { ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs =
-     {ipfsConnector: jolocomIpfsStorageAgent, ethereumConnector: jolocomEthereumResolver}
-    ): JolocomRegistry {
+    { ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs = {
+      ipfsConnector: jolocomIpfsStorageAgent,
+      ethereumConnector: jolocomEthereumResolver
+    }
+  ): JolocomRegistry {
     const jolocomRegistry = new JolocomRegistry()
     jolocomRegistry.ipfsConnector = ipfsConnector
     jolocomRegistry.ethereumConnector = ethereumConnector
@@ -36,14 +34,11 @@ export class JolocomRegistry {
   }
 
   public async create(args: IRegistryInstanceCreationArgs): Promise<IdentityWallet> {
-    const { privateIdentityKey, privateEthereumKey} = args
-    const ddoAttr = new DidDocument()
-      .fromPublicKey(privateKeyToPublicKey(privateIdentityKey))
-      .toJSON()
-    const identity = Identity.create({didDocument: ddoAttr})
-    const identityWallet = IdentityWallet
-      .create({privateIdentityKey: args.privateIdentityKey, identity})
-    await this.commit({wallet: identityWallet, privateEthereumKey})
+    const { privateIdentityKey, privateEthereumKey } = args
+    const ddoAttr = new DidDocument().fromPublicKey(privateKeyToPublicKey(privateIdentityKey)).toJSON()
+    const identity = Identity.create({ didDocument: ddoAttr })
+    const identityWallet = IdentityWallet.create({ privateIdentityKey: args.privateIdentityKey, identity })
+    await this.commit({ wallet: identityWallet, privateEthereumKey })
 
     return identityWallet
   }
@@ -53,14 +48,17 @@ export class JolocomRegistry {
     let ipfsHash
 
     try {
-      ipfsHash = await this.ipfsConnector.storeJSON({data: ddo, pin: true})
+      ipfsHash = await this.ipfsConnector.storeJSON({ data: ddo, pin: true })
     } catch (error) {
       throw new Error(`Could not save DID record on IPFS. ${error.message}`)
     }
 
     try {
-      await this.ethereumConnector
-        .updateDIDRecord({ethereumKey: privateEthereumKey, did: ddo.getDID(), newHash: ipfsHash})
+      await this.ethereumConnector.updateDIDRecord({
+        ethereumKey: privateEthereumKey,
+        did: ddo.getDID(),
+        newHash: ipfsHash
+      })
     } catch (error) {
       throw new Error(`Could not register DID record on Ethereum. ${error.message}`)
     }
@@ -79,28 +77,31 @@ export class JolocomRegistry {
 
   public async resolve(did): Promise<Identity> {
     try {
-      let identity
-      const hash = await this.ethereumConnector.resolveDID(did)
-      const ddo = await this.ipfsConnector.catJSON(hash) as IDidDocumentAttrs
+      const ddoHash = await this.ethereumConnector.resolveDID(did)
+      const ddo = (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs
 
-      const profileSection =  DidDocument.fromJSON(ddo).getServiceEndpoints().map((endpoint) => {
-        const type = endpoint.getType()
-        return (type[0] === 'PublicProfile') && endpoint
-      })
+      const identityData = {
+        didDocument: ddo,
+        profile: undefined
+      }
 
-      profileSection[0] ?
-        identity = Identity.create({didDocument: ddo, profile: await this.resolvePublicProfile(profileSection)}) :
-        identity = Identity.create({didDocument: ddo})
+      const publicProfileSection = DidDocument.fromJSON(ddo)
+        .getServiceEndpoints()
+        .find(endpoint => endpoint.getType() === 'PublicProfile')
 
-      return identity
+      if (publicProfileSection) {
+        identityData.profile = await this.fetchPublicProfile(publicProfileSection.getServiceEndpoint())
+      }
+
+      return Identity.create(identityData)
     } catch (error) {
       throw new Error(`Could not retrieve DID Document. ${error.message}`)
     }
   }
 
-  public async resolvePublicProfile(profileSection: ServiceEndpointsSection[]): Promise<SignedCredential> {
-    const hash = profileSection[0].getServiceEndpoint().replace('ipfs://', '')
-    const publicProfile =  await this.ipfsConnector.catJSON(hash) as ISignedCredentialAttrs
+  public async fetchPublicProfile(entry: string): Promise<SignedCredential> {
+    const hash = entry.replace('ipfs://', '')
+    const publicProfile = (await this.ipfsConnector.catJSON(hash)) as ISignedCredentialAttrs
 
     return SignedCredential.fromJSON(publicProfile)
   }
@@ -109,6 +110,6 @@ export class JolocomRegistry {
     const did = privateKeyToDID(privateIdentityKey)
     const identity = await this.resolve(did)
 
-    return IdentityWallet.create({privateIdentityKey, identity})
+    return IdentityWallet.create({ privateIdentityKey, identity })
   }
 }
