@@ -36,33 +36,35 @@ const deployContract = async () => {
 }
 
 export const init = async () => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
+    let address
+
     ganacheServer.listen(PORT, async (ganacheErr, blockchain) => {
-        if (ganacheErr) { return reject(ganacheErr) }
+      if (ganacheErr) { return reject(ganacheErr) }
 
-        const address = await deployContract()
-        console.log(address)
+      address = await deployContract()
 
-        daemonFactory.spawn(
-          {
-            exec: 'ipfs',
-            disposable: true,
-            defaultAddrs: true
-          },
-          (spawnErr, ipfsd) => {
-            if (spawnErr) {
-              return reject(spawnErr);
+      daemonFactory.spawn(
+        {
+          exec: 'ipfs',
+          disposable: true,
+          defaultAddrs: true
+        },
+        (spawnErr, ipfsd) => {
+          if (spawnErr) {
+            return reject(spawnErr);
+          }
+
+          ipfsd.api.id(function (apiErr, id) {
+            if (apiErr) {
+              return reject(apiErr);
             }
 
-            ipfsd.api.id(function (apiErr, id) {
-              if (apiErr) {
-                return reject(apiErr);
-              }
-              resolve()
-            });
-          }
-        )
-      })
+            resolve(address)
+          });
+        }
+      )
+    })
   })
 }
 // const startTest = () => {
