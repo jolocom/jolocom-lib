@@ -80,7 +80,6 @@ export class JolocomRegistry {
     try {
       const ddoHash = await this.ethereumConnector.resolveDID(did)
       const ddo = (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs
-      console.log(ddo)
 
       const identityData = {
         didDocument: ddo,
