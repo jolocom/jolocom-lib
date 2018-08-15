@@ -19,7 +19,7 @@ import {
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe('JolocomRegistry', () => {
+describe('JolocomRegistry', async () => {
   const sandbox = sinon.createSandbox()
   const clock = sinon.useFakeTimers()
 
@@ -30,7 +30,7 @@ describe('JolocomRegistry', () => {
   const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
   const ethereumConnector = new EthResolver(testEthereumConfig)
 
-  const ddo = new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+  const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
   const identity = Identity.create({didDocument: ddo.toJSON()})
   const identityWalletMock = IdentityWallet.create({privateIdentityKey: testPrivateIdentityKey, identity})
 

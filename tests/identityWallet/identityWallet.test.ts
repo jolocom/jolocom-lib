@@ -16,9 +16,9 @@ import { Identity } from '../../ts/identity/identity'
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe('IdentityWallet', () => {
+describe('IdentityWallet', async () => {
   const sandbox = sinon.createSandbox()
-  const ddo = new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+  const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
   const identity = Identity.create({ didDocument: ddo.toJSON() })
   const identityWallet = IdentityWallet.create({
     privateIdentityKey: testPrivateIdentityKey,

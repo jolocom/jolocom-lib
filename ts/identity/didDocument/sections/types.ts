@@ -5,7 +5,7 @@ export interface IPublicKeySectionAttrs {
 }
 
 export interface IAuthenticationSectionAttrs {
-  id: string
+  publicKey: string
   type: string
 }
 

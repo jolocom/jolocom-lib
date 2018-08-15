@@ -21,7 +21,8 @@ export const signedCredReqJson = {
   signature: 'lBcEgnfpORwlZGZ1HanoW2d3Ngm2qox-JI4T0iL-m1fBt5f6ihAvaoj0Z2usZiXwO5UtKXvvcvJTEP6rxI_MDQ'
 }
 
-export const signedCredReqJWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.\
+export const signedCredReqJWT =
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.\
 eyJpYXQiOjAsImlzcyI6ImRpZDpqb2xvOjhmOTc3ZTUwYjdlNWNiZGZlYjUzYTAzYzgxMjkxM2I3Mjk3\
 OGNhMzVjOTM1NzFmODVlODYyODYyYmFjOGNkZWIiLCJjcmVkZW50aWFsUmVxdWVzdCI6eyJjcmVkZW50\
 aWFsUmVxdWlyZW1lbnRzIjpbeyJ0eXBlIjpbIkNyZWRlbnRpYWwiLCJNb2NrQ3JlZGVudGlhbCJdLCJj\
@@ -32,27 +33,27 @@ rxI_MDQ'
 
 export const ddoAttr = {
   '@context': 'https://w3id.org/did/v1',
-  'id': 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
-  'authentication': [
+  id: 'did:jolo:ffcc8f84fae1b6ad253561d7b78167a661d72f58e86e60dbd04cd9b81096cdbe',
+  publicKey: [
     {
-      id: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb#keys-1',
-      type: 'EdDsaSAPublicKeySecp256k1'
+      id: 'did:jolo:ffcc8f84fae1b6ad253561d7b78167a661d72f58e86e60dbd04cd9b81096cdbe#keys-1',
+      type: 'Secp256k1VerificationKey2018',
+      publicKeyHex: '0343b964ac4be48b304d08aa5fc41513cbbf6a9587c687114145bf4740ce079f69'
     }
   ],
-  'publicKey': [
+  authentication: [
     {
-      id: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb#keys-1',
-      type: 'EdDsaSAPublicKeySecp256k1',
-      publicKeyHex: '039ab801fef81ad6928c62ca885b1f62c01a493daf58a0f7c76026d44d1d31f163'
+      publicKey: 'did:jolo:ffcc8f84fae1b6ad253561d7b78167a661d72f58e86e60dbd04cd9b81096cdbe#keys-1',
+      type: 'Secp256k1SignatureAuthentication2018'
     }
   ],
-  'service': [
-    {
-      id: 'public',
-      type: 'JolocomPublicProfile',
-      serviceEndpoint: 'ipfs://kjnwe6938uj3m2l3h',
-      description: 'my public profile'
-    }
-  ],
-  'created': new Date('2018-01-24T15:42:15Z')
+  service: [],
+  created: new Date('2018-01-24T15:42:15Z'),
+  proof: {
+    type: 'EcdsaKoblitzSignature2016',
+    created: '2018-08-15T13:14:10.115Z',
+    creator: 'did:jolo:ffcc8f84fae1b6ad253561d7b78167a661d72f58e86e60dbd04cd9b81096cdbe#keys-1',
+    nonce: '01fe24f91466b',
+    signatureValue: 'N1e+NpgJICu8/UZFwlHEvpucFLKIY44LKhJ/oR9ZsBQQEn9ZPO2Tu7q+TN9LJvCM13ERk4z3xYwyfTgzaEV74Q=='
+  },
 }
