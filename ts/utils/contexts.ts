@@ -20,6 +20,7 @@ export const defaultContext = {
   // TODO: split name for credential type
   ProofOfNameCredential: 'jolo:ProofOfNameCredential',
   ProofOfEmailCredential: 'jolo:ProofOfEmailCredential',
+  PublicProfileCredential: 'jolo:PublicProfileCredential',
   ProofOfMobilePhoneNumberCredential: 'jolo:ProofOfMobilePhoneNumberCredential',
   issuer: { '@id': 'cred:issuer', '@type': '@id' },
   issued: { '@id': 'cred:issued', '@type': 'xsd:dateTime' },
@@ -28,5 +29,10 @@ export const defaultContext = {
   telephone: 'schema:telephone',
   email: 'schema:email',
   givenName: 'schema:givenName',
-  familyName: 'schema:familyName'
+  familyName: 'schema:familyName',
+
+  name: 'schema:name',
+  description: 'schema:description',
+  image: 'schema:image',
+  url: 'schema:url'
 }

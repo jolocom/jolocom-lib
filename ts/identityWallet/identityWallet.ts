@@ -21,6 +21,10 @@ export class IdentityWallet {
     credentialRequest: CredentialRequest.create,
     credentialResponse: CredentialResponse.create,
     signedCredential: async (credentialAttrs: ICredentialCreateAttrs) => {
+      if (!credentialAttrs.claim.id) {
+        credentialAttrs.claim.id = this.identityDocument.getDID()
+      }
+
       return await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey })
     },
     signedCredentialRequest: (credentialRequest: CredentialRequest) =>

@@ -35,7 +35,7 @@ export class JolocomRegistry {
 
   public async create(args: IRegistryInstanceCreationArgs): Promise<IdentityWallet> {
     const { privateIdentityKey, privateEthereumKey } = args
-    const ddo = new DidDocument().fromPrivateKey(privateIdentityKey)
+    const ddo = await new DidDocument().fromPrivateKey(privateIdentityKey)
 
     const identity = Identity.create({ didDocument: ddo.toJSON() })
     const identityWallet = IdentityWallet.create({ privateIdentityKey: privateIdentityKey, identity })
@@ -80,6 +80,7 @@ export class JolocomRegistry {
     try {
       const ddoHash = await this.ethereumConnector.resolveDID(did)
       const ddo = (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs
+      console.log(ddo)
 
       const identityData = {
         didDocument: ddo,
