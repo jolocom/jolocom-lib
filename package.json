@@ -56,7 +56,7 @@
     "form-data": "^2.3.2",
     "go-ipfs-dep": "^0.4.17",
     "ipfsd-ctl": "^0.39.0",
-    "jolocom-registry-contract": "^0.1.6",
+    "jolocom-registry-contract": "^0.1.7",
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.0.1",
     "jsontokens": "^0.7.8",
