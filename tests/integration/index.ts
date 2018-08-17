@@ -48,14 +48,17 @@ describe('IdentityWallet', () => {
   describe('Creation of identity', () => {
 
     it('should generate a valid DDO', async () => {
-      const a = 1
-
       const identityWallet: IdentityWallet = await jolocomRegistry.create({
         privateIdentityKey: testPrivateIdentityKey,
         privateEthereumKey: testPrivateEthereumKey
       })
-      expect(identityWallet.getIdentity().didDocument).to.eq(ddoAttr)
+
+      const didDocument = identityWallet.getIdentity().didDocument
+
+      expect(didDocument).to.be.n.instanceOf(DidDocument)
+      expect(didDocument.getDID()).to.eq('did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af')
     })
 
   })
+
 })
