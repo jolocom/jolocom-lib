@@ -55,8 +55,36 @@ describe('IdentityWallet', () => {
 
       const didDocument = identityWallet.getIdentity().didDocument
 
-      expect(didDocument).to.be.n.instanceOf(DidDocument)
+      expect(didDocument).to.be.an.instanceOf(DidDocument)
       expect(didDocument.getDID()).to.eq('did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af')
+    })
+
+  })
+
+  describe('Authentication', () => {
+
+    it('should return authenticated identity wallet', async () => {
+      const authenticated = await jolocomRegistry.authenticate(testPrivateIdentityKey)
+
+      expect(authenticated).to.be.an.instanceOf(IdentityWallet)
+      expect(authenticated.getIdentity().getDID())
+        .to.eq('did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af')
+    })
+
+  })
+
+  describe('Signature verification', () => {
+
+    it('should generate a valid DDO', async () => {
+     return true
+    })
+
+  })
+
+  describe('Signed credentials', () => {
+
+    it('should generate a valid DDO', async () => {
+      return true
     })
 
   })
