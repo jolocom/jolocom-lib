@@ -9,6 +9,7 @@ import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsa
 import { defaultContext } from '../../utils/contexts'
 import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
 import { JolocomRegistry } from '../../registries/jolocomRegistry'
+import { registries } from '../../registries'
 
 @Exclude()
 export class SignedCredential {
@@ -110,18 +111,16 @@ export class SignedCredential {
     return signedCredential
   }
 
-  public async generateSignature(privateKey: Buffer) {
+  public async generateSignature({ key, id }: { key: Buffer, id: string }) {
     this.proof.created = new Date()
-    this.proof.creator = `${this.issuer}#${this.id}`
+    this.proof.creator = id
     this.proof.nonce = generateRandomID(8)
-    this.proof.proofSectionType = proofTypes.proofSet
+    this.setIssuer(privateKeyToDID(key))
 
     const docDigest = await this.digest()
     const sigDigest = await this.proof.digest()
 
-    this.proof.signatureValue = sign(`${sigDigest}${docDigest}`, privateKey)
-
-    this.setIssuer(privateKeyToDID(privateKey))
+    this.proof.signatureValue = sign(`${sigDigest}${docDigest}`, key)
   }
 
   public async validateSignatureWithPublicKey(pubKey: Buffer): Promise<boolean> {
@@ -140,18 +139,18 @@ export class SignedCredential {
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
     if (!registry) {
-      throw new Error('Can not instantiate default registry yet, WIP')
+      registry = registries.jolocom.create()
     }
 
     const issuerProfile = await registry.resolve(this.issuer)
-    const relevantPublicKey = issuerProfile.getPublicKeySection()[0]
-      .find((keySection) => keySection.id === this.proof.creator)
+    const relevantPublicKey = issuerProfile.getPublicKeySection()
+      .find((keySection) => keySection.getIdentifier() === this.proof.creator)
 
     if (!relevantPublicKey) {
       return false
     }
 
-    const pubKey = Buffer.from(relevantPublicKey.publicKeyHex, 'hex')
+    const pubKey = Buffer.from(relevantPublicKey.getPublicKeyHex(), 'hex')
     return this.validateSignatureWithPublicKey(pubKey)
   }
 

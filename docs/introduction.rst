@@ -2,42 +2,35 @@
 Introduction
 ============
 
-This section gives you a brief overview of the protocol architecture, a fist understanding
-on how to navigate the jolocom-lib and some context on what actually a self sovereign identity is.
-
+This section provides a brief overview of the protocol architecture, an introductory understanding on how to 
+navigate the Jolocom library, as well as some context on the concept of self-sovereign identity.
 
 .. image:: overview.jpg
-
 
 **System Architecture**
 
 The Jolocom protocol is build using the following core components:
 
-* `Hierarchical Deterministic Key Derivation <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ to allow for
-  context specific interactions & different ledger usage while 
-  preserving key manageability
+* `Hierarchical Deterministic Key Derivation <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ enables pseudonymous, context specific interactions through the creation of and control over multiple identities
 
-* `Decentralized Identifiers <https://w3c-ccg.github.io/did-spec/>`_ (DIDs) to enable self-sovereign identity creation and management
+* `Decentralized Identifiers <https://w3c-ccg.github.io/did-spec/>`_ (DIDs) are associated with each identity and used for the management of these identities
 
-* `Verifiable Credentials <https://w3c.github.io/vc-data-model/>`_ as a cryptographically consumable means to attach information to identities thus making them meaningful
+* `Verifiable Credentials <https://w3c.github.io/vc-data-model/>`_ are cryptographically verifiable and allow for an easily consumable way of attaching attribute information to identities
 
-* `JWT <https://jwt.io/>`_ as means to exchange credential requests and responses between identities
+* A distributed backend architecture (IPFS, Ethereum) provides the Jolocom identity solution with accessibility, resiliency, and immutability
 
 
-.. warning:: Please be aware that the jolocom-lib is work in progress. Also, we are currently using
-  the Ethereum testnet Rinkeby. Please do not transfer any real ether to your created addresses.
+.. warning:: Please be aware that the Jolocom library is work in progress. Also, we are currently running on the Ethereum testnet Rinkeby. Please do not transfer any real ether to your created addresses.
 
 **Interaction Flows Visualized**
 
 Coming soon.
 
-
-
 #########################
-Jolocom-lib at One Glance
+The Jolocom Library at a Glance
 #########################
 
-The jolocom-lib exposes a JolocomLib interface with four main entry points:
+The Jolocom library exposes a JolocomLib interface with four main entry points:
 
 * parse
 * registry
@@ -45,20 +38,20 @@ The jolocom-lib exposes a JolocomLib interface with four main entry points:
 * unsigned
 
 Verifiable Credentials and DID/DidDocuments are JSON-LD data types. 
-The jolocom-lib exposes methods on respective classes to serialize and deserialize.
+The Jolocom library exposes methods on their respective classes for serialization and deserialization.
 
-The parse functionality allows to parse ``fromJSON`` (JSON-LD) or ``fromJWT``.
+The parse functionality allows for the parsing of credential requests and responses 
+``fromJSON`` (JSON-LD) or ``fromJWT``.
 
-The registry is used for registering the identity, performing any updates, and as the
-resolution mechanism.
+The JolocomRegistry class is used to register the identity, perform any updates, and also contains the mechanism 
+for resolution of DIDs to their corresponding DidDocuments.
 
+The IdentityManager class is used to create and manage your keys.
 
-IdentityManagers' purpose is to create and manage your keys.
+The unsigned functionality enables usage patterns which do not require a private key.
 
-The unsigned functionality allows you to use the flows which do not require a private key.
-
-The jolocom-lib also exposes claimsMetadata. Since the verifiable credentials are JSON-LD documents
-you need to provide additional information besides the actual input.
+The Jolocom library also exposes claimsMetadata. Because verifiable credentials are structured as JSON-LD documents,
+you will need to provide further information in addition to the subject matter of the credential.
 
 
 In the case of an email address, the metadata would be:
@@ -79,15 +72,11 @@ The actual email claim would be:
   
   }
 
-Jolocom-lib tries to incorporate heavy used credential types in order to make credential creation
-as easy as possible.
-
-
-
-
+The Jolocom library tries to accomodate for commonly used credential types in order to make credential creation
+as simple as possible.
 
 ##################################
-What is a Self Sovereign Identity?
+What is a Self-Sovereign Identity?
 ##################################
 
 Coming soon.

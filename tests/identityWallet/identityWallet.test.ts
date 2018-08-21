@@ -54,11 +54,25 @@ describe('IdentityWallet', () => {
     it('should correctly return an instance of identityWallet', () => {
       expect(iWallet).to.be.instanceof(IdentityWallet)
     })
+
+    it('should expose properties key and id on identityWallet.privateIdentityKey', () => {
+      expect(Object.keys((iWallet as any).privateIdentityKey)).to.deep.equal([
+        'key',
+        'id'
+      ])
+    })
   })
 
   describe('create', () => {
     it('should expose credential, credentialRequest, signedCredential, signedCredentialRequest', () => {
-      const mockProps = ['credential', 'credentialRequest', 'signedCredential', 'signedCredentialRequest']
+      const mockProps = [
+        'credential',
+        'credentialRequest',
+        'credentialResponse',
+        'signedCredential',
+        'signedCredentialRequest',
+        'signedCredentialResponse'
+      ]
 
       expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
     })
