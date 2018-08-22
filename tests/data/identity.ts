@@ -14,7 +14,12 @@ export const ddoAttr = {
       type: 'Secp256k1SignatureAuthentication2018'
     }
   ],
-  service: [],
+  service: [{
+    id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af;public',
+    type: 'JolocomPublicProfile',
+    serviceEndpoint: 'ipfs://kjnwe6938uj3m2l3h',
+    description: 'my public profile'
+  }],
   created: new Date('2018-01-24T15:42:15Z'),
   proof: {
     type: 'EcdsaKoblitzSignature2016',

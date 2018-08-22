@@ -1,11 +1,13 @@
-import * as lolex from 'lolex'
 import { expect } from 'chai'
 import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { SignedCredentialRequest } from '../../ts/credentialRequest/signedCredentialRequest/signedCredentialRequest'
 import { CredentialRequest } from '../../ts/credentialRequest/credentialRequest'
-import { credentialRequestCreationArgs, credentialRequestCreationArgWithIssuer } from '../data/credentialRequest/credentialRequest'
+import {
+  credentialRequestCreationArgs,
+  credentialRequestCreationArgWithIssuer
+} from '../data/credentialRequest/credentialRequest'
 import {
   signedCredReqJson,
   signedCredReqJWT,
@@ -14,12 +16,13 @@ import {
   ddoAttr
 } from '../data/credentialRequest/signedCredentialRequest'
 import { privateKeyToPublicKey } from '../../ts/utils/crypto'
-import { JolocomRegistry } from '../../ts/registries/jolocomRegistry';
-import { Identity } from '../../ts/identity/identity';
+import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import { Identity } from '../../ts/identity/identity'
 chai.use(sinonChai)
 
 describe('SignedCredentialRequest', () => {
   let clock
+
   const sandbox = sinon.createSandbox()
 
   const mockCredentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
@@ -29,11 +32,11 @@ describe('SignedCredentialRequest', () => {
   }
 
   before(() => {
-    clock = lolex.install()
+    clock = sinon.useFakeTimers()
   })
 
   after(() => {
-    clock.uninstall()
+    clock.restore()
   })
 
   it('Should implement static create method with no issuer provided', () => {
@@ -105,28 +108,24 @@ describe('SignedCredentialRequest', () => {
   })
 
   describe('verification with registry', () => {
-    let resolveStub
     const mockCredentialRequestWithRealIssuer = CredentialRequest.create(credentialRequestCreationArgWithIssuer)
     const signedCredReqCreationArgs = {
       privateKey: Buffer.from(mockPrivKey, 'hex'),
       credentialRequest: mockCredentialRequestWithRealIssuer
     }
 
-    beforeEach( () => {
-      resolveStub = sandbox.stub(JolocomRegistry.prototype, 'resolve')
-        .resolves(Identity.create({ didDocument: ddoAttr }))
+    beforeEach(() => {
+      sandbox.stub(JolocomRegistry.prototype, 'resolve').resolves(Identity.create({ didDocument: ddoAttr }))
     })
 
     afterEach(() => {
       sandbox.restore()
     })
 
-    it('Should implement a validateSignature method that defaults to using JolocomRegistry', async() => {
+    it('Should implement a validateSignature method that defaults to using JolocomRegistry', async () => {
       const incorrectlySignedCR = SignedCredentialRequest.create(signedCredReqCreationArgs)
-      
-      expect(await incorrectlySignedCR.validateSignature()).to.equal(
-        false
-      )
+
+      expect(await incorrectlySignedCR.validateSignature()).to.equal(false)
     })
   })
 
