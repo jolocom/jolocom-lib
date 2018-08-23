@@ -29,7 +29,7 @@ export class ServiceEndpointsSection {
     return classToPlain(this) as IServiceEndpointSectionAttrs
   }
 
-  public fromJSON(json: IServiceEndpointSectionAttrs): ServiceEndpointsSection {
+  public static fromJSON(json: IServiceEndpointSectionAttrs): ServiceEndpointsSection {
     return plainToClass(ServiceEndpointsSection, json)
   }
 

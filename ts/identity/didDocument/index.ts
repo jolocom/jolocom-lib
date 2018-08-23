@@ -5,7 +5,7 @@ import { AuthenticationSection } from './sections/authenticationSection'
 import { ServiceEndpointsSection } from './sections/serviceEndpointsSection'
 import { PublicKeySection } from './sections/publicKeySection'
 import { canonize } from 'jsonld'
-import { JolocomRegistry, create } from '../../registries/jolocomRegistry';
+import { JolocomRegistry, createJolocomRegistry } from '../../registries/jolocomRegistry';
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016';
 
 @Exclude()
@@ -36,6 +36,10 @@ export class DidDocument {
   @Expose()
   private id: string
 
+  public addServiceEndpoint(endpoint: ServiceEndpointsSection) {
+    this.service = [endpoint]
+  }
+
   public async fromPrivateKey(privateKey: Buffer): Promise<DidDocument> {
     const did = privateKeyToDID(privateKey)
     const publicKey = privateKeyToPublicKey(privateKey)
@@ -64,7 +68,7 @@ export class DidDocument {
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
     if (!registry) {
-      registry = create()
+      registry = createJolocomRegistry()
     }
 
     const creatorDid = this.proof.creator.substring(0, this.proof.creator.indexOf('#'))

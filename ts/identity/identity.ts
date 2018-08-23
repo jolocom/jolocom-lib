@@ -14,7 +14,7 @@ export class Identity {
   }
 
   // TODO Why not pass a didDocument instance but JSON?
-  public static create({didDocument, profile}: IIdentityCreateArgs): Identity {
+  public static create({ didDocument, profile }: IIdentityCreateArgs): Identity {
     const identity = new Identity()
     identity.didDocument = DidDocument.fromJSON(didDocument)
     if (profile) {
@@ -25,14 +25,14 @@ export class Identity {
   }
 
   private getPublicProfile() {
-    if ( !this.profile ) { throw new Error('No public Profile available') }
-    return this.profile.getCredentialSection()
+    return this.profile ? this.profile : false
   }
 
   private addPublicProfile(publicProfile: SignedCredential) {
-    if ( !this.profile ) { throw new Error('Public Profile already added') }
+    if (this.profile) {
+      throw new Error('Public Profile already added')
+    }
     this.profile = publicProfile
-
     return this
   }
 
@@ -43,7 +43,9 @@ export class Identity {
   }
 
   private deletePublicProfile() {
-    if ( !this.profile ) { throw new Error('Public Profile already added') }
+    if (!this.profile) {
+      throw new Error('Public Profile already added')
+    }
     this.profile = undefined
 
     return this

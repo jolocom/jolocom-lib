@@ -1,32 +1,26 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import {
-  testPrivateIdentityKey,
-  testPrivateEthereumKey
-} from '../data/keys'
+import { testPrivateIdentityKey, testPrivateEthereumKey } from '../data/keys'
 import { DidDocument } from '../../ts/identity/didDocument'
-import { Identity } from '../../ts/identity/identity'
 import * as integrationHelper from './provision'
 import { IIpfsConfig } from '../../ts/ipfs/types'
 import { IpfsStorageAgent } from '../../ts/ipfs'
-import { registries } from '../../ts/registries'
 import { IEthereumResolverConfig } from '../../ts/ethereum/types'
 import { EthResolver } from '../../ts/ethereum'
-import { setTimeout } from 'timers'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
-import { ddoAttr } from '../data/identity'
-import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry';
+import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import { claimsMetadata } from '../../ts/index'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe('IdentityWallet', () => {
-  let address
+describe('Integration Test', () => {
   let jolocomRegistry
+  const did = 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af'
 
   before(async function() {
     this.timeout(40000)
-    address = await integrationHelper.init()
+    const address = await integrationHelper.init()
 
     const ipfsConfig: IIpfsConfig = {
       protocol: 'http',
@@ -40,13 +34,11 @@ describe('IdentityWallet', () => {
 
     const ipfsConnector = new IpfsStorageAgent(ipfsConfig)
     const ethereumConnector = new EthResolver(ethereumConfig)
+
     jolocomRegistry = createJolocomRegistry({ ipfsConnector, ethereumConnector })
-    const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
-    const identity = Identity.create({ didDocument: ddo.toJSON() })
   })
 
   describe('Creation of identity', () => {
-
     it('should generate a valid DDO', async () => {
       const identityWallet: IdentityWallet = await jolocomRegistry.create({
         privateIdentityKey: testPrivateIdentityKey,
@@ -54,40 +46,49 @@ describe('IdentityWallet', () => {
       })
 
       const didDocument = identityWallet.getIdentity().didDocument
-
       expect(didDocument).to.be.an.instanceOf(DidDocument)
-      expect(didDocument.getDID()).to.eq('did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af')
+      expect(didDocument.getDID()).to.eq(did)
     })
-
   })
 
-  // errors out now; publicProfile changes will fix it
-  // describe('Authentication', () => {
+  describe('Authentication', () => {
+    it('should return authenticated identity wallet', async () => {
+      const identityWallet = await jolocomRegistry.authenticate(testPrivateIdentityKey)
 
-  //   it('should return authenticated identity wallet', async () => {
-  //     const authenticated = await jolocomRegistry.authenticate(testPrivateIdentityKey)
+      expect(identityWallet).to.be.an.instanceOf(IdentityWallet)
+      expect(identityWallet.getIdentity().getDID()).to.eq(did)
+    })
+  })
 
-  //     expect(authenticated).to.be.an.instanceOf(IdentityWallet)
-  //     expect(authenticated.getIdentity().getDID())
-  //       .to.eq('did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af')
-  //   })
+  describe('Public Profile', () => {
+    it('should correctly add and commit public profile credential', async () => {
+      const identityWallet = await jolocomRegistry.authenticate(testPrivateIdentityKey)
+      const publicProfileCredential = await identityWallet.create.signedCredential({
+        metadata: claimsMetadata.publicProfile,
+        claim: {
+          name: 'Test Name',
+          description: 'Test Description'
+        }
+      })
 
-  // })
+      identityWallet.getIdentity().publicProfile.add(publicProfileCredential)
+      await jolocomRegistry.commit({ wallet: identityWallet, privateEthereumKey: testPrivateEthereumKey })
+
+      const committedProfile = await jolocomRegistry.resolve(did)
+
+      expect(committedProfile.publicProfile.get().getCredentialSection()).to.deep.equal({
+        id: did,
+        name: 'Test Name',
+        description: 'Test Description'
+      })
+    })
+  })
 
   describe('Signature verification', () => {
+    it('should generate a valid DDO public profile', async () => {
+      const committedProfile = await jolocomRegistry.resolve(did)
 
-    it('should generate a valid DDO', async () => {
-     return true
+      expect(await committedProfile.publicProfile.get().validateSignature(jolocomRegistry)).to.be.true
     })
-
   })
-
-  describe('Signed credentials', () => {
-
-    it('should generate a valid DDO', async () => {
-      return true
-    })
-
-  })
-
 })

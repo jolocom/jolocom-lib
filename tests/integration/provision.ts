@@ -35,8 +35,9 @@ const deployContract = async () => {
   return address
 }
 
-export const init = async () => {
-  return new Promise(async (resolve, reject) => {
+export const init = async () : Promise<string> => {
+  return new Promise<string>(async (resolve, reject) => {
+
     let address
 
     ganacheServer.listen(PORT, async (ganacheErr, blockchain) => {
