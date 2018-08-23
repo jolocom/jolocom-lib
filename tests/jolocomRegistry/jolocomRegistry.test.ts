@@ -1,6 +1,6 @@
 import { IpfsStorageAgent, jolocomIpfsStorageAgent } from '../../ts/ipfs'
 import { EthResolver, jolocomEthereumResolver } from '../../ts/ethereum'
-import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import { JolocomRegistry, createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { ddoAttr, ddoAttrNoPublicProfile, publicProfileJSON } from '../data/identity'
 import { DidDocument } from '../../ts/identity/didDocument'
 import * as sinon from 'sinon'
@@ -29,7 +29,7 @@ describe('JolocomRegistry', () => {
   describe('static create', () => {
     const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
     const ethereumConnector = new EthResolver(testEthereumConfig)
-    const jolocomRegistry = JolocomRegistry.create({ ipfsConnector, ethereumConnector })
+    const jolocomRegistry = createJolocomRegistry({ipfsConnector, ethereumConnector})
 
     // TODO We should eventually check if we can plug in another connector
     it('should correctly create an instance of JolocomRegistry if connectors are passed ', () => {
@@ -37,8 +37,8 @@ describe('JolocomRegistry', () => {
       expect(jolocomRegistry.ethereumConnector).to.deep.equal(ethereumConnector)
     })
 
-    it('should correctly create an instance of JolocomRegistry if no connectors are passed', () => {
-      const defaultJolocomRegistry = JolocomRegistry.create()
+    it('should create an instance of JolocomRegistry with correct config', () => {
+      const defaultJolocomRegistry = createJolocomRegistry()
       expect(defaultJolocomRegistry.ipfsConnector).to.deep.equal(jolocomIpfsStorageAgent)
       expect(defaultJolocomRegistry.ethereumConnector).to.deep.equal(jolocomEthereumResolver)
     })
@@ -49,7 +49,7 @@ describe('JolocomRegistry', () => {
     let commit
 
     beforeEach(async () => {
-      const jolocomRegistry = JolocomRegistry.create()
+      const jolocomRegistry = createJolocomRegistry()
 
       commit = sandbox.stub(JolocomRegistry.prototype, 'commit').resolves()
       identityWallet = await jolocomRegistry.create({
@@ -81,7 +81,7 @@ describe('JolocomRegistry', () => {
       storeJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON').resolves(testIpfsHash)
       updateDIDRecordStub = sandbox.stub(EthResolver.prototype, 'updateDIDRecord').resolves()
 
-      const jolocomRegistry = JolocomRegistry.create()
+      const jolocomRegistry = createJolocomRegistry()
       const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
       const identity = Identity.create({ didDocument: ddo.toJSON() })
       const identityWalletMock = IdentityWallet.create({ privateIdentityKey: testPrivateIdentityKey, identity })
@@ -104,7 +104,7 @@ describe('JolocomRegistry', () => {
 
   describe('resolve with public profile', () => {
     const testDDO = DidDocument.fromJSON(ddoAttr)
-    const jolocomRegistry = JolocomRegistry.create()
+    const jolocomRegistry = createJolocomRegistry()
 
     let resolveDIDStub
     let catJSONStub
@@ -150,7 +150,7 @@ describe('JolocomRegistry', () => {
     let resolvedIdentity
 
     beforeEach(async () => {
-      const jolocomRegistry = JolocomRegistry.create()
+      const jolocomRegistry = createJolocomRegistry()
       const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
 
       sandbox
@@ -178,7 +178,7 @@ describe('JolocomRegistry', () => {
   })
 
   describe('resolvePublicProfile', () => {
-    const jolocomRegistry = JolocomRegistry.create()
+    const jolocomRegistry = createJolocomRegistry()
 
     let catJSONStub
     let profile
@@ -207,7 +207,7 @@ describe('JolocomRegistry', () => {
     let identityWallet
 
     beforeEach(async () => {
-      const jolocomRegistry = JolocomRegistry.create()
+      const jolocomRegistry = createJolocomRegistry()
       const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
 
       resolveStub = sandbox
@@ -228,7 +228,7 @@ describe('JolocomRegistry', () => {
   })
 
   describe('error handling commit', () => {
-    const jolocomRegistry = JolocomRegistry.create()
+    const jolocomRegistry = createJolocomRegistry()
 
     let ddo
 
@@ -255,7 +255,7 @@ describe('JolocomRegistry', () => {
   })
 
   describe('error handling resolve', () => {
-    const jolocomRegistry = JolocomRegistry.create()
+    const jolocomRegistry = createJolocomRegistry()
 
     it('should correctly assemble the thrown error on failed resolveDID', async () => {
       const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
@@ -286,7 +286,7 @@ describe('JolocomRegistry', () => {
     let resolveDIDStub
     let removePinnedHashStub
 
-    const jolocomRegistry = JolocomRegistry.create()
+    const jolocomRegistry = createJolocomRegistry()
 
     beforeEach(async () => {
       const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
@@ -313,7 +313,7 @@ describe('JolocomRegistry', () => {
 
   describe('unpin', () => {
     let unpin
-    const jolocomRegistry = JolocomRegistry.create()
+    const jolocomRegistry = createJolocomRegistry()
 
     beforeEach(() => {
       sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON').resolves(testIpfsHash)

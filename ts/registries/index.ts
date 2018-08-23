@@ -1,7 +1,8 @@
-import { JolocomRegistry } from './jolocomRegistry'
+import { createJolocomRegistry } from './jolocomRegistry'
 
+console.log(createJolocomRegistry)
 export const registries = {
-    jolocom: {
-      create: JolocomRegistry.create
-    }
+  jolocom: {
+    create: createJolocomRegistry
+  }
 }

@@ -5,7 +5,7 @@ import { AuthenticationSection } from './sections/authenticationSection'
 import { ServiceEndpointsSection } from './sections/serviceEndpointsSection'
 import { PublicKeySection } from './sections/publicKeySection'
 import { canonize } from 'jsonld'
-import { JolocomRegistry } from '../../registries/jolocomRegistry';
+import { JolocomRegistry, create } from '../../registries/jolocomRegistry';
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016';
 
 @Exclude()
@@ -64,7 +64,7 @@ export class DidDocument {
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
     if (!registry) {
-      registry = JolocomRegistry.create()
+      registry = create()
     }
 
     const creatorDid = this.proof.creator.substring(0, this.proof.creator.indexOf('#'))

@@ -20,19 +20,6 @@ export class JolocomRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
 
-  public static create(
-    { ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs = {
-      ipfsConnector: jolocomIpfsStorageAgent,
-      ethereumConnector: jolocomEthereumResolver
-    }
-  ): JolocomRegistry {
-    const jolocomRegistry = new JolocomRegistry()
-    jolocomRegistry.ipfsConnector = ipfsConnector
-    jolocomRegistry.ethereumConnector = ethereumConnector
-
-    return jolocomRegistry
-  }
-
   public async create(args: IRegistryInstanceCreationArgs): Promise<IdentityWallet> {
     const { privateIdentityKey, privateEthereumKey } = args
     const ddo = await new DidDocument().fromPrivateKey(privateIdentityKey)
@@ -113,4 +100,17 @@ export class JolocomRegistry {
 
     return IdentityWallet.create({ privateIdentityKey, identity })
   }
+}
+
+export const createJolocomRegistry = (
+  { ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs = {
+    ipfsConnector: jolocomIpfsStorageAgent,
+    ethereumConnector: jolocomEthereumResolver
+  }
+): JolocomRegistry => {
+  const jolocomRegistry = new JolocomRegistry()
+  jolocomRegistry.ipfsConnector = ipfsConnector
+  jolocomRegistry.ethereumConnector = ethereumConnector
+
+  return jolocomRegistry
 }
