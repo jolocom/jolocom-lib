@@ -1,4 +1,5 @@
 import { IPublicKeySectionAttrs, IAuthenticationSectionAttrs, IServiceEndpointSectionAttrs  } from './sections/types'
+import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types';
 
 export interface IDidDocumentAttrs {
   '@context': string
@@ -7,4 +8,5 @@ export interface IDidDocumentAttrs {
   publicKey: IPublicKeySectionAttrs[]
   service: IServiceEndpointSectionAttrs[]
   created: Date
+  proof: ILinkedDataSignatureAttrs
 }

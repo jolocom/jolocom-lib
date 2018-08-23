@@ -1,5 +1,4 @@
 import { expect } from 'chai'
-import * as lolex from 'lolex'
 import { SignedCredentialResponse } from '../../ts/credentialResponse/signedCredentialResponse/signedCredentialResponse'
 import { CredentialResponse } from '../../ts/credentialResponse/credentialResponse'
 import { firstMockCredential } from '../data/credentialRequest/credentialRequest'
@@ -29,11 +28,11 @@ describe('SignedCredentialResponse', () => {
   }
 
   before(() => {
-    clock = lolex.install()
+    clock = sinon.useFakeTimers()
   })
 
   after(() => {
-    clock.uninstall()
+    clock.restore()
   })
 
   it('Should implement static create method', () => {

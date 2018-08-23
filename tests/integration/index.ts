@@ -2,7 +2,6 @@ import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import {
   testPrivateIdentityKey,
-  testPublicIdentityKey,
   testPrivateEthereumKey
 } from '../data/keys'
 import { DidDocument } from '../../ts/identity/didDocument'
@@ -16,6 +15,7 @@ import { EthResolver } from '../../ts/ethereum'
 import { setTimeout } from 'timers'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { ddoAttr } from '../data/identity'
+import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry';
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -40,8 +40,8 @@ describe('IdentityWallet', () => {
 
     const ipfsConnector = new IpfsStorageAgent(ipfsConfig)
     const ethereumConnector = new EthResolver(ethereumConfig)
-    jolocomRegistry = registries.jolocom.create({ ipfsConnector, ethereumConnector })
-    const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
+    jolocomRegistry = createJolocomRegistry({ ipfsConnector, ethereumConnector })
+    const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
     const identity = Identity.create({ didDocument: ddo.toJSON() })
   })
 

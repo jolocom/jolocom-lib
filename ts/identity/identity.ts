@@ -13,6 +13,7 @@ export class Identity {
     update: this.updatePublicProfile.bind(this)
   }
 
+  // TODO Why not pass a didDocument instance but JSON?
   public static create({didDocument, profile}: IIdentityCreateArgs): Identity {
     const identity = new Identity()
     identity.didDocument = DidDocument.fromJSON(didDocument)

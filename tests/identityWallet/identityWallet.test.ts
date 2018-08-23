@@ -2,7 +2,7 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
-import { testPrivateIdentityKey, testPublicIdentityKey, testPublicIdentityKey2 } from '../data/keys'
+import { testPrivateIdentityKey } from '../data/keys'
 import { DidDocument } from '../../ts/identity/didDocument'
 import { claimsMetadata } from '../../ts/index'
 import { singleClaimCreationArgs, singleClaimCredentialJSON } from '../data/credential/credential'
@@ -18,16 +18,20 @@ const expect = chai.expect
 
 describe('IdentityWallet', () => {
   const sandbox = sinon.createSandbox()
-  const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
-  const identity = Identity.create({ didDocument: ddo.toJSON() })
-  const identityWallet = IdentityWallet.create({
-    privateIdentityKey: testPrivateIdentityKey,
-    identity
-  })
-
+  let ddo
+  let identity
+  let identityWallet
   let clock
-  before(() => {
+
+  before(async () => {
     clock = sinon.useFakeTimers()
+
+    ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+    identity = Identity.create({ didDocument: ddo.toJSON() })
+    identityWallet = IdentityWallet.create({
+      privateIdentityKey: testPrivateIdentityKey,
+      identity
+    })
   })
 
   after(() => {

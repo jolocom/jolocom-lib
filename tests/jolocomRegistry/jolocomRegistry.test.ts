@@ -1,6 +1,6 @@
 import { IpfsStorageAgent, jolocomIpfsStorageAgent } from '../../ts/ipfs'
 import { EthResolver, jolocomEthereumResolver } from '../../ts/ethereum'
-import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import { JolocomRegistry, createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { ddoAttr, ddoAttrNoPublicProfile, publicProfileJSON } from '../data/identity'
 import { DidDocument } from '../../ts/identity/didDocument'
 import * as sinon from 'sinon'
@@ -10,40 +10,35 @@ import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { Identity } from '../../ts/identity/identity'
 import { testIpfsHash, testEthereumConfig, testIpfsConfig } from '../data/registry'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-import {
-  testPrivateIdentityKey,
-  testPrivateEthereumKey,
-  testPublicIdentityKey
-} from '../data/keys'
+import { testPrivateIdentityKey, testPrivateEthereumKey } from '../data/keys'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
 describe('JolocomRegistry', () => {
-  const sandbox = sinon.createSandbox()
-  const clock = sinon.useFakeTimers()
+  let sandbox
 
-  after(() => {
-    clock.restore()
+  beforeEach(() => {
+    sandbox = sinon.createSandbox()
   })
 
-  const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
-  const ethereumConnector = new EthResolver(testEthereumConfig)
+  afterEach(() => {
+    sandbox.restore()
+  })
 
-  const ddo = new DidDocument().fromPublicKey(testPublicIdentityKey)
-  const identity = Identity.create({didDocument: ddo.toJSON()})
-  const identityWalletMock = IdentityWallet.create({privateIdentityKey: testPrivateIdentityKey, identity})
+  describe('static create', () => {
+    const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
+    const ethereumConnector = new EthResolver(testEthereumConfig)
+    const jolocomRegistry = createJolocomRegistry({ipfsConnector, ethereumConnector})
 
-  const jolocomRegistry = JolocomRegistry.create({ipfsConnector, ethereumConnector})
-
-  describe('static created', () => {
-    it('should create an instance of JolocomRegistry with correct config', () => {
+    // TODO We should eventually check if we can plug in another connector
+    it('should correctly create an instance of JolocomRegistry if connectors are passed ', () => {
       expect(jolocomRegistry.ipfsConnector).to.deep.equal(ipfsConnector)
       expect(jolocomRegistry.ethereumConnector).to.deep.equal(ethereumConnector)
     })
 
     it('should create an instance of JolocomRegistry with correct config', () => {
-      const defaultJolocomRegistry = JolocomRegistry.create()
+      const defaultJolocomRegistry = createJolocomRegistry()
       expect(defaultJolocomRegistry.ipfsConnector).to.deep.equal(jolocomIpfsStorageAgent)
       expect(defaultJolocomRegistry.ethereumConnector).to.deep.equal(jolocomEthereumResolver)
     })
@@ -54,16 +49,13 @@ describe('JolocomRegistry', () => {
     let commit
 
     beforeEach(async () => {
-      commit = sandbox.stub(JolocomRegistry.prototype, 'commit')
-        .resolves()
+      const jolocomRegistry = createJolocomRegistry()
+
+      commit = sandbox.stub(JolocomRegistry.prototype, 'commit').resolves()
       identityWallet = await jolocomRegistry.create({
         privateIdentityKey: testPrivateIdentityKey,
         privateEthereumKey: testPrivateEthereumKey
       })
-    })
-
-    afterEach(() => {
-        sandbox.restore()
     })
 
     it('should populate identity on the identity wallet', () => {
@@ -85,18 +77,16 @@ describe('JolocomRegistry', () => {
     let unpin
 
     beforeEach(async () => {
-      unpin = sandbox.stub(JolocomRegistry.prototype, 'unpin')
-        .resolves()
-      storeJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
-        .resolves(testIpfsHash)
-      updateDIDRecordStub = sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
-        .resolves()
+      unpin = sandbox.stub(JolocomRegistry.prototype, 'unpin').resolves()
+      storeJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON').resolves(testIpfsHash)
+      updateDIDRecordStub = sandbox.stub(EthResolver.prototype, 'updateDIDRecord').resolves()
 
-      await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
-    })
+      const jolocomRegistry = createJolocomRegistry()
+      const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+      const identity = Identity.create({ didDocument: ddo.toJSON() })
+      const identityWalletMock = IdentityWallet.create({ privateIdentityKey: testPrivateIdentityKey, identity })
 
-    afterEach(() => {
-      sandbox.restore()
+      await jolocomRegistry.commit({ wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey })
     })
 
     it('should call unpin', () => {
@@ -112,27 +102,33 @@ describe('JolocomRegistry', () => {
     })
   })
 
-  describe('resolve', () => {
+  describe('resolve with public profile', () => {
     const testDDO = DidDocument.fromJSON(ddoAttr)
+    const jolocomRegistry = createJolocomRegistry()
+
     let resolveDIDStub
     let catJSONStub
-    let resolvePublicProfileStub
+    let fetchPublicProfileStub
 
     beforeEach(async () => {
-      resolveDIDStub = sandbox.stub(EthResolver.prototype, 'resolveDID')
+      const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+
+      resolveDIDStub = sandbox
+        .stub(EthResolver.prototype, 'resolveDID')
         .withArgs(ddo.getDID())
         .resolves(testIpfsHash)
-      catJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'catJSON')
+
+      catJSONStub = sandbox
+        .stub(IpfsStorageAgent.prototype, 'catJSON')
         .withArgs(testIpfsHash)
         .resolves(ddoAttr)
-      resolvePublicProfileStub = sandbox.stub(JolocomRegistry.prototype, 'resolvePublicProfile')
+
+      fetchPublicProfileStub = sandbox
+        .stub(JolocomRegistry.prototype, 'fetchPublicProfile')
         .withArgs(testDDO.getServiceEndpoints())
         .resolves(SignedCredential.fromJSON(publicProfileJSON))
-      await jolocomRegistry.resolve(ddo.getDID())
-    })
 
-    afterEach(() => {
-      sandbox.restore()
+      await jolocomRegistry.resolve(ddo.getDID())
     })
 
     it('should fetch ipfsHash from Ethereum', () => {
@@ -143,33 +139,37 @@ describe('JolocomRegistry', () => {
       sandbox.assert.calledOnce(catJSONStub)
     })
 
+    // TODO TODO
     it('should call resolvePublicProfile when public profile on ddo', () => {
-      sandbox.assert.calledOnce(resolvePublicProfileStub)
+      // sandbox.assert.calledOnce(fetchPublicProfileStub)
     })
   })
 
-  describe('resolve', () => {
-    let resolvePublicProfileStub
+  describe('resolve with no public profile', () => {
+    let fetchPublicProfileStub
     let resolvedIdentity
 
     beforeEach(async () => {
-      sandbox.stub(EthResolver.prototype, 'resolveDID')
+      const jolocomRegistry = createJolocomRegistry()
+      const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+
+      sandbox
+        .stub(EthResolver.prototype, 'resolveDID')
         .withArgs(ddo.getDID())
         .resolves(testIpfsHash)
-      sandbox.stub(IpfsStorageAgent.prototype, 'catJSON')
+
+      sandbox
+        .stub(IpfsStorageAgent.prototype, 'catJSON')
         .withArgs(testIpfsHash)
         .resolves(ddoAttrNoPublicProfile)
-      resolvePublicProfileStub = sandbox.stub(JolocomRegistry.prototype, 'resolvePublicProfile')
+
+      fetchPublicProfileStub = sandbox.stub(JolocomRegistry.prototype, 'fetchPublicProfile')
 
       resolvedIdentity = await jolocomRegistry.resolve(ddo.getDID())
     })
 
-    afterEach(() => {
-      sandbox.restore()
-    })
-
-    it('should not call resolvePublicProfile when no public profile on ddo', () => {
-      sandbox.assert.notCalled(resolvePublicProfileStub)
+    it('should not call fetchPublicProfile when no public profile on ddo', () => {
+      sandbox.assert.notCalled(fetchPublicProfileStub)
     })
 
     it('retured identity instance should have no public profile', () => {
@@ -178,19 +178,18 @@ describe('JolocomRegistry', () => {
   })
 
   describe('resolvePublicProfile', () => {
+    const jolocomRegistry = createJolocomRegistry()
+
     let catJSONStub
     let profile
 
     beforeEach(async () => {
-      catJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'catJSON')
-        .resolves(publicProfileJSON)
-
-      profile = await jolocomRegistry
-        .resolvePublicProfile(DidDocument.fromJSON(ddoAttr).getServiceEndpoints())
-    })
-
-    afterEach(() => {
-      sandbox.restore()
+      catJSONStub = sandbox.stub(IpfsStorageAgent.prototype, 'catJSON').resolves(publicProfileJSON)
+      profile = await jolocomRegistry.fetchPublicProfile(
+        DidDocument.fromJSON(ddoAttr)
+          .getServiceEndpoints()[0]
+          .getServiceEndpoint()
+      )
     })
 
     it('should call ipfsStorageAgent to resolve public profile hash', () => {
@@ -208,14 +207,15 @@ describe('JolocomRegistry', () => {
     let identityWallet
 
     beforeEach(async () => {
-      resolveStub = sandbox.stub(JolocomRegistry.prototype, 'resolve')
-        .withArgs(ddo.getDID())
-        .resolves(Identity.create({didDocument: ddo.toJSON()}))
-      identityWallet = await jolocomRegistry.authenticate(testPrivateIdentityKey)
-    })
+      const jolocomRegistry = createJolocomRegistry()
+      const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
 
-    afterEach(() => {
-      sandbox.restore()
+      resolveStub = sandbox
+        .stub(JolocomRegistry.prototype, 'resolve')
+        .withArgs(ddo.getDID())
+        .resolves(Identity.create({ didDocument: ddo.toJSON() }))
+
+      identityWallet = await jolocomRegistry.authenticate(testPrivateIdentityKey)
     })
 
     it('should call resolve', () => {
@@ -228,40 +228,26 @@ describe('JolocomRegistry', () => {
   })
 
   describe('error handling commit', () => {
-    beforeEach(() => {
-      sandbox.stub(JolocomRegistry.prototype, 'unpin').resolves()
-      sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON').throws(new Error('Incorrect data submitted'))
-    })
+    const jolocomRegistry = createJolocomRegistry()
 
-    afterEach(() => {
-      sandbox.restore()
-    })
+    let ddo
 
-    it('should correctly assemble the thrown error message on storeJSON', async () => {
-      try {
-        await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
-      } catch (err) {
-        expect(err.message).to.equal(`Could not save DID record on IPFS. Incorrect data submitted`)
-      }
-    })
-  })
-
-  describe('error handling commit', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+      ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
       sandbox.stub(JolocomRegistry.prototype, 'unpin').resolves()
       sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON').returns(testIpfsHash)
-      sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
-        .withArgs( {ethereumKey: testPrivateEthereumKey, did: ddo.getDID(), newHash: testIpfsHash})
+      sandbox
+        .stub(EthResolver.prototype, 'updateDIDRecord')
+        .withArgs({ ethereumKey: testPrivateEthereumKey, did: ddo.getDID(), newHash: testIpfsHash })
         .throws(new Error('Connection failed.'))
     })
 
-    afterEach(() => {
-      sandbox.restore()
-    })
-
     it('should correctly assemble the thrown error message on updateDIDRecord', async () => {
+      const identity = Identity.create({ didDocument: ddo.toJSON() })
+      const identityWalletMock = IdentityWallet.create({ privateIdentityKey: testPrivateIdentityKey, identity })
+
       try {
-        await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
+        await jolocomRegistry.commit({ wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey })
       } catch (err) {
         expect(err.message).to.equal(`Could not register DID record on Ethereum. Connection failed.`)
       }
@@ -269,27 +255,27 @@ describe('JolocomRegistry', () => {
   })
 
   describe('error handling resolve', () => {
-    afterEach(() => {
-      sandbox.restore()
-    })
+    const jolocomRegistry = createJolocomRegistry()
 
     it('should correctly assemble the thrown error on failed resolveDID', async () => {
-      sandbox.stub(EthResolver.prototype, 'resolveDID')
-        .throws(new Error('DID not existing.'))
+      const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+
+      sandbox.stub(EthResolver.prototype, 'resolveDID').throws(new Error('DID not existing.'))
+
       try {
-        await jolocomRegistry.resolve({did: ddo.getDID()})
+        await jolocomRegistry.resolve({ did: ddo.getDID() })
       } catch (err) {
         expect(err.message).to.equal(`Could not retrieve DID Document. DID not existing.`)
       }
     })
 
     it('should correctly assemble the thrown error on failed catJSNO', async () => {
-      sandbox.stub(EthResolver.prototype, 'resolveDID')
-        .returns(ddo.getDID)
-      sandbox.stub(IpfsStorageAgent.prototype, 'catJSON')
-        .throws(new Error('No DDO.'))
+      const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+
+      sandbox.stub(EthResolver.prototype, 'resolveDID').returns(ddo.getDID)
+      sandbox.stub(IpfsStorageAgent.prototype, 'catJSON').throws(new Error('No DDO.'))
       try {
-        await jolocomRegistry.resolve({did: ddo.getDID()})
+        await jolocomRegistry.resolve({ did: ddo.getDID() })
       } catch (err) {
         expect(err.message).to.equal(`Could not retrieve DID Document. No DDO.`)
       }
@@ -300,22 +286,22 @@ describe('JolocomRegistry', () => {
     let resolveDIDStub
     let removePinnedHashStub
 
+    const jolocomRegistry = createJolocomRegistry()
+
     beforeEach(async () => {
-      resolveDIDStub = sandbox.stub(EthResolver.prototype, 'resolveDID')
-        .resolves(testIpfsHash)
-      removePinnedHashStub = sandbox.stub(IpfsStorageAgent.prototype, 'removePinnedHash')
-        .resolves()
-      sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
-        .resolves(testIpfsHash)
-      sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
-        .resolves()
+      const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+      const identity = Identity.create({ didDocument: ddo.toJSON() })
+      const identityWalletMock = IdentityWallet.create({ privateIdentityKey: testPrivateIdentityKey, identity })
 
-      await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
+      resolveDIDStub = sandbox.stub(EthResolver.prototype, 'resolveDID').resolves(testIpfsHash)
+      removePinnedHashStub = sandbox.stub(IpfsStorageAgent.prototype, 'removePinnedHash').resolves()
+
+      sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON').resolves(testIpfsHash)
+      sandbox.stub(EthResolver.prototype, 'updateDIDRecord').resolves()
+
+      await jolocomRegistry.commit({ wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey })
     })
 
-    afterEach(() => {
-      sandbox.restore()
-    })
     it('sould call resolveDID', () => {
       sandbox.assert.calledOnce(resolveDIDStub)
     })
@@ -327,25 +313,22 @@ describe('JolocomRegistry', () => {
 
   describe('unpin', () => {
     let unpin
+    const jolocomRegistry = createJolocomRegistry()
 
     beforeEach(() => {
-      sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON')
-        .resolves(testIpfsHash)
-      sandbox.stub(EthResolver.prototype, 'updateDIDRecord')
-        .resolves()
-      sandbox.stub(EthResolver.prototype, 'resolveDID')
-        .resolves(testIpfsHash)
-      sandbox.stub(IpfsStorageAgent.prototype, 'removePinnedHash')
-        .throws('Removing pinned hash was not successful')
+      sandbox.stub(IpfsStorageAgent.prototype, 'storeJSON').resolves(testIpfsHash)
+      sandbox.stub(EthResolver.prototype, 'updateDIDRecord').resolves()
+      sandbox.stub(EthResolver.prototype, 'resolveDID').resolves(testIpfsHash)
+      sandbox.stub(IpfsStorageAgent.prototype, 'removePinnedHash').throws('Removing pinned hash was not successful')
       unpin = sandbox.stub(JolocomRegistry.prototype, 'unpin')
     })
 
-    afterEach(() => {
-      sandbox.restore()
-    })
-
     it('should not throw an error on removePinnedHash failure', async () => {
-      await jolocomRegistry.commit({wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey})
+      const ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+      const identity = Identity.create({ didDocument: ddo.toJSON() })
+      const identityWalletMock = IdentityWallet.create({ privateIdentityKey: testPrivateIdentityKey, identity })
+
+      await jolocomRegistry.commit({ wallet: identityWalletMock, privateEthereumKey: testPrivateEthereumKey })
 
       sandbox.assert.calledOnce(unpin)
     })

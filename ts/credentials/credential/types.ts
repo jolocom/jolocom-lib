@@ -1,5 +1,5 @@
 export interface IClaimAttrs {
-  id: string
+  id?: string
   [x: string]: string
 }
 
