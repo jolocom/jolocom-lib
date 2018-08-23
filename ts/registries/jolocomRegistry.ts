@@ -32,11 +32,29 @@ export class JolocomRegistry {
   }
 
   public async commit({ wallet, privateEthereumKey }: IRegistryCommitArgs): Promise<void> {
-    const ddo = wallet.getIdentity().didDocument
-    let ipfsHash
+    if (!privateEthereumKey) {
+      privateEthereumKey = wallet.getIdentityKey().key
+    }
 
+    const ddo = wallet.getIdentity().didDocument
+    const publicProfile = wallet.getIdentity().publicProfile.get()
+    let publicProfileHash
+
+    if (publicProfile) {
+      publicProfileHash = await this.ipfsConnector.storeJSON({ data: publicProfile, pin: true })
+      const pubProfEntry = {
+        id: `${wallet.getIdentity().getDID()};jolocomPubProfile`,
+        type: 'JolocomPublicProfile',
+        description: 'Verifiable Credential describing entity profile',
+        serviceEndpoint: `ipfs://${publicProfileHash}`
+      }
+
+      ddo.addServiceEndpoint(ServiceEndpointsSection.fromJSON(pubProfEntry))
+    }
+
+    let ipfsHash
     try {
-      ipfsHash = await this.ipfsConnector.storeJSON({ data: ddo, pin: true })
+      ipfsHash = await this.ipfsConnector.storeJSON({ data: ddo.toJSON(), pin: true })
     } catch (error) {
       throw new Error(`Could not save DID record on IPFS. ${error.message}`)
     }
@@ -50,8 +68,6 @@ export class JolocomRegistry {
     } catch (error) {
       throw new Error(`Could not register DID record on Ethereum. ${error.message}`)
     }
-
-    await this.unpin(ddo.getDID())
   }
 
   private async unpin(did): Promise<void> {
@@ -66,6 +82,7 @@ export class JolocomRegistry {
   public async resolve(did): Promise<Identity> {
     try {
       const ddoHash = await this.ethereumConnector.resolveDID(did)
+
       const ddo = (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs
 
       const identityData = {

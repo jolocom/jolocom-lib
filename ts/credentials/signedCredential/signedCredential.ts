@@ -8,7 +8,7 @@ import { ISignedCredentialAttrs, ISignedCredentialCreateArgs } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { defaultContext } from '../../utils/contexts'
 import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
-import { JolocomRegistry } from '../../registries/jolocomRegistry'
+import { JolocomRegistry, createJolocomRegistry } from '../../registries/jolocomRegistry'
 import { registries } from '../../registries'
 
 @Exclude()
@@ -139,7 +139,7 @@ export class SignedCredential {
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
     if (!registry) {
-      registry = registries.jolocom.create()
+      registry = createJolocomRegistry()
     }
 
     const issuerProfile = await registry.resolve(this.issuer)
