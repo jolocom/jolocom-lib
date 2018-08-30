@@ -1,4 +1,4 @@
-import { JSONWebToken } from './JSONWebToken';
+import { JSONWebToken } from './jsonWebToken';
 import { IJWTHeader } from '../credentialRequest/signedCredentialRequest/types';
 
 export interface IJWTHeader {

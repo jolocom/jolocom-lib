@@ -5,7 +5,7 @@ import { ISignedCredResponsePayload } from '../credentialResponse/signedCredenti
 import { SignedCredentialRequest } from '../credentialRequest/signedCredentialRequest/signedCredentialRequest'
 import { SignedCredentialResponse } from '../credentialResponse/signedCredentialResponse/signedCredentialResponse'
 import { JolocomRegistry } from '../registries/jolocomRegistry'
-import { JSONWebToken } from '../interactionFlows/JSONWebToken';
+import { JSONWebToken } from '../interactionFlows/jsonWebToken';
 import { IJSONWebTokenAttrs, IPayload } from '../interactionFlows/types';
 
 export type jwtPayload = ISignedCredRequestPayload | ISignedCredResponsePayload
