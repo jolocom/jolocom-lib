@@ -11,7 +11,11 @@ import {
   validateJWTSignature,
   computeJWTSignature,
   encodeAsJWT,
-  validateJWTSignatureWithRegistry
+  validateJWTSignatureWithRegistry,
+  deprecated_validateJWTSignature,
+  deprecated_computeJWTSignature,
+  deprecated_validateJWTSignatureWithRegistry,
+  deprecated_encodeAsJWT
 } from '../../utils/jwt'
 import { privateKeyToDID } from '../../utils/crypto'
 import { registries } from '../../registries'
@@ -39,7 +43,7 @@ export class SignedCredentialResponse {
   }
 
   private computeSignature(privateKey: Buffer) {
-    return computeJWTSignature(this.payload, privateKey)
+    return deprecated_computeJWTSignature(this.payload, privateKey)
   }
 
   public static create(args: ISignedCredResponseCreationArgs): SignedCredentialResponse {
@@ -74,14 +78,14 @@ export class SignedCredentialResponse {
   }
 
   public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
-    return validateJWTSignature(this, pubKey)
+    return deprecated_validateJWTSignature(this, pubKey)
   }
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
     if (!registry) {
-      registry = registries.jolocom.create()      
+      registry = registries.jolocom.create()
     }
-    return validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
+    return deprecated_validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
   }
 
   public toJWT(): string {
@@ -89,7 +93,7 @@ export class SignedCredentialResponse {
       throw new Error('The JWT is not complete, header / payload / signature are missing')
     }
 
-    return encodeAsJWT(this.header, this.payload, this.signature)
+    return deprecated_encodeAsJWT(this.header, this.payload, this.signature)
   }
 
   public toJSON(): ISignedCredentialResponseAttrs {
