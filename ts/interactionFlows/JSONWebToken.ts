@@ -8,9 +8,10 @@ import {
 } from '../utils/jwt'
 import { decodeToken } from 'jsontokens'
 import { classToPlain, plainToClass } from 'class-transformer'
-import { IPayload, IJSONWebTokenAttrs, IPayloadAttrs, InteractionType } from './types';
+import { IPayload, IJSONWebTokenAttrs, IPayloadAttrs, InteractionType, IJSONWebTokenCreationAttrs } from './types';
 import { JolocomRegistry } from '../registries/jolocomRegistry';
 import { registries } from '../registries';
+import { privateKeyToDID } from '../utils/crypto';
 
 export class JSONWebToken {
   private header: IJWTHeader = {
@@ -36,6 +37,29 @@ export class JSONWebToken {
     return this.signature
   }
 
+  public static create(args: IJSONWebTokenCreationAttrs): JSONWebToken {
+    const { privateKey, payload } = args
+    let issuer = payload.iss
+
+    if (!issuer) {
+      issuer = privateKeyToDID(privateKey)
+    }
+
+    const jwt: JSONWebToken = new JSONWebToken()
+    jwt.payload = {
+      iat: Date.now(),
+      iss: issuer,
+      typ: payload.typ
+    }
+    jwt.signature = jwt.sign(privateKey)
+
+    return jwt 
+  }
+
+  public sign(privateKey: Buffer) {
+    return computeJWTSignature(this.payload, privateKey)
+  }
+
   public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
     return validateJWTSignature(this, pubKey)
   }
@@ -47,7 +71,7 @@ export class JSONWebToken {
     return validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
   }
 
-  public toJWT(): string {
+  public encode(): string {
     if (!this.payload || !this.header || !this.signature) {
       throw new Error('The JWT is not complete, header / payload / signature are missing')
     }
@@ -60,14 +84,18 @@ export class JSONWebToken {
   }
 
   public static fromJSON(json: IJSONWebTokenAttrs): JSONWebToken {
-    let jwt = new JSONWebToken()
+    const jwt = new JSONWebToken()
 
     switch (json.payload.typ) {
-      case InteractionType.sso.toString(): {
+      case InteractionType.credentialRequest.toString(): {
         // TODO
         break
       }
-      case InteractionType.credentials_receiving.toString(): {
+      case InteractionType.credentialResponse.toString(): {
+        // TODO
+        break
+      }
+      case InteractionType.credentialsReceiving.toString(): {
         // TODO
         break
       }

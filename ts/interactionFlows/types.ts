@@ -16,6 +16,11 @@ export interface IPayload {
   // valid?(): boolean // so that we could use it in toJWT()
 }
 
+export interface IJSONWebTokenCreationAttrs {
+  privateKey: Buffer
+  payload: IPayload
+}
+
 export interface IPayloadAttrs {
   iss: string
   iat: number
@@ -34,6 +39,7 @@ export interface IJWTHeaderAttrs {
 }
 
 export enum InteractionType {
-  sso,
-  credentials_receiving
+  credentialRequest,
+  credentialResponse,
+  credentialsReceiving
 }

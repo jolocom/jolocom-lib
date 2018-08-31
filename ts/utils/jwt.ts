@@ -6,7 +6,7 @@ import { SignedCredentialRequest } from '../credentialRequest/signedCredentialRe
 import { SignedCredentialResponse } from '../credentialResponse/signedCredentialResponse/signedCredentialResponse'
 import { JolocomRegistry } from '../registries/jolocomRegistry'
 import { JSONWebToken } from '../interactionFlows/jsonWebToken';
-import { IJSONWebTokenAttrs, IPayload } from '../interactionFlows/types';
+import { IPayload } from '../interactionFlows/types';
 
 export type jwtPayload = ISignedCredRequestPayload | ISignedCredResponsePayload
 export type jwtEnabledClass = SignedCredentialRequest | SignedCredentialResponse
