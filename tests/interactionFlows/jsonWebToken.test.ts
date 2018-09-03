@@ -1,30 +1,24 @@
 import { expect } from 'chai'
-import { SignedCredentialResponse } from '../../ts/credentialResponse/signedCredentialResponse/signedCredentialResponse'
-import { CredentialResponse } from '../../ts/credentialResponse/credentialResponse'
-import { firstMockCredential } from '../data/credentialRequest/credentialRequest'
+import { credentialRequestJson } from '../data/credentialRequest/credentialRequest'
 import {
   mockPrivKey,
   mockSignedCredResponseJson,
-  signedCredRespJWT
 } from '../data/credentialResponse/signedCredentialResponse'
-import { privateKeyToPublicKey } from '../../ts/utils/crypto'
 import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import { ddoAttr } from '../data/credentialRequest/signedCredentialRequest';
-import { Identity } from '../../ts/identity/identity';
-import { JolocomRegistry } from '../../ts/registries/jolocomRegistry';
+import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken';
+import { IJSONWebTokenCreationAttrs, InteractionType } from '../../ts/interactionFlows/types';
+import { CredentialRequest } from '../../ts/credentialRequest/credentialRequest';
+import { jwtJSON } from '../data/interactionFlows/jsonWebToken';
 chai.use(sinonChai)
 
-describe('SignedCredentialResponse', () => {
+describe('JSONWebToken', () => {
   let clock
   const sandbox = sinon.createSandbox()
+  const privateKey = Buffer.from(mockPrivKey, 'hex')
 
-  const mockCredentialResponse = CredentialResponse.create([firstMockCredential])
-  const mockSignedCredRespCreationArgs = {
-    privateKey: Buffer.from(mockPrivKey, 'hex'),
-    credentialResponse: mockCredentialResponse
-  }
+  const mockCredentialRequest = CredentialRequest.fromJSON(credentialRequestJson)
 
   before(() => {
     clock = sinon.useFakeTimers()
@@ -34,24 +28,50 @@ describe('SignedCredentialResponse', () => {
     clock.restore()
   })
 
-  it('Should implement static create method', () => {
-    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
-    expect(signedCredentialResponse.toJSON()).to.deep.equal(mockSignedCredResponseJson)
-  })
+  describe('Static create method', () => {
+    const jwtCreateArgs = {
+      privateKey,
+      payload: {
+        iss: 'did:jolo:njkfehruu843iorj3onvgregvefd',
+        iat: Date.now(),
+        typ: InteractionType.CredentialRequest.toString(),
+        credentialRequest: {
+          callbackURL: 'http://test.com',
+          credentialRequirements: [
+            {
+              type: ['Credential', 'MockCredential'],
+              constraints: [{ '==': [
+                { var: 'issuer' },
+                'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
+              ] }]
+            }
+          ]
+        }
+      }
+    } as IJSONWebTokenCreationAttrs
 
-  it('Should implement static create method with passed issuer', () => {
-    const modifiedCreationArgs = Object.assign({}, mockSignedCredRespCreationArgs, { issuer: 'did:jolo:test' })
-    const modifiedPayload = { ...mockSignedCredResponseJson.payload, iss: 'did:jolo:test' }
-    const signedCredentialResponse = SignedCredentialResponse.create(modifiedCreationArgs)
+    it('Should return a correctly assembled instance of JSONWebToken class', () => {
+      const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
 
-    expect(signedCredentialResponse.toJSON()).to.deep.equal({
-      ...mockSignedCredResponseJson,
-      payload: modifiedPayload,
-      signature: signedCredentialResponse.getSignature()
+      console.log(jsonWebToken.getPayload().satisfiesConstraints)
+      expect(jsonWebToken.toJSON()).to.deep.equal(jwtJSON)
+      expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
     })
+
+    /* it('Should  with passed issuer', () => {
+      const modifiedCreationArgs = Object.assign({}, mockSignedCredRespCreationArgs, { issuer: 'did:jolo:test' })
+      const modifiedPayload = { ...mockSignedCredResponseJson.payload, iss: 'did:jolo:test' }
+      const signedCredentialResponse = SignedCredentialResponse.create(modifiedCreationArgs)
+
+      expect(signedCredentialResponse.toJSON()).to.deep.equal({
+        ...mockSignedCredResponseJson,
+        payload: modifiedPayload,
+        signature: signedCredentialResponse.getSignature()
+      })
+    }) */
   })
 
-  it('Should implement static fromJWT method', () => {
+  /* it('Should implement static fromJWT method', () => {
     const signedCredentialResponseFromJWT = SignedCredentialResponse.fromJWT(signedCredRespJWT)
     const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
     expect(signedCredentialResponseFromJWT).to.deep.equal(signedCredentialResponse)
@@ -110,5 +130,5 @@ describe('SignedCredentialResponse', () => {
     const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
     // tslint:disable-next-line:no-unused-expression
     expect(signedCredentialResponse.satisfiesRequest).to.exist
-  })
+  }) */
 })
