@@ -1,5 +1,9 @@
 import { JSONWebToken } from './jsonWebToken';
 import { IJWTHeader, ISignedCredentialRequestAttrs } from '../credentialRequest/signedCredentialRequest/types';
+import { SignedCredentialRequestPayload } from './signedCredentialRequest/signedCredentialRequestPayload';
+import { ISignedCredRequestPayloadAttrs } from './signedCredentialRequest/types';
+
+type InteractionTypePayloadAttrs = ISignedCredRequestPayloadAttrs
 
 export interface IJWTHeader {
   alg: string
@@ -15,13 +19,14 @@ export interface IPayload {
 
 export interface IJSONWebTokenCreationAttrs {
   privateKey: Buffer
-  payload: IPayload
+  payload: InteractionTypePayloadAttrs
 }
 
 export interface IPayloadAttrs {
   iss: string
   iat: number
   typ: string
+  [x: string]: any
 }
 
 export interface IJSONWebTokenAttrs {
@@ -36,7 +41,7 @@ export interface IJWTHeaderAttrs {
 }
 
 export enum InteractionType {
-  credentialRequest,
-  credentialResponse,
-  credentialsReceiving
+  CredentialRequest = 'credentialRequest',
+  CredentialResponse = 'credentialResponse',
+  CredentialsReceiving = 'credentialsReceiving'
 }
