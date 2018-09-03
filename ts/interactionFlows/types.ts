@@ -1,5 +1,5 @@
 import { JSONWebToken } from './jsonWebToken';
-import { IJWTHeader } from '../credentialRequest/signedCredentialRequest/types';
+import { IJWTHeader, ISignedCredentialRequestAttrs } from '../credentialRequest/signedCredentialRequest/types';
 
 export interface IJWTHeader {
   alg: string
@@ -10,10 +10,7 @@ export interface IPayload {
   iss: string
   iat: number
   typ: InteractionType
-
-  toJSON(): any
-  fromJSON(): IPayload
-  // valid?(): boolean // so that we could use it in toJWT()
+  [x: string]: any
 }
 
 export interface IJSONWebTokenCreationAttrs {

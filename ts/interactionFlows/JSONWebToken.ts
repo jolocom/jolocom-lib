@@ -12,13 +12,14 @@ import { IPayload, IJSONWebTokenAttrs, IPayloadAttrs, InteractionType, IJSONWebT
 import { JolocomRegistry } from '../registries/jolocomRegistry';
 import { registries } from '../registries';
 import { privateKeyToDID } from '../utils/crypto';
+import { SignedCredentialRequestPayload } from './signedCredentialRequest/signedCredentialRequestPayload';
 
-export class JSONWebToken {
+export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
     typ: 'JWT',
     alg: 'ES256K'
   }
-  private payload: IPayload
+  private payload: T
   private signature: string
 
   public getIssuer(): string {
@@ -37,7 +38,7 @@ export class JSONWebToken {
     return this.signature
   }
 
-  public static create(args: IJSONWebTokenCreationAttrs): JSONWebToken {
+  public static create(args: IJSONWebTokenCreationAttrs): JSONWebToken<IPayload> {
     const { privateKey, payload } = args
     let issuer = payload.iss
 
@@ -45,15 +46,15 @@ export class JSONWebToken {
       issuer = privateKeyToDID(privateKey)
     }
 
-    const jwt: JSONWebToken = new JSONWebToken()
-    jwt.payload = {
-      iat: Date.now(),
-      iss: issuer,
-      typ: payload.typ
-    }
+    type TPayload = typeof payload
+    const jwt: JSONWebToken<TPayload> = new JSONWebToken<TPayload>()
+
+    jwt.payload = payload
+    jwt.payload.iat = Date.now()
+    jwt.payload.iss =  issuer
     jwt.signature = jwt.sign(privateKey)
 
-    return jwt 
+    return jwt
   }
 
   public sign(privateKey: Buffer) {
@@ -83,8 +84,8 @@ export class JSONWebToken {
     return classToPlain(this)
   }
 
-  public static fromJSON(json: IJSONWebTokenAttrs): JSONWebToken {
-    const jwt = new JSONWebToken()
+  public static fromJSON(json: IJSONWebTokenAttrs): JSONWebToken<IPayload> {
+    let jwt
 
     switch (json.payload.typ) {
       case InteractionType.credentialRequest.toString(): {

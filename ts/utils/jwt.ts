@@ -17,7 +17,7 @@ export interface Ideprecated_IValidateJWTSignatureWithRegistryArgs {
 }
 
 export interface IValidateJWTSignatureWithRegistryArgs {
-  jwtInstance: JSONWebToken
+  jwtInstance: JSONWebToken<IPayload>
   registry: JolocomRegistry
 }
 
@@ -56,13 +56,13 @@ export function deprecated_validateJWTSignature(jwtInstance: jwtEnabledClass, pu
   const assembledJWT = jwtInstance.toJWT()
   return new TokenVerifier('ES256K', pubKey.toString('hex')).verify(assembledJWT)
 }
-export function validateJWTSignature(jwtInstance: JSONWebToken, pubKey: Buffer): boolean {
+export function validateJWTSignature(jwtInstance: JSONWebToken<IPayload>, pubKey: Buffer): boolean {
   if (!pubKey) {
     throw new Error('Please provide the issuer\'s public key')
   }
 
   // TODO Normalize / have a cannonical json form
-  const assembledJWT = jwtInstance.toJWT()
+  const assembledJWT = jwtInstance.encode()
   return new TokenVerifier('ES256K', pubKey.toString('hex')).verify(assembledJWT)
 }
 // TODO Find based on key id
