@@ -60,6 +60,15 @@ describe('JSONWebToken', () => {
         'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
       )
     })
+
+    it('Should throw an error in case the interaction type from the payload is not known', () => {
+      const modifiedCreationArgs = jwtCreateArgs
+      modifiedCreationArgs.payload.typ = 'NonExistingInteractionType'
+
+      expect(() => JSONWebToken.create(modifiedCreationArgs)).to.throw(
+        'Interaction type not recognized!'
+      )
+    })
   })
 
   describe('Static fromJSON method', () => {
