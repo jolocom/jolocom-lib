@@ -1,9 +1,9 @@
-import { JSONWebToken } from './jsonWebToken';
-import { IJWTHeader, ISignedCredentialRequestAttrs } from '../credentialRequest/signedCredentialRequest/types';
+import { IJWTHeader } from '../credentialRequest/signedCredentialRequest/types';
 import { SignedCredentialRequestPayload } from './signedCredentialRequest/signedCredentialRequestPayload';
 import { ISignedCredRequestPayloadAttrs } from './signedCredentialRequest/types';
 
 export type InteractionTypePayloadAttrs = ISignedCredRequestPayloadAttrs
+export type InteractionTypePayloads = SignedCredentialRequestPayload
 
 export interface IJWTHeader {
   alg: string

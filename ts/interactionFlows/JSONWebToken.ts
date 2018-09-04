@@ -1,5 +1,4 @@
 import { IJWTHeader } from '../credentialRequest/signedCredentialRequest/types'
-import { ILinkedDataSignature, ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
 import {
   validateJWTSignature,
   computeJWTSignature,
@@ -7,7 +6,7 @@ import {
   validateJWTSignatureWithRegistry
 } from '../utils/jwt'
 import { decodeToken } from 'jsontokens'
-import { classToPlain, plainToClass } from 'class-transformer'
+import { classToPlain } from 'class-transformer'
 import {
   IPayload,
   IJSONWebTokenAttrs,
@@ -85,15 +84,15 @@ export class JSONWebToken<T extends IPayload> {
     return validateJWTSignature(this, pubKey)
   }
 
-  public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
+  public async validateSignatureWithRegistry(registry?: JolocomRegistry): Promise<boolean> {
     if (!registry) {
       registry = registries.jolocom.create()
     }
     return validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
   }
 
-  public toJSON(): object {
-    return classToPlain(this)
+  public toJSON(): IJSONWebTokenAttrs {
+    return classToPlain(this) as IJSONWebTokenAttrs
   }
 
   public static fromJSON(json: IJSONWebTokenAttrs): InteractionTypedJWT {
