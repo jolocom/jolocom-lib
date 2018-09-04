@@ -45,3 +45,12 @@ export const jwtCreateArgs = {
     }
   }
 } as IJSONWebTokenCreationAttrs
+
+export const signedCredRequestJWT =
+'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJpc3MiOiJkaWQ6am9sbzpuamtmZWhydX\
+U4NDNpb3JqM29udmdyZWd2ZWZkIiwiaWF0IjowLCJ0eXAiOiJjcmVkZW50aWFsUmVxdWVzdCIs\
+ImNyZWRlbnRpYWxSZXF1ZXN0Ijp7ImNhbGxiYWNrVVJMIjoiaHR0cDovL3Rlc3QuY29tIiwiY3\
+JlZGVudGlhbFJlcXVpcmVtZW50cyI6W3sidHlwZSI6WyJDcmVkZW50aWFsIiwiTW9ja0NyZWRl\
+bnRpYWwiXSwiY29uc3RyYWludHMiOlt7Ij09IjpbeyJ2YXIiOiJpc3N1ZXIifSwiZGlkOmpvbG\
+86aXNzdWVyIl19XX1dfX0.SK7pVnsZkqsR_CopE35DJLvUsOgTZlFSEztNDjAAYLDjsvaoD5Hr\
+LytDWKBwr7MoUaUjEYV92Gu2br-k6lgV6Q'

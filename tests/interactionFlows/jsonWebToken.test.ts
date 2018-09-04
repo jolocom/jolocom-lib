@@ -10,10 +10,14 @@ import * as sinonChai from 'sinon-chai'
 import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken';
 import { IJSONWebTokenCreationAttrs, InteractionType } from '../../ts/interactionFlows/types';
 import { CredentialRequest } from '../../ts/credentialRequest/credentialRequest';
-import { jwtJSON, jwtCreateArgs } from '../data/interactionFlows/jsonWebToken';
+import { jwtJSON, jwtCreateArgs, signedCredRequestJWT } from '../data/interactionFlows/jsonWebToken';
 import {
    SignedCredentialRequestPayload
  } from '../../ts/interactionFlows/signedCredentialRequest/signedCredentialRequestPayload';
+import { signedCredReqJWT, ddoAttr } from '../data/credentialRequest/signedCredentialRequest';
+import { privateKeyToPublicKey } from '../../ts/utils/crypto';
+import { Identity } from '../../ts/identity/identity';
+import { JolocomRegistry } from '../../ts/registries/jolocomRegistry';
 chai.use(sinonChai)
 
 describe('JSONWebToken', () => {
@@ -73,42 +77,51 @@ describe('JSONWebToken', () => {
     })
   })
 
-  /* it('Should implement static fromJWT method', () => {
-    const signedCredentialResponseFromJWT = SignedCredentialResponse.fromJWT(signedCredRespJWT)
-    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
-    expect(signedCredentialResponseFromJWT).to.deep.equal(signedCredentialResponse)
+  describe('toJSON method', () => {
+    clock = sinon.useFakeTimers()
+    const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
+    const json = jsonWebToken.toJSON()
+
+    it('Should return a correctly structured JSON object', () => {
+      expect(json).to.deep.equal(jwtJSON)
+    })
   })
 
-  it('Should implement toJWT method', () => {
-    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
-    expect(signedCredentialResponse.toJWT()).to.equal(signedCredRespJWT)
+  describe('encode method', () => {
+    clock = sinon.useFakeTimers()
+    const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
+    const encodedJWT = jsonWebToken.encode()
+
+    it('Should return a JWT', () => {
+      expect(encodedJWT).to.deep.equal(signedCredRequestJWT)
+    })
   })
 
-  it('Should implement static fromJSON method', () => {
-    const signedCredRespFromJson = SignedCredentialResponse.fromJSON(mockSignedCredResponseJson)
-    const signedCredResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
-    expect(signedCredRespFromJson).to.deep.equal(signedCredResponse)
+  describe('decode method', () => {
+    clock = sinon.useFakeTimers()
+    const encodedJWT = signedCredRequestJWT
+    const decoded = JSONWebToken.decode(signedCredRequestJWT)
+
+    it('Should return a valid InteractionType payload class', () => {
+      expect(decoded).to.be.an.instanceof(SignedCredentialRequestPayload)
+    })
   })
 
-  it('Should implement toJSON method', () => {
-    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
-    expect(signedCredentialResponse.toJSON()).to.deep.equal(mockSignedCredResponseJson)
+  describe('validateSignatureWithPublicKey method', () => {
+    clock = sinon.useFakeTimers()
+
+    it('Should validate the signature using PublicKey', () => {
+      const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
+
+      expect(
+        jsonWebToken.validateSignatureWithPublicKey(privateKeyToPublicKey(Buffer.from(mockPrivKey, 'hex')))
+      ).to.equal(true)
+    })
   })
 
-  it('Should implement validateSignatureWithPublicKey method', () => {
-    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
-    expect(
-      signedCredentialResponse.validateSignatureWithPublicKey(privateKeyToPublicKey(Buffer.from(mockPrivKey, 'hex')))
-    ).to.equal(true)
-  })
-
-  describe('verification with registry', () => {
+  describe('validateSignatureWithRegistry method', () => {
+    clock = sinon.useFakeTimers()
     let resolveStub
-    const mockCredentialResponse = CredentialResponse.create([firstMockCredential])
-    const mockSignedCredRespCreationArgs = {
-      privateKey: Buffer.from(mockPrivKey, 'hex'),
-      credentialResponse: mockCredentialResponse
-  }
 
     beforeEach( () => {
       resolveStub = sandbox.stub(JolocomRegistry.prototype, 'resolve')
@@ -119,18 +132,12 @@ describe('JSONWebToken', () => {
       sandbox.restore()
     })
 
-    it('Should implement a validateSignature method that defaults to using JolocomRegistry', async() => {
-      const incorrectlySignedCR = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
+    it('Should validate the signature using JolocomRegistry by default', async () => {
+      const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
 
-      expect(await incorrectlySignedCR.validateSignature()).to.equal(
+      expect(await jsonWebToken.validateSignatureWithRegistry()).to.equal(
         false
       )
     })
   })
-
-  it('Should implement satisfiesRequirements method', () => {
-    const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
-    // tslint:disable-next-line:no-unused-expression
-    expect(signedCredentialResponse.satisfiesRequest).to.exist
-  }) */
 })
