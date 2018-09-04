@@ -3,7 +3,7 @@ import { IJWTHeader, ISignedCredentialRequestAttrs } from '../credentialRequest/
 import { SignedCredentialRequestPayload } from './signedCredentialRequest/signedCredentialRequestPayload';
 import { ISignedCredRequestPayloadAttrs } from './signedCredentialRequest/types';
 
-type InteractionTypePayloadAttrs = ISignedCredRequestPayloadAttrs
+export type InteractionTypePayloadAttrs = ISignedCredRequestPayloadAttrs
 
 export interface IJWTHeader {
   alg: string
@@ -31,7 +31,7 @@ export interface IPayloadAttrs {
 
 export interface IJSONWebTokenAttrs {
   header: IJWTHeaderAttrs
-  payload: IPayloadAttrs
+  payload: InteractionTypePayloadAttrs
   signature: string
 }
 

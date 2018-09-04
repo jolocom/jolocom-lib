@@ -8,14 +8,20 @@ import {
 } from '../utils/jwt'
 import { decodeToken } from 'jsontokens'
 import { classToPlain, plainToClass } from 'class-transformer'
-import { IPayload, IJSONWebTokenAttrs, IPayloadAttrs, InteractionType, IJSONWebTokenCreationAttrs } from './types';
+import {
+  IPayload,
+  IJSONWebTokenAttrs,
+  InteractionType,
+  IJSONWebTokenCreationAttrs,
+  InteractionTypePayloadAttrs
+} from './types';
 import { JolocomRegistry } from '../registries/jolocomRegistry';
 import { registries } from '../registries';
 import { privateKeyToDID } from '../utils/crypto';
 import { SignedCredentialRequestPayload } from './signedCredentialRequest/signedCredentialRequestPayload';
 import { ISignedCredRequestPayloadAttrs } from './signedCredentialRequest/types';
 
-type InteractionTypeJWT = JSONWebToken<SignedCredentialRequestPayload>
+type InteractionTypedJWT = JSONWebToken<SignedCredentialRequestPayload>
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -41,7 +47,7 @@ export class JSONWebToken<T extends IPayload> {
     return this.signature
   }
 
-  public static create(args: IJSONWebTokenCreationAttrs): InteractionTypeJWT {
+  public static create(args: IJSONWebTokenCreationAttrs): InteractionTypedJWT {
     const { privateKey, payload } = args
     let issuer = payload.iss
     if (!issuer) {
@@ -50,31 +56,25 @@ export class JSONWebToken<T extends IPayload> {
     payload.iat = Date.now()
     payload.iss = issuer
 
-    let jwt
-    switch (payload.typ) {
-      case InteractionType.CredentialRequest: {
-        jwt = new JSONWebToken<SignedCredentialRequestPayload>()
-        jwt.payload = SignedCredentialRequestPayload.fromJSON(payload as ISignedCredRequestPayloadAttrs)
-        console.log(payload)
-        break
-      }
-      case InteractionType.CredentialResponse.toString(): {
-        // TODO
-        break
-      }
-      case InteractionType.CredentialsReceiving.toString(): {
-        // TODO
-        break
-      }
-      default: {
-        throw new Error('Interaction type not recognized!')
-        break
-      }
-    }
-
+    const jwt = JSONWebToken.payloadToJWT(payload)
     jwt.signature = jwt.sign(privateKey)
 
     return jwt
+  }
+
+  public static decode(jwt: string): IPayload {
+    const json = decodeToken(jwt)
+    // TODO: verify the signature
+    // should return just the payload class instance
+    return JSONWebToken.fromJSON(json).payload
+  }
+
+  public encode(): string {
+    if (!this.payload || !this.header || !this.signature) {
+      throw new Error('The JWT is not complete, header / payload / signature are missing')
+    }
+
+    return encodeAsJWT(this.header, this.payload, this.signature)
   }
 
   public sign(privateKey: Buffer) {
@@ -92,27 +92,25 @@ export class JSONWebToken<T extends IPayload> {
     return validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
   }
 
-  public encode(): string {
-    if (!this.payload || !this.header || !this.signature) {
-      throw new Error('The JWT is not complete, header / payload / signature are missing')
-    }
-
-    return encodeAsJWT(this.header, this.payload, this.signature)
-  }
-
   public toJSON(): object {
     return classToPlain(this)
   }
 
-  public static fromJSON(json: IJSONWebTokenAttrs): InteractionTypeJWT {
+  public static fromJSON(json: IJSONWebTokenAttrs): InteractionTypedJWT {
+    const jwt = JSONWebToken.payloadToJWT(json.payload)
+    jwt.header = json.header
+    jwt.signature = json.signature
+
+    return jwt
+  }
+
+  private static payloadToJWT(payload: InteractionTypePayloadAttrs): InteractionTypedJWT {
     let jwt
 
-    switch (json.payload.typ) {
+    switch (payload.typ) {
       case InteractionType.CredentialRequest.toString(): {
         jwt = new JSONWebToken<SignedCredentialRequestPayload>()
-        jwt.header = json.header
-        jwt.payload = SignedCredentialRequestPayload.fromJSON(json.payload as ISignedCredRequestPayloadAttrs)
-        jwt.signature = json.signature
+        jwt.payload = SignedCredentialRequestPayload.fromJSON(payload as ISignedCredRequestPayloadAttrs)
         break
       }
       case InteractionType.CredentialResponse.toString(): {
@@ -129,11 +127,5 @@ export class JSONWebToken<T extends IPayload> {
       }
     }
     return jwt
-  }
-
-  public static fromJWT(jwt: string): IPayload {
-    const json = decodeToken(jwt)
-    // should return just the payload class instance
-    return JSONWebToken.fromJSON(json).payload
   }
 }

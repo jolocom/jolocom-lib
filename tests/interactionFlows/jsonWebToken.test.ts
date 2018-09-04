@@ -10,7 +10,7 @@ import * as sinonChai from 'sinon-chai'
 import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken';
 import { IJSONWebTokenCreationAttrs, InteractionType } from '../../ts/interactionFlows/types';
 import { CredentialRequest } from '../../ts/credentialRequest/credentialRequest';
-import { jwtJSON } from '../data/interactionFlows/jsonWebToken';
+import { jwtJSON, jwtCreateArgs } from '../data/interactionFlows/jsonWebToken';
 import {
    SignedCredentialRequestPayload
  } from '../../ts/interactionFlows/signedCredentialRequest/signedCredentialRequestPayload';
@@ -32,47 +32,45 @@ describe('JSONWebToken', () => {
   })
 
   describe('Static create method', () => {
-    const jwtCreateArgs = {
-      privateKey,
-      payload: {
-        iss: 'did:jolo:njkfehruu843iorj3onvgregvefd',
-        iat: Date.now(),
-        typ: InteractionType.CredentialRequest.toString(),
-        credentialRequest: {
-          callbackURL: 'http://test.com',
-          credentialRequirements: [
-            {
-              type: ['Credential', 'MockCredential'],
-              constraints: [{ '==': [
-                { var: 'issuer' },
-                'did:jolo:issuer'
-              ] }]
-            }
-          ]
-        }
-      }
-    } as IJSONWebTokenCreationAttrs
+    clock = sinon.useFakeTimers()
+    let jsonWebToken = JSONWebToken.create(jwtCreateArgs)
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
-      const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
-
-      console.log(jsonWebToken.getPayload().satisfiesConstraints())
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(SignedCredentialRequestPayload)
       expect(jsonWebToken.toJSON()).to.deep.equal(jwtJSON)
       expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
     })
 
-    /* it('Should  with passed issuer', () => {
-      const modifiedCreationArgs = Object.assign({}, mockSignedCredRespCreationArgs, { issuer: 'did:jolo:test' })
-      const modifiedPayload = { ...mockSignedCredResponseJson.payload, iss: 'did:jolo:test' }
-      const signedCredentialResponse = SignedCredentialResponse.create(modifiedCreationArgs)
+    it('The type of the payload should be the correct playload class that exposes class specific methods', () => {
+      expect(jsonWebToken.getPayload()).to.be.an.instanceof(SignedCredentialRequestPayload)
+      expect(jsonWebToken.getPayload().satisfiesConstraints).to.be.an.instanceof(Function)
+    })
 
-      expect(signedCredentialResponse.toJSON()).to.deep.equal({
-        ...mockSignedCredResponseJson,
-        payload: modifiedPayload,
-        signature: signedCredentialResponse.getSignature()
-      })
-    }) */
+    it('Should generate the issuer from the private key when not passed', () => {
+      const modifiedCreationArgs = jwtCreateArgs
+      modifiedCreationArgs.payload.iss = undefined
+
+      jsonWebToken = JSONWebToken.create(modifiedCreationArgs)
+
+      expect(jsonWebToken.getIssuer()).to.equal(
+        'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
+      )
+    })
+  })
+
+  describe('Static fromJSON method', () => {
+    clock = sinon.useFakeTimers()
+    const jsonWebToken = JSONWebToken.fromJSON(jwtJSON)
+
+    it('Should return a correctly assembled instance of JSONWebToken class', () => {
+      expect(jsonWebToken.getPayload()).to.be.an.instanceof(SignedCredentialRequestPayload)
+      expect(jsonWebToken.toJSON()).to.deep.equal(jwtJSON)
+      expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
+    })
+
+    it('The type of the payload should be the correct playload class', () => {
+      expect(jsonWebToken.getPayload()).to.be.an.instanceof(SignedCredentialRequestPayload)
+    })
   })
 
   /* it('Should implement static fromJWT method', () => {
