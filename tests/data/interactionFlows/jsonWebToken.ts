@@ -4,10 +4,11 @@ export const credentialRequestJson = {
   callbackURL: 'http://test.com',
   credentialRequirements: [
     {
-      constraints: {
-        and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
-      },
-      type: ['Credential', 'MockCredential']
+      type: ['Credential', 'MockCredential'],
+      constraints: [{ '==': [
+        { var: 'issuer' },
+        'did:jolo:issuer'
+      ] }]
     }
   ]
 }
@@ -20,5 +21,5 @@ export const jwtJSON = {
     typ: InteractionType.CredentialRequest,
     credentialRequest: credentialRequestJson
   },
-  signature: 'hUO5JAoa3neodPqX3aF29qV8fBrtmtZO_EtxMw2ATsjUn53B-V_TC-bRsX0kqy2LVw5uHKmriH9_C08EsRMhFQ'
+  signature: 'SK7pVnsZkqsR_CopE35DJLvUsOgTZlFSEztNDjAAYLDjsvaoD5HrLytDWKBwr7MoUaUjEYV92Gu2br-k6lgV6Q'
 }

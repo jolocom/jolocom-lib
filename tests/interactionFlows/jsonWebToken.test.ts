@@ -11,6 +11,9 @@ import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken';
 import { IJSONWebTokenCreationAttrs, InteractionType } from '../../ts/interactionFlows/types';
 import { CredentialRequest } from '../../ts/credentialRequest/credentialRequest';
 import { jwtJSON } from '../data/interactionFlows/jsonWebToken';
+import {
+   SignedCredentialRequestPayload
+ } from '../../ts/interactionFlows/signedCredentialRequest/signedCredentialRequestPayload';
 chai.use(sinonChai)
 
 describe('JSONWebToken', () => {
@@ -42,7 +45,7 @@ describe('JSONWebToken', () => {
               type: ['Credential', 'MockCredential'],
               constraints: [{ '==': [
                 { var: 'issuer' },
-                'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
+                'did:jolo:issuer'
               ] }]
             }
           ]
@@ -53,7 +56,8 @@ describe('JSONWebToken', () => {
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
       const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
 
-      console.log(jsonWebToken.getPayload().satisfiesConstraints)
+      console.log(jsonWebToken.getPayload().satisfiesConstraints())
+      expect(jsonWebToken.getPayload()).to.be.an.instanceof(SignedCredentialRequestPayload)
       expect(jsonWebToken.toJSON()).to.deep.equal(jwtJSON)
       expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
     })
