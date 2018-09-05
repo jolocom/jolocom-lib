@@ -1,7 +1,6 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import * as jsonlogic from 'json-logic-js'
-import { areCredTypesEqual } from '../utils/credentials'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
+import { areCredTypesEqual } from '../../utils/credentials'
 import {
   ICredentialRequestAttrs,
   comparable,
@@ -10,6 +9,7 @@ import {
   IConstraint,
   ICredentialRequestCreationArgs
 } from './types'
+import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types';
 
 export class CredentialRequest {
   private callbackURL: string
@@ -70,7 +70,6 @@ export class CredentialRequest {
   }
 }
 
-// TODO MOVE
 export const constraintFunctions: IExposedConstraintFunctions = {
   is: (field: string, value: string) => assembleStatement('==', field, value),
   not: (field: string, value: string) => assembleStatement('!=', field, value),

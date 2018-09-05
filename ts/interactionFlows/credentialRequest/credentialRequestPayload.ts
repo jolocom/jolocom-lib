@@ -1,7 +1,6 @@
 import { IPayload, InteractionType } from '../types';
-import { ISignedCredentialRequestAttrs } from '../../credentialRequest/signedCredentialRequest/types';
 import { classToPlain, plainToClass } from 'class-transformer';
-import { ICredentialRequestPayload, ICredentialRequestPayloadAttrs } from './types';
+import { ICredentialRequestPayloadAttrs } from './types';
 import { CredentialRequest } from '../../interactionFlows/credentialRequest/credentialRequest';
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types';
 
