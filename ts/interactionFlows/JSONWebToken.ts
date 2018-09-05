@@ -1,4 +1,4 @@
-import { IJWTHeader } from '../credentialRequest/signedCredentialRequest/types'
+import { IJWTHeader } from './types'
 import {
   validateJWTSignature,
   computeJWTSignature,

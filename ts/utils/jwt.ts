@@ -1,15 +1,13 @@
 import base64url from 'base64url'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
-import { ISignedCredRequestPayload, IJWTHeader } from '../credentialRequest/signedCredentialRequest/types'
 import { ISignedCredResponsePayload } from '../credentialResponse/signedCredentialResponse/types'
-import { SignedCredentialRequest } from '../credentialRequest/signedCredentialRequest/signedCredentialRequest'
 import { SignedCredentialResponse } from '../credentialResponse/signedCredentialResponse/signedCredentialResponse'
 import { JolocomRegistry } from '../registries/jolocomRegistry'
 import { JSONWebToken } from '../interactionFlows/jsonWebToken';
-import { IPayload } from '../interactionFlows/types';
+import { IPayload, IJWTHeader } from '../interactionFlows/types';
 
-export type jwtPayload = ISignedCredRequestPayload | ISignedCredResponsePayload
-export type jwtEnabledClass = SignedCredentialRequest | SignedCredentialResponse
+export type jwtPayload = ISignedCredResponsePayload
+export type jwtEnabledClass = SignedCredentialResponse
 
 export interface Ideprecated_IValidateJWTSignatureWithRegistryArgs {
   jwtInstance: jwtEnabledClass
