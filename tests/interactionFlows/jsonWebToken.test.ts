@@ -12,7 +12,7 @@ import { IJSONWebTokenCreationAttrs, InteractionType } from '../../ts/interactio
 import { CredentialRequest } from '../../ts/credentialRequest/credentialRequest';
 import { jwtJSON, jwtCreateArgs, signedCredRequestJWT } from '../data/interactionFlows/jsonWebToken';
 import {
-   SignedCredentialRequestPayload
+  CredentialRequestPayload
  } from '../../ts/interactionFlows/signedCredentialRequest/signedCredentialRequestPayload';
 import { signedCredReqJWT, ddoAttr } from '../data/credentialRequest/signedCredentialRequest';
 import { privateKeyToPublicKey } from '../../ts/utils/crypto';
@@ -40,13 +40,13 @@ describe('JSONWebToken', () => {
     let jsonWebToken = JSONWebToken.create(jwtCreateArgs)
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
-      expect(jsonWebToken.getPayload()).to.be.an.instanceof(SignedCredentialRequestPayload)
+      expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
       expect(jsonWebToken.toJSON()).to.deep.equal(jwtJSON)
       expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
     })
 
     it('The type of the payload should be the correct playload class that exposes class specific methods', () => {
-      expect(jsonWebToken.getPayload()).to.be.an.instanceof(SignedCredentialRequestPayload)
+      expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
       expect(jsonWebToken.getPayload().satisfiesConstraints).to.be.an.instanceof(Function)
     })
 
@@ -76,13 +76,13 @@ describe('JSONWebToken', () => {
     const jsonWebToken = JSONWebToken.fromJSON(jwtJSON)
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
-      expect(jsonWebToken.getPayload()).to.be.an.instanceof(SignedCredentialRequestPayload)
+      expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
       expect(jsonWebToken.toJSON()).to.deep.equal(jwtJSON)
       expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
     })
 
     it('The type of the payload should be the correct playload class', () => {
-      expect(jsonWebToken.getPayload()).to.be.an.instanceof(SignedCredentialRequestPayload)
+      expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
     })
   })
 
@@ -111,7 +111,7 @@ describe('JSONWebToken', () => {
     const decoded = JSONWebToken.decode(signedCredRequestJWT)
 
     it('Should return a valid InteractionType payload class', () => {
-      expect(decoded).to.be.an.instanceof(SignedCredentialRequestPayload)
+      expect(decoded).to.be.an.instanceof(CredentialRequestPayload)
     })
   })
 
