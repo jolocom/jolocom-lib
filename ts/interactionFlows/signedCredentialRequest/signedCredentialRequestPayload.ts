@@ -11,7 +11,7 @@ export class SignedCredentialRequestPayload implements IPayload {
   public credentialRequest: CredentialRequest
 
   public static fromJSON(json: ISignedCredRequestPayloadAttrs): SignedCredentialRequestPayload {
-    // TODO: implement the mothodo
+    // TODO: implement the method
     const signedCredReqPayload = plainToClass(SignedCredentialRequestPayload, json)
 
     return signedCredReqPayload
