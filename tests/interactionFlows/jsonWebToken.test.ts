@@ -62,12 +62,12 @@ describe('JSONWebToken', () => {
     })
 
     it('Should throw an error in case the interaction type from the payload is not known', () => {
-      const modifiedCreationArgs = jwtCreateArgs
-      modifiedCreationArgs.payload.typ = 'NonExistingInteractionType'
+      jwtCreateArgs.payload.typ = 'NonExistingInteractionType'
 
-      expect(() => JSONWebToken.create(modifiedCreationArgs)).to.throw(
+      expect(() => JSONWebToken.create(jwtCreateArgs)).to.throw(
         'Interaction type not recognized!'
       )
+      jwtCreateArgs.payload.typ = InteractionType.CredentialRequest
     })
   })
 
@@ -108,7 +108,6 @@ describe('JSONWebToken', () => {
 
   describe('decode method', () => {
     clock = sinon.useFakeTimers()
-    const encodedJWT = signedCredRequestJWT
     const decoded = JSONWebToken.decode(signedCredRequestJWT)
 
     it('Should return a valid InteractionType payload class', () => {
