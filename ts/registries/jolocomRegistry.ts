@@ -1,7 +1,7 @@
 import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
-import { privateKeyToPublicKey, privateKeyToDID } from '../utils/crypto'
+import { privateKeyToDID } from '../utils/crypto'
 import { DidDocument } from '../identity/didDocument'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { ServiceEndpointsSection } from '../identity/didDocument/sections/serviceEndpointsSection'

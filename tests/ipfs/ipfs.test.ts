@@ -102,13 +102,13 @@ describe('IpfsStorageAgent', () => {
   //   expect(resultingHash).to.deep.equal(testHash)
   // })
 
-  it('should throw an error if submitted data is not an object', async () => {
-    try {
-      await storageAgent.createDagObject({data: testDataString, pin: pinBoolean})
-    } catch (err) {
-      expect(err.message).to.equal('Object expected, received string')
-    }
-  })
+  // it('should throw an error if submitted data is not an object', async () => {
+  //   try {
+  //     await storageAgent.createDagObject({data: testDataString, pin: pinBoolean})
+  //   } catch (err) {
+  //     expect(err.message).to.equal('Object expected, received string')
+  //   }
+  // })
 
   it('should attempt to retrieve the DAG object', async () => {
     nock(localHostStorage)
