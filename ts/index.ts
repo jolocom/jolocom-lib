@@ -5,6 +5,7 @@ import { Credential } from './credentials/credential/credential'
 import { registries } from './registries'
 import { IdentityManager } from './identityManager/identityManager';
 import { JSONWebToken } from './interactionFlows/jsonWebToken';
+import { CredentialRequest } from './interactionFlows/credentialRequest/credentialRequest';
 
 export const JolocomLib = {
   parse,
@@ -14,6 +15,7 @@ export const JolocomLib = {
   },
   unsigned : {
     createCredential: Credential.create,
+    createCredentialRequest: CredentialRequest.create,
     createInteractionJSONWebToken: JSONWebToken.create,
   }
 }
