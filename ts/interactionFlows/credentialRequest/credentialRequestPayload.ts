@@ -11,18 +11,14 @@ export class CredentialRequestPayload implements IPayload {
   public credentialRequest: CredentialRequest
 
   public static fromJSON(json: ICredentialRequestPayloadAttrs): CredentialRequestPayload {
-    // TODO: implement the method
-    const signedCredReqPayload = plainToClass(CredentialRequestPayload, json)
+    const credentialRequestPayload = plainToClass(CredentialRequestPayload, json)
+    credentialRequestPayload.credentialRequest = plainToClass(CredentialRequest, json.credentialRequest)
 
-    return signedCredReqPayload
+    return credentialRequestPayload
   }
 
   public toJSON(): ICredentialRequestPayloadAttrs {
     return classToPlain(this) as ICredentialRequestPayloadAttrs
-  }
-
-  public getCredentialRequest(): CredentialRequest {
-    return this.credentialRequest
   }
 
   public getCallbackURL(): string {
