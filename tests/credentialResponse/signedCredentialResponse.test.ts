@@ -80,7 +80,7 @@ describe('SignedCredentialResponse', () => {
     ).to.equal(true)
   })
 
-  describe('verification with registry', () => {
+  /* describe('verification with registry', () => {
     let resolveStub
     const mockCredentialResponse = CredentialResponse.create([firstMockCredential])
     const mockSignedCredRespCreationArgs = {
@@ -104,11 +104,11 @@ describe('SignedCredentialResponse', () => {
         false
       )
     })
-  })
+  }) */
 
-  it('Should implement satisfiesRequirements method', () => {
+/*   it('Should implement satisfiesRequirements method', () => {
     const signedCredentialResponse = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
     // tslint:disable-next-line:no-unused-expression
     expect(signedCredentialResponse.satisfiesRequest).to.exist
-  })
+  }) */
 })

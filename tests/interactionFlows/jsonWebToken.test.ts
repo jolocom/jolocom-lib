@@ -46,7 +46,7 @@ describe('JSONWebToken', () => {
 
     it('The type of the payload should be the correct playload class that exposes class specific methods', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
-      expect(jsonWebToken.getPayload().satisfiesConstraints).to.be.an.instanceof(Function)
+      expect(jsonWebToken.getPayload().applyConstraints).to.be.an.instanceof(Function)
     })
 
     it('Should generate the issuer from the private key when not passed', () => {

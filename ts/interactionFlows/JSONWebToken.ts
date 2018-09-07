@@ -14,7 +14,7 @@ import {
   IJSONWebTokenCreationAttrs,
   InteractionTypePayloadAttrs
 } from './types';
-import { JolocomRegistry } from '../registries/jolocomRegistry';
+import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry';
 import { registries } from '../registries';
 import { privateKeyToDID } from '../utils/crypto';
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
@@ -86,7 +86,7 @@ export class JSONWebToken<T extends IPayload> {
 
   public async validateSignatureWithRegistry(registry?: JolocomRegistry): Promise<boolean> {
     if (!registry) {
-      registry = registries.jolocom.create()
+      registry = createJolocomRegistry()
     }
     return validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
   }

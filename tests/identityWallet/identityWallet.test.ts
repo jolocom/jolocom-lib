@@ -10,8 +10,11 @@ import { Credential } from '../../ts/credentials/credential/credential'
 import { credentialRequestCreationArgs } from '../data/credentialRequest/credentialRequest'
 import { testSignedCred, testSignedCredRequest } from '../data/identityWallet'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-import { SignedCredentialRequest } from '../../ts/credentialRequest/signedCredentialRequest/signedCredentialRequest'
 import { Identity } from '../../ts/identity/identity'
+import { credentialRequestPayloadJson } from '../data/interactionFlows/jsonWebToken';
+import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken';
+import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload';
+import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest';
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -71,11 +74,8 @@ describe('IdentityWallet', () => {
     it('should expose credential, credentialRequest, signedCredential, signedCredentialRequest', () => {
       const mockProps = [
         'credential',
-        'credentialRequest',
-        'credentialResponse',
         'signedCredential',
-        'signedCredentialRequest',
-        'signedCredentialResponse'
+        'credentialRequestJSONWebToken',
       ]
 
       expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
@@ -91,14 +91,13 @@ describe('IdentityWallet', () => {
       expect(credential).to.deep.equal(credentialFromJSON)
     })
 
-    it('create.credentialRequest should return a correct credentialRequest', () => {
-      const credRequest = identityWallet.create.credentialRequest(credentialRequestCreationArgs)
+    it('create.credentialRequestJSONWebToken should return a correct credentialRequest JWT', () => {
+      const credRequestJWT = identityWallet.create.credentialRequestJSONWebToken(credentialRequestPayloadJson)
+      const credRequestPayload = credRequestJWT.getPayload()
 
-      expect(credRequest.getCallbackURL()).to.equal(credentialRequestCreationArgs.callbackURL)
-      expect(credRequest.getRequestedCredentialTypes().length).to.equal(1)
-      expect(credRequest.getRequestedCredentialTypes()).to.deep.equal([
-        credentialRequestCreationArgs.credentialRequirements[0].type
-      ])
+      expect(credRequestJWT).to.be.an.instanceof(JSONWebToken)
+      expect(credRequestPayload).to.be.an.instanceof(CredentialRequestPayload)
+      expect(credRequestPayload.credentialRequest).to.be.an.instanceof(CredentialRequest)
     })
 
     it('create.signedCredential should return a correct signed credential', async () => {
@@ -111,23 +110,21 @@ describe('IdentityWallet', () => {
       expect(signedCred.getType()).to.deep.equal(mockSignedCred.getType())
     })
 
-    it('create.signedCredentialRequest should return a correct signed credential request', () => {
+/*     it('create.signedCredentialRequest should return a correct signed credential request', () => {
       const credRequest = identityWallet.create.credentialRequest(credentialRequestCreationArgs)
       const signedCredRequest = identityWallet.create.signedCredentialRequest(credRequest)
       const mockSignedReq = SignedCredentialRequest.fromJSON(testSignedCredRequest)
 
       expect(signedCredRequest).to.deep.equal(mockSignedReq)
-    })
+    }) */
   })
 
   describe('sign', () => {
     let signCredential
-    let signCredentialRequest
     let iWallet
 
     before(() => {
       signCredential = sandbox.spy(IdentityWallet.prototype, 'signCredential')
-      signCredentialRequest = sandbox.spy(IdentityWallet.prototype, 'signCredentialRequest')
       iWallet = IdentityWallet.create({
         privateIdentityKey: testPrivateIdentityKey,
         identity
@@ -147,14 +144,6 @@ describe('IdentityWallet', () => {
 
       sandbox.assert.calledOnce(signCredential)
       sandbox.assert.calledWith(signCredential, credential)
-    })
-
-    it('sign.credentialRequest should call signCredentialRequest with correct params', () => {
-      const credRequest = iWallet.create.credentialRequest(credentialRequestCreationArgs)
-      iWallet.sign.credentialRequest(credRequest)
-
-      sandbox.assert.calledOnce(signCredentialRequest)
-      sandbox.assert.calledWith(signCredentialRequest, credRequest)
     })
   })
 
@@ -179,7 +168,7 @@ describe('IdentityWallet', () => {
     })
   })
 
-  describe('signCredentialRequest', () => {
+ /*  describe('signCredentialRequest', () => {
     it('should return a correct signCredentialRequest', () => {
       const credRequest = identityWallet.create.credentialRequest(credentialRequestCreationArgs)
       const signedCredRequest = identityWallet.signCredentialRequest(credRequest)
@@ -187,5 +176,5 @@ describe('IdentityWallet', () => {
 
       expect(signedCredRequest).to.deep.equal(mockSignedReq)
     })
-  })
+  }) */
 })

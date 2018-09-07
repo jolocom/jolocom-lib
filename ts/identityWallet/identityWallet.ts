@@ -24,7 +24,7 @@ export class IdentityWallet {
       return await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey })
     },
     credentialRequestJSONWebToken: (payload: ICredentialRequestPayloadAttrs) => {
-      JSONWebToken.create({privateKey: this.privateIdentityKey.key, payload})
+      return JSONWebToken.create({privateKey: this.privateIdentityKey.key, payload})
     }
   }
 
