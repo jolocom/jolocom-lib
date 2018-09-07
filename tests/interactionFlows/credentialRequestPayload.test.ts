@@ -22,8 +22,6 @@ describe('CredentialRequestPayload', () => {
   it('Should implement toJSON method which returns a correct JSON', () => {
     const crp = CredentialRequestPayload.fromJSON(credentialRequestPayloadJson)
     const json = crp.toJSON()
-    console.log(json)
-    console.log(credentialRequestPayloadJson)
     expect(json).to.deep.equal(credentialRequestPayloadJson)
   })
 
