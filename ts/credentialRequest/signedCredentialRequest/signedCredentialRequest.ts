@@ -14,7 +14,11 @@ import {
   validateJWTSignature,
   computeJWTSignature,
   encodeAsJWT,
-  validateJWTSignatureWithRegistry
+  validateJWTSignatureWithRegistry,
+  deprecated_computeJWTSignature,
+  deprecated_validateJWTSignature,
+  deprecated_validateJWTSignatureWithRegistry,
+  deprecated_encodeAsJWT
 } from '../../utils/jwt'
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 import { registries } from '../../registries'
@@ -54,7 +58,7 @@ export class SignedCredentialRequest {
   }
 
   public sign(privateKey: Buffer) {
-    return computeJWTSignature(this.payload, privateKey)
+    return deprecated_computeJWTSignature(this.payload, privateKey)
   }
 
   public static create(args: ISignedCredRequestCreationArgs): SignedCredentialRequest {
@@ -77,14 +81,14 @@ export class SignedCredentialRequest {
   }
 
   public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
-    return validateJWTSignature(this, pubKey)
+    return deprecated_validateJWTSignature(this, pubKey)
   }
 
   public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
     if (!registry) {
       registry = registries.jolocom.create()
     }
-    return validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
+    return deprecated_validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
   }
 
   public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
@@ -96,7 +100,7 @@ export class SignedCredentialRequest {
       throw new Error('The JWT is not complete, header / payload / signature are missing')
     }
 
-    return encodeAsJWT(this.header, this.payload, this.signature)
+    return deprecated_encodeAsJWT(this.header, this.payload, this.signature)
   }
 
   public static fromJWT(jwt: string): SignedCredentialRequest {

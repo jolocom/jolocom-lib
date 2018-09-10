@@ -16,7 +16,6 @@ import { Identity } from '../../ts/identity/identity';
 import { JolocomRegistry } from '../../ts/registries/jolocomRegistry';
 chai.use(sinonChai)
 
-
 describe('SignedCredentialResponse', () => {
   let clock
   const sandbox = sinon.createSandbox()
@@ -83,10 +82,10 @@ describe('SignedCredentialResponse', () => {
 
   describe('verification with registry', () => {
     let resolveStub
-  const mockCredentialResponse = CredentialResponse.create([firstMockCredential])
-  const mockSignedCredRespCreationArgs = {
-    privateKey: Buffer.from(mockPrivKey, 'hex'),
-    credentialResponse: mockCredentialResponse
+    const mockCredentialResponse = CredentialResponse.create([firstMockCredential])
+    const mockSignedCredRespCreationArgs = {
+      privateKey: Buffer.from(mockPrivKey, 'hex'),
+      credentialResponse: mockCredentialResponse
   }
 
     beforeEach( () => {
@@ -100,7 +99,7 @@ describe('SignedCredentialResponse', () => {
 
     it('Should implement a validateSignature method that defaults to using JolocomRegistry', async() => {
       const incorrectlySignedCR = SignedCredentialResponse.create(mockSignedCredRespCreationArgs)
-      
+
       expect(await incorrectlySignedCR.validateSignature()).to.equal(
         false
       )
