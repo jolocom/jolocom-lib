@@ -36,7 +36,7 @@ describe('JSONWebToken', () => {
 
   describe('Static create method', () => {
     clock = sinon.useFakeTimers()
-    let jsonWebToken = JSONWebToken.create(jwtCreateArgs)
+    const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
@@ -47,17 +47,6 @@ describe('JSONWebToken', () => {
     it('The type of the payload should be the correct playload class that exposes class specific methods', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
       expect(jsonWebToken.getPayload().applyConstraints).to.be.an.instanceof(Function)
-    })
-
-    it('Should generate the issuer from the private key when not passed', () => {
-      const modifiedCreationArgs = jwtCreateArgs
-      modifiedCreationArgs.payload.iss = undefined
-
-      jsonWebToken = JSONWebToken.create(modifiedCreationArgs)
-
-      expect(jsonWebToken.getIssuer()).to.equal(
-        'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
-      )
     })
 
     it('Should throw an error in case the interaction type from the payload is not known', () => {
