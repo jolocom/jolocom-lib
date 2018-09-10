@@ -48,14 +48,11 @@ export class JSONWebToken<T extends IPayload> {
 
   public static create(args: IJSONWebTokenCreationAttrs): InteractionTypedJWT {
     const { privateKey, payload } = args
-    let issuer = payload.iss
-    if (!issuer) {
-      issuer = privateKeyToDID(privateKey)
-    }
-    payload.iat = Date.now()
-    payload.iss = issuer
 
     const jwt = JSONWebToken.payloadToJWT(payload)
+
+    jwt.payload.iat = Date.now()
+    jwt.payload.iss = privateKeyToDID(privateKey)
     jwt.signature = jwt.sign(privateKey)
 
     return jwt

@@ -1,9 +1,14 @@
 import { CredentialRequest } from '../../interactionFlows/credentialRequest/credentialRequest';
 import { InteractionType, IPayload, IPayloadAttrs } from '../types';
 
-export interface ICredentialRequestPayloadAttrs extends IPayloadAttrs {
+export interface ICredentialRequestPayloadAttrs {
   iat: number
   iss: string
+  typ: string
+  credentialRequest: ICredentialRequestCreationAttrs
+}
+
+export interface ICredentialRequestPayloadCreationAttrs {
   typ: string
   credentialRequest: ICredentialRequestCreationAttrs
 }

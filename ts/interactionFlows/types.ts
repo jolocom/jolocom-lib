@@ -1,7 +1,7 @@
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
-import { ICredentialRequestPayloadAttrs } from './credentialRequest/types';
+import { ICredentialRequestPayloadAttrs, ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
 
-export type InteractionTypePayloadAttrs = ICredentialRequestPayloadAttrs
+export type InteractionTypePayloadAttrs = ICredentialRequestPayloadCreationAttrs
 export type InteractionTypePayloads = CredentialRequestPayload
 
 export interface IJWTHeader {
@@ -22,8 +22,6 @@ export interface IJSONWebTokenCreationAttrs {
 }
 
 export interface IPayloadAttrs {
-  iss: string
-  iat: number
   typ: string
   [x: string]: any
 }
