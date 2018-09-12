@@ -1,5 +1,4 @@
 import { Credential } from '../credentials/credential/credential'
-import { ICredentialCreateAttrs } from '../credentials/credential/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { SignedCredentialRequest } from '../credentialRequest/signedCredentialRequest/signedCredentialRequest'
 import { CredentialRequest } from '../credentialRequest/credentialRequest'
@@ -8,6 +7,7 @@ import { Identity } from '../identity/identity'
 import { CredentialResponse } from '../credentialResponse/credentialResponse'
 import { privateKeyToPublicKey } from '../utils/crypto'
 import { SignedCredentialResponse } from '../credentialResponse/signedCredentialResponse/signedCredentialResponse'
+import { BaseMetadata } from 'cred-types-jolocom-core'
 
 export class IdentityWallet {
   private identityDocument: Identity
@@ -20,12 +20,20 @@ export class IdentityWallet {
     credential: Credential.create,
     credentialRequest: CredentialRequest.create,
     credentialResponse: CredentialResponse.create,
-    signedCredential: async (credentialAttrs: ICredentialCreateAttrs) => {
-      if (!credentialAttrs.claim.id) {
-        credentialAttrs.claim.id = this.identityDocument.getDID()
+    signedCredential: async <T extends BaseMetadata>({
+      metadata,
+      claim,
+      subject
+    }: {
+      metadata: T
+      claim: typeof metadata['claimInterface']
+      subject?: string
+    }) => {
+      if (!subject) {
+        subject = this.getIdentity().getDID()
       }
 
-      return await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey })
+      return await SignedCredential.create({ metadata, claim, privateIdentityKey: this.privateIdentityKey, subject })
     },
     signedCredentialRequest: (credentialRequest: CredentialRequest) =>
       SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey.key }),
@@ -43,7 +51,7 @@ export class IdentityWallet {
   public static create({ privateIdentityKey, identity }: IIdentityWalletCreateArgs): IdentityWallet {
     const identityWallet = new IdentityWallet()
     const pubKey = privateKeyToPublicKey(privateIdentityKey).toString('hex')
-    const entry = identity.getPublicKeySection().find((pubKeySec) => pubKeySec.getPublicKeyHex() === pubKey)
+    const entry = identity.getPublicKeySection().find(pubKeySec => pubKeySec.getPublicKeyHex() === pubKey)
 
     identityWallet.privateIdentityKey = {
       key: privateIdentityKey,
@@ -65,7 +73,7 @@ export class IdentityWallet {
     }
   }
 
-  public getIdentityKey(): { key: Buffer, id: string } {
+  public getIdentityKey(): { key: Buffer; id: string } {
     return this.privateIdentityKey
   }
 

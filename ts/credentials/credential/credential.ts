@@ -1,10 +1,14 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
-import { IClaimAttrs, IClaimMetadata, ICredentialAttrs, ICredentialCreateAttrs } from './types'
+import { IClaimAttrs, ICredentialAttrs } from './types'
+import { BaseMetadata, validContextEntry } from 'cred-types-jolocom-core'
+
+// TODO TODO TODO
+const defaultContextsBrief = []
 
 @Exclude()
 export class Credential {
   @Expose()
-  private '@context': string[] | object[]
+  private '@context': Array<string | { [key: string]: string }>
 
   @Expose()
   private type: string[]
@@ -15,29 +19,21 @@ export class Credential {
   @Expose()
   private name: string
 
-  public static create({metadata, claim}: ICredentialCreateAttrs): Credential {
-    const allPresent = metadata.fieldNames.every((field) => !!claim[field])
-    if (!allPresent) {
-      throw new Error(`Missing claims, expected keys are: ${metadata.fieldNames.toString()}`)
-    }
-
-    const assembledClaim = {
-      id: claim.id
-    }
-
-    const combinedFieldNames = [...metadata.fieldNames, ...metadata.optionalFieldNames]
-
-    combinedFieldNames.forEach((fieldName) => {
-      if (claim[fieldName]) {
-        assembledClaim[fieldName] = claim[fieldName]
-      }
-    })
-
+  public static create<T extends BaseMetadata>({
+    metadata,
+    claim,
+    subject
+  }: {
+    metadata: T
+    claim: typeof metadata['claimInterface']
+    subject: string
+  }) {
     const credential = new Credential()
-    credential['@context'] = metadata.context
+    credential['@context'] = [...defaultContextsBrief, ...metadata.context]
     credential.type = metadata.type
     credential.name = metadata.name
-    credential.claim = assembledClaim
+    credential.claim = claim
+    credential.claim.id = subject
 
     return credential
   }
@@ -54,7 +50,7 @@ export class Credential {
     return this.name
   }
 
-  public getContext(): string[] | object[] {
+  public getContext(): Array<validContextEntry> {
     return this['@context']
   }
 

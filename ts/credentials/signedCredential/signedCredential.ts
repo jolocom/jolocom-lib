@@ -1,29 +1,36 @@
 import 'reflect-metadata'
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { canonize } from 'jsonld'
-import { IClaimAttrs, ICredentialCreateAttrs } from '../credential/types'
+import { IClaimAttrs } from '../credential/types'
 import { Credential } from '../credential/credential'
 import { generateRandomID, sign, sha256, verifySignature, privateKeyToDID } from '../../utils/crypto'
-import { ISignedCredentialAttrs, ISignedCredentialCreateArgs } from './types'
+import { ISignedCredentialAttrs } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { defaultContext } from '../../utils/contexts'
-import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
+import { ILinkedDataSignature } from '../../linkedDataSignature/types'
 import { JolocomRegistry, createJolocomRegistry } from '../../registries/jolocomRegistry'
-import { registries } from '../../registries'
+import { validContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
+import { IIndexedIdentityKey } from '../../identityWallet/types'
 
 @Exclude()
 export class SignedCredential {
-  @Expose() private '@context': string[] | object[]
+  @Expose()
+  private '@context': validContextEntry[]
 
-  @Expose() private id: string
+  @Expose()
+  private id: string
 
-  @Expose() private name: string
+  @Expose()
+  private name: string
 
-  @Expose() private issuer: string
+  @Expose()
+  private issuer: string
 
-  @Expose() private type: string[]
+  @Expose()
+  private type: string[]
 
-  @Expose() private claim: IClaimAttrs
+  @Expose()
+  private claim: IClaimAttrs
 
   @Type(() => Date)
   @Expose()
@@ -82,7 +89,7 @@ export class SignedCredential {
       return this.name
     }
 
-    const customType = this.type.find((t) => t !== 'Credential')
+    const customType = this.type.find(t => t !== 'Credential')
 
     if (!customType) {
       return 'Credential'
@@ -91,10 +98,20 @@ export class SignedCredential {
     return customType.replace(/([A-Z])/g, ' $1').trim()
   }
 
-  public static async create(args: ISignedCredentialCreateArgs): Promise<SignedCredential> {
-    const credential = Credential.create(args.credentialAttrs)
+  public static async create<T extends BaseMetadata>({
+    metadata,
+    claim,
+    privateIdentityKey,
+    subject
+  }: {
+    metadata: T
+    claim: typeof metadata['claimInterface']
+    privateIdentityKey: IIndexedIdentityKey
+    subject: string
+  }): Promise<SignedCredential> {
+    const credential = Credential.create<T>({ metadata, claim, subject })
     const signedCredential = SignedCredential.fromCredential(credential)
-    await signedCredential.generateSignature(args.privateIdentityKey)
+    await signedCredential.generateSignature(privateIdentityKey)
 
     return signedCredential
   }
@@ -111,7 +128,7 @@ export class SignedCredential {
     return signedCredential
   }
 
-  public async generateSignature({ key, id }: { key: Buffer, id: string }) {
+  public async generateSignature({ key, id }: { key: Buffer; id: string }) {
     this.proof.created = new Date()
     this.proof.creator = id
     this.proof.nonce = generateRandomID(8)
@@ -125,7 +142,7 @@ export class SignedCredential {
 
   public async validateSignatureWithPublicKey(pubKey: Buffer): Promise<boolean> {
     if (!pubKey) {
-      throw new Error('Please provide the issuer\'s public key')
+      throw new Error("Please provide the issuer's public key")
     }
 
     const docDigest = await this.digest()
@@ -143,8 +160,9 @@ export class SignedCredential {
     }
 
     const issuerProfile = await registry.resolve(this.issuer)
-    const relevantPublicKey = issuerProfile.getPublicKeySection()
-      .find((keySection) => keySection.getIdentifier() === this.proof.creator)
+    const relevantPublicKey = issuerProfile
+      .getPublicKeySection()
+      .find(keySection => keySection.getIdentifier() === this.proof.creator)
 
     if (!relevantPublicKey) {
       return false

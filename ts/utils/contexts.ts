@@ -1,4 +1,6 @@
-export const defaultContext = {
+import { validContextEntry } from 'cred-types-jolocom-core'
+
+export const defaultContext: validContextEntry = {
   id: '@id',
   type: '@type',
   cred: 'https://w3id.org/credentials#',
