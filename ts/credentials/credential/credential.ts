@@ -1,5 +1,5 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
-import { IClaimAttrs, ICredentialAttrs } from './types'
+import { ICredentialAttrs, IClaimSection } from './types'
 import { BaseMetadata, validContextEntry } from 'cred-types-jolocom-core'
 
 // TODO TODO TODO
@@ -14,7 +14,7 @@ export class Credential {
   private type: string[]
 
   @Expose()
-  private claim: IClaimAttrs
+  private claim: IClaimSection
 
   @Expose()
   private name: string
@@ -38,7 +38,7 @@ export class Credential {
     return credential
   }
 
-  public getClaim(): IClaimAttrs {
+  public getClaim(): IClaimSection {
     return this.claim
   }
 

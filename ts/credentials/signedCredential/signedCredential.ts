@@ -1,7 +1,6 @@
 import 'reflect-metadata'
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { canonize } from 'jsonld'
-import { IClaimAttrs } from '../credential/types'
 import { Credential } from '../credential/credential'
 import { generateRandomID, sign, sha256, verifySignature, privateKeyToDID } from '../../utils/crypto'
 import { ISignedCredentialAttrs } from './types'
@@ -11,6 +10,7 @@ import { ILinkedDataSignature } from '../../linkedDataSignature/types'
 import { JolocomRegistry, createJolocomRegistry } from '../../registries/jolocomRegistry'
 import { validContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
 import { IIndexedIdentityKey } from '../../identityWallet/types'
+import { IClaimSection } from '../credential/types';
 
 @Exclude()
 export class SignedCredential {
@@ -30,7 +30,7 @@ export class SignedCredential {
   private type: string[]
 
   @Expose()
-  private claim: IClaimAttrs
+  private claim: IClaimSection
 
   @Type(() => Date)
   @Expose()
@@ -80,7 +80,7 @@ export class SignedCredential {
     return this.claim.id
   }
 
-  public getCredentialSection(): IClaimAttrs {
+  public getCredentialSection(): IClaimSection {
     return this.claim
   }
 

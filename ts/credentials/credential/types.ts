@@ -1,14 +1,16 @@
 import { validContextEntry } from "cred-types-jolocom-core"
 
-// TODO DEPRECATE
-export interface IClaimAttrs {
+type validClaimTypes = string | number | boolean
+export type validClaimEntry = validClaimTypes | {[key: string]: validClaimEntry}
+
+export interface IClaimSection {
   id?: string
-  [x: string]: string
+  [x: string]: validClaimEntry
 }
 
 export interface ICredentialAttrs {
   '@context': validContextEntry[]
   type: string[]
   name?: string
-  claim: IClaimAttrs
+  claim: validClaimEntry
 }

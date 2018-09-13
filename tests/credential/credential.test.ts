@@ -37,7 +37,9 @@ describe('Credential', () => {
       const customCredential = Credential.create<typeof customClaimMetadata>({
         metadata: customClaimMetadata,
         claim: {
-          age: '20'
+          birthDate: 20,
+          birthMonth: 'april',
+          birthYear: 1984
         },
         subject: 'did:jolo:test'
       })
