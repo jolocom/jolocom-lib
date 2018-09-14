@@ -29,22 +29,44 @@ export const customCredentialCreationArgs = {
   secondTest: 'second'
 }
 
+const defaultContext = [
+  'https://w3id.org/identity/v1',
+  {
+    proof: 'https://w3id.org/security#proof'
+  }
+]
+
 export const singleClaimCredentialJSON = {
-  '@context': [{ ProofOfEmailCredential: 'https://identity.jolocom.com/terms/ProofOfEmailCredential' }],
+  '@context': [
+    ...defaultContext,
+    {
+      email: 'schema:email',
+      schema: 'http://schema.org/',
+      ProofOfEmailCredential: 'https://identity.jolocom.com/terms/ProofOfEmailCredential'
+    }
+  ],
   type: ['Credential', 'ProofOfEmailCredential'],
   claim: { id: 'did:jolo:test', email: 'eugeniu@jolocom.com' },
   name: 'Email address'
 }
 
 export const multipleClaimsCredentialJSON = {
-  '@context': [{ ProofOfNameCredential: 'https://identity.jolocom.com/terms/ProofOfNameCredential' }],
+  '@context': [
+    ...defaultContext,
+    {
+      ProofOfNameCredential: 'https://identity.jolocom.com/terms/ProofOfNameCredential',
+      familyName: 'schema:familyName',
+      givenName: 'schema:givenName',
+      schema: 'http://schema.org/'
+    }
+  ],
   type: ['Credential', 'ProofOfNameCredential'],
   claim: { id: 'did:jolo:test', givenName: 'Eugeniu', familyName: 'Rusu' },
   name: 'Name'
 }
 
 export const customCredentialJSON = {
-  '@context': ['http://test.com', { test: 'http://test.com/terms' }],
+  '@context': [...defaultContext, 'http://test.com', { test: 'http://test.com/terms' }],
   type: ['Credential', 'MockCredential'],
   claim: { id: 'did:jolo:test', birthDate: 20, birthMonth: 'april', birthYear: 1984 },
   name: 'Mock'

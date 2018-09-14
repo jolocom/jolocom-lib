@@ -5,7 +5,6 @@ import { Credential } from '../credential/credential'
 import { generateRandomID, sign, sha256, verifySignature, privateKeyToDID } from '../../utils/crypto'
 import { ISignedCredentialAttrs } from './types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
-import { defaultContext } from '../../utils/contexts'
 import { ILinkedDataSignature } from '../../linkedDataSignature/types'
 import { JolocomRegistry, createJolocomRegistry } from '../../registries/jolocomRegistry'
 import { validContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
@@ -192,8 +191,6 @@ export class SignedCredential {
 
   private async normalize(): Promise<string> {
     const json = this.toJSON()
-
-    json['@context'] = [defaultContext]
     delete json.proof
 
     return canonize(json)
