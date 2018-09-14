@@ -12,9 +12,9 @@ import {
   signedCredReqJson,
   signedCredReqJWT,
   mockPrivKey,
-  privKeyDID,
-  ddoAttr
+  privKeyDID
 } from '../data/credentialRequest/signedCredentialRequest'
+import { ddoAttr } from '../data/identity'
 import { privateKeyToPublicKey } from '../../ts/utils/crypto'
 import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { Identity } from '../../ts/identity/identity'

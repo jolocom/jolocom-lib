@@ -1,4 +1,4 @@
-import * as keyDerivation from '../utils/keyDerivation'
+import { generateMnemonic, deriveChildKeyPair, deriveMasterKeyPairFromMnemonic } from '../utils/keyDerivation'
 import { IKeyResponse } from '../utils/keyDerivation'
 import { keyTypes } from '../'
 
@@ -21,17 +21,17 @@ export class IdentityManager {
   }
 
   public deriveChildKey(path: string): IKeyResponse {
-    const mnemonic = keyDerivation.generateMnemonic(this.seed)
-    const masterKeyPair = keyDerivation.deriveMasterKeyPairFromMnemonic(mnemonic)
+    const mnemonic = generateMnemonic(this.seed)
+    const masterKeyPair = deriveMasterKeyPairFromMnemonic(mnemonic)
 
-    return keyDerivation.deriveChildKeyPair({masterKeyPair, path})
+    return deriveChildKeyPair({ masterKeyPair, path })
   }
 
   public getSchema(): IKeyDerivationSchema {
     return this.schema
   }
 
-  public addSchemaEntry({name, path}: {name: string, path: string}): void {
+  public addSchemaEntry({ name, path }: { name: string; path: string }): void {
     this.schema[name] = path
   }
 }

@@ -11,10 +11,6 @@ import {
 } from './types'
 import { JolocomRegistry } from '../../registries/jolocomRegistry'
 import {
-  validateJWTSignature,
-  computeJWTSignature,
-  encodeAsJWT,
-  validateJWTSignatureWithRegistry,
   deprecated_computeJWTSignature,
   deprecated_validateJWTSignature,
   deprecated_validateJWTSignatureWithRegistry,
