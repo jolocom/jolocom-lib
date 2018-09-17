@@ -8,8 +8,7 @@ import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsa
 import { ILinkedDataSignature } from '../../linkedDataSignature/types'
 import { JolocomRegistry, createJolocomRegistry } from '../../registries/jolocomRegistry'
 import { validContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
-import { IIndexedIdentityKey } from '../../identityWallet/types'
-import { IClaimSection } from '../credential/types';
+import { IClaimSection } from '../credential/types'
 
 @Exclude()
 export class SignedCredential {
@@ -105,7 +104,10 @@ export class SignedCredential {
   }: {
     metadata: T
     claim: typeof metadata['claimInterface']
-    privateIdentityKey: IIndexedIdentityKey
+    privateIdentityKey: {
+      key: Buffer
+      id: string
+    }
     subject: string
   }): Promise<SignedCredential> {
     const credential = Credential.create<T>({ metadata, claim, subject })
