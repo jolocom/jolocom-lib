@@ -3,7 +3,7 @@ import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import { ISignedCredResponsePayload } from '../credentialResponse/signedCredentialResponse/types'
 import { SignedCredentialResponse } from '../credentialResponse/signedCredentialResponse/signedCredentialResponse'
 import { JolocomRegistry } from '../registries/jolocomRegistry'
-import { JSONWebToken } from '../interactionFlows/jsonWebToken';
+import { JSONWebToken } from '../interactionFlows/JSONWebToken';
 import { IPayload, IJWTHeader } from '../interactionFlows/types';
 
 export type jwtPayload = ISignedCredResponsePayload
