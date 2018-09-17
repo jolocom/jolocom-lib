@@ -18,7 +18,7 @@ import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomReg
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
 import { ICredentialRequestPayloadAttrs } from './credentialRequest/types';
 import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload';
-import { ICredentialResponsePayloadCreationAttrs, ICredentialResponsePayloadAttrs } from './credentialResponse/types';
+import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types';
 
 type InteractionTypedJWT = JSONWebToken<CredentialRequestPayload> | JSONWebToken<CredentialRequestPayload>
 
