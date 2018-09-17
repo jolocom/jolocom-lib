@@ -1,5 +1,5 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
-import { IClaimAttrs, IClaimMetadata, ICredentialAttrs, ICredentialCreateAttrs } from './types'
+import { IClaimAttrs, ICredentialAttrs, ICredentialCreateAttrs } from './types'
 
 @Exclude()
 export class Credential {

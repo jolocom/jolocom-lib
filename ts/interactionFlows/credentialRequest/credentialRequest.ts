@@ -9,7 +9,7 @@ import {
   IConstraint,
   ICredentialRequestCreationArgs
 } from './types'
-import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types';
+import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
 export class CredentialRequest {
   private callbackURL: string

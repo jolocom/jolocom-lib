@@ -1,15 +1,14 @@
 import 'reflect-metadata'
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { canonize } from 'jsonld'
-import { IClaimAttrs, ICredentialCreateAttrs } from '../credential/types'
+import { IClaimAttrs } from '../credential/types'
 import { Credential } from '../credential/credential'
 import { generateRandomID, sign, sha256, verifySignature, privateKeyToDID } from '../../utils/crypto'
 import { ISignedCredentialAttrs, ISignedCredentialCreateArgs } from './types'
-import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { defaultContext } from '../../utils/contexts'
-import { proofTypes, ILinkedDataSignature } from '../../linkedDataSignature/types'
+import { ILinkedDataSignature } from '../../linkedDataSignature/types'
 import { JolocomRegistry, createJolocomRegistry } from '../../registries/jolocomRegistry'
-import { registries } from '../../registries'
+import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 
 @Exclude()
 export class SignedCredential {

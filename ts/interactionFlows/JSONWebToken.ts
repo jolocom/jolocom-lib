@@ -13,12 +13,11 @@ import {
   InteractionType,
   IJSONWebTokenCreationAttrs,
   InteractionTypePayloadAttrs
-} from './types';
-import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry';
-import { registries } from '../registries';
-import { privateKeyToDID } from '../utils/crypto';
-import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
-import { ICredentialRequestPayloadAttrs } from './credentialRequest/types';
+} from './types'
+import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
+import { privateKeyToDID } from '../utils/crypto'
+import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
+import { ICredentialRequestPayloadAttrs } from './credentialRequest/types'
 
 type InteractionTypedJWT = JSONWebToken<CredentialRequestPayload>
 

@@ -1,4 +1,4 @@
-import { ILibConfig } from './types';
+import { ILibConfig } from './types'
 
 export const defaultConfig: ILibConfig = {
   identity: {

@@ -13,7 +13,7 @@ import {
 } from '../../utils/jwt'
 import { privateKeyToDID } from '../../utils/crypto'
 import { registries } from '../../registries'
-import { IJWTHeader } from '../../interactionFlows/types';
+import { IJWTHeader } from '../../interactionFlows/types'
 
 export class SignedCredentialResponse {
   private header: IJWTHeader = {

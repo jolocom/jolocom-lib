@@ -7,14 +7,13 @@ import { DidDocument } from '../../ts/identity/didDocument'
 import { claimsMetadata } from '../../ts/index'
 import { singleClaimCreationArgs, singleClaimCredentialJSON } from '../data/credential/credential'
 import { Credential } from '../../ts/credentials/credential/credential'
-import { credentialRequestCreationArgs } from '../data/credentialRequest/credentialRequest'
-import { testSignedCred, testSignedCredRequest } from '../data/identityWallet'
+import { testSignedCred } from '../data/identityWallet'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
-import { credentialRequestPayloadJson } from '../data/interactionFlows/jsonWebToken';
-import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken';
-import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload';
-import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest';
+import { credentialRequestPayloadJson } from '../data/interactionFlows/jsonWebToken'
+import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
+import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
+import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
 
 chai.use(sinonChai)
 const expect = chai.expect

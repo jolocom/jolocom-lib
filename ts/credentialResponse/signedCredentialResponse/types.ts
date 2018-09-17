@@ -1,6 +1,6 @@
 import { CredentialResponse } from '../credentialResponse'
-import { ICredentialResponseAttrs } from '../types';
-import { IJWTHeader } from '../../interactionFlows/types';
+import { ICredentialResponseAttrs } from '../types'
+import { IJWTHeader } from '../../interactionFlows/types'
 
 export interface ISignedCredentialResponseAttrs {
   header: IJWTHeader

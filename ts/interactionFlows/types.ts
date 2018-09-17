@@ -1,5 +1,5 @@
-import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
-import { ICredentialRequestPayloadAttrs, ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
+import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
+import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
 
 export type InteractionTypePayloadAttrs = ICredentialRequestPayloadCreationAttrs
 export type InteractionTypePayloads = CredentialRequestPayload

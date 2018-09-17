@@ -1,3 +1,3 @@
-import { PublicKeySection } from './publicKeySection'
-import { AuthenticationSection } from './authenticationSection'
-import { ServiceEndpointsSection} from './serviceEndpointsSection'
+export { PublicKeySection } from './publicKeySection'
+export { AuthenticationSection } from './authenticationSection'
+export { ServiceEndpointsSection} from './serviceEndpointsSection'
