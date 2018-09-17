@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { CredentialRequest } from '../../ts/credentialRequest/credentialRequest'
+import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
 import {
   credentialRequestCreationArgs,
   firstMockCredential,

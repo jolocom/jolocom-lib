@@ -4,7 +4,6 @@ import { IpfsStorageAgent } from '../../ts/ipfs/index'
 import {
   localHostStorage,
   pinBoolean,
-  testDataObject,
   testDataString,
   testHash,
   testDDO,
