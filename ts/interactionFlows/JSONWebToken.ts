@@ -15,8 +15,6 @@ import {
   InteractionTypePayloadAttrs
 } from './types';
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry';
-import { registries } from '../registries';
-import { privateKeyToDID } from '../utils/crypto';
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
 import { ICredentialRequestPayloadAttrs } from './credentialRequest/types';
 
@@ -52,8 +50,8 @@ export class JSONWebToken<T extends IPayload> {
     const jwt = JSONWebToken.payloadToJWT(payload)
 
     jwt.payload.iat = Date.now()
-    jwt.payload.iss = privateKeyToDID(privateKey)
-    jwt.signature = jwt.sign(privateKey)
+    jwt.payload.iss = privateKey.id
+    jwt.signature = jwt.sign(privateKey.key)
 
     return jwt
   }

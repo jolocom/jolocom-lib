@@ -1,5 +1,6 @@
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
-import { ICredentialRequestPayloadAttrs, ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
+import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
+import { IPrivateKeyWithId } from '../identityWallet/types';
 
 export type InteractionTypePayloadAttrs = ICredentialRequestPayloadCreationAttrs
 export type InteractionTypePayloads = CredentialRequestPayload
@@ -17,7 +18,7 @@ export interface IPayload {
 }
 
 export interface IJSONWebTokenCreationAttrs {
-  privateKey: Buffer
+  privateKey: IPrivateKeyWithId
   payload: InteractionTypePayloadAttrs
 }
 
