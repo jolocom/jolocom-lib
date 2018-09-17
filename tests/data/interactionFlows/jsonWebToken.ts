@@ -26,7 +26,10 @@ export const jwtJSON = {
 }
 
 export const jwtCreateArgs = {
-  privateKey: Buffer.from(mockPrivKey, 'hex'),
+  privateKey: {
+    key: Buffer.from(mockPrivKey, 'hex'),
+    id: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
+  },
   payload: {
     typ: InteractionType.CredentialRequest,
     credentialRequest: {

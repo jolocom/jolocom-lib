@@ -1,8 +1,8 @@
 import { IJWTHeader } from './types'
+import base64url from 'base64url'
 import {
   validateJWTSignature,
   computeJWTSignature,
-  encodeAsJWT,
   validateJWTSignatureWithRegistry
 } from '../utils/jwt'
 import { decodeToken } from 'jsontokens'
@@ -67,8 +67,11 @@ export class JSONWebToken<T extends IPayload> {
     if (!this.payload || !this.header || !this.signature) {
       throw new Error('The JWT is not complete, header / payload / signature are missing')
     }
-
-    return encodeAsJWT(this.header, this.payload, this.signature)
+    const jwtParts = []
+    jwtParts.push(base64url.encode(JSON.stringify(this.header)))
+    jwtParts.push(base64url.encode(JSON.stringify(this.payload)))
+    jwtParts.push(this.signature)
+    return jwtParts.join('.')
   }
 
   public sign(privateKey: Buffer) {
