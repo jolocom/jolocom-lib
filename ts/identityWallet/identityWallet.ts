@@ -1,13 +1,11 @@
 import { Credential } from '../credentials/credential/credential'
 import { ICredentialCreateAttrs } from '../credentials/credential/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { SignedCredentialRequest } from '../credentialRequest/signedCredentialRequest/signedCredentialRequest'
-import { CredentialRequest } from '../credentialRequest/credentialRequest'
 import { IIdentityWalletCreateArgs } from './types'
 import { Identity } from '../identity/identity'
-import { CredentialResponse } from '../credentialResponse/credentialResponse'
 import { privateKeyToPublicKey } from '../utils/crypto'
-import { SignedCredentialResponse } from '../credentialResponse/signedCredentialResponse/signedCredentialResponse'
+import { ICredentialRequestPayloadAttrs } from '../interactionFlows/credentialRequest/types'
+import { JSONWebToken } from '../interactionFlows/jsonWebToken'
 
 export class IdentityWallet {
   private identityDocument: Identity
@@ -18,8 +16,6 @@ export class IdentityWallet {
 
   public create = {
     credential: Credential.create,
-    credentialRequest: CredentialRequest.create,
-    credentialResponse: CredentialResponse.create,
     signedCredential: async (credentialAttrs: ICredentialCreateAttrs) => {
       if (!credentialAttrs.claim.id) {
         credentialAttrs.claim.id = this.identityDocument.getDID()
@@ -27,15 +23,13 @@ export class IdentityWallet {
 
       return await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey })
     },
-    signedCredentialRequest: (credentialRequest: CredentialRequest) =>
-      SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey.key }),
-    signedCredentialResponse: (credentialResponse: CredentialResponse) =>
-      SignedCredentialResponse.create({ credentialResponse, privateKey: this.privateIdentityKey.key })
+    credentialRequestJSONWebToken: (payload: ICredentialRequestPayloadAttrs) => {
+      return JSONWebToken.create({privateKey: this.privateIdentityKey.key, payload})
+    }
   }
 
   public sign = {
     credential: this.signCredential.bind(this),
-    credentialRequest: this.signCredentialRequest.bind(this)
   }
 
   public identity
@@ -74,15 +68,5 @@ export class IdentityWallet {
     await signedCredential.generateSignature(this.privateIdentityKey)
 
     return signedCredential
-  }
-
-  public signCredentialRequest(credentialRequest: CredentialRequest): SignedCredentialRequest {
-    const signedCredRequest = SignedCredentialRequest.create({
-      credentialRequest,
-      privateKey: this.privateIdentityKey.key
-    })
-    signedCredRequest.sign(this.privateIdentityKey.key)
-
-    return signedCredRequest
   }
 }

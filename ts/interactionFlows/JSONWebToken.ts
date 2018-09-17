@@ -1,4 +1,4 @@
-import { IJWTHeader } from '../credentialRequest/signedCredentialRequest/types'
+import { IJWTHeader } from './types'
 import {
   validateJWTSignature,
   computeJWTSignature,
@@ -13,14 +13,13 @@ import {
   InteractionType,
   IJSONWebTokenCreationAttrs,
   InteractionTypePayloadAttrs
-} from './types';
-import { JolocomRegistry } from '../registries/jolocomRegistry';
-import { registries } from '../registries';
-import { privateKeyToDID } from '../utils/crypto';
-import { SignedCredentialRequestPayload } from './signedCredentialRequest/signedCredentialRequestPayload';
-import { ISignedCredRequestPayloadAttrs } from './signedCredentialRequest/types';
+} from './types'
+import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
+import { privateKeyToDID } from '../utils/crypto'
+import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
+import { ICredentialRequestPayloadAttrs } from './credentialRequest/types'
 
-type InteractionTypedJWT = JSONWebToken<SignedCredentialRequestPayload>
+type InteractionTypedJWT = JSONWebToken<CredentialRequestPayload>
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -48,14 +47,11 @@ export class JSONWebToken<T extends IPayload> {
 
   public static create(args: IJSONWebTokenCreationAttrs): InteractionTypedJWT {
     const { privateKey, payload } = args
-    let issuer = payload.iss
-    if (!issuer) {
-      issuer = privateKeyToDID(privateKey)
-    }
-    payload.iat = Date.now()
-    payload.iss = issuer
 
     const jwt = JSONWebToken.payloadToJWT(payload)
+
+    jwt.payload.iat = Date.now()
+    jwt.payload.iss = privateKeyToDID(privateKey)
     jwt.signature = jwt.sign(privateKey)
 
     return jwt
@@ -86,7 +82,7 @@ export class JSONWebToken<T extends IPayload> {
 
   public async validateSignatureWithRegistry(registry?: JolocomRegistry): Promise<boolean> {
     if (!registry) {
-      registry = registries.jolocom.create()
+      registry = createJolocomRegistry()
     }
     return validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
   }
@@ -108,8 +104,8 @@ export class JSONWebToken<T extends IPayload> {
 
     switch (payload.typ) {
       case InteractionType.CredentialRequest.toString(): {
-        jwt = new JSONWebToken<SignedCredentialRequestPayload>()
-        jwt.payload = SignedCredentialRequestPayload.fromJSON(payload as ISignedCredRequestPayloadAttrs)
+        jwt = new JSONWebToken<CredentialRequestPayload>()
+        jwt.payload = CredentialRequestPayload.fromJSON(payload as ICredentialRequestPayloadAttrs)
         break
       }
       case InteractionType.CredentialResponse.toString(): {

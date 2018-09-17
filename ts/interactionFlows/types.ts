@@ -1,9 +1,8 @@
-import { IJWTHeader } from '../credentialRequest/signedCredentialRequest/types';
-import { SignedCredentialRequestPayload } from './signedCredentialRequest/signedCredentialRequestPayload';
-import { ISignedCredRequestPayloadAttrs } from './signedCredentialRequest/types';
+import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
+import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
 
-export type InteractionTypePayloadAttrs = ISignedCredRequestPayloadAttrs
-export type InteractionTypePayloads = SignedCredentialRequestPayload
+export type InteractionTypePayloadAttrs = ICredentialRequestPayloadCreationAttrs
+export type InteractionTypePayloads = CredentialRequestPayload
 
 export interface IJWTHeader {
   alg: string
@@ -23,8 +22,6 @@ export interface IJSONWebTokenCreationAttrs {
 }
 
 export interface IPayloadAttrs {
-  iss: string
-  iat: number
   typ: string
   [x: string]: any
 }

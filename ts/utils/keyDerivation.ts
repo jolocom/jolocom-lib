@@ -1,6 +1,5 @@
 import * as bip39 from 'bip39'
 import * as bitcoin from 'bitcoinjs-lib'
-import { keyTypes } from '../index'
 
 export interface IKeyResponse {
   wif: string

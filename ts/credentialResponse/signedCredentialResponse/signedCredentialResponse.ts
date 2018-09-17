@@ -1,17 +1,11 @@
 import 'reflect-metadata'
 import { decodeToken } from 'jsontokens'
 import { classToPlain, plainToClass } from 'class-transformer'
-import { IJWTHeader } from '../../credentialRequest/signedCredentialRequest/types'
 import { ISuppliedCredentialsAttrs } from '../types'
-import { CredentialRequest } from '../../credentialRequest/credentialRequest'
 import { ISignedCredResponsePayload, ISignedCredResponseCreationArgs, ISignedCredentialResponseAttrs } from './types'
 import { CredentialResponse } from '../credentialResponse'
 import { JolocomRegistry } from '../../registries/jolocomRegistry'
 import {
-  validateJWTSignature,
-  computeJWTSignature,
-  encodeAsJWT,
-  validateJWTSignatureWithRegistry,
   deprecated_validateJWTSignature,
   deprecated_computeJWTSignature,
   deprecated_validateJWTSignatureWithRegistry,
@@ -19,6 +13,7 @@ import {
 } from '../../utils/jwt'
 import { privateKeyToDID } from '../../utils/crypto'
 import { registries } from '../../registries'
+import { IJWTHeader } from '../../interactionFlows/types'
 
 export class SignedCredentialResponse {
   private header: IJWTHeader = {
@@ -73,9 +68,9 @@ export class SignedCredentialResponse {
     return this.payload.credentialResponse.getSuppliedCredentials()
   }
 
-  public satisfiesRequest(cr: CredentialRequest): boolean {
+  /* public satisfiesRequest(cr: CredentialRequest): boolean {
     return this.payload.credentialResponse.satisfiesRequest(cr)
-  }
+  } */
 
   public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
     return deprecated_validateJWTSignature(this, pubKey)

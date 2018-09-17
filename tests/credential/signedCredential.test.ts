@@ -2,7 +2,7 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-import { testSignedCredentialCreateArgs } from '../data/credential/signedCredential';
+import { testSignedCredentialCreateArgs } from '../data/credential/signedCredential'
 
 chai.use(sinonChai)
 

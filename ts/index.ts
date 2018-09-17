@@ -2,10 +2,9 @@ import 'reflect-metadata'
 import { IDefaultClaimsMetadata } from './credentials/credential/types'
 import { parse } from './parse/parser'
 import { Credential } from './credentials/credential/credential'
-import { CredentialRequest } from './credentialRequest/credentialRequest'
-import { CredentialResponse } from './credentialResponse/credentialResponse'
 import { registries } from './registries'
-import { IdentityManager } from './identityManager/identityManager';
+import { IdentityManager } from './identityManager/identityManager'
+import { CredentialRequest } from './interactionFlows/credentialRequest/credentialRequest'
 
 export const JolocomLib = {
   parse,
@@ -16,7 +15,6 @@ export const JolocomLib = {
   unsigned : {
     createCredential: Credential.create,
     createCredentialRequest: CredentialRequest.create,
-    createCredentialResponse: CredentialResponse.create
   }
 }
 

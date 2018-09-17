@@ -1,12 +1,10 @@
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
-import { publicKeyToDID, privateKeyToDID, privateKeyToPublicKey, sha256, verifySignature, generateRandomID, sign } from '../../utils/crypto'
+import { privateKeyToDID, privateKeyToPublicKey, sha256, verifySignature, generateRandomID, sign } from '../../utils/crypto'
 import { IDidDocumentAttrs } from './types'
-import { AuthenticationSection } from './sections/authenticationSection'
-import { ServiceEndpointsSection } from './sections/serviceEndpointsSection'
-import { PublicKeySection } from './sections/publicKeySection'
 import { canonize } from 'jsonld'
-import { JolocomRegistry, createJolocomRegistry } from '../../registries/jolocomRegistry';
-import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016';
+import { JolocomRegistry, createJolocomRegistry } from '../../registries/jolocomRegistry'
+import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
+import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections'
 
 @Exclude()
 export class DidDocument {
