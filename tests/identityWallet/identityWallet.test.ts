@@ -75,6 +75,7 @@ describe('IdentityWallet', () => {
         'credential',
         'signedCredential',
         'credentialRequestJSONWebToken',
+        'credentialResponseJSONWebToken'
       ]
 
       expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
