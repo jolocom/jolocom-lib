@@ -1,13 +1,28 @@
 import { IPayload, InteractionType } from '../types'
 import { classToPlain, plainToClass } from 'class-transformer'
-import { CredentialResponse } from './credentialResponse';
-import { ICredentialResponsePayloadAttrs, ISuppliedCredentialsAttrs } from './types';
+import { CredentialResponse } from '../../interactionFlows/credentialResponse/credentialResponse'
+import {
+  ICredentialResponsePayloadAttrs,
+  ISuppliedCredentialsAttrs,
+  ICredentialResponsePayloadCreationAttrs
+} from './types'
 
 export class CredentialResponsePayload implements IPayload {
   public iss: string
   public iat: number
   public typ: InteractionType
   public credentialResponse: CredentialResponse
+
+  public static create(attrs: ICredentialResponsePayloadCreationAttrs): CredentialResponsePayload {
+    const credentialResponse = attrs.credentialResponse
+    if (attrs.typ !== InteractionType.CredentialResponse) {
+      throw new Error('Incorrect payload for CredentialResponse')
+    }
+    const credentialResponsePayload = new CredentialResponsePayload()
+    credentialResponsePayload.credentialResponse = plainToClass(CredentialResponse, CredentialResponse)
+
+    return credentialResponsePayload
+  }
 
   public static fromJSON(json: ICredentialResponsePayloadAttrs): CredentialResponsePayload {
     const credentialResponsePayload = plainToClass(CredentialResponsePayload, json)
