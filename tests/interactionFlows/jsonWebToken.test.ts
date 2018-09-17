@@ -1,30 +1,21 @@
 import { expect } from 'chai'
-import { credentialRequestJson } from '../data/credentialRequest/credentialRequest'
-import {
-  mockPrivKey,
-} from '../data/credentialResponse/signedCredentialResponse'
+import { mockPrivKey } from '../data/credentialResponse/signedCredentialResponse'
 import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import { JSONWebToken } from '../../ts/interactionFlows/JSONWebToken';
-import { InteractionType } from '../../ts/interactionFlows/types';
-import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest';
-import { jwtJSON, jwtCreateArgs, signedCredRequestJWT } from '../data/interactionFlows/jsonWebToken';
-import {
-  CredentialRequestPayload
- } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload';
-import { ddoAttr } from '../data/credentialRequest/signedCredentialRequest';
-import { privateKeyToPublicKey } from '../../ts/utils/crypto';
-import { Identity } from '../../ts/identity/identity';
-import { JolocomRegistry } from '../../ts/registries/jolocomRegistry';
+import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
+import { InteractionType } from '../../ts/interactionFlows/types'
+import { jwtJSON, jwtCreateArgs, signedCredRequestJWT } from '../data/interactionFlows/jsonWebToken'
+import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
+import { ddoAttr } from '../data/credentialRequest/signedCredentialRequest'
+import { privateKeyToPublicKey } from '../../ts/utils/crypto'
+import { Identity } from '../../ts/identity/identity'
+import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
 chai.use(sinonChai)
 
 describe('JSONWebToken', () => {
   let clock
   const sandbox = sinon.createSandbox()
-  const privateKey = Buffer.from(mockPrivKey, 'hex')
-
-  const mockCredentialRequest = CredentialRequest.fromJSON(credentialRequestJson)
 
   before(() => {
     clock = sinon.useFakeTimers()
@@ -52,9 +43,7 @@ describe('JSONWebToken', () => {
     it('Should throw an error in case the interaction type from the payload is not known', () => {
       jwtCreateArgs.payload.typ = 'NonExistingInteractionType'
 
-      expect(() => JSONWebToken.create(jwtCreateArgs)).to.throw(
-        'Interaction type not recognized!'
-      )
+      expect(() => JSONWebToken.create(jwtCreateArgs)).to.throw('Interaction type not recognized!')
       jwtCreateArgs.payload.typ = InteractionType.CredentialRequest
     })
   })
@@ -117,11 +106,9 @@ describe('JSONWebToken', () => {
 
   describe('validateSignatureWithRegistry method', () => {
     clock = sinon.useFakeTimers()
-    let resolveStub
 
-    beforeEach( () => {
-      resolveStub = sandbox.stub(JolocomRegistry.prototype, 'resolve')
-        .resolves(Identity.create({ didDocument: ddoAttr }))
+    beforeEach(() => {
+      sandbox.stub(JolocomRegistry.prototype, 'resolve').resolves(Identity.create({ didDocument: ddoAttr }))
     })
 
     afterEach(() => {
@@ -131,9 +118,7 @@ describe('JSONWebToken', () => {
     it('Should validate the signature using JolocomRegistry by default', async () => {
       const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
 
-      expect(await jsonWebToken.validateSignatureWithRegistry()).to.equal(
-        false
-      )
+      expect(await jsonWebToken.validateSignatureWithRegistry()).to.equal(false)
     })
   })
 })

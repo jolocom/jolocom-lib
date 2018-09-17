@@ -1,1 +1,1 @@
-import { EcdsaLinkedDataSignature } from './suites/ecdsaKoblitzSignature2016'
+export { EcdsaLinkedDataSignature } from './suites/ecdsaKoblitzSignature2016'

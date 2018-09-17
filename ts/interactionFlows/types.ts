@@ -1,6 +1,6 @@
-import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
-import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
-import { IPrivateKeyWithId } from '../identityWallet/types';
+import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
+import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
+import { IPrivateKeyWithId } from '../identityWallet/types'
 
 export type InteractionTypePayloadAttrs = ICredentialRequestPayloadCreationAttrs
 export type InteractionTypePayloads = CredentialRequestPayload

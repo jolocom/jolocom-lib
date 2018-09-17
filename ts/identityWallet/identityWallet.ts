@@ -4,8 +4,8 @@ import { SignedCredential } from '../credentials/signedCredential/signedCredenti
 import { IIdentityWalletCreateArgs, IPrivateKeyWithId } from './types'
 import { Identity } from '../identity/identity'
 import { privateKeyToPublicKey } from '../utils/crypto'
-import { ICredentialRequestPayloadAttrs } from '../interactionFlows/credentialRequest/types';
-import { JSONWebToken } from '../interactionFlows/jsonWebToken';
+import { ICredentialRequestPayloadAttrs } from '../interactionFlows/credentialRequest/types'
+import { JSONWebToken } from '../interactionFlows/jsonWebToken'
 
 export class IdentityWallet {
   private identityDocument: Identity

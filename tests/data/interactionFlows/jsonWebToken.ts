@@ -1,5 +1,5 @@
-import { InteractionType, IJSONWebTokenCreationAttrs } from '../../../ts/interactionFlows/types';
-import { mockPrivKey } from '../credentialResponse/signedCredentialResponse';
+import { InteractionType, IJSONWebTokenCreationAttrs } from '../../../ts/interactionFlows/types'
+import { mockPrivKey } from '../credentialResponse/signedCredentialResponse'
 
 export const credentialRequestJson = {
   callbackURL: 'http://test.com',
@@ -28,7 +28,7 @@ export const jwtJSON = {
 export const jwtCreateArgs = {
   privateKey: Buffer.from(mockPrivKey, 'hex'),
   payload: {
-    typ: InteractionType.CredentialRequest.toString(),
+    typ: InteractionType.CredentialRequest,
     credentialRequest: {
       callbackURL: 'http://test.com',
       credentialRequirements: [
@@ -58,7 +58,7 @@ ucAi2p9j16kuZKj79HUUHA'
 export const credentialRequestPayloadJson = {
   iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
   iat: 0,
-  typ: InteractionType.CredentialRequest.toString(),
+  typ: InteractionType.CredentialRequest,
   credentialRequest: {
     callbackURL: 'http://test.com',
     credentialRequirements: [
