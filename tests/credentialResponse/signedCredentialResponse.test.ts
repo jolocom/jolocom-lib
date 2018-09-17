@@ -11,9 +11,7 @@ import { privateKeyToPublicKey } from '../../ts/utils/crypto'
 import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import { ddoAttr } from '../data/credentialRequest/signedCredentialRequest';
-import { Identity } from '../../ts/identity/identity';
-import { JolocomRegistry } from '../../ts/registries/jolocomRegistry';
+
 chai.use(sinonChai)
 
 describe('SignedCredentialResponse', () => {
@@ -31,6 +29,7 @@ describe('SignedCredentialResponse', () => {
   })
 
   after(() => {
+    sandbox.restore()
     clock.restore()
   })
 

@@ -1,5 +1,4 @@
 import { expect } from 'chai'
-import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
 import {
   credentialRequestCreationArgs,
   firstMockCredential,
@@ -7,8 +6,8 @@ import {
   credentialRequestJson,
   expectedRequestedCredentials
 } from '../data/credentialRequest/credentialRequest'
-import { credentialRequestPayloadJson } from '../data/interactionFlows/jsonWebToken';
-import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload';
+import { credentialRequestPayloadJson } from '../data/interactionFlows/jsonWebToken'
+import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 
 describe('CredentialRequestPayload', () => {
   it('Should implement static fromJSON method which returns a valid instance of CredentialRequestPayload', () => {

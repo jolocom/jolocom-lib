@@ -3,9 +3,8 @@ import { IDefaultClaimsMetadata } from './credentials/credential/types'
 import { parse } from './parse/parser'
 import { Credential } from './credentials/credential/credential'
 import { registries } from './registries'
-import { IdentityManager } from './identityManager/identityManager';
-import { JSONWebToken } from './interactionFlows/jsonWebToken';
-import { CredentialRequest } from './interactionFlows/credentialRequest/credentialRequest';
+import { IdentityManager } from './identityManager/identityManager'
+import { CredentialRequest } from './interactionFlows/credentialRequest/credentialRequest'
 
 export const JolocomLib = {
   parse,

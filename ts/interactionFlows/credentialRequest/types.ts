@@ -1,6 +1,3 @@
-import { CredentialRequest } from '../../interactionFlows/credentialRequest/credentialRequest';
-import { InteractionType, IPayload, IPayloadAttrs } from '../types';
-
 export interface ICredentialRequestPayloadAttrs {
   iat: number
   iss: string
