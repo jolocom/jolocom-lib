@@ -6,7 +6,7 @@ import {
   credentialRequestJson,
   expectedRequestedCredentials
 } from '../data/credentialRequest/credentialRequest'
-import { credentialRequestPayloadJson } from '../data/interactionFlows/jsonWebToken'
+import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 
 describe('CredentialRequestPayload', () => {

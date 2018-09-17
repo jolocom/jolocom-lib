@@ -13,7 +13,12 @@ export const credentialRequestCreationArgWithIssuer = {
   credentialRequirements: [
     {
       type: ['Credential', 'MockCredential'],
-      constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'] }]
+      constraints: [
+        {
+          '==': [{ var: 'issuer' },
+          'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'] 
+        }
+      ]
     }
   ]
 }

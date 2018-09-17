@@ -1,18 +1,6 @@
+import { credentialRequestJson } from './credentialRequest';
 import { InteractionType, IJSONWebTokenCreationAttrs } from '../../../ts/interactionFlows/types'
 import { mockPrivKey } from '../credentialResponse/signedCredentialResponse'
-
-export const credentialRequestJson = {
-  callbackURL: 'http://test.com',
-  credentialRequirements: [
-    {
-      type: ['Credential', 'MockCredential'],
-      constraints: [{ '==': [
-        { var: 'issuer' },
-        'did:jolo:issuer'
-      ] }]
-    }
-  ]
-}
 
 export const jwtJSON = {
   header: { typ: 'JWT', alg: 'ES256K' },
@@ -57,21 +45,3 @@ ifSwiaWF0IjowLCJpc3MiOiJkaWQ6am9sbzo4Zjk3N2U1MGI3ZTVjYmRmZWI1M2\
 EwM2M4MTI5MTNiNzI5NzhjYTM1YzkzNTcxZjg1ZTg2Mjg2MmJhYzhjZGViIn0.L\
 yZytGL7Ixf3ulHIoHRJqQPjXqrqTKC462NRt4P6m_pyo5ROrjzrqJVSvAqhY6aH\
 ucAi2p9j16kuZKj79HUUHA'
-
-export const credentialRequestPayloadJson = {
-  iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
-  iat: 0,
-  typ: InteractionType.CredentialRequest,
-  credentialRequest: {
-    callbackURL: 'http://test.com',
-    credentialRequirements: [
-      {
-        type: ['Credential', 'MockCredential'],
-        constraints: [{ '==': [
-          { var: 'issuer' },
-          'did:jolo:issuer'
-        ] }]
-      }
-    ]
-  }
-}

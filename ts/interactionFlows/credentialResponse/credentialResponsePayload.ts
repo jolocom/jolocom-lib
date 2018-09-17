@@ -1,6 +1,6 @@
 import { IPayload, InteractionType } from '../types'
 import { classToPlain, plainToClass } from 'class-transformer'
-import { CredentialResponse } from '../../credentialResponse/credentialResponse';
+import { CredentialResponse } from './credentialResponse';
 import { ICredentialResponsePayloadAttrs, ISuppliedCredentialsAttrs } from './types';
 
 export class CredentialResponsePayload implements IPayload {
