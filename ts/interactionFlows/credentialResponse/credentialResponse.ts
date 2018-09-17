@@ -1,6 +1,7 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import { ISuppliedCredentialsAttrs, ICredentialResponseAttrs } from './types'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
+import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types';
+import { CredentialRequest } from '../credentialRequest/credentialRequest';
 
 export class CredentialResponse {
   private suppliedCredentials: ISuppliedCredentialsAttrs[] = []
@@ -24,11 +25,11 @@ export class CredentialResponse {
     return this.suppliedCredentials
   }
 
-  /* public satisfiesRequest(cr: CredentialRequest): boolean {
+  public satisfiesRequest(cr: CredentialRequest): boolean {
     const credentials = this.suppliedCredentials.map((section) => section.credential)
     const validCredentials = cr.applyConstraints(credentials)
     return credentials.length === validCredentials.length
-  } */
+  }
 
   public toJSON(): ICredentialResponseAttrs {
     return classToPlain(this) as ICredentialResponseAttrs

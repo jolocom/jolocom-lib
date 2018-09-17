@@ -1,9 +1,10 @@
 import { expect } from 'chai'
-import { CredentialResponse } from '../../ts/credentialResponse/credentialResponse'
 import { mockSuppliedCredentials } from '../data/credentialResponse/credentialResponse'
 import {
-  firstMockCredential,
+  firstMockCredential, credentialRequestCreationArgs, secondMockCredential,
 } from '../data/credentialRequest/credentialRequest'
+import { CredentialResponse } from '../../ts/interactionFlows/credentialResponse/credentialResponse'
+import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest';
 
 describe('CredentialResponse', () => {
   it('Should implement static create method', () => {
@@ -28,7 +29,7 @@ describe('CredentialResponse', () => {
     expect(credentialResponse.getSuppliedCredentials()).to.deep.equal(mockSuppliedCredentials)
   })
 
-  /* it('Should implement a satisfiesRequest method', () => {
+  it('Should implement a satisfiesRequest method', () => {
     const credentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
 
     const validCredentialResponse = CredentialResponse.create([firstMockCredential])
@@ -42,5 +43,5 @@ describe('CredentialResponse', () => {
     const mixedCredentialResponse = CredentialResponse.create([firstMockCredential, secondMockCredential])
     // tslint:disable-next-line:no-unused-expression
     expect(mixedCredentialResponse.satisfiesRequest(credentialRequest)).to.be.false
-  }) */
+  })
 })

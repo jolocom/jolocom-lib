@@ -19,7 +19,6 @@ import { CredentialRequestPayload } from './credentialRequest/credentialRequestP
 import { ICredentialRequestPayloadAttrs } from './credentialRequest/types';
 
 type InteractionTypedJWT = JSONWebToken<CredentialRequestPayload>
-export type InteractionTypePayloads = CredentialRequestPayload
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
