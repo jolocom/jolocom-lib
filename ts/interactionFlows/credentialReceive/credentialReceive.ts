@@ -1,20 +1,28 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import { SignedCredential } from '../../credentials/signedCredential/signedCredential';
 import { ICredentialReceiveAttrs } from './types'
+import { createDecipher } from 'crypto';
 
-// TODO: check if validation function is needed??
 export class CredentialReceive {
-  private signedCredential: SignedCredential
+  private signedCredentials: SignedCredential[]
 
-  public static create(signedCredential: SignedCredential): CredentialReceive {
+  public static create(signedCredentials: SignedCredential[]): CredentialReceive {
     const credentialReceive = new CredentialReceive() 
-    credentialReceive.signedCredential = signedCredential
+    credentialReceive.signedCredentials = signedCredentials
 
     return credentialReceive
   }
 
-  public getSignedCredential(): SignedCredential {
-    return this.signedCredential
+  public async validateCredentials(did: string): Promise<boolean> {
+    const res = await this.signedCredentials.map(async (cred) => {
+      return await cred.validateSignature() && cred.getSubject() === did
+    })
+    
+    return !!!res.indexOf(false)
+  }
+
+  public getSignedCredentials(): SignedCredential[] {
+    return this.signedCredentials
   }
 
   public toJSON(): ICredentialReceiveAttrs {

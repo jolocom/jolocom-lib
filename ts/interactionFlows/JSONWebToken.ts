@@ -112,7 +112,7 @@ export class JSONWebToken<T extends IPayload> {
         // TODO
         break
       }
-      case InteractionType.CredentialsReceiving.toString(): {
+      case InteractionType.CredentialsReceive.toString(): {
         // TODO
         break
       }

@@ -1,7 +1,7 @@
 import { SignedCredential } from '../../credentials/signedCredential/signedCredential';
 
 export interface ICredentialReceiveAttrs {
-  signedCredential: SignedCredential
+  signedCredentials: SignedCredential[]
 }
 
 export interface ICredentialReceivePayloadAttrs {
