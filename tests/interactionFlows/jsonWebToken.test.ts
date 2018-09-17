@@ -7,10 +7,10 @@ import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
 import { InteractionType } from '../../ts/interactionFlows/types'
 import { jwtJSON, jwtCreateArgs, signedCredRequestJWT } from '../data/interactionFlows/jsonWebToken'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
-import { ddoAttr } from '../data/credentialRequest/signedCredentialRequest'
 import { privateKeyToPublicKey } from '../../ts/utils/crypto'
 import { Identity } from '../../ts/identity/identity'
 import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import { ddoAttr } from '../data/identity'
 chai.use(sinonChai)
 
 describe('JSONWebToken', () => {
