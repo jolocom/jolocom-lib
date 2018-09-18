@@ -1,5 +1,5 @@
 import { plainToClass, classToPlain } from 'class-transformer'
-import { ISuppliedCredentialsAttrs, ICredentialResponseAttrs } from './types'
+import { ISuppliedCredentialsAttrs, ICredentialResponseCreationAttrs } from './types'
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types';
 import { CredentialRequest } from '../credentialRequest/credentialRequest';
 
@@ -31,11 +31,11 @@ export class CredentialResponse {
     return credentials.length === validCredentials.length
   }
 
-  public toJSON(): ICredentialResponseAttrs {
-    return classToPlain(this) as ICredentialResponseAttrs
+  public toJSON(): ICredentialResponseCreationAttrs {
+    return classToPlain(this) as ICredentialResponseCreationAttrs
   }
 
-  public static fromJSON(json: ICredentialResponseAttrs): CredentialResponse {
+  public static fromJSON(json: ICredentialResponseCreationAttrs): CredentialResponse {
     return plainToClass(CredentialResponse, json)
   }
 }

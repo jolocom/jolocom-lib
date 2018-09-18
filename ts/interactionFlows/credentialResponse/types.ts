@@ -4,15 +4,15 @@ export interface ICredentialResponsePayloadAttrs {
   iat: number
   iss: string
   typ: string
-  credentialResponse: ICredentialResponsePayloadCreationAttrs
+  credentialResponse: ICredentialResponseCreationAttrs
 }
 
 export interface ICredentialResponsePayloadCreationAttrs {
   typ: string
-  credentialResponse: ICredentialResponsePayloadCreationAttrs
+  credentialResponse: ICredentialResponseCreationAttrs
 }
 
-export interface ICredentialResponseAttrs {
+export interface ICredentialResponseCreationAttrs {
   // TODO: rethink naming of SuppliedCredential
   suppliedCredentials: ISuppliedCredentialsAttrs[]
 }

@@ -41,6 +41,7 @@ export interface IExposedConstraintFunctions {
   smaller: comparableConstraintFunc
 }
 
+// TODO: clean up interfaces, remove duplicates etc
 export interface ICredentialRequestAttrs {
   callbackURL: string
   credentialRequirements: ICredentialRequest[]
