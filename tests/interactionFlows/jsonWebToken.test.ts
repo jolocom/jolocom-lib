@@ -4,7 +4,7 @@ import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
-import { InteractionType } from '../../ts/interactionFlows/types'
+import { InteractionType, IJSONWebTokenAttrs } from '../../ts/interactionFlows/types'
 import { jwtJSON, jwtCreateArgs, signedCredRequestJWT } from '../data/interactionFlows/jsonWebToken'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { ddoAttr } from '../data/interactionFlows/credentialRequest'
@@ -38,13 +38,6 @@ describe('JSONWebToken', () => {
     it('The type of the payload should be the correct playload class that exposes class specific methods', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
       expect(jsonWebToken.getPayload().applyConstraints).to.be.an.instanceof(Function)
-    })
-
-    it('Should throw an error in case the interaction type from the payload is not known', () => {
-      jwtCreateArgs.payload.typ = 'NonExistingInteractionType'
-
-      expect(() => JSONWebToken.create(jwtCreateArgs)).to.throw('Interaction type not recognized!')
-      jwtCreateArgs.payload.typ = InteractionType.CredentialRequest
     })
   })
 

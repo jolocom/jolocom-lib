@@ -1,6 +1,5 @@
-import { credentialRequestJson } from './credentialRequest';
+import { credentialRequestJson, mockPrivKey } from './credentialRequest';
 import { InteractionType, IJSONWebTokenCreationAttrs } from '../../../ts/interactionFlows/types'
-import { mockPrivKey } from '../credentialResponse/signedCredentialResponse'
 
 export const jwtJSON = {
   header: { typ: 'JWT', alg: 'ES256K' },

@@ -1,4 +1,4 @@
-import { IJWTHeader } from './types'
+import { IJWTHeader, InteractionTypePayloadCreationAttrs } from './types'
 import base64url from 'base64url'
 import {
   validateJWTSignature,
@@ -16,11 +16,12 @@ import {
 } from './types';
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry';
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
-import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
 import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload';
 import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types';
+import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
 
 type InteractionTypedJWT = JSONWebToken<CredentialRequestPayload> | JSONWebToken<CredentialRequestPayload>
+// TODO: rename
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -103,7 +104,9 @@ export class JSONWebToken<T extends IPayload> {
     return jwt
   }
 
-  private static payloadToJWT(payload: InteractionTypePayloadAttrs): InteractionTypedJWT {
+  private static payloadToJWT(
+    payload: IPayload
+  ): InteractionTypedJWT {
     let jwt
 
     switch (payload.typ) {
