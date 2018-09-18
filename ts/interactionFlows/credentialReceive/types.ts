@@ -1,4 +1,9 @@
-import { SignedCredential } from '../../credentials/signedCredential/signedCredential';
+import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
+
+export interface ICredentialReceivePayloadCreationAttrs {
+  typ: string
+  credentialReceive: ICredentialReceiveAttrs
+}
 
 export interface ICredentialReceiveAttrs {
   signedCredentials: SignedCredential[]

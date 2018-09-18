@@ -1,7 +1,6 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import { SignedCredential } from '../../credentials/signedCredential/signedCredential';
 import { ICredentialReceiveAttrs } from './types'
-import { createDecipher } from 'crypto';
 
 export class CredentialReceive {
   private signedCredentials: SignedCredential[]
@@ -12,13 +11,12 @@ export class CredentialReceive {
 
     return credentialReceive
   }
-
+  // TODO: optimize validation
   public async validateCredentials(did: string): Promise<boolean> {
     const res = await this.signedCredentials.map(async (cred) => {
       return await cred.validateSignature() && cred.getSubject() === did
     })
-    
-    return !!!res.indexOf(false)
+    return res[0]
   }
 
   public getSignedCredentials(): SignedCredential[] {

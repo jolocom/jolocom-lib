@@ -18,8 +18,10 @@ import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomReg
 import { privateKeyToDID } from '../utils/crypto'
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
 import { ICredentialRequestPayloadAttrs } from './credentialRequest/types'
+import { CredentialReceivePayload } from './credentialReceive/credentialReceivePayload';
+import { ICredentialReceivePayloadCreationAttrs } from './credentialReceive/types';
 
-type InteractionTypedJWT = JSONWebToken<CredentialRequestPayload>
+type InteractionTypedJWT = JSONWebToken<CredentialRequestPayload | CredentialReceivePayload>
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -113,7 +115,8 @@ export class JSONWebToken<T extends IPayload> {
         break
       }
       case InteractionType.CredentialsReceive.toString(): {
-        // TODO
+        jwt = new JSONWebToken<CredentialReceivePayload>()
+        jwt.payload = CredentialReceivePayload.create(payload as ICredentialReceivePayloadCreationAttrs)
         break
       }
       default: {

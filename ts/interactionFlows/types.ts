@@ -1,8 +1,10 @@
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
 import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
+import { ICredentialReceivePayloadCreationAttrs } from './credentialReceive/types'
+import { CredentialReceivePayload } from './credentialReceive/credentialReceivePayload';
 
-export type InteractionTypePayloadAttrs = ICredentialRequestPayloadCreationAttrs
-export type InteractionTypePayloads = CredentialRequestPayload
+export type InteractionTypePayloadAttrs = ICredentialRequestPayloadCreationAttrs | ICredentialReceivePayloadCreationAttrs
+export type InteractionTypePayloads = CredentialRequestPayload | CredentialReceivePayload
 
 export interface IJWTHeader {
   alg: string
