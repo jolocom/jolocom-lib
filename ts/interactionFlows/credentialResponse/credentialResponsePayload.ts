@@ -14,12 +14,12 @@ export class CredentialResponsePayload implements IPayload {
   public credentialResponse: CredentialResponse
 
   public static create(attrs: ICredentialResponsePayloadCreationAttrs): CredentialResponsePayload {
-    const credentialResponse = attrs.credentialResponse
     if (attrs.typ !== InteractionType.CredentialResponse) {
       throw new Error('Incorrect payload for CredentialResponse')
     }
     const credentialResponsePayload = new CredentialResponsePayload()
-    credentialResponsePayload.credentialResponse = plainToClass(CredentialResponse, CredentialResponse)
+    credentialResponsePayload.credentialResponse = plainToClass(CredentialResponse, attrs.credentialResponse)
+    credentialResponsePayload.typ = InteractionType.CredentialResponse
 
     return credentialResponsePayload
   }

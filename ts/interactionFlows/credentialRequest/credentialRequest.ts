@@ -7,7 +7,7 @@ import {
   IExposedConstraintFunctions,
   ICredentialRequest,
   IConstraint,
-  ICredentialRequestCreationArgs
+  ICredentialRequestCreationAttrs
 } from './types'
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
@@ -15,7 +15,7 @@ export class CredentialRequest {
   private callbackURL: string
   private credentialRequirements: ICredentialRequest[] = []
 
-  public static create(args: ICredentialRequestCreationArgs): CredentialRequest {
+  public static create(args: ICredentialRequestCreationAttrs): CredentialRequest {
     const credentialRequest = new CredentialRequest()
     credentialRequest.setCallbackURL(args.callbackURL)
     args.credentialRequirements.forEach((req) => credentialRequest.addCredentialRequirement(req))

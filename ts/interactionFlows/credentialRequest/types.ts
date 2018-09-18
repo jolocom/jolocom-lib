@@ -30,6 +30,7 @@ export interface ICredentialRequest {
   }
 }
 
+// TODO: Should be upper case
 export type comparable = number | Date
 export type constraintFunc = (field: string, value: string ) => IConstraint
 export type comparableConstraintFunc = (field: string, value: comparable) => IConstraint
@@ -45,10 +46,4 @@ export interface IExposedConstraintFunctions {
 export interface ICredentialRequestAttrs {
   callbackURL: string
   credentialRequirements: ICredentialRequest[]
-}
-
-export type requestedCredentialArgs = Array<{type: string[], constraints: IConstraint[]}>
-export interface ICredentialRequestCreationArgs {
-  callbackURL: string
-  credentialRequirements: requestedCredentialArgs
 }

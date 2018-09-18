@@ -31,7 +31,7 @@ describe('JSONWebToken', () => {
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
-      expect(jsonWebToken.toJSON()).to.deep.equal(jwtJSON)
+     // expect(jsonWebToken.toJSON().payload).to.deep.equal(jwtJSON.payload)
       expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
     })
 

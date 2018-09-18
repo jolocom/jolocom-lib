@@ -1,6 +1,6 @@
 import { IPayload, InteractionType } from '../types'
 import { classToPlain, plainToClass } from 'class-transformer'
-import { ICredentialRequestPayloadAttrs } from './types'
+import { ICredentialRequestPayloadAttrs, ICredentialRequestPayloadCreationAttrs } from './types'
 import { CredentialRequest } from '../credentialRequest/credentialRequest'
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
@@ -9,6 +9,14 @@ export class CredentialRequestPayload implements IPayload {
   public iat: number
   public typ: InteractionType
   public credentialRequest: CredentialRequest
+
+  public static create(json: ICredentialRequestPayloadCreationAttrs): CredentialRequestPayload {
+    const credentialRequestPayload = new CredentialRequestPayload()
+    credentialRequestPayload.credentialRequest = plainToClass(CredentialRequest, json.credentialRequest)
+    credentialRequestPayload.typ = InteractionType.CredentialRequest
+
+    return credentialRequestPayload
+  }
 
   public static fromJSON(json: ICredentialRequestPayloadAttrs): CredentialRequestPayload {
     const credentialRequestPayload = plainToClass(CredentialRequestPayload, json)

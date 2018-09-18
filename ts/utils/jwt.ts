@@ -8,7 +8,6 @@ export interface IValidateJWTSignatureWithRegistryArgs {
   jwtInstance: JSONWebToken<IPayload>
   registry: JolocomRegistry
 }
-
 export function computeJWTSignature(payload: IPayload, privateKey: Buffer): string {
   const signed = new TokenSigner('ES256K', privateKey.toString('hex')).sign(payload)
   return decodeToken(signed).signature

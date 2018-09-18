@@ -16,7 +16,7 @@ import {
 } from './types';
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry';
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
-import { ICredentialRequestPayloadAttrs } from './credentialRequest/types';
+import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
 import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload';
 import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types';
 
@@ -109,7 +109,7 @@ export class JSONWebToken<T extends IPayload> {
     switch (payload.typ) {
       case InteractionType.CredentialRequest.toString(): {
         jwt = new JSONWebToken<CredentialRequestPayload>()
-        jwt.payload = CredentialRequestPayload.fromJSON(payload as ICredentialRequestPayloadAttrs)
+        jwt.payload = CredentialRequestPayload.create(payload as ICredentialRequestPayloadCreationAttrs)
         break
       }
       case InteractionType.CredentialResponse.toString(): {
