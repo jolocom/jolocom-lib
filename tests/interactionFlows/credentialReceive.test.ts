@@ -1,9 +1,7 @@
 import { expect } from 'chai'
 import { CredentialReceive } from '../../ts/interactionFlows/credentialReceive/credentialReceive'
-import {
-  testSignedCredentialCreateArgs
-} from '../data/credential/signedCredential'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential';
+import { testSignedCredentialCreateArgs } from '../data/credential/signedCredential'
+import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import * as sinon from 'sinon'
 
 describe('CredentialReceive', () => {
@@ -21,7 +19,7 @@ describe('CredentialReceive', () => {
     sandbox.restore()
   })
 
-  it('Should create instace of CredentialReceive on static create', async () => {  
+  it('Should create instace of CredentialReceive on static create', () => {  
     expect(credReceive).to.be.instanceOf(CredentialReceive)
   })
 
