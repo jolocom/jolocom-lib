@@ -1,36 +1,39 @@
+import { mockSuppliedCredential } from './../data/interactionFlows/credentialResponse';
 import { expect } from 'chai'
-import { mockSuppliedCredentials } from '../data/credentialResponse/credentialResponse'
 import {
-  firstMockCredential, credentialRequestCreationArgs, secondMockCredential,
-} from '../data/credentialRequest/credentialRequest'
+  firstMockCredential,
+  credentialRequestCreationAttrs,
+  secondMockCredential
+} from '../data/interactionFlows/credentialRequest'
 import { CredentialResponse } from '../../ts/interactionFlows/credentialResponse/credentialResponse'
 import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest';
 
 describe('CredentialResponse', () => {
   it('Should implement static create method', () => {
     const credentialResponse = CredentialResponse.create([firstMockCredential])
-    expect(credentialResponse.getSuppliedCredentials()).to.deep.equal(mockSuppliedCredentials)
+    expect(credentialResponse.getSuppliedCredentials()).to.deep.equal(mockSuppliedCredential)
   })
 
   it('Should implement static fromJSON method', () => {
-    const credentialResponse = CredentialResponse.fromJSON({suppliedCredentials: mockSuppliedCredentials})
+    const credentialResponse = CredentialResponse.fromJSON({suppliedCredentials: mockSuppliedCredential})
     const expectedCredentialResponse = CredentialResponse.create([firstMockCredential])
     expect(credentialResponse).to.deep.equal(expectedCredentialResponse)
   })
 
   it('Should implement toJSON method', () => {
     const credentialResponse = CredentialResponse.create([firstMockCredential])
-    expect(credentialResponse.toJSON()).to.deep.equal({suppliedCredentials: mockSuppliedCredentials})
+    expect(credentialResponse.toJSON()).to.deep.equal({suppliedCredentials: mockSuppliedCredential})
   })
 
   it('Should implement all getter methods', () => {
     const credentialResponse = CredentialResponse.create([firstMockCredential])
     expect(credentialResponse.getSuppliedCredentials().length).to.equal(1)
-    expect(credentialResponse.getSuppliedCredentials()).to.deep.equal(mockSuppliedCredentials)
+    expect(credentialResponse.getSuppliedCredentials()).to.deep.equal(mockSuppliedCredential)
   })
 
   it('Should implement a satisfiesRequest method', () => {
-    const credentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
+    // should args still be used here?
+    const credentialRequest = CredentialRequest.create(credentialRequestCreationAttrs)
 
     const validCredentialResponse = CredentialResponse.create([firstMockCredential])
     // tslint:disable-next-line:no-unused-expression

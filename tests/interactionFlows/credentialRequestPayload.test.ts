@@ -1,11 +1,4 @@
 import { expect } from 'chai'
-import {
-  credentialRequestCreationArgs,
-  firstMockCredential,
-  secondMockCredential,
-  credentialRequestJson,
-  expectedRequestedCredentials
-} from '../data/credentialRequest/credentialRequest'
 import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 
