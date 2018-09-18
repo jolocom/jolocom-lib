@@ -2,14 +2,6 @@ import { ICredentialRequestPayloadCreationAttrs, ICredentialRequestPayloadAttrs 
 import { IPrivateKeyWithId } from '../identityWallet/types'
 import { ICredentialResponsePayloadCreationAttrs, ICredentialResponsePayloadAttrs } from './credentialResponse/types';
 
-export type InteractionTypePayloadCreationAttrs =
-  ICredentialRequestPayloadCreationAttrs |
-  ICredentialResponsePayloadCreationAttrs
-
-export type InteractionTypePayloadAttrs =
-  ICredentialRequestPayloadAttrs |
-  ICredentialResponsePayloadAttrs
-
 export interface IJWTHeader {
   alg: string
   typ: string
@@ -22,14 +14,9 @@ export interface IPayload {
   [x: string]: any
 }
 
-export interface IPayloadCreation {
-  typ: InteractionType
-  [x: string]: any
-}
-
 export interface IJSONWebTokenCreationAttrs {
   privateKey: IPrivateKeyWithId
-  payload: IPayloadCreation
+  payload: IPayloadCreationAttrs
 }
 
 export interface IJSONWebTokenAttrs {
@@ -38,7 +25,7 @@ export interface IJSONWebTokenAttrs {
   signature: string
 }
 
-export interface IPayloadAttrs {
+export interface IPayloadCreationAttrs {
   typ: string
   [x: string]: any
 }
