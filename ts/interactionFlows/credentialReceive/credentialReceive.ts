@@ -3,7 +3,7 @@ import { SignedCredential } from '../../credentials/signedCredential/signedCrede
 import { ICredentialReceiveAttrs } from './types'
 
 export class CredentialReceive {
-  private signedCredentials: SignedCredential[]
+  public signedCredentials: SignedCredential[]
 
   public static create(signedCredentials: SignedCredential[]): CredentialReceive {
     const credentialReceive = new CredentialReceive() 
@@ -11,12 +11,8 @@ export class CredentialReceive {
 
     return credentialReceive
   }
-  // TODO: optimize validation
+  // TODO: add method
   // public async validateCredentials(did: string): Promise<boolean> {
-  //   const res = await this.signedCredentials.map(async (cred) => {
-  //     return await cred.validateSignature() && cred.getSubject() === did
-  //   })
-  //   return res[0]
   // }
 
   public getSignedCredentials(): SignedCredential[] {
@@ -28,7 +24,10 @@ export class CredentialReceive {
   }
 
   public static fromJSON(json: ICredentialReceiveAttrs): CredentialReceive {
-    return plainToClass(CredentialReceive, json)
+    const credentialReceive = plainToClass(CredentialReceive, json)
+    credentialReceive.signedCredentials = plainToClass(SignedCredential, json.signedCredentials )
+
+    return credentialReceive
   }
 
 }
