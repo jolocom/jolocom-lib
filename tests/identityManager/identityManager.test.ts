@@ -2,7 +2,7 @@ import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import * as testKeys from '../data/keys'
 import { IdentityManager } from '../../ts/identityManager/identityManager'
-import { keyTypes } from '../../ts/index'
+import { keyTypes } from '../../ts/identityManager/identityManager'
 
 chai.use(sinonChai)
 const expect = chai.expect

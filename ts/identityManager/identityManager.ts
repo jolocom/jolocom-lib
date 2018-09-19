@@ -1,6 +1,10 @@
 import { generateMnemonic, deriveChildKeyPair, deriveMasterKeyPairFromMnemonic } from '../utils/keyDerivation'
 import { IKeyResponse } from '../utils/keyDerivation'
-import { keyTypes } from '../'
+
+export enum keyTypes {
+  jolocomIdentityKey = 'm/73\'/0\'/0\'/0',
+  ethereumKey = 'm/44\'/60\'/0\'/0/0'
+}
 
 export interface IKeyDerivationSchema {
   [key: string]: string
