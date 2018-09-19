@@ -17,7 +17,7 @@ export interface ICredentialRequestCreationAttrs {
   credentialRequirements: RequestedCredentialAttrs
 }
 
-export type ConstraintStatement = boolean[] | Array<{ var: string } | string | comparable >
+export type ConstraintStatement = boolean[] | Array<{ var: string } | string | Comparable >
 
 export interface IConstraint {
   [operator: string]: ConstraintStatement
