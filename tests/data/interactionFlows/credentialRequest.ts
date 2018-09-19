@@ -37,29 +37,6 @@ export const expectedRequestedCredentials = {
   }
 }
 
-export const firstMockCredential = {
-  '@context': ['http://schema.org/'],
-  id: 'claim:id:test',
-  issuer: 'did:jolo:issuer',
-  claim: {
-    id: 'did:jolo:subject',
-    mock: 'value'
-  },
-  issued: '',
-  type: ['Credential', 'MockCredential'],
-  proof: {
-    created: '1970-01-01T00:00:00.000Z',
-    creator: 'did:jolo:issuer/keys#1',
-    nonce: '00000',
-    signatureValue: 'invalidMockSignature',
-    type: 'mockType'
-  }
-}
-
-export const secondMockCredential = Object.assign({}, firstMockCredential, {
-  issuer: 'did:jolo:different'
-})
-
 export const credentialRequestCreationAttrs = {
   callbackURL: 'http://test.com',
   credentialRequirements: [
@@ -103,6 +80,7 @@ In0sImRpZDpqb2xvOmlzc3VlciJdfV19fV0sImNhbGxiYWNrVVJMIjoiaHR0cDovL3Rlc3QuY29tIn19
 .lBcEgnfpORwlZGZ1HanoW2d3Ngm2qox-JI4T0iL-m1fBt5f6ihAvaoj0Z2usZiXwO5UtKXvvcvJTEP6\
 rxI_MDQ'
 
+// do we need this mock data? if yes, lets move this to identity file
 export const ddoAttr = {
   '@context': 'https://w3id.org/did/v1',
   id: 'did:jolo:ffcc8f84fae1b6ad253561d7b78167a661d72f58e86e60dbd04cd9b81096cdbe',
