@@ -10,10 +10,10 @@ import { Credential } from '../../ts/credentials/credential/credential'
 import { testSignedCred } from '../data/identityWallet'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
-import { credentialRequestPayloadJson } from '../data/interactionFlows/jsonWebToken'
 import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
+import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest';
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -75,6 +75,7 @@ describe('IdentityWallet', () => {
         'credential',
         'signedCredential',
         'credentialRequestJSONWebToken',
+        'credentialResponseJSONWebToken'
       ]
 
       expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)

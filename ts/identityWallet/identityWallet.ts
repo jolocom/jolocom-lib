@@ -1,18 +1,16 @@
 import { Credential } from '../credentials/credential/credential'
 import { ICredentialCreateAttrs } from '../credentials/credential/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { IIdentityWalletCreateArgs } from './types'
+import { IIdentityWalletCreateArgs, IPrivateKeyWithId } from './types'
 import { Identity } from '../identity/identity'
 import { privateKeyToPublicKey } from '../utils/crypto'
-import { ICredentialRequestPayloadAttrs } from '../interactionFlows/credentialRequest/types'
+import { ICredentialRequestPayloadCreationAttrs } from '../interactionFlows/credentialRequest/types'
 import { JSONWebToken } from '../interactionFlows/jsonWebToken'
+import { ICredentialResponsePayloadCreationAttrs } from '../interactionFlows/credentialResponse/types';
 
 export class IdentityWallet {
   private identityDocument: Identity
-  private privateIdentityKey: {
-    key: Buffer
-    id: string
-  }
+  private privateIdentityKey: IPrivateKeyWithId
 
   public create = {
     credential: Credential.create,
@@ -23,9 +21,12 @@ export class IdentityWallet {
 
       return await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey })
     },
-    credentialRequestJSONWebToken: (payload: ICredentialRequestPayloadAttrs) => {
-      return JSONWebToken.create({privateKey: this.privateIdentityKey.key, payload})
-    }
+    credentialRequestJSONWebToken: (payload: ICredentialRequestPayloadCreationAttrs) => {
+      return JSONWebToken.create({privateKey: this.privateIdentityKey, payload})
+    },
+    credentialResponseJSONWebToken: (payload: ICredentialResponsePayloadCreationAttrs) => {
+      return JSONWebToken.create({privateKey: this.privateIdentityKey, payload})
+    },
   }
 
   public sign = {

@@ -1,3 +1,75 @@
+import { InteractionType } from '../../../ts/interactionFlows/types'
+
+export const credentialRequestPayloadJson = {
+  iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
+  iat: 0,
+  typ: InteractionType.CredentialRequest,
+  credentialRequest: {
+    callbackURL: 'http://test.com',
+    credentialRequirements: [
+      {
+        type: ['Credential', 'MockCredential'],
+        constraints: [{ '==': [
+          { var: 'issuer' },
+          'did:jolo:issuer'
+        ] }]
+      }
+    ]
+  }
+}
+
+export const credentialRequestJson = {
+  callbackURL: 'http://test.com',
+  credentialRequirements: [
+    {
+      constraints: {
+        and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
+      },
+      type: ['Credential', 'MockCredential']
+    }
+  ]
+}
+
+export const expectedRequestedCredentials = {
+  type: ['Credential', 'MockCredential'],
+  constraints: {
+    and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
+  }
+}
+
+export const firstMockCredential = {
+  '@context': ['http://schema.org/'],
+  id: 'claim:id:test',
+  issuer: 'did:jolo:issuer',
+  claim: {
+    id: 'did:jolo:subject',
+    mock: 'value'
+  },
+  issued: '',
+  type: ['Credential', 'MockCredential'],
+  proof: {
+    created: '1970-01-01T00:00:00.000Z',
+    creator: 'did:jolo:issuer/keys#1',
+    nonce: '00000',
+    signatureValue: 'invalidMockSignature',
+    type: 'mockType'
+  }
+}
+
+export const secondMockCredential = Object.assign({}, firstMockCredential, {
+  issuer: 'did:jolo:different'
+})
+
+export const credentialRequestCreationAttrs = {
+  callbackURL: 'http://test.com',
+  credentialRequirements: [
+    {
+      type: ['Credential', 'MockCredential'],
+      constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
+    }
+  ]
+}
+
 export const mockPrivKey = '3a1076bf45ab87712ad64ccb3b10217737f7faacbf2872e88fdd9a537d8fe266'
 export const privKeyDID = 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
 

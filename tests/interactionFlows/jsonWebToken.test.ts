@@ -1,14 +1,12 @@
 import { expect } from 'chai'
-import { mockPrivKey } from '../data/credentialResponse/signedCredentialResponse'
+import { mockPrivKey } from '../data/interactionFlows/credentialResponse'
 import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
-import { InteractionType } from '../../ts/interactionFlows/types'
-import { jwtJSON, jwtCreateArgs, signedCredRequestJWT, jwtCredentialReceiveArgs } from '../data/interactionFlows/jsonWebToken'
+import { jwtJSON, jwtCreateArgs, signedCredRequestJWT } from '../data/interactionFlows/jsonWebToken'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
-import { CredentialReceivePayload } from '../../ts/interactionFlows/credentialReceive/credentialReceivePayload'
-import { ddoAttr } from '../data/credentialRequest/signedCredentialRequest'
+import { ddoAttr } from '../data/interactionFlows/credentialRequest'
 import { privateKeyToPublicKey } from '../../ts/utils/crypto'
 import { Identity } from '../../ts/identity/identity'
 import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
@@ -29,35 +27,23 @@ describe('JSONWebToken', () => {
   describe('Static create method', () => {
     clock = sinon.useFakeTimers()
     const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
-    const jwtCredentialReceive = JSONWebToken.create(jwtCredentialReceiveArgs)
+    // const jwtCredentialReceive = JSONWebToken.create(jwtCredentialReceiveArgs)
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
-      expect(jsonWebToken.toJSON()).to.deep.equal(jwtJSON)
+      expect(jsonWebToken.toJSON().payload).to.deep.equal(jwtJSON.payload)
       expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
     })
 
-    // TODO: consolidate better when all flows are in
-    it('Should return a correctly assembled instance of JSONWebToken class for credentialReceive', () => {
-      expect(jwtCredentialReceive.getPayload()).to.be.an.instanceof(CredentialReceivePayload)
-    })
-
-    it('The type of the payload should be the correct playload class that exposes class specific methods', () => {
+    it('The type of the payload should be the correct payload class that exposes class specific methods', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
       // expect(jsonWebToken.getPayload().applyConstraints).to.be.an.instanceof(Function)
-    })
-
-    it('Should throw an error in case the interaction type from the payload is not known', () => {
-      jwtCreateArgs.payload.typ = 'NonExistingInteractionType'
-
-      expect(() => JSONWebToken.create(jwtCreateArgs)).to.throw('Interaction type not recognized!')
-      jwtCreateArgs.payload.typ = InteractionType.CredentialRequest
     })
   })
 
   describe('Static fromJSON method', () => {
     clock = sinon.useFakeTimers()
-    const jsonWebToken = JSONWebToken.fromJSON(jwtJSON)
+    const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
