@@ -9,7 +9,7 @@ export const multipleClaimsCreationArgs = {
   familyName: 'Rusu'
 }
 
-export interface ClaimInterface extends BaseMetadata {
+export interface BirthDateClaimInterface extends BaseMetadata {
   claimInterface?: {
     birthDate: number
     birthMonth: string
@@ -17,7 +17,7 @@ export interface ClaimInterface extends BaseMetadata {
   }
 }
 
-export const customClaimMetadata: ClaimInterface = {
+export const customClaimMetadata: BirthDateClaimInterface = {
   context: ['http://test.com', { test: 'http://test.com/terms' }],
   type: ['Credential', 'MockCredential'],
   name: 'Mock'

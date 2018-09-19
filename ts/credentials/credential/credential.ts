@@ -6,7 +6,7 @@ import { defaultContext } from '../../utils/contexts'
 @Exclude()
 export class Credential {
   @Expose()
-  private '@context': Array<validContextEntry>
+  private '@context': validContextEntry
 
   @Expose()
   private type: string[]
