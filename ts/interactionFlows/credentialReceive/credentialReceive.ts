@@ -12,12 +12,12 @@ export class CredentialReceive {
     return credentialReceive
   }
   // TODO: optimize validation
-  public async validateCredentials(did: string): Promise<boolean> {
-    const res = await this.signedCredentials.map(async (cred) => {
-      return await cred.validateSignature() && cred.getSubject() === did
-    })
-    return res[0]
-  }
+  // public async validateCredentials(did: string): Promise<boolean> {
+  //   const res = await this.signedCredentials.map(async (cred) => {
+  //     return await cred.validateSignature() && cred.getSubject() === did
+  //   })
+  //   return res[0]
+  // }
 
   public getSignedCredentials(): SignedCredential[] {
     return this.signedCredentials

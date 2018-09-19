@@ -19,6 +19,7 @@ export class CredentialReceivePayload implements IPayload {
 
     const credentialReceivePayload = new CredentialReceivePayload()
     credentialReceivePayload.credentialReceive = plainToClass(CredentialReceive, credentialReceive)
+    credentialReceivePayload.typ = attrs.typ
 
     return credentialReceivePayload
   }

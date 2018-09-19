@@ -12,14 +12,16 @@ import {
   IJSONWebTokenAttrs,
   InteractionType,
   IJSONWebTokenCreationAttrs,
-} from './types';
-import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry';
-import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
-import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload';
-import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types';
-import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
+} from './types'
+import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
+import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
+import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload'
+import { CredentialReceivePayload } from './credentialReceive/credentialReceivePayload'
+import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types'
+import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
+import { ICredentialReceivePayloadCreationAttrs } from './credentialReceive/types'
 
-type InteractionTypedJWT = JSONWebToken<CredentialRequestPayload> | JSONWebToken<CredentialRequestPayload>
+type InteractionTypedJWT = JSONWebToken<IPayload>
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -102,9 +104,7 @@ export class JSONWebToken<T extends IPayload> {
     return jwt
   }
 
-  private static payloadToJWT(
-    payload: IPayload
-  ): InteractionTypedJWT {
+  private static payloadToJWT(payload: IPayload): InteractionTypedJWT {
     let jwt
 
     switch (payload.typ) {
@@ -125,7 +125,6 @@ export class JSONWebToken<T extends IPayload> {
       }
       default: {
         throw new Error('Interaction type not recognized!')
-        break
       }
     }
     return jwt
