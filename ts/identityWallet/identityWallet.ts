@@ -1,25 +1,19 @@
 import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { SignedCredentialRequest } from '../credentialRequest/signedCredentialRequest/signedCredentialRequest'
-import { CredentialRequest } from '../credentialRequest/credentialRequest'
-import { IIdentityWalletCreateArgs } from './types'
+import { IIdentityWalletCreateArgs, IPrivateKeyWithId } from './types'
 import { Identity } from '../identity/identity'
-import { CredentialResponse } from '../credentialResponse/credentialResponse'
 import { privateKeyToPublicKey } from '../utils/crypto'
-import { SignedCredentialResponse } from '../credentialResponse/signedCredentialResponse/signedCredentialResponse'
 import { BaseMetadata } from 'cred-types-jolocom-core'
+import { JSONWebToken } from '../interactionFlows/jsonWebToken'
+import { ICredentialRequestPayloadCreationAttrs } from '../interactionFlows/credentialRequest/types'
+import { ICredentialResponsePayloadCreationAttrs } from '../interactionFlows/credentialResponse/types';
 
 export class IdentityWallet {
   private identityDocument: Identity
-  private privateIdentityKey: {
-    key: Buffer
-    id: string
-  }
+  private privateIdentityKey: IPrivateKeyWithId
 
   public create = {
     credential: Credential.create,
-    credentialRequest: CredentialRequest.create,
-    credentialResponse: CredentialResponse.create,
     signedCredential: async <T extends BaseMetadata>({
       metadata,
       claim,
@@ -35,15 +29,16 @@ export class IdentityWallet {
 
       return await SignedCredential.create({ metadata, claim, privateIdentityKey: this.privateIdentityKey, subject })
     },
-    signedCredentialRequest: (credentialRequest: CredentialRequest) =>
-      SignedCredentialRequest.create({ credentialRequest, privateKey: this.privateIdentityKey.key }),
-    signedCredentialResponse: (credentialResponse: CredentialResponse) =>
-      SignedCredentialResponse.create({ credentialResponse, privateKey: this.privateIdentityKey.key })
+    credentialRequestJSONWebToken: (payload: ICredentialRequestPayloadCreationAttrs) => {
+      return JSONWebToken.create({privateKey: this.privateIdentityKey, payload})
+    },
+    credentialResponseJSONWebToken: (payload: ICredentialResponsePayloadCreationAttrs) => {
+      return JSONWebToken.create({privateKey: this.privateIdentityKey, payload})
+    },
   }
 
   public sign = {
     credential: this.signCredential.bind(this),
-    credentialRequest: this.signCredentialRequest.bind(this)
   }
 
   public identity
@@ -82,15 +77,5 @@ export class IdentityWallet {
     await signedCredential.generateSignature(this.privateIdentityKey)
 
     return signedCredential
-  }
-
-  public signCredentialRequest(credentialRequest: CredentialRequest): SignedCredentialRequest {
-    const signedCredRequest = SignedCredentialRequest.create({
-      credentialRequest,
-      privateKey: this.privateIdentityKey.key
-    })
-    signedCredRequest.sign(this.privateIdentityKey.key)
-
-    return signedCredRequest
   }
 }

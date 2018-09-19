@@ -4,13 +4,13 @@ import { IdentityWallet } from '../identityWallet/identityWallet'
 import { privateKeyToDID } from '../utils/crypto'
 import { DidDocument } from '../identity/didDocument'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
-import { ServiceEndpointsSection } from '../identity/didDocument/sections/serviceEndpointsSection'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
 import { IRegistryCommitArgs, IRegistryInstanceCreationArgs, IRegistryStaticCreationArgs } from './types'
 import { jolocomIpfsStorageAgent } from '../ipfs'
 import { jolocomEthereumResolver } from '../ethereum'
+import { ServiceEndpointsSection } from '../identity/didDocument/sections'
 
 /** Jolocom specific Registry, which uses IPFS
  *  and Ethereum for registering the indentity and the resolution

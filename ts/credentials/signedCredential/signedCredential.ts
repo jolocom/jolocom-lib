@@ -154,24 +154,6 @@ export class SignedCredential {
     return verifySignature(tbv, pubKey, sig)
   }
 
-  public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
-    if (!registry) {
-      registry = createJolocomRegistry()
-    }
-
-    const issuerProfile = await registry.resolve(this.issuer)
-    const relevantPublicKey = issuerProfile
-      .getPublicKeySection()
-      .find(keySection => keySection.getIdentifier() === this.proof.creator)
-
-    if (!relevantPublicKey) {
-      return false
-    }
-
-    const pubKey = Buffer.from(relevantPublicKey.getPublicKeyHex(), 'hex')
-    return this.validateSignatureWithPublicKey(pubKey)
-  }
-
   public static fromJSON(json: ISignedCredentialAttrs): SignedCredential {
     return plainToClass(SignedCredential, json)
   }

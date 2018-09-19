@@ -1,8 +1,6 @@
 import 'reflect-metadata'
 import { parse } from './parse/parser'
 import { Credential } from './credentials/credential/credential'
-import { CredentialRequest } from './credentialRequest/credentialRequest'
-import { CredentialResponse } from './credentialResponse/credentialResponse'
 import { registries } from './registries'
 import { IdentityManager } from './identityManager/identityManager'
 
@@ -14,8 +12,6 @@ export const JolocomLib = {
   },
   unsigned : {
     createCredential: Credential.create,
-    createCredentialRequest: CredentialRequest.create,
-    createCredentialResponse: CredentialResponse.create
   }
 }
 

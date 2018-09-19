@@ -1,19 +1,13 @@
-import { CredentialResponseParser } from '../credentialResponse/credentialResponseParser'
 import { CredentialParser } from '../credentials/credential/credentialParser'
-import { CredentialRequestParser } from '../credentialRequest/credentialRequestParser'
-import {
-  SignedCredentialRequestParser
-} from '../credentialRequest/signedCredentialRequest/signedCredentialRequestParser'
-import {
-  SignedCredentialResponseParser
-} from '../credentialResponse/signedCredentialResponse/signedCredentialResponseParser'
-import { SignedCredentialParser } from '../credentials/signedCredential/signedCredentialParser';
+import { SignedCredentialParser } from '../credentials/signedCredential/signedCredentialParser'
+import { CredentialRequestParser } from '../interactionFlows/credentialRequest/credentialRequestParser'
+import { CredentialResponseParser } from '../interactionFlows/credentialResponse/credentialResponseParser';
+import { JSONWebTokenParser } from '../interactionFlows/JSONWebTokenParser';
 
 export const parse = {
+  interactionJSONWebToken: JSONWebTokenParser,
+  credential: CredentialParser,
   credentialRequest : CredentialRequestParser,
-  signedCredentialRequest : SignedCredentialRequestParser,
-  credentialResponse : CredentialResponseParser,
-  signedCredentialResponse : SignedCredentialResponseParser,
-  credential : CredentialParser,
+  credentialResponse: CredentialResponseParser,
   signedCredential : SignedCredentialParser
 }

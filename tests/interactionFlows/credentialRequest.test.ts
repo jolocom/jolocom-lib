@@ -1,40 +1,40 @@
 import { expect } from 'chai'
-import { CredentialRequest } from '../../ts/credentialRequest/credentialRequest'
+import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
 import {
-  credentialRequestCreationArgs,
+  credentialRequestCreationAttrs,
   firstMockCredential,
   secondMockCredential,
   credentialRequestJson,
   expectedRequestedCredentials
-} from '../data/credentialRequest/credentialRequest'
+} from '../data/interactionFlows/credentialRequest'
 
 describe('CredentialRequest', () => {
   it('Should implement static create method', () => {
-    const cr = CredentialRequest.create(credentialRequestCreationArgs)
-    expect(cr.getCallbackURL()).to.equal(credentialRequestCreationArgs.callbackURL)
+    const cr = CredentialRequest.create(credentialRequestCreationAttrs)
+    expect(cr.getCallbackURL()).to.equal(credentialRequestCreationAttrs.callbackURL)
     expect(cr.getRequestedCredentialTypes()).to.deep.equal([
-      credentialRequestCreationArgs.credentialRequirements[0].type
+      credentialRequestCreationAttrs.credentialRequirements[0].type
     ])
   })
 
   it('Should implement an applyConstraints method', () => {
-    const cr = CredentialRequest.create(credentialRequestCreationArgs)
+    const cr = CredentialRequest.create(credentialRequestCreationAttrs)
     const filtered = cr.applyConstraints([firstMockCredential, secondMockCredential])
     expect(filtered).to.deep.equal([firstMockCredential])
   })
 
   it('Should implement toJSON method', () => {
-    const cr = CredentialRequest.create(credentialRequestCreationArgs)
+    const cr = CredentialRequest.create(credentialRequestCreationAttrs)
     expect(cr.toJSON()).to.deep.equal(credentialRequestJson)
   })
 
   it('Should implement all getter methods', () => {
-    const credentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
-    expect(credentialRequest.getCallbackURL()).to.equal(credentialRequestCreationArgs.callbackURL)
+    const credentialRequest = CredentialRequest.create(credentialRequestCreationAttrs)
+    expect(credentialRequest.getCallbackURL()).to.equal(credentialRequestCreationAttrs.callbackURL)
     expect(credentialRequest.getRequestedCredentials()).to.deep.equal([expectedRequestedCredentials])
     expect(credentialRequest.getRequestedCredentialTypes().length).to.equal(1)
     expect(credentialRequest.getRequestedCredentialTypes()[0]).to.deep.equal(
-      credentialRequestCreationArgs.credentialRequirements[0].type
+      credentialRequestCreationAttrs.credentialRequirements[0].type
     )
   })
 
@@ -50,7 +50,7 @@ describe('CredentialRequest', () => {
 
   it('Should implement static fromJSON method', () => {
     const credentialRequest = CredentialRequest.fromJSON(credentialRequestJson)
-    const expectedCredentialRequest = CredentialRequest.create(credentialRequestCreationArgs)
+    const expectedCredentialRequest = CredentialRequest.create(credentialRequestCreationAttrs)
     expect(credentialRequest).to.deep.equal(expectedCredentialRequest)
   })
 })

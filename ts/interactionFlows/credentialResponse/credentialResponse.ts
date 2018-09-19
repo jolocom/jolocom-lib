@@ -1,6 +1,6 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import { ISuppliedCredentialsAttrs, ICredentialResponseAttrs } from './types'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
+import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 import { CredentialRequest } from '../credentialRequest/credentialRequest'
 
 export class CredentialResponse {

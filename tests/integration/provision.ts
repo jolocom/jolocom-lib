@@ -1,15 +1,10 @@
 import * as ganache from 'ganache-cli'
-import * as wallet from 'ethereumjs-wallet'
 import * as registryContract from 'jolocom-registry-contract'
 import {
   testPrivateEthereumKey,
 } from '../data/keys'
-import { checkServerIdentity } from 'tls';
 const Web3 = require('web3')
 const IPFSFactory = require('ipfsd-ctl')
-
-const testAccount = wallet.fromPrivateKey(testPrivateEthereumKey).getAddress().toString('hex')
-const fromAccount = '0x3a05343912C4D59948c11567788006114eB15FF0'
 
 const PORT = 8945
 const web3 = new Web3()
@@ -40,7 +35,7 @@ export const init = async () : Promise<string> => {
 
     let address
 
-    ganacheServer.listen(PORT, async (ganacheErr, blockchain) => {
+    ganacheServer.listen(PORT, async (ganacheErr) => {
       if (ganacheErr) { return reject(ganacheErr) }
 
       address = await deployContract()
@@ -53,35 +48,18 @@ export const init = async () : Promise<string> => {
         },
         (spawnErr, ipfsd) => {
           if (spawnErr) {
-            return reject(spawnErr);
+            return reject(spawnErr)
           }
 
-          ipfsd.api.id(function (apiErr, id) {
+          ipfsd.api.id(function (apiErr) {
             if (apiErr) {
-              return reject(apiErr);
+              return reject(apiErr)
             }
 
             resolve(address)
-          });
+          })
         }
       )
     })
   })
 }
-// const startTest = () => {
-//   node.version((err, version) => {
-//     if (err) {
-//       console.log('Failed to start node')
-//       return
-//     }
-//     console.log(version)
-//   })
-// }
-
-// const cleanUp = () => {
-//   console.log('stopped')
-// }
-
-// const node = new ipfs()
-// node.on('ready', startTest)
-// node.on('stop', cleanUp)

@@ -1,45 +1,32 @@
-import { InteractionType, IJSONWebTokenCreationAttrs } from '../../../ts/interactionFlows/types';
-import { mockPrivKey } from '../credentialResponse/signedCredentialResponse';
-
-export const credentialRequestJson = {
-  callbackURL: 'http://test.com',
-  credentialRequirements: [
-    {
-      type: ['Credential', 'MockCredential'],
-      constraints: [{ '==': [
-        { var: 'issuer' },
-        'did:jolo:issuer'
-      ] }]
-    }
-  ]
-}
+import { credentialRequestJson, mockPrivKey } from './credentialRequest';
+import { InteractionType, IJSONWebTokenCreationAttrs } from '../../../ts/interactionFlows/types'
 
 export const jwtJSON = {
   header: { typ: 'JWT', alg: 'ES256K' },
   payload: {
-    iss: 'did:jolo:njkfehruu843iorj3onvgregvefd',
+    iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
     iat: 0,
     typ: InteractionType.CredentialRequest,
     credentialRequest: credentialRequestJson
   },
-  signature: 'SK7pVnsZkqsR_CopE35DJLvUsOgTZlFSEztNDjAAYLDjsvaoD5HrLytDWKBwr7MoUaUjEYV92Gu2br-k6lgV6Q'
+  signature: 'VhUfwXkQ4Nxh02qdy7N9n1m4HfVnE0tgCrMwrRrEWNuOwzfnjfD9Xyi06xOkUGKHcoLGYUnWDIPos0fI8ufXOQ'
 }
 
 export const jwtCreateArgs = {
-  privateKey: Buffer.from(mockPrivKey, 'hex'),
+  privateKey: {
+    key: Buffer.from(mockPrivKey, 'hex'),
+    id: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
+  },
   payload: {
-    iss: 'did:jolo:njkfehruu843iorj3onvgregvefd',
-    iat: 0,
-    typ: InteractionType.CredentialRequest.toString(),
+    typ: InteractionType.CredentialRequest,
     credentialRequest: {
       callbackURL: 'http://test.com',
       credentialRequirements: [
         {
           type: ['Credential', 'MockCredential'],
-          constraints: [{ '==': [
-            { var: 'issuer' },
-            'did:jolo:issuer'
-          ] }]
+          constraints: {
+            and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
+          }
         }
       ]
     }
@@ -47,10 +34,5 @@ export const jwtCreateArgs = {
 } as IJSONWebTokenCreationAttrs
 
 export const signedCredRequestJWT =
-'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJpc3MiOiJkaWQ6am9sbzpuamtmZWhydX\
-U4NDNpb3JqM29udmdyZWd2ZWZkIiwiaWF0IjowLCJ0eXAiOiJjcmVkZW50aWFsUmVxdWVzdCIs\
-ImNyZWRlbnRpYWxSZXF1ZXN0Ijp7ImNhbGxiYWNrVVJMIjoiaHR0cDovL3Rlc3QuY29tIiwiY3\
-JlZGVudGlhbFJlcXVpcmVtZW50cyI6W3sidHlwZSI6WyJDcmVkZW50aWFsIiwiTW9ja0NyZWRl\
-bnRpYWwiXSwiY29uc3RyYWludHMiOlt7Ij09IjpbeyJ2YXIiOiJpc3N1ZXIifSwiZGlkOmpvbG\
-86aXNzdWVyIl19XX1dfX0.SK7pVnsZkqsR_CopE35DJLvUsOgTZlFSEztNDjAAYLDjsvaoD5Hr\
-LytDWKBwr7MoUaUjEYV92Gu2br-k6lgV6Q'
+// tslint:disable-next-line
+'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjcmVkZW50aWFsUmVxdWVzdCI6eyJjcmVkZW50aWFsUmVxdWlyZW1lbnRzIjpbeyJ0eXBlIjpbIkNyZWRlbnRpYWwiLCJNb2NrQ3JlZGVudGlhbCJdLCJjb25zdHJhaW50cyI6eyJhbmQiOlt7Ij09IjpbdHJ1ZSx0cnVlXX0seyI9PSI6W3sidmFyIjoiaXNzdWVyIn0sImRpZDpqb2xvOmlzc3VlciJdfV19fV0sImNhbGxiYWNrVVJMIjoiaHR0cDovL3Rlc3QuY29tIn0sInR5cCI6ImNyZWRlbnRpYWxSZXF1ZXN0IiwiaWF0IjowLCJpc3MiOiJkaWQ6am9sbzo4Zjk3N2U1MGI3ZTVjYmRmZWI1M2EwM2M4MTI5MTNiNzI5NzhjYTM1YzkzNTcxZjg1ZTg2Mjg2MmJhYzhjZGViIn0.VhUfwXkQ4Nxh02qdy7N9n1m4HfVnE0tgCrMwrRrEWNuOwzfnjfD9Xyi06xOkUGKHcoLGYUnWDIPos0fI8ufXOQ'
