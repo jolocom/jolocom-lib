@@ -37,7 +37,7 @@ describe('JSONWebToken', () => {
 
     it('The type of the payload should be the correct payload class that exposes class specific methods', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
-      // expect(jsonWebToken.getPayload().applyConstraints).to.be.an.instanceof(Function)
+      expect(jsonWebToken.getPayload().applyConstraints).to.be.an.instanceof(Function)
     })
   })
 
