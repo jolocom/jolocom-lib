@@ -32,7 +32,6 @@ describe('CredentialResponse', () => {
   })
 
   it('Should implement a satisfiesRequest method', () => {
-    // should args still be used here?
     const credentialRequest = CredentialRequest.create(credentialRequestCreationAttrs)
 
     const validCredentialResponse = CredentialResponse.create([firstMockCredential])

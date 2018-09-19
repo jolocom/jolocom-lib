@@ -31,11 +31,11 @@ describe('JSONWebToken', () => {
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
-     // expect(jsonWebToken.toJSON().payload).to.deep.equal(jwtJSON.payload)
+      expect(jsonWebToken.toJSON().payload).to.deep.equal(jwtJSON.payload)
       expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
     })
 
-    it('The type of the payload should be the correct playload class that exposes class specific methods', () => {
+    it('The type of the payload should be the correct payload class that exposes class specific methods', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
       expect(jsonWebToken.getPayload().applyConstraints).to.be.an.instanceof(Function)
     })
@@ -43,7 +43,7 @@ describe('JSONWebToken', () => {
 
   describe('Static fromJSON method', () => {
     clock = sinon.useFakeTimers()
-    const jsonWebToken = JSONWebToken.fromJSON(jwtJSON)
+    const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)

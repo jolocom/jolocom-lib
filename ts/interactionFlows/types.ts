@@ -1,6 +1,4 @@
-import { ICredentialRequestPayloadCreationAttrs, ICredentialRequestPayloadAttrs } from './credentialRequest/types'
 import { IPrivateKeyWithId } from '../identityWallet/types'
-import { ICredentialResponsePayloadCreationAttrs, ICredentialResponsePayloadAttrs } from './credentialResponse/types';
 
 export interface IJWTHeader {
   alg: string
@@ -10,7 +8,7 @@ export interface IJWTHeader {
 export interface IPayload {
   iss?: string
   iat?: number
-  typ: InteractionType
+  typ: string
   [x: string]: any
 }
 

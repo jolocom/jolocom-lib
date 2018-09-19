@@ -1,4 +1,4 @@
-import { IJWTHeader, InteractionTypePayloadCreationAttrs } from './types'
+import { IJWTHeader } from './types'
 import base64url from 'base64url'
 import {
   validateJWTSignature,
@@ -12,7 +12,7 @@ import {
   IJSONWebTokenAttrs,
   InteractionType,
   IJSONWebTokenCreationAttrs,
-  InteractionTypePayloadAttrs
+  // InteractionTypePayloadAttrs
 } from './types';
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry';
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
@@ -20,6 +20,7 @@ import { CredentialResponsePayload } from './credentialResponse/credentialRespon
 import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types';
 import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
 
+// TODO: this interaction type need to be removed
 type InteractionTypedJWT = JSONWebToken<CredentialRequestPayload> | JSONWebToken<CredentialRequestPayload>
 // TODO: rename
 
