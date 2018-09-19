@@ -1,3 +1,58 @@
+import { InteractionType } from '../../../ts/interactionFlows/types'
+
+export const credentialResponsePayloadJson = {
+  iat: 0,
+  iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
+  typ: InteractionType.CredentialResponse,
+  credentialResponse: {
+    suppliedCredentials: [
+      {
+        type: ['Credential', 'MockCredential'],
+        credential: {
+          '@context': ['http://schema.org/'],
+          id: 'claim:id:test',
+          issuer: 'did:jolo:issuer',
+          issued: 'this date',
+          type: ['Credential', 'MockCredential'],
+          claim: {
+            id: 'did:jolo:subject',
+            mock: 'value'
+          },
+          proof: {
+            created: '1970-01-01T00:00:00.000Z',
+            creator: 'did:jolo:issuer/keys#1',
+            nonce: '00000',
+            signatureValue: 'invalidMockSignature',
+            type: 'mockType'
+          }
+        }
+      }
+    ]
+  }
+}
+
+export const mockSuppliedCredential = [{
+  type: ['Credential', 'MockCredential'],
+  credential: {
+    '@context': ['http://schema.org/'],
+    id: 'claim:id:test',
+    issuer: 'did:jolo:issuer',
+    claim: {
+      id: 'did:jolo:subject',
+      mock: 'value'
+    },
+    issued: '',
+    type: ['Credential', 'MockCredential'],
+    proof: {
+      created: '1970-01-01T00:00:00.000Z',
+      creator: 'did:jolo:issuer/keys#1',
+      nonce: '00000',
+      signatureValue: 'invalidMockSignature',
+      type: 'mockType'
+    }
+  }
+}]
+
 export const mockPrivKey = '3a1076bf45ab87712ad64ccb3b10217737f7faacbf2872e88fdd9a537d8fe266'
 export const privKeyDID = 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
 
