@@ -96,22 +96,4 @@ describe('JSONWebToken', () => {
       ).to.equal(true)
     })
   })
-
-  describe('validateSignatureWithRegistry method', () => {
-    clock = sinon.useFakeTimers()
-
-    beforeEach(() => {
-      sandbox.stub(JolocomRegistry.prototype, 'resolve').resolves(Identity.create({ didDocument: ddoAttr }))
-    })
-
-    afterEach(() => {
-      sandbox.restore()
-    })
-
-    it('Should validate the signature using JolocomRegistry by default', async () => {
-      const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
-
-      expect(await jsonWebToken.validateSignatureWithRegistry()).to.equal(false)
-    })
-  })
 })

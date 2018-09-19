@@ -1,11 +1,6 @@
 import { IJWTHeader } from './types'
 import base64url from 'base64url'
-import {
-  validateJWTSignature,
-  computeJWTSignature,
-  validateJWTSignatureWithRegistry
-} from '../utils/jwt'
-import { decodeToken } from 'jsontokens'
+import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import { classToPlain } from 'class-transformer'
 import {
   IPayload,
@@ -13,15 +8,12 @@ import {
   InteractionType,
   IJSONWebTokenCreationAttrs,
 } from './types'
-import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
 import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload'
 import { CredentialReceivePayload } from './credentialReceive/credentialReceivePayload'
 import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types'
 import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
 import { ICredentialReceivePayloadCreationAttrs } from './credentialReceive/types'
-
-type InteractionTypedJWT = JSONWebToken<IPayload>
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -47,7 +39,7 @@ export class JSONWebToken<T extends IPayload> {
     return this.signature
   }
 
-  public static create(args: IJSONWebTokenCreationAttrs): InteractionTypedJWT {
+  public static create(args: IJSONWebTokenCreationAttrs): JSONWebToken<IPayload> {
     const { privateKey, payload } = args
 
     const jwt = JSONWebToken.payloadToJWT(payload)
@@ -78,25 +70,24 @@ export class JSONWebToken<T extends IPayload> {
   }
 
   public sign(privateKey: Buffer) {
-    return computeJWTSignature(this.payload, privateKey)
+    const signed = new TokenSigner('ES256K', privateKey.toString('hex')).sign(this.payload)
+    return decodeToken(signed).signature
   }
 
   public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
-    return validateJWTSignature(this, pubKey)
-  }
-
-  public async validateSignatureWithRegistry(registry?: JolocomRegistry): Promise<boolean> {
-    if (!registry) {
-      registry = createJolocomRegistry()
+    if (!pubKey) {
+      throw new Error('Please provide the issuer\'s public key')
     }
-    return validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
+    // TODO Normalize / have a cannonical json form
+    const assembledJWT = this.encode()
+    return new TokenVerifier('ES256K', pubKey.toString('hex')).verify(assembledJWT)
   }
 
   public toJSON(): IJSONWebTokenAttrs {
     return classToPlain(this) as IJSONWebTokenAttrs
   }
 
-  public static fromJSON(json: IJSONWebTokenAttrs): InteractionTypedJWT {
+  public static fromJSON(json: IJSONWebTokenAttrs): JSONWebToken<IPayload> {
     const jwt = JSONWebToken.payloadToJWT(json.payload)
     jwt.header = json.header
     jwt.signature = json.signature
@@ -104,7 +95,7 @@ export class JSONWebToken<T extends IPayload> {
     return jwt
   }
 
-  private static payloadToJWT(payload: IPayload): InteractionTypedJWT {
+  private static payloadToJWT(payload: IPayload): JSONWebToken<IPayload> {
     let jwt
 
     switch (payload.typ) {
