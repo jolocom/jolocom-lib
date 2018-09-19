@@ -30,7 +30,6 @@ export interface ICredentialRequest {
   }
 }
 
-// TODO: Should be upper case
 export type Comparable = number | Date
 export type ConstraintFunc = (field: string, value: string ) => IConstraint
 export type ComparableConstraintFunc = (field: string, value: Comparable) => IConstraint
