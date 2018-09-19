@@ -1,25 +1,17 @@
 import { IJWTHeader } from './types'
-import {
-  validateJWTSignature,
-  computeJWTSignature,
-  encodeAsJWT,
-  validateJWTSignatureWithRegistry
-} from '../utils/jwt'
-import { decodeToken } from 'jsontokens'
+import base64url from 'base64url'
+import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import { classToPlain } from 'class-transformer'
 import {
   IPayload,
   IJSONWebTokenAttrs,
   InteractionType,
   IJSONWebTokenCreationAttrs,
-  InteractionTypePayloadAttrs
-} from './types'
-import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
-import { privateKeyToDID } from '../utils/crypto'
-import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
-import { ICredentialRequestPayloadAttrs } from './credentialRequest/types'
-
-type InteractionTypedJWT = JSONWebToken<CredentialRequestPayload>
+} from './types';
+import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
+import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload';
+import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types';
+import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -45,14 +37,14 @@ export class JSONWebToken<T extends IPayload> {
     return this.signature
   }
 
-  public static create(args: IJSONWebTokenCreationAttrs): InteractionTypedJWT {
+  public static create(args: IJSONWebTokenCreationAttrs): JSONWebToken<IPayload> {
     const { privateKey, payload } = args
 
     const jwt = JSONWebToken.payloadToJWT(payload)
 
     jwt.payload.iat = Date.now()
-    jwt.payload.iss = privateKeyToDID(privateKey)
-    jwt.signature = jwt.sign(privateKey)
+    jwt.payload.iss = privateKey.id
+    jwt.signature = jwt.sign(privateKey.key)
 
     return jwt
   }
@@ -68,30 +60,32 @@ export class JSONWebToken<T extends IPayload> {
     if (!this.payload || !this.header || !this.signature) {
       throw new Error('The JWT is not complete, header / payload / signature are missing')
     }
-
-    return encodeAsJWT(this.header, this.payload, this.signature)
+    const jwtParts = []
+    jwtParts.push(base64url.encode(JSON.stringify(this.header)))
+    jwtParts.push(base64url.encode(JSON.stringify(this.payload)))
+    jwtParts.push(this.signature)
+    return jwtParts.join('.')
   }
 
   public sign(privateKey: Buffer) {
-    return computeJWTSignature(this.payload, privateKey)
+    const signed = new TokenSigner('ES256K', privateKey.toString('hex')).sign(this.payload)
+    return decodeToken(signed).signature
   }
 
   public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
-    return validateJWTSignature(this, pubKey)
-  }
-
-  public async validateSignatureWithRegistry(registry?: JolocomRegistry): Promise<boolean> {
-    if (!registry) {
-      registry = createJolocomRegistry()
+    if (!pubKey) {
+      throw new Error('Please provide the issuer\'s public key')
     }
-    return validateJWTSignatureWithRegistry({ jwtInstance: this, registry })
+    // TODO Normalize / have a cannonical json form
+    const assembledJWT = this.encode()
+    return new TokenVerifier('ES256K', pubKey.toString('hex')).verify(assembledJWT)
   }
 
   public toJSON(): IJSONWebTokenAttrs {
     return classToPlain(this) as IJSONWebTokenAttrs
   }
 
-  public static fromJSON(json: IJSONWebTokenAttrs): InteractionTypedJWT {
+  public static fromJSON(json: IJSONWebTokenAttrs): JSONWebToken<IPayload> {
     const jwt = JSONWebToken.payloadToJWT(json.payload)
     jwt.header = json.header
     jwt.signature = json.signature
@@ -99,17 +93,18 @@ export class JSONWebToken<T extends IPayload> {
     return jwt
   }
 
-  private static payloadToJWT(payload: InteractionTypePayloadAttrs): InteractionTypedJWT {
+  private static payloadToJWT(payload: IPayload): JSONWebToken<IPayload> {
     let jwt
 
     switch (payload.typ) {
       case InteractionType.CredentialRequest.toString(): {
         jwt = new JSONWebToken<CredentialRequestPayload>()
-        jwt.payload = CredentialRequestPayload.fromJSON(payload as ICredentialRequestPayloadAttrs)
+        jwt.payload = CredentialRequestPayload.create(payload as ICredentialRequestPayloadCreationAttrs)
         break
       }
       case InteractionType.CredentialResponse.toString(): {
-        // TODO
+        jwt = new JSONWebToken<CredentialResponsePayload>()
+        jwt.payload = CredentialResponsePayload.create(payload as ICredentialResponsePayloadCreationAttrs)
         break
       }
       case InteractionType.CredentialsReceiving.toString(): {

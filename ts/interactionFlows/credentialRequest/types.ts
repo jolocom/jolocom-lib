@@ -10,17 +10,17 @@ export interface ICredentialRequestPayloadCreationAttrs {
   credentialRequest: ICredentialRequestCreationAttrs
 }
 
-export type requestedCredentialAttrs = Array<{type: string[], constraints: IConstraint[]}>
+export type RequestedCredentialAttrs = Array<{type: string[], constraints: IConstraint[]}>
 
 export interface ICredentialRequestCreationAttrs {
   callbackURL: string
-  credentialRequirements: requestedCredentialAttrs
+  credentialRequirements: RequestedCredentialAttrs
 }
 
-export type constraintStatement = boolean[] | Array<{ var: string } | string | comparable >
+export type ConstraintStatement = boolean[] | Array<{ var: string } | string | Comparable >
 
 export interface IConstraint {
-  [operator: string]: constraintStatement
+  [operator: string]: ConstraintStatement
 }
 
 export interface ICredentialRequest {
@@ -30,24 +30,19 @@ export interface ICredentialRequest {
   }
 }
 
-export type comparable = number | Date
-export type constraintFunc = (field: string, value: string ) => IConstraint
-export type comparableConstraintFunc = (field: string, value: comparable) => IConstraint
+export type Comparable = number | Date
+export type ConstraintFunc = (field: string, value: string ) => IConstraint
+export type ComparableConstraintFunc = (field: string, value: Comparable) => IConstraint
 
 export interface IExposedConstraintFunctions {
-  is: constraintFunc
-  not: constraintFunc
-  greater: comparableConstraintFunc
-  smaller: comparableConstraintFunc
+  is: ConstraintFunc
+  not: ConstraintFunc
+  greater: ComparableConstraintFunc
+  smaller: ComparableConstraintFunc
 }
 
+// TODO: clean up interfaces, remove duplicates etc
 export interface ICredentialRequestAttrs {
   callbackURL: string
   credentialRequirements: ICredentialRequest[]
-}
-
-export type requestedCredentialArgs = Array<{type: string[], constraints: IConstraint[]}>
-export interface ICredentialRequestCreationArgs {
-  callbackURL: string
-  credentialRequirements: requestedCredentialArgs
 }

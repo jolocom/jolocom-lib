@@ -1,18 +1,18 @@
 import { BaseMetadata } from 'cred-types-jolocom-core'
 import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { IIdentityWalletCreateArgs } from './types'
+import { IIdentityWalletCreateArgs, IPrivateKeyWithId } from './types'
 import { Identity } from '../identity/identity'
 import { privateKeyToPublicKey } from '../utils/crypto'
-import { ICredentialRequestPayloadAttrs } from '../interactionFlows/credentialRequest/types'
-import { JSONWebToken } from '../interactionFlows/jsonWebToken'
+import { ICredentialRequestPayloadCreationAttrs } from '../interactionFlows/credentialRequest/types'
+import { JSONWebToken } from '../interactionFlows/JSONWebToken'
+import { ICredentialResponsePayloadCreationAttrs } from '../interactionFlows/credentialResponse/types';
+import { CredentialRequestPayload } from '../interactionFlows/credentialRequest/credentialRequestPayload';
+import { CredentialResponsePayload } from '../interactionFlows/credentialResponse/credentialResponsePayload';
 
 export class IdentityWallet {
   private identityDocument: Identity
-  private privateIdentityKey: {
-    key: Buffer
-    id: string
-  }
+  private privateIdentityKey: IPrivateKeyWithId
 
   public create = {
     credential: Credential.create,
@@ -31,9 +31,20 @@ export class IdentityWallet {
 
       return await SignedCredential.create({ metadata, claim, privateIdentityKey: this.privateIdentityKey, subject })
     },
-    credentialRequestJSONWebToken: (payload: ICredentialRequestPayloadAttrs) => {
-      return JSONWebToken.create({privateKey: this.privateIdentityKey.key, payload})
-    }
+    credentialRequestJSONWebToken: (
+      payload: ICredentialRequestPayloadCreationAttrs
+    ): JSONWebToken<CredentialRequestPayload> => {
+      return JSONWebToken.create(
+        {privateKey: this.privateIdentityKey, payload}
+      ) as JSONWebToken<CredentialRequestPayload>
+    },
+    credentialResponseJSONWebToken: (
+      payload: ICredentialResponsePayloadCreationAttrs
+    ): JSONWebToken<CredentialResponsePayload> => {
+      return JSONWebToken.create(
+        {privateKey: this.privateIdentityKey, payload}
+      ) as JSONWebToken<CredentialResponsePayload>
+    },
   }
 
   public sign = {

@@ -10,10 +10,11 @@ import { Credential } from '../../ts/credentials/credential/credential'
 import { testSignedCred } from '../data/identityWallet'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
-import { credentialRequestPayloadJson } from '../data/interactionFlows/jsonWebToken'
 import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
+import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest';
+import { IPayload } from '../../ts/interactionFlows/types';
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -75,6 +76,7 @@ describe('IdentityWallet', () => {
         'credential',
         'signedCredential',
         'credentialRequestJSONWebToken',
+        'credentialResponseJSONWebToken'
       ]
 
       expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
@@ -94,7 +96,6 @@ describe('IdentityWallet', () => {
       const credRequestJWT = identityWallet.create.credentialRequestJSONWebToken(credentialRequestPayloadJson)
       const credRequestPayload = credRequestJWT.getPayload()
 
-      expect(credRequestJWT).to.be.an.instanceof(JSONWebToken)
       expect(credRequestPayload).to.be.an.instanceof(CredentialRequestPayload)
       expect(credRequestPayload.credentialRequest).to.be.an.instanceof(CredentialRequest)
     })
@@ -108,14 +109,6 @@ describe('IdentityWallet', () => {
       expect(signedCred.getCredentialSection()).to.deep.equal(mockSignedCred.getCredentialSection())
       expect(signedCred.getType()).to.deep.equal(mockSignedCred.getType())
     })
-
-/*     it('create.signedCredentialRequest should return a correct signed credential request', () => {
-      const credRequest = identityWallet.create.credentialRequest(credentialRequestCreationArgs)
-      const signedCredRequest = identityWallet.create.signedCredentialRequest(credRequest)
-      const mockSignedReq = SignedCredentialRequest.fromJSON(testSignedCredRequest)
-
-      expect(signedCredRequest).to.deep.equal(mockSignedReq)
-    }) */
   })
 
   describe('sign', () => {
@@ -166,14 +159,4 @@ describe('IdentityWallet', () => {
       expect(signedCred.getType()).to.deep.equal(mockSignedCred.getType())
     })
   })
-
- /*  describe('signCredentialRequest', () => {
-    it('should return a correct signCredentialRequest', () => {
-      const credRequest = identityWallet.create.credentialRequest(credentialRequestCreationArgs)
-      const signedCredRequest = identityWallet.signCredentialRequest(credRequest)
-      const mockSignedReq = SignedCredentialRequest.fromJSON(testSignedCredRequest)
-
-      expect(signedCredRequest).to.deep.equal(mockSignedReq)
-    })
-  }) */
 })

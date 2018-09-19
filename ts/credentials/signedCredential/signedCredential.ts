@@ -4,11 +4,10 @@ import { canonize } from 'jsonld'
 import { Credential } from '../credential/credential'
 import { generateRandomID, sign, sha256, verifySignature, privateKeyToDID } from '../../utils/crypto'
 import { ISignedCredentialAttrs } from './types'
-import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { ILinkedDataSignature } from '../../linkedDataSignature/types'
-import { JolocomRegistry, createJolocomRegistry } from '../../registries/jolocomRegistry'
 import { validContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
+import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 
 @Exclude()
 export class SignedCredential {
@@ -153,24 +152,6 @@ export class SignedCredential {
     const sig = this.proof.getSigValue()
 
     return verifySignature(tbv, pubKey, sig)
-  }
-
-  public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
-    if (!registry) {
-      registry = createJolocomRegistry()
-    }
-
-    const issuerProfile = await registry.resolve(this.issuer)
-    const relevantPublicKey = issuerProfile
-      .getPublicKeySection()
-      .find(keySection => keySection.getIdentifier() === this.proof.creator)
-
-    if (!relevantPublicKey) {
-      return false
-    }
-
-    const pubKey = Buffer.from(relevantPublicKey.getPublicKeyHex(), 'hex')
-    return this.validateSignatureWithPublicKey(pubKey)
   }
 
   public static fromJSON(json: ISignedCredentialAttrs): SignedCredential {

@@ -13,7 +13,6 @@ export const JolocomLib = {
   },
   unsigned : {
     createCredential: Credential.create,
-    createCredentialRequest: CredentialRequest.create,
   }
 }
 

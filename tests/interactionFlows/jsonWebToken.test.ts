@@ -1,16 +1,12 @@
 import { expect } from 'chai'
-import { mockPrivKey } from '../data/credentialResponse/signedCredentialResponse'
+import { mockPrivKey } from '../data/interactionFlows/credentialResponse'
 import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
-import { InteractionType } from '../../ts/interactionFlows/types'
 import { jwtJSON, jwtCreateArgs, signedCredRequestJWT } from '../data/interactionFlows/jsonWebToken'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { privateKeyToPublicKey } from '../../ts/utils/crypto'
-import { Identity } from '../../ts/identity/identity'
-import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
-import { ddoAttr } from '../data/identity'
 chai.use(sinonChai)
 
 describe('JSONWebToken', () => {
@@ -31,26 +27,19 @@ describe('JSONWebToken', () => {
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
-      expect(jsonWebToken.toJSON()).to.deep.equal(jwtJSON)
+      expect(jsonWebToken.toJSON().payload).to.deep.equal(jwtJSON.payload)
       expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
     })
 
-    it('The type of the payload should be the correct playload class that exposes class specific methods', () => {
+    it('The type of the payload should be the correct payload class that exposes class specific methods', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
       expect(jsonWebToken.getPayload().applyConstraints).to.be.an.instanceof(Function)
-    })
-
-    it('Should throw an error in case the interaction type from the payload is not known', () => {
-      jwtCreateArgs.payload.typ = 'NonExistingInteractionType'
-
-      expect(() => JSONWebToken.create(jwtCreateArgs)).to.throw('Interaction type not recognized!')
-      jwtCreateArgs.payload.typ = InteractionType.CredentialRequest
     })
   })
 
   describe('Static fromJSON method', () => {
     clock = sinon.useFakeTimers()
-    const jsonWebToken = JSONWebToken.fromJSON(jwtJSON)
+    const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
@@ -101,24 +90,6 @@ describe('JSONWebToken', () => {
       expect(
         jsonWebToken.validateSignatureWithPublicKey(privateKeyToPublicKey(Buffer.from(mockPrivKey, 'hex')))
       ).to.equal(true)
-    })
-  })
-
-  describe('validateSignatureWithRegistry method', () => {
-    clock = sinon.useFakeTimers()
-
-    beforeEach(() => {
-      sandbox.stub(JolocomRegistry.prototype, 'resolve').resolves(Identity.create({ didDocument: ddoAttr }))
-    })
-
-    afterEach(() => {
-      sandbox.restore()
-    })
-
-    it('Should validate the signature using JolocomRegistry by default', async () => {
-      const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
-
-      expect(await jsonWebToken.validateSignatureWithRegistry()).to.equal(false)
     })
   })
 })

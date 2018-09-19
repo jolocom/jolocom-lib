@@ -87,8 +87,11 @@ describe('Integration Test', () => {
   describe('Signature verification', () => {
     it('should generate a valid DDO public profile', async () => {
       const committedProfile = await jolocomRegistry.resolve(did)
+      const publicKey = committedProfile.getPublicKeySection()[0].getPublicKeyHex()
 
-      expect(await committedProfile.publicProfile.get().validateSignature(jolocomRegistry)).to.be.true
+      expect(
+        await committedProfile.publicProfile.get().validateSignatureWithPublicKey(Buffer.from(publicKey, 'hex')
+      )).to.be.true
     })
   })
 })

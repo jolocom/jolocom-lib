@@ -3,11 +3,11 @@ import * as jsonlogic from 'json-logic-js'
 import { areCredTypesEqual } from '../../utils/credentials'
 import {
   ICredentialRequestAttrs,
-  comparable,
+  Comparable,
   IExposedConstraintFunctions,
   ICredentialRequest,
   IConstraint,
-  ICredentialRequestCreationArgs
+  ICredentialRequestCreationAttrs
 } from './types'
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
@@ -15,7 +15,7 @@ export class CredentialRequest {
   private callbackURL: string
   private credentialRequirements: ICredentialRequest[] = []
 
-  public static create(args: ICredentialRequestCreationArgs): CredentialRequest {
+  public static create(args: ICredentialRequestCreationAttrs): CredentialRequest {
     const credentialRequest = new CredentialRequest()
     credentialRequest.setCallbackURL(args.callbackURL)
     args.credentialRequirements.forEach((req) => credentialRequest.addCredentialRequirement(req))
@@ -73,10 +73,10 @@ export class CredentialRequest {
 export const constraintFunctions: IExposedConstraintFunctions = {
   is: (field: string, value: string) => assembleStatement('==', field, value),
   not: (field: string, value: string) => assembleStatement('!=', field, value),
-  greater: (field: string, value: comparable) => assembleStatement('>', field, value),
-  smaller: (field: string, value: comparable) => assembleStatement('<', field, value)
+  greater: (field: string, value: Comparable) => assembleStatement('>', field, value),
+  smaller: (field: string, value: Comparable) => assembleStatement('<', field, value)
 }
 
-const assembleStatement = (operator: string, field: string, value: string | comparable): IConstraint => {
+const assembleStatement = (operator: string, field: string, value: string | Comparable): IConstraint => {
   return { [operator]: [{ var: field }, value] } as IConstraint
 }
