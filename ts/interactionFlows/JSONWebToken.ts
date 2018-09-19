@@ -12,7 +12,6 @@ import {
   IJSONWebTokenAttrs,
   InteractionType,
   IJSONWebTokenCreationAttrs,
-  // InteractionTypePayloadAttrs
 } from './types';
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry';
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
@@ -20,9 +19,7 @@ import { CredentialResponsePayload } from './credentialResponse/credentialRespon
 import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types';
 import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
 
-// TODO: this interaction type need to be removed
 type InteractionTypedJWT = JSONWebToken<CredentialRequestPayload> | JSONWebToken<CredentialRequestPayload>
-// TODO: rename
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
