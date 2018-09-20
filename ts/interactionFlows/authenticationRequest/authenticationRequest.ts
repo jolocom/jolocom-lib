@@ -8,6 +8,7 @@ export class AuthenticationRequest {
   public static create(attrs: IAuthenticationRequestAttrs): AuthenticationRequest {
     const authReq = new AuthenticationRequest()
     authReq.challenge = attrs.challenge
+    authReq.callbackURL = attrs.callbackURL
 
     return authReq
   }
