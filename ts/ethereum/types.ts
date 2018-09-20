@@ -4,7 +4,7 @@ export interface IEthereumResolverConfig {
 }
 
 export interface IEthereumResolverUpdateDIDArgs {
-  ethereumKey: object
+  ethereumKey: Buffer
   did: string
   newHash: string
 }

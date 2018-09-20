@@ -3,6 +3,7 @@ import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { testSignedCredentialCreateArgs } from '../data/credential/signedCredential'
+import { EmailClaimMetadata } from 'cred-types-jolocom-core/js/types'
 
 chai.use(sinonChai)
 
@@ -15,7 +16,7 @@ describe('SignedCredential', () => {
     before(() => {
       create = sandbox.spy(SignedCredential, 'create')
       generateSignature = sandbox.spy(SignedCredential.prototype, 'generateSignature')
-      SignedCredential.create(testSignedCredentialCreateArgs)
+      SignedCredential.create<EmailClaimMetadata>(testSignedCredentialCreateArgs)
     })
 
     after(() => {

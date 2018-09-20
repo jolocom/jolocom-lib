@@ -1,48 +1,42 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
-import { IClaimAttrs, ICredentialAttrs, ICredentialCreateAttrs } from './types'
+import { ICredentialAttrs, IClaimSection } from './types'
+import { BaseMetadata, validContextEntry } from 'cred-types-jolocom-core'
+import { defaultContext } from '../../utils/contexts'
 
 @Exclude()
 export class Credential {
   @Expose()
-  private '@context': string[] | object[]
+  private '@context': validContextEntry[]
 
   @Expose()
   private type: string[]
 
   @Expose()
-  private claim: IClaimAttrs
+  private claim: IClaimSection
 
   @Expose()
   private name: string
 
-  public static create({metadata, claim}: ICredentialCreateAttrs): Credential {
-    const allPresent = metadata.fieldNames.every((field) => !!claim[field])
-    if (!allPresent) {
-      throw new Error(`Missing claims, expected keys are: ${metadata.fieldNames.toString()}`)
-    }
-
-    const assembledClaim = {
-      id: claim.id
-    }
-
-    const combinedFieldNames = [...metadata.fieldNames, ...metadata.optionalFieldNames]
-
-    combinedFieldNames.forEach((fieldName) => {
-      if (claim[fieldName]) {
-        assembledClaim[fieldName] = claim[fieldName]
-      }
-    })
-
+  public static create<T extends BaseMetadata>({
+    metadata,
+    claim,
+    subject
+  }: {
+    metadata: T
+    claim: typeof metadata['claimInterface']
+    subject: string
+  }) {
     const credential = new Credential()
-    credential['@context'] = metadata.context
+    credential['@context'] = [...defaultContext, ...metadata.context]
     credential.type = metadata.type
     credential.name = metadata.name
-    credential.claim = assembledClaim
+    credential.claim = claim
+    credential.claim.id = subject
 
     return credential
   }
 
-  public getClaim(): IClaimAttrs {
+  public getClaim(): IClaimSection {
     return this.claim
   }
 
@@ -54,7 +48,7 @@ export class Credential {
     return this.name
   }
 
-  public getContext(): string[] | object[] {
+  public getContext(): validContextEntry[] {
     return this['@context']
   }
 

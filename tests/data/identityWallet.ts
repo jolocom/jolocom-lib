@@ -4,8 +4,11 @@ import { singleClaimCreationArgs } from '../data/credential/credential'
 
 export const credentialAttr = {
   metadata:  claimsMetadata.emailAddress,
-  claim: singleClaimCreationArgs
+  claim: singleClaimCreationArgs,
+  subject: 'did:jolo:test'
 }
+
+export const testSubject = 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af'
 
 export const testSignedCred = {
   '@context': [
@@ -20,7 +23,7 @@ export const testSignedCred = {
   issuer: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af',
   type: [ 'Credential', 'ProofOfEmailCredential' ],
   claim: {
-    id: 'did:jolo:test',
+    id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af',
     email: 'eugeniu@jolocom.com'
   },
   issued: '1970-01-01T00:00:00.000Z',
