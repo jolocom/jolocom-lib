@@ -2,7 +2,7 @@ import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import * as testKeys from '../data/keys'
 import { IdentityManager } from '../../ts/identityManager/identityManager'
-import { keyTypes } from '../../ts/identityManager/identityManager'
+import { KeyTypes } from '../../ts/identityManager/identityManager'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -14,8 +14,8 @@ describe('IdentityManager', () => {
     it('should create an instance of IdentityManager with correct default keys schema', () => {
       const keySchema = identityManager.getSchema()
 
-      expect(keySchema.jolocomIdentityKey).to.equal(keyTypes.jolocomIdentityKey)
-      expect(keySchema.ethereumKey).to.equal(keyTypes.ethereumKey)
+      expect(keySchema.jolocomIdentityKey).to.equal(KeyTypes.jolocomIdentityKey)
+      expect(keySchema.ethereumKey).to.equal(KeyTypes.ethereumKey)
     })
   })
 
@@ -32,7 +32,7 @@ describe('IdentityManager', () => {
     it('should return the schema object', () => {
       const keySchema = identityManager.getSchema()
 
-      expect(keySchema).to.deep.equal(keyTypes)
+      expect(keySchema).to.deep.equal(KeyTypes)
     })
   })
 
