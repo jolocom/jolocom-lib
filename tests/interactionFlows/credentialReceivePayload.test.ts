@@ -1,31 +1,31 @@
 import { expect } from 'chai'
-import { CredentialReceivePayload } from '../../ts/interactionFlows/credentialReceive/credentialReceivePayload'
+import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'  
-import { CredentialReceive } from '../../ts/interactionFlows/credentialReceive/credentialReceive'
+import { CredentialsReceive } from '../../ts/interactionFlows/credentialsReceive/credentialsReceive'
 import { testSignedCredential } from '../data/credential/signedCredential'
 import { jsonCredReceivePayload } from '../data/interactionFlows/credentialReceive'
 
 describe('CredentialReceivePayload', () => {
-  const credentialReceivePayload = CredentialReceivePayload.create({
+  const credentialsReceivePayload = CredentialsReceivePayload.create({
     typ: 'credentialsReceive',
-    credentialReceive: CredentialReceive.create([SignedCredential.fromJSON(testSignedCredential)])
+    credentialsReceive: CredentialsReceive.create([SignedCredential.fromJSON(testSignedCredential)])
   }) 
 
   it('Should implement static create method and return correct instance', () => {
-    expect(credentialReceivePayload).to.be.instanceOf(CredentialReceivePayload)
-    expect(credentialReceivePayload.getSignedCredentials()[0]).to.be.instanceOf(SignedCredential)
+    expect(credentialsReceivePayload).to.be.instanceOf(CredentialsReceivePayload)
+    expect(credentialsReceivePayload.getSignedCredentials()[0]).to.be.instanceOf(SignedCredential)
   })
 
   it('Should implement static fromJSON method & return correct instance CredentialReceive', () => {
-    const credReceivePayloadRevived = CredentialReceivePayload
-      .fromJSON(credentialReceivePayload.toJSON())
+    const credReceivePayloadRevived = CredentialsReceivePayload
+      .fromJSON(credentialsReceivePayload.toJSON())
     
-    expect(credReceivePayloadRevived).to.be.instanceOf(CredentialReceivePayload)
-    expect(credReceivePayloadRevived.credentialReceive).to.be.instanceOf(CredentialReceive)
-    expect(credentialReceivePayload.getSignedCredentials()[0]).to.be.instanceOf(SignedCredential)
+    expect(credReceivePayloadRevived).to.be.instanceOf(CredentialsReceivePayload)
+    expect(credReceivePayloadRevived.credentialsReceive).to.be.instanceOf(CredentialsReceive)
+    expect(credentialsReceivePayload.getSignedCredentials()[0]).to.be.instanceOf(SignedCredential)
   })
 
   it('Should implement toJSON method which returns a correct JSON', () => {
-    expect(jsonCredReceivePayload).to.deep.equal(credentialReceivePayload.toJSON())
+    expect(jsonCredReceivePayload).to.deep.equal(credentialsReceivePayload.toJSON())
   })
 })

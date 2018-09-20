@@ -27,7 +27,6 @@ describe('JSONWebToken', () => {
   describe('Static create method', () => {
     clock = sinon.useFakeTimers()
     const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
-    // const jwtCredentialReceive = JSONWebToken.create(jwtCredentialReceiveArgs)
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)

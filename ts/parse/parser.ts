@@ -3,13 +3,13 @@ import { SignedCredentialParser } from '../credentials/signedCredential/signedCr
 import { CredentialRequestParser } from '../interactionFlows/credentialRequest/credentialRequestParser'
 import { CredentialResponseParser } from '../interactionFlows/credentialResponse/credentialResponseParser'
 import { JSONWebTokenParser } from '../interactionFlows/JSONWebTokenParser'
-import { CredentialReceiveParser } from '../interactionFlows/credentialReceive/credentialReceiveParser'
+import { CredentialsReceiveParser } from '../interactionFlows/credentialsReceive/credentialsReceiveParser'
 
 export const parse = {
   interactionJSONWebToken: JSONWebTokenParser,
   credential: CredentialParser,
   credentialRequest : CredentialRequestParser,
   credentialResponse: CredentialResponseParser,
-  credentialReceive: CredentialReceiveParser,
+  credentialsReceive: CredentialsReceiveParser,
   signedCredential : SignedCredentialParser
 }

@@ -10,10 +10,10 @@ import {
 } from './types'
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
 import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload'
-import { CredentialReceivePayload } from './credentialReceive/credentialReceivePayload'
+import { CredentialsReceivePayload } from './credentialsReceive/credentialsReceivePayload'
 import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types'
 import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
-import { ICredentialReceivePayloadCreationAttrs } from './credentialReceive/types'
+import { ICredentialsReceivePayloadCreationAttrs } from './credentialsReceive/types'
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -110,8 +110,8 @@ export class JSONWebToken<T extends IPayload> {
         break
       }
       case InteractionType.CredentialsReceive.toString(): {
-        jwt = new JSONWebToken<CredentialReceivePayload>()
-        jwt.payload = CredentialReceivePayload.create(payload as ICredentialReceivePayloadCreationAttrs)
+        jwt = new JSONWebToken<CredentialsReceivePayload>()
+        jwt.payload = CredentialsReceivePayload.create(payload as ICredentialsReceivePayloadCreationAttrs)
         break
       }
       default: {

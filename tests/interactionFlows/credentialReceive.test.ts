@@ -1,32 +1,32 @@
 import { expect } from 'chai'
-import { CredentialReceive } from '../../ts/interactionFlows/credentialReceive/credentialReceive'
+import { CredentialsReceive } from '../../ts/interactionFlows/credentialsReceive/credentialsReceive'
 import { testSignedCredential } from '../data/credential/signedCredential'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { jsonCredReceive } from '../data/interactionFlows/credentialReceive'
 
 describe('CredentialReceive', () => {
-  const credentialReceive = CredentialReceive
+  const credentialsReceive = CredentialsReceive
     .create([SignedCredential.fromJSON(testSignedCredential)])
 
   it('Should create instace of CredentialReceive on static create', () => {  
-    expect(credentialReceive).to.be.instanceOf(CredentialReceive)
+    expect(credentialsReceive).to.be.instanceOf(CredentialsReceive)
   })
 
   it('should return an array of signed credential on getSignedCredentials', () => {
-    const creds = credentialReceive.getSignedCredentials()
+    const creds = credentialsReceive.getSignedCredentials()
     
     expect(creds).to.be.instanceOf(Array)
     expect(creds[0]).to.be.instanceOf(SignedCredential)
   })
 
   it('Should implement toJSON method', () => {
-    expect(credentialReceive.toJSON()).to.deep.equal(jsonCredReceive)
+    expect(credentialsReceive.toJSON()).to.deep.equal(jsonCredReceive)
   })
 
   it('Should implement static fromJSON method', () => {
-    const credReceive = CredentialReceive.fromJSON(credentialReceive.toJSON())
+    const credReceive = CredentialsReceive.fromJSON(credentialsReceive.toJSON())
     
-    expect(credReceive).to.be.instanceOf(CredentialReceive)
+    expect(credReceive).to.be.instanceOf(CredentialsReceive)
     expect(credReceive.getSignedCredentials()[0]).to.be.instanceOf(SignedCredential)
   })
 })
