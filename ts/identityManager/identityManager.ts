@@ -1,7 +1,7 @@
 import { generateMnemonic, deriveChildKeyPair, deriveMasterKeyPairFromMnemonic } from '../utils/keyDerivation'
 import { IKeyResponse } from '../utils/keyDerivation'
 
-export enum keyTypes {
+export enum KeyTypes {
   jolocomIdentityKey = 'm/73\'/0\'/0\'/0',
   ethereumKey = 'm/44\'/60\'/0\'/0/0'
 }
@@ -18,7 +18,7 @@ export class IdentityManager {
     const identityManager = new IdentityManager()
     identityManager.seed = seed
     identityManager.schema = {
-      ...keyTypes
+      ...KeyTypes
     }
 
     return identityManager
