@@ -12,7 +12,10 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { Identity } from '../../ts/identity/identity'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
-import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest';
+import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest'
+import { jsonAuthResponsePayload } from '../data/interactionFlows/authenticationResponse'
+import { AuthenticationResponsePayload } from '../../ts/interactionFlows/authenticationResponse/authenticationResponsePayload'
+import { AuthenticationResponse } from '../../ts/interactionFlows/authenticationResponse/authenticationResponse'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -74,7 +77,8 @@ describe('IdentityWallet', () => {
         'credential',
         'signedCredential',
         'credentialRequestJSONWebToken',
-        'credentialResponseJSONWebToken'
+        'credentialResponseJSONWebToken',
+        'authenticationResponseJSONWebToken'
       ]
 
       expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
@@ -97,6 +101,14 @@ describe('IdentityWallet', () => {
 
       expect(credRequestPayload).to.be.an.instanceof(CredentialRequestPayload)
       expect(credRequestPayload.credentialRequest).to.be.an.instanceof(CredentialRequest)
+    })
+
+    it('create.authenticationResponseJSONWebToken should return a correct authenticationResponse JWT', () => {
+      const authResWT = identityWallet.create.authenticationResponseJSONWebToken(jsonAuthResponsePayload)
+      const authResPayload = authResWT.getPayload()
+
+      expect(authResPayload).to.be.an.instanceof(AuthenticationResponsePayload)
+      expect(authResPayload.authResponse).to.be.an.instanceof(AuthenticationResponse)
     })
 
     it('create.signedCredential should return a correct signed credential', async () => {

@@ -25,5 +25,6 @@ describe('AuthenticationResponse', () => {
     const authResponse = AuthenticationResponse.fromJSON(jsonAuthResponse)
     
     expect(authResponse).to.be.instanceOf(AuthenticationResponse)
+    expect(authResponse).to.deep.equal(authenticationResponse)
   })
 })

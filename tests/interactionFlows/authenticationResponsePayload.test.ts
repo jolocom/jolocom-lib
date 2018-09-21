@@ -13,10 +13,6 @@ describe('AuthenticationResponsePayload', () => {
     authResponse: jsonAuthResponse
   }) 
 
-  it('Should implement static create method and return correct instance', () => {
-    expect(authResponsePayload).to.be.instanceOf(AuthenticationResponsePayload)
-  })
-
   it('Should expose class specific methods on authenticationResponsePayload', async () => {
     expect(authResponsePayload.getChallengeResponse()).to.deep.equal(challengeResponse)
     // TODO
@@ -33,5 +29,11 @@ describe('AuthenticationResponsePayload', () => {
     
     expect(AuthenticationResponsePayload.fromJSON(mockJsonAuthResponsePayload))
       .to.deep.equal(authResponsePayload)
+  })
+
+  it('Should implement static create method and return correct instance', () => {
+    expect(authResponsePayload).to.be.instanceOf(AuthenticationResponsePayload)
+    expect(authResponsePayload)
+      .to.deep.equal(AuthenticationResponsePayload.fromJSON(mockJsonAuthResponsePayload))
   })
 })
