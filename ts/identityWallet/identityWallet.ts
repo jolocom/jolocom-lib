@@ -4,6 +4,9 @@ import { SignedCredential } from '../credentials/signedCredential/signedCredenti
 import { IIdentityWalletCreateArgs, IPrivateKeyWithId } from './types'
 import { Identity } from '../identity/identity'
 import { privateKeyToPublicKey } from '../utils/crypto'
+import { JSONWebToken } from '../interactionFlows/jsonWebToken'
+import { ICredentialRequestPayloadCreationAttrs } from '../interactionFlows/credentialRequest/types'
+import { BaseMetadata } from 'cred-types-jolocom-core'
 import { ICredentialRequestPayloadCreationAttrs } from '../interactionFlows/credentialRequest/types'
 import { JSONWebToken } from '../interactionFlows/JSONWebToken'
 import { ICredentialResponsePayloadCreationAttrs } from '../interactionFlows/credentialResponse/types';
