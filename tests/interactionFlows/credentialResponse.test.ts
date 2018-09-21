@@ -1,12 +1,9 @@
-import { mockSuppliedCredential } from './../data/interactionFlows/credentialResponse';
+import { mockSuppliedCredential } from './../data/interactionFlows/credentialResponse'
 import { expect } from 'chai'
-import {
-  firstMockCredential,
-  credentialRequestCreationAttrs,
-  secondMockCredential
-} from '../data/interactionFlows/credentialRequest'
+import { credentialRequestCreationAttrs } from '../data/interactionFlows/credentialRequest'
 import { CredentialResponse } from '../../ts/interactionFlows/credentialResponse/credentialResponse'
-import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest';
+import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
+import { firstMockCredential, secondMockCredential } from '../data/credential/signedCredential'
 
 describe('CredentialResponse', () => {
   it('Should implement static create method', () => {

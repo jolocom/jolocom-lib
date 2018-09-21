@@ -1,4 +1,4 @@
-import { credentialRequestJson, mockPrivKey } from './credentialRequest';
+import { credentialRequestJson, mockPrivKey } from './credentialRequest'
 import { InteractionType, IJSONWebTokenCreationAttrs } from '../../../ts/interactionFlows/types'
 
 export const jwtJSON = {
