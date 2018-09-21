@@ -8,6 +8,7 @@ describe('AuthenticationRequest', () => {
 
   it('Should create instace of AuthenticationRequest on static create', () => {  
     expect(authenticationRequest).to.be.instanceOf(AuthenticationRequest)
+    expect(authenticationRequest).to.deep.equal(AuthenticationRequest.fromJSON(jsonAuthRequest))
   })
 
   it('Should expose class specific methods on authenticationRequest', () => {
@@ -23,5 +24,6 @@ describe('AuthenticationRequest', () => {
     const authRequest = AuthenticationRequest.fromJSON(jsonAuthRequest)
     
     expect(authRequest).to.be.instanceOf(AuthenticationRequest)
+    expect(authRequest).to.deep.equal(authenticationRequest)
   })
 })

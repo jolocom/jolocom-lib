@@ -12,7 +12,10 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { Identity } from '../../ts/identity/identity'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
-import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest';
+import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest'
+import { jsonAuthRequestPayload } from '../data/interactionFlows/authenticationRequest'
+import { AuthenticationRequestPayload } from '../../ts/interactionFlows/authenticationRequest/authenticationRequestPayload'
+import { AuthenticationRequest } from '../../ts/interactionFlows/authenticationRequest/authenticationRequest'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -74,7 +77,8 @@ describe('IdentityWallet', () => {
         'credential',
         'signedCredential',
         'credentialRequestJSONWebToken',
-        'credentialResponseJSONWebToken'
+        'credentialResponseJSONWebToken',
+        'authenticationRequestJSONWebToken'
       ]
 
       expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
@@ -97,6 +101,14 @@ describe('IdentityWallet', () => {
 
       expect(credRequestPayload).to.be.an.instanceof(CredentialRequestPayload)
       expect(credRequestPayload.credentialRequest).to.be.an.instanceof(CredentialRequest)
+    })
+
+    it('create.authenticationRequestJSONWebToken should return a correct authenticationRequest JWT', () => {
+      const authReqJWT = identityWallet.create.authenticationRequestJSONWebToken(jsonAuthRequestPayload)
+      const authReqPayload = authReqJWT.getPayload()
+ 
+      expect(authReqPayload).to.be.an.instanceof(AuthenticationRequestPayload)
+      expect(authReqPayload.authRequest).to.be.an.instanceof(AuthenticationRequest)
     })
 
     it('create.signedCredential should return a correct signed credential', async () => {
