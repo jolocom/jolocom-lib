@@ -6,10 +6,7 @@ import * as sinonChai from 'sinon-chai'
 import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
 import { jwtJSON, jwtCreateArgs, signedCredRequestJWT } from '../data/interactionFlows/jsonWebToken'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
-import { ddoAttr } from '../data/interactionFlows/credentialRequest'
 import { privateKeyToPublicKey } from '../../ts/utils/crypto'
-import { Identity } from '../../ts/identity/identity'
-import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
 chai.use(sinonChai)
 
 describe('JSONWebToken', () => {
@@ -93,24 +90,6 @@ describe('JSONWebToken', () => {
       expect(
         jsonWebToken.validateSignatureWithPublicKey(privateKeyToPublicKey(Buffer.from(mockPrivKey, 'hex')))
       ).to.equal(true)
-    })
-  })
-
-  describe('validateSignatureWithRegistry method', () => {
-    clock = sinon.useFakeTimers()
-
-    beforeEach(() => {
-      sandbox.stub(JolocomRegistry.prototype, 'resolve').resolves(Identity.create({ didDocument: ddoAttr }))
-    })
-
-    afterEach(() => {
-      sandbox.restore()
-    })
-
-    it('Should validate the signature using JolocomRegistry by default', async () => {
-      const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
-
-      expect(await jsonWebToken.validateSignatureWithRegistry()).to.equal(false)
     })
   })
 })

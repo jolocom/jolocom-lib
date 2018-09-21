@@ -1,14 +1,12 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { ICredentialAttrs, IClaimSection } from './types'
 import { BaseMetadata, validContextEntry } from 'cred-types-jolocom-core'
-
-// TODO TODO TODO
-const defaultContextsBrief = []
+import { defaultContext } from '../../utils/contexts'
 
 @Exclude()
 export class Credential {
   @Expose()
-  private '@context': Array<string | { [key: string]: string }>
+  private '@context': validContextEntry[]
 
   @Expose()
   private type: string[]
@@ -29,7 +27,7 @@ export class Credential {
     subject: string
   }) {
     const credential = new Credential()
-    credential['@context'] = [...defaultContextsBrief, ...metadata.context]
+    credential['@context'] = [...defaultContext, ...metadata.context]
     credential.type = metadata.type
     credential.name = metadata.name
     credential.claim = claim
@@ -50,7 +48,7 @@ export class Credential {
     return this.name
   }
 
-  public getContext(): Array<validContextEntry> {
+  public getContext(): validContextEntry[] {
     return this['@context']
   }
 

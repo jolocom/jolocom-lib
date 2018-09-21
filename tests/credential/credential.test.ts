@@ -10,6 +10,7 @@ import {
   customCredentialJSON
 } from '../data/credential/credential'
 import { EmailClaimMetadata, NameClaimMetadata } from 'cred-types-jolocom-core/js/types'
+import { defaultContext } from '../../ts/utils/contexts'
 
 describe('Credential', () => {
   describe('static create method', () => {
@@ -56,7 +57,7 @@ describe('Credential', () => {
     })
 
     expect(credential.getClaim()).to.deep.equal(singleClaimCreationArgs)
-    expect(credential.getContext()).to.deep.equal(claimsMetadata.emailAddress.context)
+    expect(credential.getContext()).to.deep.equal([...defaultContext, ...claimsMetadata.emailAddress.context])
     expect(credential.getName()).to.deep.equal(claimsMetadata.emailAddress.name)
     expect(credential.getType()).to.deep.equal(claimsMetadata.emailAddress.type)
   })

@@ -1,4 +1,4 @@
-import { validContextEntry } from "cred-types-jolocom-core"
+import { validContextEntry } from 'cred-types-jolocom-core'
 
 type validClaimTypes = string | number | boolean
 export type validClaimEntry = validClaimTypes | {[key: string]: validClaimEntry}
