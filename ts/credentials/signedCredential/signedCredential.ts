@@ -8,6 +8,7 @@ import { ILinkedDataSignature } from '../../linkedDataSignature/types'
 import { validContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
+import { IPrivateKeyWithId } from '../../identityWallet/types';
 
 @Exclude()
 export class SignedCredential {
@@ -103,10 +104,7 @@ export class SignedCredential {
   }: {
     metadata: T
     claim: typeof metadata['claimInterface']
-    privateIdentityKey: {
-      key: Buffer
-      id: string
-    }
+    privateIdentityKey: IPrivateKeyWithId
     subject: string
   }): Promise<SignedCredential> {
     const credential = Credential.create<T>({ metadata, claim, subject })
