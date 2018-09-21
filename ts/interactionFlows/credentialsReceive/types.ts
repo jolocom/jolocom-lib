@@ -1,4 +1,5 @@
 import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
+import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
 export interface ICredentialsReceivePayloadCreationAttrs {
   typ: string
@@ -6,7 +7,7 @@ export interface ICredentialsReceivePayloadCreationAttrs {
 }
 
 export interface ICredentialsReceiveAttrs {
-  signedCredentials: SignedCredential[]
+  signedCredentials: ISignedCredentialAttrs[]
 }
 
 export interface ICredentialsReceivePayloadAttrs {

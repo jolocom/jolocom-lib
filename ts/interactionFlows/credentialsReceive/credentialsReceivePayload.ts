@@ -17,23 +17,26 @@ export class CredentialsReceivePayload implements IPayload {
       throw new Error('Incorrect payload for CredentialReceive')
     }
 
-    const credentialsReceivePayload = new CredentialsReceivePayload()
-    credentialsReceivePayload.credentialsReceive = plainToClass(CredentialsReceive, credentialsReceive)
-    credentialsReceivePayload.typ = attrs.typ
-
-    return credentialsReceivePayload
+    const crp = new CredentialsReceivePayload()
+    crp.typ = attrs.typ
+    crp.credentialsReceive = plainToClass(CredentialsReceive, credentialsReceive)
+    crp.credentialsReceive.signedCredentials = credentialsReceive.signedCredentials
+      .map(sCred => plainToClass(SignedCredential, sCred))
+    
+    return crp
   }
-
 
   public getSignedCredentials(): SignedCredential[] {
     return this.credentialsReceive.getSignedCredentials()
   }
 
   public static fromJSON(json: ICredentialsReceivePayloadAttrs): CredentialsReceivePayload {
-    const credentialsReceivePayload = plainToClass(CredentialsReceivePayload, json)
-    credentialsReceivePayload.credentialsReceive = plainToClass(CredentialsReceive, json.credentialsReceive)
+    const crp = plainToClass(CredentialsReceivePayload, json)
+    crp.credentialsReceive = plainToClass(CredentialsReceive, json.credentialsReceive)
+    crp.credentialsReceive.signedCredentials = json.credentialsReceive.signedCredentials
+      .map(sCred => plainToClass(SignedCredential, sCred))
     
-    return credentialsReceivePayload
+    return crp
   }
 
   public toJSON(): ICredentialsReceivePayloadAttrs {

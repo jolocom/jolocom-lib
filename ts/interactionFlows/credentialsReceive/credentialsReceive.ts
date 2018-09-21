@@ -25,7 +25,8 @@ export class CredentialsReceive {
 
   public static fromJSON(json: ICredentialsReceiveAttrs): CredentialsReceive {
     const credentialsReceive = plainToClass(CredentialsReceive, json)
-    credentialsReceive.signedCredentials = plainToClass(SignedCredential, json.signedCredentials )
+    credentialsReceive.signedCredentials = json.signedCredentials
+      .map(sCred => plainToClass(SignedCredential, sCred))
 
     return credentialsReceive
   }
