@@ -9,6 +9,8 @@ import { JSONWebToken } from '../interactionFlows/JSONWebToken'
 import { ICredentialResponsePayloadCreationAttrs } from '../interactionFlows/credentialResponse/types';
 import { CredentialRequestPayload } from '../interactionFlows/credentialRequest/credentialRequestPayload';
 import { CredentialResponsePayload } from '../interactionFlows/credentialResponse/credentialResponsePayload';
+import { IAuthenticationResponsePayloadCreationAttrs } from '../interactionFlows/authenticationResponse/types';
+import { AuthenticationResponsePayload } from '../interactionFlows/authenticationResponse/authenticationResponsePayload';
 
 export class IdentityWallet {
   private identityDocument: Identity
@@ -45,6 +47,13 @@ export class IdentityWallet {
         {privateKey: this.privateIdentityKey, payload}
       ) as JSONWebToken<CredentialResponsePayload>
     },
+    authenticationResponseJSONWebToken: (
+      payload: IAuthenticationResponsePayloadCreationAttrs
+    ): JSONWebToken<AuthenticationResponsePayload> => {
+      return JSONWebToken.create(
+        {privateKey: this.privateIdentityKey, payload}
+      ) as JSONWebToken<AuthenticationResponsePayload>
+    }
   }
 
   public sign = {
