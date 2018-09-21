@@ -12,7 +12,7 @@ export class AuthenticationResponse {
   }
 
   public async validateChallengeResponse(): Promise<boolean> {
-    // TODO implement when registry method is ready
+    // TODO
     return false
   }
 
