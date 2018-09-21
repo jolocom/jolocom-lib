@@ -7,11 +7,13 @@ import {
   IJSONWebTokenAttrs,
   InteractionType,
   IJSONWebTokenCreationAttrs,
-} from './types';
-import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload';
-import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload';
-import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types';
-import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types';
+} from './types'
+import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
+import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload'
+import { CredentialsReceivePayload } from './credentialsReceive/credentialsReceivePayload'
+import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types'
+import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
+import { ICredentialsReceivePayloadCreationAttrs } from './credentialsReceive/types'
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -107,13 +109,13 @@ export class JSONWebToken<T extends IPayload> {
         jwt.payload = CredentialResponsePayload.create(payload as ICredentialResponsePayloadCreationAttrs)
         break
       }
-      case InteractionType.CredentialsReceiving.toString(): {
-        // TODO
+      case InteractionType.CredentialsReceive.toString(): {
+        jwt = new JSONWebToken<CredentialsReceivePayload>()
+        jwt.payload = CredentialsReceivePayload.create(payload as ICredentialsReceivePayloadCreationAttrs)
         break
       }
       default: {
         throw new Error('Interaction type not recognized!')
-        break
       }
     }
     return jwt
