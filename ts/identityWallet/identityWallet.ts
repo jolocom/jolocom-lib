@@ -1,5 +1,5 @@
+import { BaseMetadata } from 'cred-types-jolocom-core'
 import { Credential } from '../credentials/credential/credential'
-import { ICredentialCreateAttrs } from '../credentials/credential/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { IIdentityWalletCreateArgs, IPrivateKeyWithId } from './types'
 import { Identity } from '../identity/identity'
@@ -16,12 +16,20 @@ export class IdentityWallet {
 
   public create = {
     credential: Credential.create,
-    signedCredential: async (credentialAttrs: ICredentialCreateAttrs) => {
-      if (!credentialAttrs.claim.id) {
-        credentialAttrs.claim.id = this.identityDocument.getDID()
+    signedCredential: async <T extends BaseMetadata>({
+      metadata,
+      claim,
+      subject
+    }: {
+      metadata: T
+      claim: typeof metadata['claimInterface']
+      subject?: string
+    }) => {
+      if (!subject) {
+        subject = this.getIdentity().getDID()
       }
 
-      return await SignedCredential.create({ credentialAttrs, privateIdentityKey: this.privateIdentityKey })
+      return await SignedCredential.create({ metadata, claim, privateIdentityKey: this.privateIdentityKey, subject })
     },
     credentialRequestJSONWebToken: (
       payload: ICredentialRequestPayloadCreationAttrs
@@ -48,7 +56,7 @@ export class IdentityWallet {
   public static create({ privateIdentityKey, identity }: IIdentityWalletCreateArgs): IdentityWallet {
     const identityWallet = new IdentityWallet()
     const pubKey = privateKeyToPublicKey(privateIdentityKey).toString('hex')
-    const entry = identity.getPublicKeySection().find((pubKeySec) => pubKeySec.getPublicKeyHex() === pubKey)
+    const entry = identity.getPublicKeySection().find(pubKeySec => pubKeySec.getPublicKeyHex() === pubKey)
 
     identityWallet.privateIdentityKey = {
       key: privateIdentityKey,
@@ -70,7 +78,7 @@ export class IdentityWallet {
     }
   }
 
-  public getIdentityKey(): { key: Buffer, id: string } {
+  public getIdentityKey(): { key: Buffer; id: string } {
     return this.privateIdentityKey
   }
 
