@@ -6,10 +6,7 @@ import * as sinonChai from 'sinon-chai'
 import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
 import { jwtJSON, jwtCreateArgs, signedCredRequestJWT } from '../data/interactionFlows/jsonWebToken'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
-import { ddoAttr } from '../data/interactionFlows/credentialRequest'
 import { privateKeyToPublicKey } from '../../ts/utils/crypto'
-import { Identity } from '../../ts/identity/identity'
-import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
 chai.use(sinonChai)
 
 describe('JSONWebToken', () => {

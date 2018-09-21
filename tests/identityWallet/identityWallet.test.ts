@@ -7,14 +7,12 @@ import { DidDocument } from '../../ts/identity/didDocument'
 import { claimsMetadata } from '../../ts/index'
 import { singleClaimCreationArgs, singleClaimCredentialJSON } from '../data/credential/credential'
 import { Credential } from '../../ts/credentials/credential/credential'
-import { testSignedCred } from '../data/identityWallet'
+import { testSignedCred, testSubject } from '../data/identityWallet'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
-import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
 import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest';
-import { IPayload } from '../../ts/interactionFlows/types';
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -85,7 +83,8 @@ describe('IdentityWallet', () => {
     it('create.credential should return a correct credential', () => {
       const credential = identityWallet.create.credential({
         metadata: claimsMetadata.emailAddress,
-        claim: singleClaimCreationArgs
+        claim: singleClaimCreationArgs,
+        subject: 'did:jolo:test'
       })
       const credentialFromJSON = Credential.fromJSON(singleClaimCredentialJSON)
 
@@ -101,7 +100,7 @@ describe('IdentityWallet', () => {
     })
 
     it('create.signedCredential should return a correct signed credential', async () => {
-      const credAttr = { metadata: claimsMetadata.emailAddress, claim: singleClaimCreationArgs }
+      const credAttr = { metadata: claimsMetadata.emailAddress, claim: singleClaimCreationArgs, subject: testSubject }
       const signedCred = await identityWallet.create.signedCredential(credAttr)
       const mockSignedCred = SignedCredential.fromJSON(testSignedCred)
 
@@ -130,7 +129,8 @@ describe('IdentityWallet', () => {
     it('sign.credential should call signCredential with correct params', () => {
       const credential = iWallet.create.credential({
         metadata: claimsMetadata.emailAddress,
-        claim: singleClaimCreationArgs
+        claim: singleClaimCreationArgs,
+        subject: testSubject
       })
       iWallet.sign.credential(credential)
 
@@ -146,10 +146,12 @@ describe('IdentityWallet', () => {
   })
 
   describe('signCredential', () => {
+
     it('should return a correct signed credential', async () => {
       const credential = identityWallet.create.credential({
         metadata: claimsMetadata.emailAddress,
-        claim: singleClaimCreationArgs
+        claim: singleClaimCreationArgs,
+        subject: testSubject
       })
       const signedCred = await identityWallet.signCredential(credential)
       const mockSignedCred = SignedCredential.fromJSON(testSignedCred)
