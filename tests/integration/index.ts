@@ -1,4 +1,4 @@
-import { credentialAttr } from './../data/identityWallet';
+import { ICredentialResponsePayloadCreationAttrs } from './../../js/interactionFlows/credentialResponse/types.d';
 import { InteractionType } from './../../ts/interactionFlows/types'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
@@ -102,19 +102,6 @@ describe('Integration Test', () => {
 
   describe.only('SSO interaction flow', async () => {
 
-    const credentialRequestCreationPayload: ICredentialRequestPayloadCreationAttrs = {
-      typ: InteractionType.CredentialRequest,
-      credentialRequest: {
-        callbackURL: 'http://test.com',
-        credentialRequirements: [
-          {
-            type: ['Credential', 'MockCredential'],
-            constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
-          }
-        ]
-      }
-    }
-
     const testSignedCreds = [{
       '@context': defaultContext,
       id: 'claimId:bcf70ac9c940e',
@@ -156,8 +143,24 @@ describe('Integration Test', () => {
 
     let credentialRequestJWT
     let encodedJWT
+    let filteredCredentials
+    let credentialResponseJWT
 
     it('should allow for simple generation of credential requests', async () => {
+
+      const credentialRequestCreationPayload: ICredentialRequestPayloadCreationAttrs = {
+        typ: InteractionType.CredentialRequest,
+        credentialRequest: {
+          callbackURL: 'http://test.com',
+          credentialRequirements: [
+            {
+              type: ['Credential', 'MockCredential'],
+              constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
+            }
+          ]
+        }
+      }
+
       const identityWallet: IdentityWallet = await jolocomRegistry.create({
         privateIdentityKey: testPrivateIdentityKey,
         privateEthereumKey: testPrivateEthereumKey
@@ -167,20 +170,27 @@ describe('Integration Test', () => {
       expect(credentialRequestJWT.getPayload().credentialRequest).to.be.an.instanceof(CredentialRequest)
     })
 
-    it('should allow for simple consumption of credential requests and generation of the appropriate\
-    credential response', async () => {
+    it('should allow for simple consumption of credential requests', async () => {
+
+      const decoded = JSONWebToken.decode(encodedJWT)
+      filteredCredentials = decoded.applyConstraints(testSignedCreds)
+      expect(filteredCredentials[0]).to.deep.equal(testSignedCreds[0])
+    })
+
+    it('should allow for simple generation of appropriate of credential response', async () => {
       const identityWallet: IdentityWallet = await jolocomRegistry.create({
         privateIdentityKey: testPrivateIdentityKey,
         privateEthereumKey: testPrivateEthereumKey
       })
 
-      const decoded = JSONWebToken.decode(encodedJWT)
-      const filtered = decoded.applyConstraints(testSignedCreds)
-      // const identityWallet: IdentityWallet = await jolocomRegistry.create({
-      //   privateIdentityKey: testPrivateIdentityKey,
-      //   privateEthereumKey: testPrivateEthereumKey
-      // })
+      const credentialResponseCreationPayload: ICredentialResponsePayloadCreationAttrs = {
+        typ: InteractionType.CredentialResponse,
+        credentialResponse: { suppliedCredentials: filteredCredentials }
+      }
 
+      credentialResponseJWT = identityWallet.create.credentialResponseJSONWebToken(credentialResponseCreationPayload)
+      // console.log(credentialResponseCreationPayload, 'payload')
+      // expect(credentialResponseJWT.getPayload().credentialResponse).to.be.an.instanceof(CredentialResponse)
     })
 
   })
