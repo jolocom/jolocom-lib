@@ -185,7 +185,7 @@ describe('Integration Test', () => {
 
       const credentialResponseCreationPayload: ICredentialResponsePayloadCreationAttrs = {
         typ: InteractionType.CredentialResponse,
-        credentialResponse: { suppliedCredentials: filteredCredentials }
+        credentialResponse: filteredCredentials
       }
 
       credentialResponseJWT = identityWallet.create.credentialResponseJSONWebToken(credentialResponseCreationPayload)
