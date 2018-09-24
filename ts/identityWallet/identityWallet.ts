@@ -6,6 +6,8 @@ import { Identity } from '../identity/identity'
 import { privateKeyToPublicKey } from '../utils/crypto'
 import { ICredentialRequestPayloadCreationAttrs } from '../interactionFlows/credentialRequest/types'
 import { JSONWebToken } from '../interactionFlows/JSONWebToken'
+import { IAuthenticationResponsePayloadCreationAttrs } from '../interactionFlows/authenticationResponse/types'
+import { AuthenticationResponsePayload } from '../interactionFlows/authenticationResponse/authenticationResponsePayload'
 import { CredentialRequestPayload } from '../interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialResponsePayload } from '../interactionFlows/credentialResponse/credentialResponsePayload'
 import { IAuthenticationRequestPayloadCreationAttrs } from '../interactionFlows/authenticationRequest/types'
@@ -48,6 +50,13 @@ export class IdentityWallet {
       return JSONWebToken.create(
         {privateKey: this.privateIdentityKey, payload}
       ) as JSONWebToken<CredentialResponsePayload>
+    },
+    authenticationResponseJSONWebToken: (
+      payload: IAuthenticationResponsePayloadCreationAttrs
+    ): JSONWebToken<AuthenticationResponsePayload> => {
+      return JSONWebToken.create(
+        {privateKey: this.privateIdentityKey, payload}
+      ) as JSONWebToken<AuthenticationResponsePayload>
     },
     authenticationRequestJSONWebToken: (
       payload: IAuthenticationRequestPayloadCreationAttrs

@@ -13,6 +13,9 @@ import { Identity } from '../../ts/identity/identity'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
 import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest'
+import { jsonAuthResponsePayload } from '../data/interactionFlows/authenticationResponse'
+import { AuthenticationResponsePayload } from '../../ts/interactionFlows/authenticationResponse/authenticationResponsePayload'
+import { AuthenticationResponse } from '../../ts/interactionFlows/authenticationResponse/authenticationResponse'
 import { jsonAuthRequestPayload } from '../data/interactionFlows/authenticationRequest'
 import { AuthenticationRequestPayload } from '../../ts/interactionFlows/authenticationRequest/authenticationRequestPayload'
 import { AuthenticationRequest } from '../../ts/interactionFlows/authenticationRequest/authenticationRequest'
@@ -81,6 +84,7 @@ describe('IdentityWallet', () => {
         'signedCredential',
         'credentialRequestJSONWebToken',
         'credentialResponseJSONWebToken',
+        'authenticationResponseJSONWebToken',
         'authenticationRequestJSONWebToken',
         'credentialsReceiveJSONWebToken'
       ]
@@ -107,6 +111,14 @@ describe('IdentityWallet', () => {
       expect(credRequestPayload.credentialRequest).to.be.an.instanceof(CredentialRequest)
     })
 
+    it('create.authenticationResponseJSONWebToken should return a correct authenticationResponse JWT', () => {
+      const authResWT = identityWallet.create.authenticationResponseJSONWebToken(jsonAuthResponsePayload)
+      const authResPayload = authResWT.getPayload()
+
+      expect(authResPayload).to.be.an.instanceof(AuthenticationResponsePayload)
+      expect(authResPayload.authResponse).to.be.an.instanceof(AuthenticationResponse)
+    })
+    
     it('create.authenticationRequestJSONWebToken should return a correct authenticationRequest JWT', () => {
       const authReqJWT = identityWallet.create.authenticationRequestJSONWebToken(jsonAuthRequestPayload)
       const authReqPayload = authReqJWT.getPayload()
