@@ -16,6 +16,9 @@ import { credentialRequestPayloadJson } from '../data/interactionFlows/credentia
 import { jsonAuthRequestPayload } from '../data/interactionFlows/authenticationRequest'
 import { AuthenticationRequestPayload } from '../../ts/interactionFlows/authenticationRequest/authenticationRequestPayload'
 import { AuthenticationRequest } from '../../ts/interactionFlows/authenticationRequest/authenticationRequest'
+import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload'
+import { CredentialsReceive } from '../../ts/interactionFlows/credentialsReceive/credentialsReceive'
+import { jsonCredReceivePayload } from '../data/interactionFlows/credentialReceive'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -72,13 +75,14 @@ describe('IdentityWallet', () => {
   })
 
   describe('create', () => {
-    it('should expose credential, credentialRequest, signedCredential, signedCredentialRequest', () => {
+    it('should expose credential, signedCredential & JWT options', () => {
       const mockProps = [
         'credential',
         'signedCredential',
         'credentialRequestJSONWebToken',
         'credentialResponseJSONWebToken',
-        'authenticationRequestJSONWebToken'
+        'authenticationRequestJSONWebToken',
+        'credentialsReceiveJSONWebToken'
       ]
 
       expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
@@ -109,6 +113,14 @@ describe('IdentityWallet', () => {
  
       expect(authReqPayload).to.be.an.instanceof(AuthenticationRequestPayload)
       expect(authReqPayload.authRequest).to.be.an.instanceof(AuthenticationRequest)
+    })
+    
+    it('create.credentialReceiveJSONWebToken should return a correct credentialsReceive JWT', () => {
+      const credReceiveJWT = identityWallet.create.credentialsReceiveJSONWebToken(jsonCredReceivePayload)
+      const credReceivePayload = credReceiveJWT.getPayload()
+
+      expect(credReceivePayload).to.be.an.instanceof(CredentialsReceivePayload)
+      expect(credReceivePayload.credentialsReceive).to.be.an.instanceof(CredentialsReceive)
     })
 
     it('create.signedCredential should return a correct signed credential', async () => {
