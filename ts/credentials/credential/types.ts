@@ -1,7 +1,8 @@
 import { validContextEntry } from 'cred-types-jolocom-core'
+import { ClaimInterface } from 'cred-types-jolocom-core/types'
 
 type ClaimType = string | number | boolean | {}
-export type ClaimEntry = ClaimType | {[key: string]: ClaimType}
+export type ClaimEntry = ClaimType | ClaimInterface
 
 export interface IClaimSection {
   id?: string
