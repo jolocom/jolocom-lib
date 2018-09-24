@@ -101,7 +101,7 @@ describe('Integration Test', () => {
     })
   })
 
-  describe.only('SSO interaction flow', async () => {
+  describe('SSO interaction flow', async () => {
 
     const testSignedCreds = [{
       '@context': defaultContext,
