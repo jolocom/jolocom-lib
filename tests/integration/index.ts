@@ -1,3 +1,4 @@
+import { CredentialResponse } from './../../ts/interactionFlows/credentialResponse/credentialResponse';
 import { ICredentialResponsePayloadCreationAttrs } from './../../js/interactionFlows/credentialResponse/types.d';
 import { InteractionType } from './../../ts/interactionFlows/types'
 import * as chai from 'chai'
@@ -189,8 +190,10 @@ describe('Integration Test', () => {
       }
 
       credentialResponseJWT = identityWallet.create.credentialResponseJSONWebToken(credentialResponseCreationPayload)
-      // console.log(credentialResponseCreationPayload, 'payload')
-      // expect(credentialResponseJWT.getPayload().credentialResponse).to.be.an.instanceof(CredentialResponse)
+      const credRequest = credentialRequestJWT.getPayload().credentialRequest
+      const credResp = credentialResponseJWT.getPayload().credentialResponse
+      expect(credentialResponseJWT.getPayload().credentialResponse).to.be.an.instanceof(CredentialResponse)
+      expect(credResp.satisfiesRequest(credRequest)).to.be.true
     })
 
   })

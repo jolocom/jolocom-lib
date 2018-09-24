@@ -18,15 +18,7 @@ export class CredentialResponsePayload implements IPayload {
       throw new Error('Incorrect payload for CredentialResponse')
     }
     const credentialResponsePayload = new CredentialResponsePayload()
-    console.log(Array.isArray(attrs.credentialResponse), 'attrs in create method')
-    console.log(attrs.credentialResponse)
-    // console.log(CredentialResponse.create(attrs.credentialResponse))
-    // credentialResponsePayload.credentialResponse = CredentialResponse.create(attrs)
-    // console.log(credentialResponsePayload.credentialResponse)
-    // plainToClass(CredentialResponse, attrs.credentialResponse)
-    // console.log(CredentialResponse.create(attrs.credentialResponse))
-    // console.log(plainToClass(CredentialResponse, attrs.credentialResponse), 'plain to class')
-    // console.log(credentialResponsePayload.credentialResponse, 'payload in CR')
+    credentialResponsePayload.credentialResponse = CredentialResponse.create(attrs.credentialResponse)
     credentialResponsePayload.typ = InteractionType.CredentialResponse
 
     return credentialResponsePayload
