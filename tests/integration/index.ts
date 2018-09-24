@@ -106,14 +106,6 @@ describe('Integration Test', () => {
       typ: InteractionType.CredentialRequest,
       credentialRequest: {
         callbackURL: 'http://test.com',
-        // credentialRequirements: [
-        //   {
-        //     constraints: {
-        //       and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
-        //     },
-        //     type: ['Credential', 'MockCredential']
-        //   }
-        // ],
         credentialRequirements: [
           {
             type: ['Credential', 'MockCredential'],
@@ -183,16 +175,7 @@ describe('Integration Test', () => {
       })
 
       const decoded = JSONWebToken.decode(encodedJWT)
-      // console.log(decoded.crede)
-      // const decodedClass = CredentialRequest.fromJSON(decoded)
-      const test = CredentialRequest.create(credentialRequestCreationPayload.credentialRequest)
-      const test1 = test.getRequestedCredentials()
-      console.log(test1[0].constraints)
-      // const cr = new CredentialRequest().fromJWT(encodedJWT)
-      console.log(decoded.credentialRequest.credentialRequirements[0].constraints)
-      const filtered = decoded.credentialRequest.applyConstraints(testSignedCreds)
-      console.log(filtered)
-
+      const filtered = decoded.applyConstraints(testSignedCreds)
       // const identityWallet: IdentityWallet = await jolocomRegistry.create({
       //   privateIdentityKey: testPrivateIdentityKey,
       //   privateEthereumKey: testPrivateEthereumKey
