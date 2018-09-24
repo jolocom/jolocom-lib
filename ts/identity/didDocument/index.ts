@@ -2,12 +2,12 @@ import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transfo
 import { privateKeyToDID, privateKeyToPublicKey, sha256, verifySignature, generateRandomID, sign } from '../../utils/crypto'
 import { IDidDocumentAttrs } from './types'
 import { canonize } from 'jsonld'
-import { JolocomRegistry, createJolocomRegistry } from '../../registries/jolocomRegistry'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections'
+import { IVerifiable } from '../../registries/types'
 
 @Exclude()
-export class DidDocument {
+export class DidDocument implements IVerifiable {
   @Type(() => AuthenticationSection)
   @Expose()
   private authentication: AuthenticationSection[] = []
@@ -64,24 +64,6 @@ export class DidDocument {
     this.proof.signatureValue = sign(`${docDigest}`, key)
   }
 
-  public async validateSignature(registry?: JolocomRegistry): Promise<boolean> {
-    if (!registry) {
-      registry = createJolocomRegistry()
-    }
-
-    const creatorDid = this.proof.creator.substring(0, this.proof.creator.indexOf('#'))
-    const creatorProfile = await registry.resolve(creatorDid)
-    const relevantPublicKey = creatorProfile.getPublicKeySection()
-      .find((keySection) => keySection.getIdentifier() === this.proof.creator)
-
-    if (!relevantPublicKey) {
-      return false
-    }
-
-    const pubKey = Buffer.from(relevantPublicKey.getPublicKeyHex(), 'hex')
-    return this.validateSignatureWithPublicKey(pubKey)
-  }
-
   public async validateSignatureWithPublicKey(pubKey: Buffer): Promise<boolean> {
     if (!pubKey) {
       throw new Error('Please provide the issuer\'s public key')
@@ -106,6 +88,11 @@ export class DidDocument {
 
   public getDID(): string {
     return this.id
+  }
+
+  public getSigner(): string {
+    return this.proof.creator
+      .substring(0, this.proof.creator.indexOf('#'))
   }
 
   public getServiceEndpoints(): ServiceEndpointsSection[] {
