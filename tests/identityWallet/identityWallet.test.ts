@@ -13,6 +13,9 @@ import { Identity } from '../../ts/identity/identity'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
 import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest'
+import { jsonAuthRequestPayload } from '../data/interactionFlows/authenticationRequest'
+import { AuthenticationRequestPayload } from '../../ts/interactionFlows/authenticationRequest/authenticationRequestPayload'
+import { AuthenticationRequest } from '../../ts/interactionFlows/authenticationRequest/authenticationRequest'
 import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload'
 import { CredentialsReceive } from '../../ts/interactionFlows/credentialsReceive/credentialsReceive'
 import { jsonCredReceivePayload } from '../data/interactionFlows/credentialReceive'
@@ -78,6 +81,7 @@ describe('IdentityWallet', () => {
         'signedCredential',
         'credentialRequestJSONWebToken',
         'credentialResponseJSONWebToken',
+        'authenticationRequestJSONWebToken',
         'credentialsReceiveJSONWebToken'
       ]
 
@@ -103,6 +107,14 @@ describe('IdentityWallet', () => {
       expect(credRequestPayload.credentialRequest).to.be.an.instanceof(CredentialRequest)
     })
 
+    it('create.authenticationRequestJSONWebToken should return a correct authenticationRequest JWT', () => {
+      const authReqJWT = identityWallet.create.authenticationRequestJSONWebToken(jsonAuthRequestPayload)
+      const authReqPayload = authReqJWT.getPayload()
+ 
+      expect(authReqPayload).to.be.an.instanceof(AuthenticationRequestPayload)
+      expect(authReqPayload.authRequest).to.be.an.instanceof(AuthenticationRequest)
+    })
+    
     it('create.credentialReceiveJSONWebToken should return a correct credentialsReceive JWT', () => {
       const credReceiveJWT = identityWallet.create.credentialsReceiveJSONWebToken(jsonCredReceivePayload)
       const credReceivePayload = credReceiveJWT.getPayload()
