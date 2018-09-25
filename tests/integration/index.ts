@@ -10,7 +10,7 @@ import { EthResolver } from '../../ts/ethereum'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { claimsMetadata } from '../../ts/index'
-import { JSONWebToken } from './../../ts/interactionFlows/JSONWebToken';
+import { JSONWebToken } from './../../ts/interactionFlows/JSONWebToken'
 import { CredentialRequest } from './../../ts/interactionFlows/credentialRequest/credentialRequest'
 import { ICredentialRequestPayloadCreationAttrs } from './../../js/interactionFlows/credentialRequest/types.d'
 import {
@@ -20,9 +20,9 @@ import {
   sampleDid,
   integrationTestIpfsConfig,
   ethereumConfigProviderUrl
-} from './../data/interactionFlows/integrationTest';
-import { CredentialResponse } from './../../ts/interactionFlows/credentialResponse/credentialResponse';
-import { ICredentialResponsePayloadCreationAttrs } from './../../js/interactionFlows/credentialResponse/types.d';
+} from './../data/interactionFlows/integrationTest'
+import { CredentialResponse } from './../../ts/interactionFlows/credentialResponse/credentialResponse'
+import { ICredentialResponsePayloadCreationAttrs } from './../../js/interactionFlows/credentialResponse/types.d'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -53,6 +53,7 @@ describe('Integration Test', () => {
         privateEthereumKey: testPrivateEthereumKey
       })
       const didDocument = identityWallet.getIdentity().didDocument
+      
       expect(didDocument).to.be.an.instanceOf(DidDocument)
       expect(didDocument.getDID()).to.eq(sampleDid)
     })
@@ -61,6 +62,7 @@ describe('Integration Test', () => {
   describe('Authentication', () => {
     it('should return authenticated identity wallet', async () => {
       const identityWallet = await jolocomRegistry.authenticate(testPrivateIdentityKey)
+      
       expect(identityWallet).to.be.an.instanceOf(IdentityWallet)
       expect(identityWallet.getIdentity().getDID()).to.eq(sampleDid)
     })
@@ -99,14 +101,12 @@ describe('Integration Test', () => {
   })
 
   describe('SSO interaction flow', async () => {
-
     let credentialRequestJWT
     let encodedJWT
     let filteredCredentials
     let credentialResponseJWT
 
     it('should allow for simple generation of credential requests', async () => {
-
       const credentialRequestCreationPayload: ICredentialRequestPayloadCreationAttrs = {
         typ: InteractionType.CredentialRequest,
         credentialRequest: sampleCredentialRequest
@@ -118,13 +118,14 @@ describe('Integration Test', () => {
       })
       credentialRequestJWT = identityWallet.create.credentialRequestJSONWebToken(credentialRequestCreationPayload)
       encodedJWT = credentialRequestJWT.encode()
+      
       expect(credentialRequestJWT.getPayload().credentialRequest).to.be.an.instanceof(CredentialRequest)
     })
 
     it('should allow for simple consumption of credential requests', async () => {
-
       const decoded = JSONWebToken.decode(encodedJWT)
       filteredCredentials = decoded.applyConstraints(testSignedCreds)
+      
       expect(filteredCredentials[0]).to.deep.equal(testSignedCreds[0])
     })
 
@@ -142,6 +143,7 @@ describe('Integration Test', () => {
       credentialResponseJWT = identityWallet.create.credentialResponseJSONWebToken(credentialResponseCreationPayload)
       const credRequest = credentialRequestJWT.getPayload().credentialRequest
       const credResp = credentialResponseJWT.getPayload().credentialResponse
+      
       expect(credentialResponseJWT.getPayload().credentialResponse).to.be.an.instanceof(CredentialResponse)
       expect(credResp.satisfiesRequest(credRequest)).to.be.true
     })

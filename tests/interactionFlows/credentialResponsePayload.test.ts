@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { credentialResponsePayloadJson } from './../data/interactionFlows/credentialResponse'
+import { credentialResponsePayloadJson, credentialResponsePayloadCreationAttrs } from './../data/interactionFlows/credentialResponse'
 import { CredentialResponsePayload } from '../../ts/interactionFlows/credentialResponse/credentialResponsePayload'
 import { CredentialResponse } from '../../ts/interactionFlows/credentialResponse/credentialResponse'
 import { CredentialRequest } from '../../ts/interactionFlows/CredentialRequest/credentialRequest'
@@ -9,7 +9,7 @@ describe('CredentialResponsePayload', () => {
   const crp = CredentialResponsePayload.fromJSON(credentialResponsePayloadJson)
 
   it('Should correctly return a credentialResponsePayload class on static create method', () => {
-    const credResPayload = CredentialResponsePayload.create(credentialResponsePayloadJson)
+    const credResPayload = CredentialResponsePayload.create(credentialResponsePayloadCreationAttrs)
     credResPayload.iss = credentialResponsePayloadJson.iss
     credResPayload.iat = credentialResponsePayloadJson.iat
 
@@ -31,6 +31,7 @@ describe('CredentialResponsePayload', () => {
   })
 
   it('Should implement toJSON method which returns a correct JSON', () => {
+    const crp = CredentialResponsePayload.fromJSON(credentialResponsePayloadJson)
     const json = crp.toJSON()
     expect(json).to.deep.equal(credentialResponsePayloadJson)
   })

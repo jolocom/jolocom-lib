@@ -1,13 +1,13 @@
 import { expect } from 'chai'
-import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest'
+import { credentialRequestPayloadJson, credentialRequestPayloadCreateAttrs } from '../data/interactionFlows/credentialRequest'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
-import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest';
+import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
 
 describe('CredentialRequestPayload', () => {
   const crp = CredentialRequestPayload.fromJSON(credentialRequestPayloadJson)
-  
+
   it('Should correctly return a credentialRequestPayload class on static create method', () => {
-    const credReqPayload = CredentialRequestPayload.create(credentialRequestPayloadJson)
+    const credReqPayload = CredentialRequestPayload.create(credentialRequestPayloadCreateAttrs)
     credReqPayload.iss = credentialRequestPayloadJson.iss
     credReqPayload.iat = credentialRequestPayloadJson.iat
     
