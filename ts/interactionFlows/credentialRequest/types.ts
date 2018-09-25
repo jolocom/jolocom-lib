@@ -2,7 +2,7 @@ export interface ICredentialRequestPayloadAttrs {
   iat: number
   iss: string
   typ: string
-  credentialRequest: ICredentialRequestCreationAttrs
+  credentialRequest: ICredentialRequestAttrs
 }
 
 export interface ICredentialRequestPayloadCreationAttrs {
