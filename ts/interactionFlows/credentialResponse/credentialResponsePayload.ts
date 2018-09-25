@@ -18,7 +18,7 @@ export class CredentialResponsePayload implements IPayload {
       throw new Error('Incorrect payload for CredentialResponse')
     }
     const credentialResponsePayload = new CredentialResponsePayload()
-    credentialResponsePayload.credentialResponse = plainToClass(CredentialResponse, attrs.credentialResponse)
+    credentialResponsePayload.credentialResponse = CredentialResponse.create(attrs.credentialResponse)
     credentialResponsePayload.typ = InteractionType.CredentialResponse
 
     return credentialResponsePayload
