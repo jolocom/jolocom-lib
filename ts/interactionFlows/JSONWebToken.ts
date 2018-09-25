@@ -99,6 +99,7 @@ export class JSONWebToken<T extends IPayload> {
     switch (payload.typ) {
       case InteractionType.CredentialRequest.toString(): {
         jwt = new JSONWebToken<CredentialRequestPayload>()
+        console.log(payload.credentialRequest.credentialRequirements, 'payload in JWT')
         jwt.payload = CredentialRequestPayload.create(payload as ICredentialRequestPayloadCreationAttrs)
         break
       }
