@@ -7,7 +7,11 @@ import {
   multipleClaimsCreationArgs,
   multipleClaimsCredentialJSON,
   customClaimMetadata,
-  customCredentialJSON
+  customCredentialJSON,
+  NestedAddressClaimInterface,
+  nestedAddressClaimMetadata,
+  addressCredentialJSON,
+  addressClaimCreationArgs
 } from '../data/credential/credential'
 import { EmailClaimMetadata, NameClaimMetadata } from 'cred-types-jolocom-core/js/types'
 import { defaultContext } from '../../ts/utils/contexts'
@@ -32,6 +36,15 @@ describe('Credential', () => {
       })
       const credentialFromJSON = Credential.fromJSON(multipleClaimsCredentialJSON)
       expect(credential).to.deep.equal(credentialFromJSON)
+    })
+
+    it('Should correctly assemble a credential given nested, multiline claims', () => {
+      const credential = Credential.create<NestedAddressClaimInterface>({
+        metadata: nestedAddressClaimMetadata,
+        claim: addressClaimCreationArgs,
+        subject: 'did:jolo:test'
+      })
+      expect(credential.toJSON()).to.deep.equal(addressCredentialJSON)
     })
 
     it('Should correctly assemble a custom credential', () => {
