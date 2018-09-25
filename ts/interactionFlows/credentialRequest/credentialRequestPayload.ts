@@ -12,16 +12,14 @@ export class CredentialRequestPayload implements IPayload {
 
   public static create(json: ICredentialRequestPayloadCreationAttrs): CredentialRequestPayload {
     const credentialRequestPayload = new CredentialRequestPayload()
-    credentialRequestPayload.credentialRequest = plainToClass(CredentialRequest, json.credentialRequest)
+    credentialRequestPayload.credentialRequest = CredentialRequest.create(json.credentialRequest)
     credentialRequestPayload.typ = InteractionType.CredentialRequest
-
     return credentialRequestPayload
   }
 
   public static fromJSON(json: ICredentialRequestPayloadAttrs): CredentialRequestPayload {
     const credentialRequestPayload = plainToClass(CredentialRequestPayload, json)
-    credentialRequestPayload.credentialRequest = plainToClass(CredentialRequest, json.credentialRequest)
-
+    credentialRequestPayload.credentialRequest = CredentialRequest.create(json.credentialRequest)
     return credentialRequestPayload
   }
 

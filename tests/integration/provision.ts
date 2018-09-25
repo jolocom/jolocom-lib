@@ -30,7 +30,7 @@ const deployContract = async () => {
   return address
 }
 
-export const init = async () : Promise<string> => {
+export const init = async (): Promise<string> => {
   return new Promise<string>(async (resolve, reject) => {
 
     let address
@@ -51,7 +51,7 @@ export const init = async () : Promise<string> => {
             return reject(spawnErr)
           }
 
-          ipfsd.api.id(function (apiErr) {
+          ipfsd.api.id((apiErr) => {
             if (apiErr) {
               return reject(apiErr)
             }

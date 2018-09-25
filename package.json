@@ -8,7 +8,8 @@
     "test": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts ./tests/**/*.test.ts",
     "prepublish": "rm -rf ./js/; ./node_modules/.bin/tsc -p ./tsconfig.json",
     "test:watch": "./node_modules/.bin/mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
-    "test:single": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts"
+    "test:single": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts",
+    "test:integration":"./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts ./tests/integration/index.ts"
   },
   "nyc": {
     "include": [
