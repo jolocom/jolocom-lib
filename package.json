@@ -1,6 +1,6 @@
 {
   "name": "jolocom-lib",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "typings": "js/index.d.ts",
@@ -9,7 +9,7 @@
     "prepublish": "rm -rf ./js/; ./node_modules/.bin/tsc -p ./tsconfig.json",
     "test:watch": "./node_modules/.bin/mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
     "test:single": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts",
-    "test:integration":"./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts ./tests/integration/index.ts"
+    "test:integration": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts ./tests/integration/index.ts"
   },
   "nyc": {
     "include": [
