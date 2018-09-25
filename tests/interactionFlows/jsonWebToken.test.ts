@@ -9,7 +9,7 @@ import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRe
 import { privateKeyToPublicKey } from '../../ts/utils/crypto'
 chai.use(sinonChai)
 
-describe('JSONWebToken', () => {
+describe.only('JSONWebToken', () => {
   let clock
   const sandbox = sinon.createSandbox()
 
@@ -26,6 +26,10 @@ describe('JSONWebToken', () => {
     const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
 
     it('Should return a correctly assembled instance of JSONWebToken class', () => {
+      console.log(jsonWebToken.toJSON().payload.credentialRequest.credentialRequirements[0].constraints)
+      console.log('================')
+      console.log(jwtJSON.payload.credentialRequest.credentialRequirements[0].constraints)
+      console.log('================')
       expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
       expect(jsonWebToken.toJSON().payload).to.deep.equal(jwtJSON.payload)
       expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)

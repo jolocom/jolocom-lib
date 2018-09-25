@@ -18,6 +18,7 @@ export class CredentialRequest {
   public static create(args: ICredentialRequestCreationAttrs): CredentialRequest {
     const credentialRequest = new CredentialRequest()
     credentialRequest.setCallbackURL(args.callbackURL)
+    console.log(args, 'args in CR')
     args.credentialRequirements.forEach((req) => {
       credentialRequest.addCredentialRequirement(req)
     })
