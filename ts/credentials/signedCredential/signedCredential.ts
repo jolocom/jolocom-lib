@@ -5,7 +5,7 @@ import { Credential } from '../credential/credential'
 import { generateRandomID, sign, sha256, verifySignature, privateKeyToDID } from '../../utils/crypto'
 import { ISignedCredentialAttrs } from './types'
 import { ILinkedDataSignature } from '../../linkedDataSignature/types'
-import { validContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
+import { ContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { IPrivateKeyWithId } from '../../identityWallet/types';
@@ -13,7 +13,7 @@ import { IPrivateKeyWithId } from '../../identityWallet/types';
 @Exclude()
 export class SignedCredential {
   @Expose()
-  private '@context': validContextEntry[]
+  private '@context': ContextEntry[]
 
   @Expose()
   private id: string
