@@ -113,6 +113,3 @@ export class DidDocument implements IVerifiable {
     return plainToClass(DidDocument, json)
   }
 }
-
-// return this.proof.creator
-//       .substring(0, this.proof.creator.indexOf('#'))
