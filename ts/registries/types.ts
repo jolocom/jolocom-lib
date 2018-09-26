@@ -19,5 +19,10 @@ export interface IRegistryCommitArgs {
 
 export interface IVerifiable {
   validateSignatureWithPublicKey: (pubKey: Buffer) => Promise<boolean>
-  getSigner: () => string
+  getSigner: () => ISigner
+}
+
+export interface ISigner {
+  did: string
+  keyId: string
 }

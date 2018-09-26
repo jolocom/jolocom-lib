@@ -8,7 +8,7 @@ import { ILinkedDataSignature } from '../../linkedDataSignature/types'
 import { validContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
-import { IVerifiable } from '../../registries/types'
+import { IVerifiable, ISigner } from '../../registries/types'
 
 @Exclude()
 export class SignedCredential implements IVerifiable {
@@ -66,8 +66,11 @@ export class SignedCredential implements IVerifiable {
     return this.issuer
   }
 
-  public getSigner(): string {
-    return this.issuer
+  public getSigner(): ISigner {
+    return {
+      did: this.issuer,
+      keyId: this.proof.creator
+    }
   }
   
   public getExpiryDate(): Date {

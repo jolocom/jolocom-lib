@@ -4,7 +4,7 @@ import { IDidDocumentAttrs } from './types'
 import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections'
-import { IVerifiable } from '../../registries/types'
+import { IVerifiable, ISigner } from '../../registries/types'
 
 @Exclude()
 export class DidDocument implements IVerifiable {
@@ -90,9 +90,11 @@ export class DidDocument implements IVerifiable {
     return this.id
   }
 
-  public getSigner(): string {
-    return this.proof.creator
-      .substring(0, this.proof.creator.indexOf('#'))
+  public getSigner(): ISigner {
+    return {
+      did: this.id,
+      keyId: this.proof.creator
+    }
   }
 
   public getServiceEndpoints(): ServiceEndpointsSection[] {
@@ -111,3 +113,6 @@ export class DidDocument implements IVerifiable {
     return plainToClass(DidDocument, json)
   }
 }
+
+// return this.proof.creator
+//       .substring(0, this.proof.creator.indexOf('#'))

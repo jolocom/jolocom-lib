@@ -120,11 +120,12 @@ export class JolocomRegistry {
   }
 
   public async validateSignature(obj: IVerifiable): Promise<boolean> {
-    const did = obj.getSigner()
+    const { did, keyId }= obj.getSigner()
     const identity = await this.resolve(did)
-    const pubKey = identity.getPublicKeySection()[0].getPublicKeyHex()
-
-    const res = obj.validateSignatureWithPublicKey(Buffer.from(pubKey, 'hex'))
+    const pubKey = identity.getPublicKeySection()
+      .find(pubKeySection => pubKeySection.getIdentifier() === keyId)
+      
+    const res = obj.validateSignatureWithPublicKey(Buffer.from(pubKey.getPublicKeyHex(), 'hex'))
 
     return res
   }
