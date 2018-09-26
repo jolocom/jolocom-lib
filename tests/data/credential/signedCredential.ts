@@ -62,7 +62,7 @@ export const testSignedCredentialDefault = {
   }
 }
 
-export const testSignedCredentialDefaultNegative = {
+export const testSignedCredentialDefaultIncorrect = {
   '@context': [
     'https://w3id.org/identity/v1',
     {

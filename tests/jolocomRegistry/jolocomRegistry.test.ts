@@ -13,7 +13,7 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { testPrivateIdentityKey, testPrivateEthereumKey } from '../data/keys'
 import {
   testSignedCredentialDefault,
-  testSignedCredentialDefaultNegative
+  testSignedCredentialDefaultIncorrect
 } from '../data/credential/signedCredential'
 
 chai.use(sinonChai)
@@ -264,7 +264,7 @@ describe('JolocomRegistry', () => {
     })
 
     it('Should return false for invalid signed credential signature validation', async () => {
-      const sigCred = SignedCredential.fromJSON(testSignedCredentialDefaultNegative) 
+      const sigCred = SignedCredential.fromJSON(testSignedCredentialDefaultIncorrect) 
       const res = await defaultJolocomRegistry.validateSignature(sigCred)
 
       expect(res).to.be.false
