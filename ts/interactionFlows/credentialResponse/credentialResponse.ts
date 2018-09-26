@@ -4,7 +4,7 @@ import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types
 import { CredentialRequest } from '../credentialRequest/credentialRequest'
 
 export class CredentialResponse {
-  private suppliedCredentials: ISuppliedCredentialsAttrs[] = []
+  public suppliedCredentials: ISuppliedCredentialsAttrs[] = []
 
   public static create(credentials: ISignedCredentialAttrs[]): CredentialResponse {
     const CR = new CredentialResponse()

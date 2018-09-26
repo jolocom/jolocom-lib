@@ -1,6 +1,6 @@
 {
   "name": "jolocom-lib",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "typings": "js/index.d.ts",
@@ -8,7 +8,8 @@
     "test": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts ./tests/**/*.test.ts",
     "prepublish": "rm -rf ./js/; ./node_modules/.bin/tsc -p ./tsconfig.json",
     "test:watch": "./node_modules/.bin/mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
-    "test:single": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts"
+    "test:single": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts",
+    "test:integration": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts ./tests/integration/index.ts"
   },
   "nyc": {
     "include": [
@@ -52,7 +53,7 @@
     "bip39": "^2.5.0",
     "bitcoinjs-lib": "^3.3.2",
     "class-transformer": "^0.1.9",
-    "cred-types-jolocom-core": "^0.0.7",
+    "cred-types-jolocom-core": "^0.0.8",
     "detect-node": "^2.0.4",
     "ethereumjs-util": "^5.2.0",
     "form-data": "^2.3.2",

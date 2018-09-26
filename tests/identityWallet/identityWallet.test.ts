@@ -12,7 +12,16 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { Identity } from '../../ts/identity/identity'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
-import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest';
+import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest'
+import { jsonAuthResponsePayload } from '../data/interactionFlows/authenticationResponse'
+import { AuthenticationResponsePayload } from '../../ts/interactionFlows/authenticationResponse/authenticationResponsePayload'
+import { AuthenticationResponse } from '../../ts/interactionFlows/authenticationResponse/authenticationResponse'
+import { jsonAuthRequestPayload } from '../data/interactionFlows/authenticationRequest'
+import { AuthenticationRequestPayload } from '../../ts/interactionFlows/authenticationRequest/authenticationRequestPayload'
+import { AuthenticationRequest } from '../../ts/interactionFlows/authenticationRequest/authenticationRequest'
+import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload'
+import { CredentialsReceive } from '../../ts/interactionFlows/credentialsReceive/credentialsReceive'
+import { jsonCredReceivePayload } from '../data/interactionFlows/credentialReceive'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -69,12 +78,15 @@ describe('IdentityWallet', () => {
   })
 
   describe('create', () => {
-    it('should expose credential, credentialRequest, signedCredential, signedCredentialRequest', () => {
+    it('should expose credential, signedCredential & JWT options', () => {
       const mockProps = [
         'credential',
         'signedCredential',
         'credentialRequestJSONWebToken',
-        'credentialResponseJSONWebToken'
+        'credentialResponseJSONWebToken',
+        'authenticationResponseJSONWebToken',
+        'authenticationRequestJSONWebToken',
+        'credentialsReceiveJSONWebToken'
       ]
 
       expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
@@ -97,6 +109,30 @@ describe('IdentityWallet', () => {
 
       expect(credRequestPayload).to.be.an.instanceof(CredentialRequestPayload)
       expect(credRequestPayload.credentialRequest).to.be.an.instanceof(CredentialRequest)
+    })
+
+    it('create.authenticationResponseJSONWebToken should return a correct authenticationResponse JWT', () => {
+      const authResWT = identityWallet.create.authenticationResponseJSONWebToken(jsonAuthResponsePayload)
+      const authResPayload = authResWT.getPayload()
+
+      expect(authResPayload).to.be.an.instanceof(AuthenticationResponsePayload)
+      expect(authResPayload.authResponse).to.be.an.instanceof(AuthenticationResponse)
+    })
+    
+    it('create.authenticationRequestJSONWebToken should return a correct authenticationRequest JWT', () => {
+      const authReqJWT = identityWallet.create.authenticationRequestJSONWebToken(jsonAuthRequestPayload)
+      const authReqPayload = authReqJWT.getPayload()
+ 
+      expect(authReqPayload).to.be.an.instanceof(AuthenticationRequestPayload)
+      expect(authReqPayload.authRequest).to.be.an.instanceof(AuthenticationRequest)
+    })
+    
+    it('create.credentialReceiveJSONWebToken should return a correct credentialsReceive JWT', () => {
+      const credReceiveJWT = identityWallet.create.credentialsReceiveJSONWebToken(jsonCredReceivePayload)
+      const credReceivePayload = credReceiveJWT.getPayload()
+
+      expect(credReceivePayload).to.be.an.instanceof(CredentialsReceivePayload)
+      expect(credReceivePayload.credentialsReceive).to.be.an.instanceof(CredentialsReceive)
     })
 
     it('create.signedCredential should return a correct signed credential', async () => {

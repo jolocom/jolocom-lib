@@ -24,9 +24,9 @@ export const jwtCreateArgs = {
       credentialRequirements: [
         {
           type: ['Credential', 'MockCredential'],
-          constraints: {
-            and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
-          }
+          constraints: [
+            { '==': [{ var: 'issuer' }, 'did:jolo:issuer']}
+          ]
         }
       ]
     }

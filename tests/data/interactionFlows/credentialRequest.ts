@@ -1,8 +1,6 @@
 import { InteractionType } from '../../../ts/interactionFlows/types'
 
-export const credentialRequestPayloadJson = {
-  iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
-  iat: 0,
+export const credentialRequestPayloadCreateAttrs = {
   typ: InteractionType.CredentialRequest.toString(),
   credentialRequest: {
     callbackURL: 'http://test.com',
@@ -13,6 +11,23 @@ export const credentialRequestPayloadJson = {
           { var: 'issuer' },
           'did:jolo:issuer'
         ] }]
+      }
+    ]
+  }
+}
+
+export const credentialRequestPayloadJson = {
+  iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
+  iat: 0,
+  typ: InteractionType.CredentialRequest.toString(),
+  credentialRequest: {
+    callbackURL: 'http://test.com',
+    credentialRequirements: [
+      {
+        type: ['Credential', 'MockCredential'],
+        constraints: {
+          and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
+        }
       }
     ]
   }
@@ -55,6 +70,7 @@ export const signedCredReqJson = {
   payload: {
     iat: 0,
     iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
+    typ:  InteractionType.CredentialRequest,
     credentialRequest: {
       credentialRequirements: [
         {

@@ -11,9 +11,13 @@ import {
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
 import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload'
 import { CredentialsReceivePayload } from './credentialsReceive/credentialsReceivePayload'
+import { AuthenticationResponsePayload } from './authenticationResponse/authenticationResponsePayload'
+import { IAuthenticationResponsePayloadCreationAttrs } from './authenticationResponse/types'
+import { AuthenticationRequestPayload } from './authenticationRequest/authenticationRequestPayload'
 import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types'
 import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
 import { ICredentialsReceivePayloadCreationAttrs } from './credentialsReceive/types'
+import { IAuthenticationRequestPayloadCreationAttrs } from './authenticationRequest/types'
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -112,6 +116,17 @@ export class JSONWebToken<T extends IPayload> {
       case InteractionType.CredentialsReceive.toString(): {
         jwt = new JSONWebToken<CredentialsReceivePayload>()
         jwt.payload = CredentialsReceivePayload.create(payload as ICredentialsReceivePayloadCreationAttrs)
+        break
+      }
+      case InteractionType.AuthenticationResponse.toString(): {
+        jwt = new JSONWebToken<AuthenticationResponsePayload>()
+        jwt.payload = AuthenticationResponsePayload
+          .create(payload as IAuthenticationResponsePayloadCreationAttrs)
+        break
+      }
+      case InteractionType.AuthenticationRequest.toString(): {
+        jwt = new JSONWebToken<AuthenticationRequestPayload>()
+        jwt.payload = AuthenticationRequestPayload.create(payload as IAuthenticationRequestPayloadCreationAttrs)
         break
       }
       default: {

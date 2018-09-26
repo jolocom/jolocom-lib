@@ -12,13 +12,15 @@ import {
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
 export class CredentialRequest {
-  private callbackURL: string
-  private credentialRequirements: ICredentialRequest[] = []
+  public callbackURL: string
+  public credentialRequirements: ICredentialRequest[] = []
 
   public static create(args: ICredentialRequestCreationAttrs): CredentialRequest {
     const credentialRequest = new CredentialRequest()
     credentialRequest.setCallbackURL(args.callbackURL)
-    args.credentialRequirements.forEach((req) => credentialRequest.addCredentialRequirement(req))
+    args.credentialRequirements.forEach((req) => {
+      credentialRequest.addCredentialRequirement(req)
+    })
     return credentialRequest
   }
 
