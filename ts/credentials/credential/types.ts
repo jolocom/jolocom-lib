@@ -1,5 +1,4 @@
-import { validContextEntry } from 'cred-types-jolocom-core'
-import { ClaimInterface } from 'cred-types-jolocom-core/types'
+import { ContextEntry, ClaimInterface } from 'cred-types-jolocom-core'
 
 type ClaimType = string | number | boolean | {}
 export type ClaimEntry = ClaimType | ClaimInterface
@@ -10,7 +9,7 @@ export interface IClaimSection {
 }
 
 export interface ICredentialAttrs {
-  '@context': validContextEntry[]
+  '@context': ContextEntry[]
   type: string[]
   name?: string
   claim: ClaimEntry

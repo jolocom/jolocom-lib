@@ -1,12 +1,12 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { ICredentialAttrs, IClaimSection } from './types'
-import { BaseMetadata, validContextEntry } from 'cred-types-jolocom-core'
+import { BaseMetadata, ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContext } from '../../utils/contexts'
 
 @Exclude()
 export class Credential {
   @Expose()
-  private '@context': validContextEntry[]
+  private '@context': ContextEntry[]
 
   @Expose()
   private type: string[]
@@ -48,7 +48,7 @@ export class Credential {
     return this.name
   }
 
-  public getContext(): validContextEntry[] {
+  public getContext(): ContextEntry[] {
     return this['@context']
   }
 
