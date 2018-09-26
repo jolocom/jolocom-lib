@@ -1,7 +1,7 @@
 import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
-import { privateKeyToDID } from '../utils/crypto'
+import { privateKeyToDID, verifySignature } from '../utils/crypto'
 import { DidDocument } from '../identity/didDocument'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
@@ -11,6 +11,7 @@ import { IRegistryCommitArgs, IRegistryInstanceCreationArgs, IRegistryStaticCrea
 import { jolocomIpfsStorageAgent } from '../ipfs'
 import { jolocomEthereumResolver } from '../ethereum'
 import { ServiceEndpointsSection } from '../identity/didDocument/sections'
+import { IVerifiable } from './types'
 
 /** Jolocom specific Registry, which uses IPFS
  *  and Ethereum for registering the indentity and the resolution
@@ -116,6 +117,17 @@ export class JolocomRegistry {
     const identity = await this.resolve(did)
 
     return IdentityWallet.create({ privateIdentityKey, identity })
+  }
+
+  public async validateSignature(obj: IVerifiable): Promise<boolean> {
+    const { did, keyId }= obj.getSigner()
+    const identity = await this.resolve(did)
+    const pubKey = identity.getPublicKeySection()
+      .find(pubKeySection => pubKeySection.getIdentifier() === keyId)
+    
+    const res = obj.validateSignatureWithPublicKey(Buffer.from(pubKey.getPublicKeyHex(), 'hex'))
+
+    return res
   }
 }
 

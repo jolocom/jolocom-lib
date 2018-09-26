@@ -11,6 +11,10 @@ import { Identity } from '../../ts/identity/identity'
 import { testIpfsHash, testEthereumConfig, testIpfsConfig } from '../data/registry'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { testPrivateIdentityKey, testPrivateEthereumKey } from '../data/keys'
+import {
+  testSignedCredentialDefault,
+  testSignedCredentialDefaultIncorrect
+} from '../data/credential/signedCredential'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -224,6 +228,46 @@ describe('JolocomRegistry', () => {
 
     it('should return proper identityWallet instance on create', () => {
       expect(identityWallet).to.be.instanceof(IdentityWallet)
+    })
+  })
+
+  describe('validateSignature', () => { 
+    const defaultJolocomRegistry = createJolocomRegistry()
+    let ddo
+
+    beforeEach(async () => {
+      ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+      sandbox
+        .stub(JolocomRegistry.prototype, 'resolve')
+        .withArgs(ddo.getDID())
+        .resolves(ddo)
+    })
+
+    it('Should return true for valid signed DidDocument signature validation', async () => {
+      const res = await defaultJolocomRegistry.validateSignature(ddo)
+
+      expect(res).to.be.true
+    })
+
+    it('Should return false for invalid signed DidDocument signature validaton', async () => {
+      ddo.proof.signatureValue = 'hello969M2c5R80rEEMbhwKdTaHNVoWoUndx0EPZ1RdkaVwACa0jN4bMEnfOhBljUSL2ZI/pDlDveYXNiKaaew=='
+      const res = await defaultJolocomRegistry.validateSignature(ddo)
+      
+      expect(res).to.be.false
+    })
+
+    it('Should return true for valid signed credential signature validation', async () => {
+      const sigCred = SignedCredential.fromJSON(testSignedCredentialDefault)
+      const res = await defaultJolocomRegistry.validateSignature(sigCred)
+
+      expect(res).to.be.true
+    })
+
+    it('Should return false for invalid signed credential signature validation', async () => {
+      const sigCred = SignedCredential.fromJSON(testSignedCredentialDefaultIncorrect) 
+      const res = await defaultJolocomRegistry.validateSignature(sigCred)
+
+      expect(res).to.be.false
     })
   })
 
