@@ -124,7 +124,7 @@ export class JolocomRegistry {
     const identity = await this.resolve(did)
     const pubKey = identity.getPublicKeySection()
       .find(pubKeySection => pubKeySection.getIdentifier() === keyId)
-      
+    
     const res = obj.validateSignatureWithPublicKey(Buffer.from(pubKey.getPublicKeyHex(), 'hex'))
 
     return res
