@@ -18,6 +18,7 @@ import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/ty
 import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
 import { ICredentialsReceivePayloadCreationAttrs } from './credentialsReceive/types'
 import { IAuthenticationRequestPayloadCreationAttrs } from './authenticationRequest/types'
+import { createJolocomRegistry, JolocomRegistry } from '../registries/jolocomRegistry'
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -55,10 +56,19 @@ export class JSONWebToken<T extends IPayload> {
     return jwt
   }
 
-  public static decode(jwt: string): IPayload {
+  public static async decode(jwt: string): Promise<IPayload> {
     const json = decodeToken(jwt)
-    // TODO: verify the signature
-    // should return just the payload class instance
+    let valid
+    try {
+      valid = await JSONWebToken.validateSignatureWithPublicKey(json)
+    } catch (error) {
+      throw new Error(`Could not validate signature on decode. ${error.message}`)
+    }
+    
+    if (!valid) {
+      throw new Error('JWT signature is invalid')
+    }
+
     return JSONWebToken.fromJSON(json).payload
   }
 
@@ -78,13 +88,21 @@ export class JSONWebToken<T extends IPayload> {
     return decodeToken(signed).signature
   }
 
-  public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
-    if (!pubKey) {
-      throw new Error('Please provide the issuer\'s public key')
+  public static async validateSignatureWithPublicKey(jwt: JSONWebToken<IPayload>): Promise<boolean> {
+    const registry = createJolocomRegistry()
+    const did = jwt.payload.iss.substring(0, jwt.payload.iss.indexOf('#'))
+    let pubKey
+    
+    try {
+      const identity = await registry.resolve(did)  
+      pubKey = identity.getPublicKeySection()
+        .find(pubKeySection => pubKeySection.getIdentifier() === jwt.payload.iss)
+    } catch (error) {
+      throw new Error(`Could not validate signature on JWT. ${error.message}`)
     }
-    // TODO Normalize / have a cannonical json form
-    const assembledJWT = this.encode()
-    return new TokenVerifier('ES256K', pubKey.toString('hex')).verify(assembledJWT)
+
+    return new TokenVerifier('ES256K', pubKey.getPublicKeyHex())
+      .verify(jwt)
   }
 
   public toJSON(): IJSONWebTokenAttrs {
