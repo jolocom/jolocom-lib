@@ -120,14 +120,19 @@ export class JolocomRegistry {
   }
 
   public async validateSignature(obj: IVerifiable): Promise<boolean> {
-    const { did, keyId }= obj.getSigner()
-    const identity = await this.resolve(did)
-    const pubKey = identity.getPublicKeySection()
-      .find(pubKeySection => pubKeySection.getIdentifier() === keyId)
+    const { did, keyId } = obj.getSigner()
+    let pubKey
     
-    const res = obj.validateSignatureWithPublicKey(Buffer.from(pubKey.getPublicKeyHex(), 'hex'))
+    try {
+      const identity = await this.resolve(did)
+      pubKey = identity.getPublicKeySection()
+        .find(pubKeySection => pubKeySection.getIdentifier() === keyId)
+    } catch (error) {
+      throw new Error(`Could not validate signature with registry. ${error.message}`)
+    }
 
-    return res
+    return obj
+      .validateSignatureWithPublicKey(Buffer.from(pubKey.getPublicKeyHex(), 'hex'))
   }
 }
 
