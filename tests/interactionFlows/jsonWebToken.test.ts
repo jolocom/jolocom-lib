@@ -4,21 +4,29 @@ import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
-import { jwtJSON, jwtCreateArgs, signedCredRequestJWT } from '../data/interactionFlows/jsonWebToken'
+import {
+  jwtJSON,
+  jwtCreateArgs,
+  signedCredRequestJWT,
+  signedCredRequestJWTIncorrect
+} from '../data/interactionFlows/jsonWebToken'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
-import { privateKeyToPublicKey } from '../../ts/utils/crypto'
+import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import { DidDocument } from '../../ts/identity/didDocument'
 chai.use(sinonChai)
 
 describe('JSONWebToken', () => {
   let clock
-  const sandbox = sinon.createSandbox()
+  let sandbox
 
   before(() => {
     clock = sinon.useFakeTimers()
+    sandbox = sinon.createSandbox()
   })
 
   after(() => {
     clock.restore()
+    sandbox.restore()
   })
 
   describe('Static create method', () => {
@@ -73,23 +81,37 @@ describe('JSONWebToken', () => {
   })
 
   describe('decode method', () => {
-    clock = sinon.useFakeTimers()
-    const decoded = JSONWebToken.decode(signedCredRequestJWT)
-
-    it('Should return a valid InteractionType payload class', () => {
+    before( async () => {
+      const ddo = await new DidDocument().fromPrivateKey(Buffer.from(mockPrivKey, 'hex'))
+      sandbox.stub(JolocomRegistry.prototype, 'resolve')
+        .resolves(ddo)
+    })
+    
+    it('Should return a valid InteractionType payload class and pass signature validation', async () => {
+      const decoded = await JSONWebToken.decode(signedCredRequestJWT)
+      
       expect(decoded).to.be.an.instanceof(CredentialRequestPayload)
     })
-  })
 
-  describe('validateSignatureWithPublicKey method', () => {
-    clock = sinon.useFakeTimers()
-
-    it('Should validate the signature using PublicKey', () => {
+    it('validateSignatureWithPublicKey should return true with valid inputs', async () => {
       const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
+      const token = jsonWebToken.encode()
+      const valid = await JSONWebToken.validateSignatureWithPublicKey({
+        keyId: jsonWebToken.getPayload().iss,
+        jwt: token
+      })
 
-      expect(
-        jsonWebToken.validateSignatureWithPublicKey(privateKeyToPublicKey(Buffer.from(mockPrivKey, 'hex')))
-      ).to.equal(true)
+      expect(valid).to.be.true
+    })
+
+    it('validateSignatureWithPublicKey should return false with invalid JWT signature', async () => {
+      const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
+      const valid = await JSONWebToken.validateSignatureWithPublicKey({
+        keyId: jsonWebToken.getPayload().iss,
+        jwt: signedCredRequestJWTIncorrect
+      })
+
+      expect(valid).to.be.false
     })
   })
 })

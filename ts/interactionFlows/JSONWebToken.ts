@@ -18,6 +18,7 @@ import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/ty
 import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
 import { ICredentialsReceivePayloadCreationAttrs } from './credentialsReceive/types'
 import { IAuthenticationRequestPayloadCreationAttrs } from './authenticationRequest/types'
+import { createJolocomRegistry, JolocomRegistry } from '../registries/jolocomRegistry'
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -45,20 +46,30 @@ export class JSONWebToken<T extends IPayload> {
 
   public static create(args: IJSONWebTokenCreationAttrs): JSONWebToken<IPayload> {
     const { privateKey, payload } = args
-
     const jwt = JSONWebToken.payloadToJWT(payload)
 
     jwt.payload.iat = Date.now()
     jwt.payload.iss = privateKey.id
     jwt.signature = jwt.sign(privateKey.key)
-
+    
     return jwt
   }
 
-  public static decode(jwt: string): IPayload {
+  public static async decode(jwt: string): Promise<IPayload> {
     const json = decodeToken(jwt)
-    // TODO: verify the signature
-    // should return just the payload class instance
+    let valid
+    
+    try {
+      valid = await JSONWebToken
+        .validateSignatureWithPublicKey({ keyId: json.payload.iss, jwt })
+    } catch (error) {
+      throw new Error(`Could not validate signature on decode. ${error.message}`)
+    }
+    
+    if (!valid) {
+      throw new Error('JWT signature is invalid')
+    }
+
     return JSONWebToken.fromJSON(json).payload
   }
 
@@ -70,6 +81,7 @@ export class JSONWebToken<T extends IPayload> {
     jwtParts.push(base64url.encode(JSON.stringify(this.header)))
     jwtParts.push(base64url.encode(JSON.stringify(this.payload)))
     jwtParts.push(this.signature)
+    
     return jwtParts.join('.')
   }
 
@@ -78,13 +90,26 @@ export class JSONWebToken<T extends IPayload> {
     return decodeToken(signed).signature
   }
 
-  public validateSignatureWithPublicKey(pubKey: Buffer): boolean {
-    if (!pubKey) {
-      throw new Error('Please provide the issuer\'s public key')
+  public static async validateSignatureWithPublicKey(
+    {keyId, jwt}: {keyId: string, jwt: string}): Promise<boolean> {
+    const registry = createJolocomRegistry()
+    const did = keyId.substring(0, keyId.indexOf('#'))
+    let pubKey
+  
+    try {
+      const identity = await registry.resolve(did)
+      pubKey = identity.getPublicKeySection()
+        .find(pubKeySection => pubKeySection.getIdentifier() === keyId)
+    } catch (error) {
+      throw new Error(`Could not validate signature on JWT. ${error.message}`)
     }
-    // TODO Normalize / have a cannonical json form
-    const assembledJWT = this.encode()
-    return new TokenVerifier('ES256K', pubKey.toString('hex')).verify(assembledJWT)
+
+    if (!pubKey) {
+      throw new Error('No matching public key found.')
+    }
+
+    return new TokenVerifier('ES256K', pubKey.getPublicKeyHex())
+      .verify(jwt)
   }
 
   public toJSON(): IJSONWebTokenAttrs {

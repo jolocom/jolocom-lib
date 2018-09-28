@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import { Type, plainToClass, classToPlain, Exclude, Expose } from 'class-transformer'
 import { canonize } from 'jsonld'
 import { ILinkedDataSignature, proofTypes, ILinkedDataSignatureAttrs } from '../types'
