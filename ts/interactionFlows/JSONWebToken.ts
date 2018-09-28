@@ -46,21 +46,22 @@ export class JSONWebToken<T extends IPayload> {
 
   public static create(args: IJSONWebTokenCreationAttrs): JSONWebToken<IPayload> {
     const { privateKey, payload } = args
-
     const jwt = JSONWebToken.payloadToJWT(payload)
 
     jwt.payload.iat = Date.now()
     jwt.payload.iss = privateKey.id
     jwt.signature = jwt.sign(privateKey.key)
-
+    
     return jwt
   }
 
   public static async decode(jwt: string): Promise<IPayload> {
     const json = decodeToken(jwt)
     let valid
+    
     try {
-      valid = await JSONWebToken.validateSignatureWithPublicKey(json)
+      valid = await JSONWebToken
+        .validateSignatureWithPublicKey({ keyId: json.payload.iss, jwt })
     } catch (error) {
       throw new Error(`Could not validate signature on decode. ${error.message}`)
     }
@@ -80,6 +81,7 @@ export class JSONWebToken<T extends IPayload> {
     jwtParts.push(base64url.encode(JSON.stringify(this.header)))
     jwtParts.push(base64url.encode(JSON.stringify(this.payload)))
     jwtParts.push(this.signature)
+    
     return jwtParts.join('.')
   }
 
@@ -88,17 +90,22 @@ export class JSONWebToken<T extends IPayload> {
     return decodeToken(signed).signature
   }
 
-  public static async validateSignatureWithPublicKey(jwt: JSONWebToken<IPayload>): Promise<boolean> {
+  public static async validateSignatureWithPublicKey(
+    {keyId, jwt}: {keyId: string, jwt: string}): Promise<boolean> {
     const registry = createJolocomRegistry()
-    const did = jwt.payload.iss.substring(0, jwt.payload.iss.indexOf('#'))
+    const did = keyId.substring(0, keyId.indexOf('#'))
     let pubKey
-    
+  
     try {
-      const identity = await registry.resolve(did)  
+      const identity = await registry.resolve(did)
       pubKey = identity.getPublicKeySection()
-        .find(pubKeySection => pubKeySection.getIdentifier() === jwt.payload.iss)
+        .find(pubKeySection => pubKeySection.getIdentifier() === keyId)
     } catch (error) {
       throw new Error(`Could not validate signature on JWT. ${error.message}`)
+    }
+
+    if (!pubKey) {
+      throw new Error('No matching public key found.')
     }
 
     return new TokenVerifier('ES256K', pubKey.getPublicKeyHex())
