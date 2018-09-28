@@ -1,7 +1,9 @@
 import { InteractionType } from './../../ts/interactionFlows/types'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
+import * as sinon from 'sinon'
 import { testPrivateIdentityKey, testPrivateEthereumKey } from '../data/keys'
+import { testSignedCredentialDefault } from '../data/credential/signedCredential'
 import { DidDocument } from '../../ts/identity/didDocument'
 import * as integrationHelper from './provision'
 import { IpfsStorageAgent } from '../../ts/ipfs'
@@ -23,13 +25,15 @@ import {
 } from './../data/interactionFlows/integrationTest'
 import { CredentialResponse } from './../../ts/interactionFlows/credentialResponse/credentialResponse'
 import { ICredentialResponsePayloadCreationAttrs } from './../../js/interactionFlows/credentialResponse/types.d'
+import * as jr from '../../ts/registries/jolocomRegistry'
+import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential';
 
 chai.use(sinonChai)
 const expect = chai.expect
 
 describe('Integration Test', () => {
   let jolocomRegistry
-
+  
   before(async function() {
     this.timeout(40000)
     const address = await integrationHelper.init()
@@ -43,7 +47,6 @@ describe('Integration Test', () => {
     const ethereumConnector = new EthResolver(ethereumConfig)
 
     jolocomRegistry = createJolocomRegistry({ ipfsConnector, ethereumConnector })
-
   })
 
   describe('Creation of identity', () => {
@@ -122,14 +125,17 @@ describe('Integration Test', () => {
       expect(credentialRequestJWT.getPayload().credentialRequest).to.be.an.instanceof(CredentialRequest)
     })
 
-    it('should allow for simple consumption of credential requests', async () => {
-      const decoded = JSONWebToken.decode(encodedJWT)
+    it('should allow for simple consumption of signed credential requests', async () => {
+      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
+      
+      const decoded = await JSONWebToken.decode(encodedJWT)
       filteredCredentials = decoded.applyConstraints(testSignedCreds)
       
       expect(filteredCredentials[0]).to.deep.equal(testSignedCreds[0])
+      sinon.restore()
     })
 
-    it('should allow for simple generation of appropriate of credential response', async () => {
+    it('should allow for simple generation of appropriate credential response', async () => {
       const identityWallet: IdentityWallet = await jolocomRegistry.create({
         privateIdentityKey: testPrivateIdentityKey,
         privateEthereumKey: testPrivateEthereumKey
@@ -143,9 +149,31 @@ describe('Integration Test', () => {
       credentialResponseJWT = identityWallet.create.credentialResponseJSONWebToken(credentialResponseCreationPayload)
       const credRequest = credentialRequestJWT.getPayload().credentialRequest
       const credResp = credentialResponseJWT.getPayload().credentialResponse
-      
       expect(credentialResponseJWT.getPayload().credentialResponse).to.be.an.instanceof(CredentialResponse)
       expect(credResp.satisfiesRequest(credRequest)).to.be.true
+    })
+
+    it('should validate signature of signed credetnial on credential response', async () => {
+      const identityWallet: IdentityWallet = await jolocomRegistry.create({
+        privateIdentityKey: testPrivateIdentityKey,
+        privateEthereumKey: testPrivateEthereumKey
+      })
+
+      const credentialResponseCreationPayload: ICredentialResponsePayloadCreationAttrs = {
+        typ: InteractionType.CredentialResponse,
+        credentialResponse: [testSignedCredentialDefault]
+      }
+      
+      credentialResponseJWT = identityWallet.create
+        .credentialResponseJSONWebToken(credentialResponseCreationPayload)
+
+      const suppliedCredential = credentialResponseJWT.getPayload()
+        .getSuppliedCredentials()[0].credential
+
+      const valid = await jolocomRegistry
+        .validateSignature(SignedCredential.fromJSON(suppliedCredential))  
+      
+      expect(valid).to.be.true
     })
   })
 })
