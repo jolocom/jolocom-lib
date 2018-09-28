@@ -17,14 +17,16 @@ chai.use(sinonChai)
 
 describe('JSONWebToken', () => {
   let clock
-  const sandbox = sinon.createSandbox()
+  let sandbox
 
   before(() => {
     clock = sinon.useFakeTimers()
+    sandbox = sinon.createSandbox()
   })
 
   after(() => {
     clock.restore()
+    sandbox.restore()
   })
 
   describe('Static create method', () => {
@@ -101,6 +103,7 @@ describe('JSONWebToken', () => {
 
       expect(valid).to.be.true
     })
+
     it('validateSignatureWithPublicKey should return false with invalid JWT signature', async () => {
       const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
       const valid = await JSONWebToken.validateSignatureWithPublicKey({
