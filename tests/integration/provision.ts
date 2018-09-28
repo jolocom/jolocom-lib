@@ -1,7 +1,7 @@
 import * as ganache from 'ganache-cli'
 import * as registryContract from 'jolocom-registry-contract'
 import {
-  testPrivateEthereumKey,
+  testPrivateEthereumKey, testPrivateEthereumKey3,
 } from '../data/keys'
 const Web3 = require('web3')
 const IPFSFactory = require('ipfsd-ctl')
@@ -14,6 +14,9 @@ const ganacheServer = ganache.server({
       balance: web3.utils.toWei('1')
     }, {
       secretKey: testPrivateEthereumKey,
+      balance: web3.utils.toWei('1')
+    }, {
+      secretKey: testPrivateEthereumKey3,
       balance: web3.utils.toWei('1')
     }]
   })
