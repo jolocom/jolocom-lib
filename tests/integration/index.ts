@@ -53,6 +53,10 @@ describe('Integration Test', () => {
     jolocomRegistry = createJolocomRegistry({ ipfsConnector, ethereumConnector })
   })
 
+  after(() => {
+    process.exit(0)
+  })
+
   describe('Creation of identity', () => {
     it('should generate a valid DDO', async () => {
       const identityWallet: IdentityWallet = await jolocomRegistry.create({
