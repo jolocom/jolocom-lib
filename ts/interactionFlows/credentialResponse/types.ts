@@ -1,4 +1,4 @@
-import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types';
+import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
 export interface ICredentialResponsePayloadAttrs {
   iat: number
@@ -9,15 +9,10 @@ export interface ICredentialResponsePayloadAttrs {
 
 export interface ICredentialResponsePayloadCreationAttrs {
   typ: string
-  credentialResponse: ISignedCredentialAttrs[]
+  credentialResponse: ICredentialResponseAttrs
 }
 
 export interface ICredentialResponseAttrs {
-  // TODO: rethink naming of SuppliedCredential
-  suppliedCredentials: ISuppliedCredentialsAttrs[]
+  suppliedCredentials: ISignedCredentialAttrs[]
 }
 
-export interface ISuppliedCredentialsAttrs {
-  type: string[]
-  credential: ISignedCredentialAttrs
-}

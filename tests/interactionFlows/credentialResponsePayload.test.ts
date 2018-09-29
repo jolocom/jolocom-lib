@@ -1,39 +1,51 @@
 import { expect } from 'chai'
-import { credentialResponsePayloadJson, credentialResponsePayloadCreationAttrs } from './../data/interactionFlows/credentialResponse'
+import {
+  credResponsePayloadJSON,
+  credentialResponsePayloadCreationAttrs
+} from './../data/interactionFlows/credentialResponse'
 import { CredentialResponsePayload } from '../../ts/interactionFlows/credentialResponse/credentialResponsePayload'
 import { CredentialResponse } from '../../ts/interactionFlows/credentialResponse/credentialResponse'
 import { CredentialRequest } from '../../ts/interactionFlows/CredentialRequest/credentialRequest'
-import { credentialRequestCreationAttrs } from '../data/interactionFlows/credentialRequest'
+import { credRequestCreationAttrs } from '../data/interactionFlows/credentialRequest'
+import { testSignedCredentialDefault } from '../data/credential/signedCredential'
+import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 
 describe('CredentialResponsePayload', () => {
-  const crp = CredentialResponsePayload.fromJSON(credentialResponsePayloadJson)
+  const crp = CredentialResponsePayload.create(credentialResponsePayloadCreationAttrs)
 
   it('Should correctly return a credentialResponsePayload class on static create method', () => {
-    const credResPayload = CredentialResponsePayload.create(credentialResponsePayloadCreationAttrs)
-    credResPayload.iss = credentialResponsePayloadJson.iss
-    credResPayload.iat = credentialResponsePayloadJson.iat
-
-    expect(credResPayload).to.deep.equal(crp)
-    expect(credResPayload).to.be.instanceOf(CredentialResponsePayload)
-    expect(credResPayload.credentialResponse).to.be.instanceOf(CredentialResponse)
-    expect(credResPayload.getSuppliedCredentials()).to.deep.equal(crp.getSuppliedCredentials())
+    expect(crp).to.be.instanceOf(CredentialResponsePayload)
+    expect(crp.credentialResponse).to.be.instanceOf(CredentialResponse)
+    expect(crp.credentialResponse.getSuppliedCredentials()[0]).to.be.instanceOf(SignedCredential)
+    expect(crp.credentialResponse.getSuppliedCredentials()[0])
+      .to.deep.equal(SignedCredential.fromJSON(testSignedCredentialDefault))
   })
 
   it('Should return true on credentialResponse.satisfiesRequest call', () => {
-    const cr = CredentialRequest.create(credentialRequestCreationAttrs)
+    const cr = CredentialRequest.create(credRequestCreationAttrs)
   
     expect(crp.credentialResponse.satisfiesRequest(cr)).to.be.true
   })
 
   it('Should implement static fromJSON method which returns a valid instance of CredentialResponsePayload', () => {  
-    expect(crp.credentialResponse.getSuppliedCredentials())
-      .to.deep.equal(credentialResponsePayloadJson.credentialResponse.suppliedCredentials)
+    const credResPayload = CredentialResponsePayload.fromJSON(credResponsePayloadJSON)
+    crp.iss = credResponsePayloadJSON.iss
+    crp.iat = credResponsePayloadJSON.iat
+
+    expect(credResPayload).to.be.instanceOf(CredentialResponsePayload)
+    expect(credResPayload.credentialResponse).to.be.instanceOf(CredentialResponse)
+    expect(credResPayload.credentialResponse.getSuppliedCredentials()[0]).to.be.instanceOf(SignedCredential)
+    expect(credResPayload).to.deep.equal(crp)
+    expect(credResPayload.credentialResponse.suppliedCredentials[0].getIssuer())
+      .to.deep.equal(crp.credentialResponse.suppliedCredentials[0].getIssuer())
   })
 
   it('Should implement toJSON method which returns a correct JSON', () => {
-    const crp = CredentialResponsePayload.fromJSON(credentialResponsePayloadJson)
     const json = crp.toJSON()
-    expect(json).to.deep.equal(credentialResponsePayloadJson)
+    // date issue
+    expect(json.credentialResponse.suppliedCredentials[0].issuer)
+      .to.deep.equal(credResponsePayloadJSON.credentialResponse.suppliedCredentials[0].issuer)
+    expect(json.typ).to.deep.equal(credResponsePayloadJSON.typ)
   })
 
   it('Should expose CredentialResponse specific methods', () => {

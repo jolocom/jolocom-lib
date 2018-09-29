@@ -1,119 +1,30 @@
 import { InteractionType } from '../../../ts/interactionFlows/types'
 import { defaultContext } from './../../../ts/utils/contexts'
+import { testSignedCredentialDefault } from '../credential/signedCredential'
 
 export const credentialResponsePayloadCreationAttrs = {
-  iat: 0,
-  iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
   typ: InteractionType.CredentialResponse,
-  credentialResponse: [{
-    '@context': defaultContext,
-    id: 'claimId:bcf70ac9c940e',
-    name: 'Email address',
-    issuer: 'did:jolo:issuer',
-    type: [ 'Credential', 'MockCredential' ],
-    claim: {
-      id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af',
-      email: 'testUser@jolocom.com'
-    },
-    issued: '1970-01-01T00:00:00.000Z',
-    proof: {
-      type: 'EcdsaKoblitzSignature2016',
-      created: '1970-01-01T00:00:00.000Z',
-      creator: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#claimId:bcf70ac9c940e',
-      nonce: '90a6764469fc4',
-      signatureValue: 'TlGz5inRY4T7GyvZi3eDq22GCEVoMlhb0mAhz7xc9y1CPe6e8PCLFK3fL4ajSD4pQhK0vFPZ3dUOdDPuopYhKQ=='
-    }
-  }]
-}
-
-export const credentialResponsePayloadJson = {
-  iat: 0,
-  iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
-  typ: InteractionType.CredentialResponse.toString(),
   credentialResponse: {
-    suppliedCredentials: [{
-      type: [ 'Credential', 'MockCredential' ],
-      credential: {
-        '@context': defaultContext,
-        id: 'claimId:bcf70ac9c940e',
-        name: 'Email address',
-        issuer: 'did:jolo:issuer',
-        type: [ 'Credential', 'MockCredential' ],
-        claim: {
-          id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af',
-          email: 'testUser@jolocom.com'
-        },
-        issued: '1970-01-01T00:00:00.000Z',
-        proof: {
-          type: 'EcdsaKoblitzSignature2016',
-          created: '1970-01-01T00:00:00.000Z',
-          creator: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#claimId:bcf70ac9c940e',
-          nonce: '90a6764469fc4',
-          signatureValue: 'TlGz5inRY4T7GyvZi3eDq22GCEVoMlhb0mAhz7xc9y1CPe6e8PCLFK3fL4ajSD4pQhK0vFPZ3dUOdDPuopYhKQ=='
-        }
-      }
-    }]
+    suppliedCredentials: [testSignedCredentialDefault]
   }
 }
 
-export const mockSuppliedCredential = [{
-  type: ['Credential', 'MockCredential'],
-  credential: {
-    '@context': ['http://schema.org/'],
-    id: 'claim:id:test',
-    issuer: 'did:jolo:issuer',
-    claim: {
-      id: 'did:jolo:subject',
-      mock: 'value'
-    },
-    issued: '',
-    type: ['Credential', 'MockCredential'],
-    proof: {
-      created: '1970-01-01T00:00:00.000Z',
-      creator: 'did:jolo:issuer/keys#1',
-      nonce: '00000',
-      signatureValue: 'invalidMockSignature',
-      type: 'mockType'
-    }
-  }
-}]
+export const credentialResponseJSON = {
+  suppliedCredentials: [testSignedCredentialDefault]
+}
 
+export const credResponsePayloadJSON = {
+  credentialResponse: {
+    suppliedCredentials: [ testSignedCredentialDefault ] 
+  },
+  typ: 'credentialResponse',
+  iat: 0,
+  iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
+}
+
+// where are these used?
 export const mockPrivKey = '3a1076bf45ab87712ad64ccb3b10217737f7faacbf2872e88fdd9a537d8fe266'
 export const privKeyDID = 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
-
-export const mockSignedCredResponseJson = {
-  header: { alg: 'ES256K', typ: 'JWT' },
-  payload: {
-    iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
-    iat: 0,
-    credentialResponse: {
-      suppliedCredentials: [
-        {
-          type: ['Credential', 'MockCredential'],
-          credential: {
-            '@context': ['http://schema.org/'],
-            id: 'claim:id:test',
-            issuer: 'did:jolo:issuer',
-            claim: {
-              id: 'did:jolo:subject',
-              mock: 'value'
-            },
-            issued: '',
-            type: ['Credential', 'MockCredential'],
-            proof: {
-              created: '1970-01-01T00:00:00.000Z',
-              creator: 'did:jolo:issuer/keys#1',
-              nonce: '00000',
-              signatureValue: 'invalidMockSignature',
-              type: 'mockType'
-            }
-          }
-        }
-      ]
-    }
-  },
-  signature: '8J4ntVxXvJIpt3uGpSkMwUuxWFdLmZH_BVrNbE7KlkCcp65GXE0Q-pG5X2fmgsF2JoXGxogxvrWNykjq4o9joA'
-}
 
 export const signedCredRespJWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.\
 eyJpc3MiOiJkaWQ6am9sbzo4Zjk3N2U1MGI3ZTVjYmRmZWI1M2EwM2M4MTI5MTNiNzI5NzhjYTM1Yzkz\

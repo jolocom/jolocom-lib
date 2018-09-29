@@ -21,3 +21,24 @@ export const testPublicIdentityKey2 = Buffer.from(
   'f4952882df8c67447ba0955ec8d59fb360dcdc94e114de9949ab8a4d09c0eabb',
   'hex'
 )
+
+export const testSeed3 = Buffer.from(
+  '316AF5B648D7E1DF31B73729E8E6628AEB8060CC4389C2B2A81BD56E92E9228F',
+  'hex'
+)
+
+// used for integration tests
+export const testPrivateIdentityKey3 = Buffer.from(
+  'a8736629c00011bc18b226eb0ce274c37d6042641eac768b5a4352227affda0e',
+  'hex'
+)
+
+export const testPublicIdentityKey3 = Buffer.from(
+  '036b3dd49a48ee790646014ba4e98664dd328097710ac02bbe8e3a0e9bc824a8ca',
+  'hex'
+)
+
+export const testPrivateEthereumKey3 = Buffer.from(
+  'ae084ea439ae5eecdccbf43b188567bbf23adfd11928fb6268071225048140bc',
+  'hex'
+)

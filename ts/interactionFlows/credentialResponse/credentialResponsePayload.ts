@@ -3,9 +3,9 @@ import { classToPlain, plainToClass } from 'class-transformer'
 import { CredentialResponse } from '../../interactionFlows/credentialResponse/credentialResponse'
 import {
   ICredentialResponsePayloadAttrs,
-  ISuppliedCredentialsAttrs,
   ICredentialResponsePayloadCreationAttrs
 } from './types'
+import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
 
 export class CredentialResponsePayload implements IPayload {
   public iss: string
@@ -17,25 +17,29 @@ export class CredentialResponsePayload implements IPayload {
     if (attrs.typ !== InteractionType.CredentialResponse) {
       throw new Error('Incorrect payload for CredentialResponse')
     }
-    const credentialResponsePayload = new CredentialResponsePayload()
-    credentialResponsePayload.credentialResponse = CredentialResponse.create(attrs.credentialResponse)
-    credentialResponsePayload.typ = InteractionType.CredentialResponse
+    const credResponsePayload = new CredentialResponsePayload()
+    credResponsePayload.credentialResponse = CredentialResponse
+      .create(attrs.credentialResponse.suppliedCredentials)
+    credResponsePayload.typ = InteractionType.CredentialResponse
 
-    return credentialResponsePayload
+    return credResponsePayload
   }
 
   public static fromJSON(json: ICredentialResponsePayloadAttrs): CredentialResponsePayload {
-    const credentialResponsePayload = plainToClass(CredentialResponsePayload, json)
-    credentialResponsePayload.credentialResponse = plainToClass(CredentialResponse, json.credentialResponse)
+    const credResponsePayload = plainToClass(CredentialResponsePayload, json)
+    credResponsePayload.credentialResponse = plainToClass(CredentialResponse, json.credentialResponse)
+    credResponsePayload.credentialResponse.suppliedCredentials = json.credentialResponse
+      .suppliedCredentials
+      .map((sCred) => plainToClass(SignedCredential, sCred))
 
-    return credentialResponsePayload
+    return credResponsePayload
   }
 
   public toJSON(): ICredentialResponsePayloadAttrs {
     return classToPlain(this) as ICredentialResponsePayloadAttrs
   }
 
-  public getSuppliedCredentials(): ISuppliedCredentialsAttrs[] {
+  public getSuppliedCredentials(): SignedCredential[] {
     return this.credentialResponse.getSuppliedCredentials()
   }
 }

@@ -1,46 +1,52 @@
-import { mockSuppliedCredential } from './../data/interactionFlows/credentialResponse'
+import { credentialResponseJSON } from './../data/interactionFlows/credentialResponse'
 import { expect } from 'chai'
-import { credentialRequestCreationAttrs } from '../data/interactionFlows/credentialRequest'
+import { credRequestCreationAttrs } from '../data/interactionFlows/credentialRequest'
 import { CredentialResponse } from '../../ts/interactionFlows/credentialResponse/credentialResponse'
 import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
-import { firstMockCredential, secondMockCredential } from '../data/credential/signedCredential'
+import { testSignedCredentialDefault, secondMockCredential } from '../data/credential/signedCredential'
+import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 
 describe('CredentialResponse', () => {
+  const credentialResponse = CredentialResponse.create([testSignedCredentialDefault])
+  
   it('Should implement static create method', () => {
-    const credentialResponse = CredentialResponse.create([firstMockCredential])
-    expect(credentialResponse.getSuppliedCredentials()).to.deep.equal(mockSuppliedCredential)
+    expect(credentialResponse).to.be.instanceOf(CredentialResponse)
+    expect(credentialResponse.getSuppliedCredentials()[0])
+      .to.be.instanceOf(SignedCredential)
+    expect(credentialResponse.getSuppliedCredentials())
+      .to.deep.equal([SignedCredential.fromJSON(testSignedCredentialDefault)])
   })
 
   it('Should implement static fromJSON method', () => {
-    const credentialResponse = CredentialResponse.fromJSON({suppliedCredentials: mockSuppliedCredential})
-    const expectedCredentialResponse = CredentialResponse.create([firstMockCredential])
-    expect(credentialResponse).to.deep.equal(expectedCredentialResponse)
+    const credResponse = CredentialResponse.fromJSON(credentialResponseJSON)
+    const expectedCredentialResponse = CredentialResponse.create([testSignedCredentialDefault])
+    
+    expect(credResponse).to.be.instanceOf(CredentialResponse)
+    expect(credResponse.getSuppliedCredentials()[0]).to.be.instanceOf(SignedCredential)
+    expect(credResponse).to.deep.equal(expectedCredentialResponse)
   })
 
   it('Should implement toJSON method', () => {
-    const credentialResponse = CredentialResponse.create([firstMockCredential])
-    expect(credentialResponse.toJSON()).to.deep.equal({suppliedCredentials: mockSuppliedCredential})
+    const json = credentialResponse.toJSON()
+
+    // date issue
+    expect(json.suppliedCredentials[0].issuer)
+      .to.deep.equal(credentialResponseJSON.suppliedCredentials[0].issuer)
   })
 
   it('Should implement all getter methods', () => {
-    const credentialResponse = CredentialResponse.create([firstMockCredential])
+    expect(credentialResponse.getSuppliedCredentials).to.exist
     expect(credentialResponse.getSuppliedCredentials().length).to.equal(1)
-    expect(credentialResponse.getSuppliedCredentials()).to.deep.equal(mockSuppliedCredential)
   })
 
-  it('Should implement a satisfiesRequest method', () => {
-    const credentialRequest = CredentialRequest.create(credentialRequestCreationAttrs)
-
-    const validCredentialResponse = CredentialResponse.create([firstMockCredential])
-    // tslint:disable-next-line:no-unused-expression
-    expect(validCredentialResponse.satisfiesRequest(credentialRequest)).to.be.true
-
+  it('Should correctly implement the satisfiesRequest method', () => {
+    const credentialRequest = CredentialRequest.create(credRequestCreationAttrs)
     const invalidCredentialResponse = CredentialResponse.create([secondMockCredential])
-    // tslint:disable-next-line:no-unused-expression
-    expect(invalidCredentialResponse.satisfiesRequest(credentialRequest)).to.be.false
+    const mixedCredentialResponse = CredentialResponse
+      .create([testSignedCredentialDefault, secondMockCredential])
 
-    const mixedCredentialResponse = CredentialResponse.create([firstMockCredential, secondMockCredential])
-    // tslint:disable-next-line:no-unused-expression
+    expect(credentialResponse.satisfiesRequest(credentialRequest)).to.be.true
+    expect(invalidCredentialResponse.satisfiesRequest(credentialRequest)).to.be.false
     expect(mixedCredentialResponse.satisfiesRequest(credentialRequest)).to.be.false
   })
 })
