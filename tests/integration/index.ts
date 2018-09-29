@@ -186,7 +186,7 @@ describe('Integration Test', () => {
 
       const suppliedCredentials = credResponse.getSuppliedCredentials()
       const valid = await jolocomRegistry
-        .validateSignature(SignedCredential.fromJSON(suppliedCredentials[0]))  
+        .validateSignature(suppliedCredentials[0])  
       
       expect(valid).to.be.true
     })
