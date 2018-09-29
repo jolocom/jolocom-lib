@@ -4,7 +4,9 @@ import { testSignedCredentialDefault } from '../credential/signedCredential'
 
 export const credentialResponsePayloadCreationAttrs = {
   typ: InteractionType.CredentialResponse,
-  credentialResponse: [testSignedCredentialDefault]
+  credentialResponse: {
+    suppliedCredentials: [testSignedCredentialDefault]
+  }
 }
 
 export const credentialResponseJSON = {

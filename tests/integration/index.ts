@@ -160,7 +160,9 @@ describe('Integration Test', () => {
     it('should allow for simple generation of appropriate credential response by user', async () => {
       credResponseJWTClass = identityWalletUser.create.credentialResponseJSONWebToken({
         typ: InteractionType.CredentialResponse,
-        credentialResponse: [testSignedCredentialDefault]
+        credentialResponse: {
+          suppliedCredentials: [testSignedCredentialDefault]
+        }
       })
      
       credResponseJWT = credResponseJWTClass.encode()
@@ -182,11 +184,11 @@ describe('Integration Test', () => {
       const credResponse = await JSONWebToken.decode(credResponseJWT)
       sinon.restore()
 
-      // const suppliedCredentials = credResponse.getSuppliedCredentials()
-      // const valid = await jolocomRegistry
-      //   .validateSignature(SignedCredential.fromJSON(suppliedCredentials[0]))  
+      const suppliedCredentials = credResponse.getSuppliedCredentials()
+      const valid = await jolocomRegistry
+        .validateSignature(SignedCredential.fromJSON(suppliedCredentials[0]))  
       
-      // expect(valid).to.be.true
+      expect(valid).to.be.true
     })
   })
 })

@@ -19,6 +19,7 @@ export class CredentialResponse {
     return this.suppliedCredentials
   }
 
+  // TODO: expose this method also on respective payload
   public satisfiesRequest(cr: CredentialRequest): boolean {
     const credentials = this.suppliedCredentials
       .map((sCredClass) => sCredClass.toJSON())

@@ -17,8 +17,9 @@ export class CredentialResponsePayload implements IPayload {
     if (attrs.typ !== InteractionType.CredentialResponse) {
       throw new Error('Incorrect payload for CredentialResponse')
     }
-   const credResponsePayload = new CredentialResponsePayload()
-    credResponsePayload.credentialResponse = CredentialResponse.create(attrs.credentialResponse)
+    const credResponsePayload = new CredentialResponsePayload()
+    credResponsePayload.credentialResponse = CredentialResponse
+      .create(attrs.credentialResponse.suppliedCredentials)
     credResponsePayload.typ = InteractionType.CredentialResponse
 
     return credResponsePayload

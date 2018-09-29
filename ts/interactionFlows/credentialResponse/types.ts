@@ -9,7 +9,7 @@ export interface ICredentialResponsePayloadAttrs {
 
 export interface ICredentialResponsePayloadCreationAttrs {
   typ: string
-  credentialResponse: ISignedCredentialAttrs[]
+  credentialResponse: ICredentialResponseAttrs
 }
 
 export interface ICredentialResponseAttrs {
