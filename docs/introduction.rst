@@ -11,20 +11,22 @@ navigate the Jolocom library, as well as some context on the concept of self-sov
 
 The Jolocom protocol is build using the following core components:
 
-* `Hierarchical Deterministic Key Derivation <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ enables pseudonymous, context specific interactions through the creation of and control over multiple identities
+* `Hierarchical Deterministic Key Derivation <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ enables pseudonymous, context specific interactions through the creation of and control over multiple identities.
 
-* `Decentralized Identifiers <https://w3c-ccg.github.io/did-spec/>`_ (DIDs) are associated with each identity and used for the management of these identities
+* `Decentralized Identifiers <https://w3c-ccg.github.io/did-spec/>`_ (DIDs) are associated with each identity and used during most interaction flows explore later, such as authentication or data exchange.
 
-* `Verifiable Credentials <https://w3c.github.io/vc-data-model/>`_ are cryptographically verifiable and allow for an easily consumable way of attaching attribute information to identities
+* `Verifiable Credentials <https://w3c.github.io/vc-data-model/>`_ are digitally signed attestations issued by an identity. The specification ca be used to develop a simple way of associating attribute information with identifiers.
 
-* A distributed backend architecture (IPFS, Ethereum) provides the Jolocom identity solution with accessibility, resiliency, and immutability
+* A public, censorship resistent, decentralized network for anchoring and resolving user identifiers, (currently IPFS for storage, and Ethereum for aiding resolution)
 
 
-.. warning:: Please be aware that the Jolocom library is work in progress. Also, we are currently running on the Ethereum testnet Rinkeby. Please do not transfer any real ether to your created addresses.
+.. warning:: Please be aware that the Jolocom library is still in early stages, we are currently anchoring all identities on the Rinkeby testnet.
+
+  Please do not transfer any real ether to your Jolocom identity.
 
 **Interaction Flows Visualized**
 
-Coming soon.
+We are currently working on diagrams to illustrate the main interaction flows, coming soon.
 
 #########################
 The Jolocom Library at a Glance
