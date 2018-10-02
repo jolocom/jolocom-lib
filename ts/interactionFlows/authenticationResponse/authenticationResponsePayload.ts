@@ -3,8 +3,7 @@ import { classToPlain, plainToClass } from 'class-transformer'
 import { AuthenticationResponse } from './authenticationResponse'
 import { 
   IAuthenticationResponsePayloadCreationAttrs,
-  IAuthentiactionResponsePayloadAttrs,
-  IChallengeResponse
+  IAuthentiactionResponsePayloadAttrs
 } from './types'
 
 export class AuthenticationResponsePayload implements IPayload {
@@ -21,13 +20,8 @@ export class AuthenticationResponsePayload implements IPayload {
     return authResponsePayload
   }
 
-// TODO: include possibility to check with available pubKey
-  public async validateChallengeResponse(): Promise<boolean> {
-      return this.authResponse.validateChallengeResponse()
-  }
-
-  public getChallengeResponse(): IChallengeResponse {
-    return this.authResponse.challengeResponse
+  public getAuthenticationResponse(): AuthenticationResponse {
+    return this.authResponse
   }
 
   public static fromJSON(json: IAuthentiactionResponsePayloadAttrs): AuthenticationResponsePayload {

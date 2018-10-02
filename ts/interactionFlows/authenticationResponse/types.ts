@@ -10,11 +10,20 @@ export interface IAuthentiactionResponsePayloadAttrs {
     authResponse: IAuthenticationResponseAttrs
   }
   
+  export interface IAuthenticationResponseCreationAttrs {
+    challenge: string
+    did: string
+    keyId: string
+    privKey: Buffer
+  }
+
   export interface IAuthenticationResponseAttrs {
     challengeResponse: IChallengeResponse
   }
 
   export interface IChallengeResponse {
+    challenge: string
     did: string
-    signedChallenge: string
+    keyId: string
+    signatureValue: string
   }
