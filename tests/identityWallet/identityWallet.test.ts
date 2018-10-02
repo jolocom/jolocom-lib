@@ -13,12 +13,9 @@ import { Identity } from '../../ts/identity/identity'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
 import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest'
-import { jsonAuthResponsePayload } from '../data/interactionFlows/authenticationResponse'
-import { AuthenticationResponsePayload } from '../../ts/interactionFlows/authenticationResponse/authenticationResponsePayload'
-import { AuthenticationResponse } from '../../ts/interactionFlows/authenticationResponse/authenticationResponse'
-import { jsonAuthRequestPayload } from '../data/interactionFlows/authenticationRequest'
-import { AuthenticationRequestPayload } from '../../ts/interactionFlows/authenticationRequest/authenticationRequestPayload'
-import { AuthenticationRequest } from '../../ts/interactionFlows/authenticationRequest/authenticationRequest'
+import { AuthenticationPayload } from '../../ts/interactionFlows/authentication/authenticationPayload'
+import { Authentication } from '../../ts/interactionFlows/authentication/authentication'
+import { jsonAuthPayload } from '../data/interactionFlows/authentication'
 import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload'
 import { CredentialsReceive } from '../../ts/interactionFlows/credentialsReceive/credentialsReceive'
 import { jsonCredReceivePayload } from '../data/interactionFlows/credentialReceive'
@@ -84,8 +81,7 @@ describe('IdentityWallet', () => {
         'signedCredential',
         'credentialRequestJSONWebToken',
         'credentialResponseJSONWebToken',
-        'authenticationResponseJSONWebToken',
-        'authenticationRequestJSONWebToken',
+        'authenticationJSONWebToken',
         'credentialsReceiveJSONWebToken'
       ]
 
@@ -111,20 +107,12 @@ describe('IdentityWallet', () => {
       expect(credRequestPayload.credentialRequest).to.be.an.instanceof(CredentialRequest)
     })
 
-    it('create.authenticationResponseJSONWebToken should return a correct authenticationResponse JWT', () => {
-      const authResWT = identityWallet.create.authenticationResponseJSONWebToken(jsonAuthResponsePayload)
-      const authResPayload = authResWT.getPayload()
+    it('create.authenticationJSONWebToken should return a correct authentication JWT', () => {
+      const authJWT = identityWallet.create.authenticationJSONWebToken(jsonAuthPayload)
+      const authPayload = authJWT.getPayload()
 
-      expect(authResPayload).to.be.an.instanceof(AuthenticationResponsePayload)
-      expect(authResPayload.authResponse).to.be.an.instanceof(AuthenticationResponse)
-    })
-    
-    it('create.authenticationRequestJSONWebToken should return a correct authenticationRequest JWT', () => {
-      const authReqJWT = identityWallet.create.authenticationRequestJSONWebToken(jsonAuthRequestPayload)
-      const authReqPayload = authReqJWT.getPayload()
- 
-      expect(authReqPayload).to.be.an.instanceof(AuthenticationRequestPayload)
-      expect(authReqPayload.authRequest).to.be.an.instanceof(AuthenticationRequest)
+      expect(authPayload).to.be.an.instanceof(AuthenticationPayload)
+      expect(authPayload.authentication).to.be.an.instanceof(Authentication)
     })
     
     it('create.credentialReceiveJSONWebToken should return a correct credentialsReceive JWT', () => {
