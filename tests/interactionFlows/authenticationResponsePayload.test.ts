@@ -1,39 +1,37 @@
 import { expect } from 'chai'
 import { AuthenticationResponsePayload } from '../../ts/interactionFlows/authenticationResponse/authenticationResponsePayload'
 import {
-  challengeResponse,
   jsonAuthResponse,
-  jsonAuthResponsePayload,
-  mockJsonAuthResponsePayload
+  jsonAuthResponsePayload
 } from '../data/interactionFlows/authenticationResponse'
+import { AuthenticationResponse } from '../../ts/interactionFlows/authenticationResponse/authenticationResponse';
 
 describe('AuthenticationResponsePayload', () => {
   const authResponsePayload = AuthenticationResponsePayload.create({
     typ: 'authenticationResponse',
     authResponse: jsonAuthResponse
   }) 
-
-  it('Should expose class specific methods on authenticationResponsePayload', async () => {
-    expect(authResponsePayload.getChallengeResponse()).to.deep.equal(challengeResponse)
-    // TODO
-    expect(await authResponsePayload.validateChallengeResponse()).to.be.false
-  })
   
+  it('Should implement static create method and return correct instance', () => {
+    authResponsePayload.iat = jsonAuthResponsePayload.iat
+    authResponsePayload.iss = jsonAuthResponsePayload.iss
+
+    expect(authResponsePayload).to.be.instanceOf(AuthenticationResponsePayload)
+    expect(authResponsePayload.authResponse).to.be.instanceOf(AuthenticationResponse)
+    expect(authResponsePayload)
+      .to.deep.equal(AuthenticationResponsePayload.fromJSON(jsonAuthResponsePayload))
+  })
+ 
+  it('Should expose class specific methods', () => {
+    expect(authResponsePayload.getAuthenticationResponse).to.exist
+  })
+
   it('Should implement toJSON method which returns a correct JSON', () => {
     expect(authResponsePayload.toJSON()).to.deep.equal(jsonAuthResponsePayload)
   })
 
-  it('Should correctly implement static fromJSON method', () => {
-    authResponsePayload.iss = mockJsonAuthResponsePayload.iss
-    authResponsePayload.iat = mockJsonAuthResponsePayload.iat
-    
-    expect(AuthenticationResponsePayload.fromJSON(mockJsonAuthResponsePayload))
+  it('Should correctly implement static fromJSON method', () => {    
+    expect(AuthenticationResponsePayload.fromJSON(jsonAuthResponsePayload))
       .to.deep.equal(authResponsePayload)
-  })
-
-  it('Should implement static create method and return correct instance', () => {
-    expect(authResponsePayload).to.be.instanceOf(AuthenticationResponsePayload)
-    expect(authResponsePayload)
-      .to.deep.equal(AuthenticationResponsePayload.fromJSON(mockJsonAuthResponsePayload))
   })
 })

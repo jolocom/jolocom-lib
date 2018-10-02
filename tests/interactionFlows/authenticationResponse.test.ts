@@ -1,20 +1,33 @@
 import { expect } from 'chai'
 import { AuthenticationResponse } from '../../ts/interactionFlows/authenticationResponse/authenticationResponse'
-import { challengeResponse, jsonAuthResponse } from '../data/interactionFlows/authenticationResponse'
+import { jsonAuthResponse } from '../data/interactionFlows/authenticationResponse'
+import { testPrivateIdentityKey } from '../data/keys'
+import { jsonAuthRequest } from '../data/interactionFlows/authenticationRequest'
+import { privateKeyToDID, privateKeyToPublicKey } from '../../ts/utils/crypto';
 
 describe('AuthenticationResponse', () => {
-  const authenticationResponse = AuthenticationResponse
-    .create({challengeResponse})
+  const did = privateKeyToDID(Buffer.from(testPrivateIdentityKey))
+  const pubKey = privateKeyToPublicKey(Buffer.from(testPrivateIdentityKey))
+  const authenticationResponse = AuthenticationResponse.create({
+    challenge: jsonAuthRequest.challenge,
+    did,
+    keyId: `${did}#keys-1`,
+    privKey: testPrivateIdentityKey
+  })
 
-  it('Should create instace of AuthenticationResponse on static create', () => {  
+  it('Should create instace of AuthenticationResponse on static create', () => {
     expect(authenticationResponse).to.be.instanceOf(AuthenticationResponse)
     expect(authenticationResponse).to.deep.equal(AuthenticationResponse.fromJSON(jsonAuthResponse))
   })
 
   it('Should expose class specific methods on authenticationResponse', async () => {
-    expect(authenticationResponse.getChallengeResponse()).to.deep.equal(challengeResponse)
-    // TODO: adjust when validateChallengeResponse is implemented
-    expect(await authenticationResponse.validateChallengeResponse()).to.be.false
+    expect(authenticationResponse.validateSignatureWithPublicKey).to.exist
+    expect(authenticationResponse.getSigner).to.exist
+    expect(authenticationResponse.generateSignature).to.exist
+  })
+
+  it('Should correctly validate signature of challenge on validateSignatureWithPublicKey', async () => {
+    expect(await authenticationResponse.validateSignatureWithPublicKey(pubKey)).to.be.true
   })
 
   it('Should implement toJSON method', () => {
