@@ -1,6 +1,9 @@
-===============
 Getting Started
 ===============
+
+How to install the Jolocom library
+###################################
+
 The first step to start using the Jolocom protocol is to make sure to install the Jolocom library as a dependency in your project. You can use ``npm`` or ``yarn`` to do so:
 
 .. code-block:: terminal
@@ -17,7 +20,7 @@ The first step to start using the Jolocom protocol is to make sure to install th
 
 
 How to create a Self-Sovereign Identity
-=======================================
+#########################################
 
 On a higher level, the creation of a self-sovereign identity comprises the following steps:
 
@@ -166,7 +169,7 @@ In this case, we defined a custom class that will handle all communication with 
 The returned ``identityWallet`` class allows for creating digital signatures, authenticating against services, and creating verifiable credentials. We'll explore some of this functionality in later sections.
 
 What can I do now?
-==================
+#########################################
 
 Up to this point, you have successfully created and anchored a self-sovereign identity. Now you can use 
 this identity to:

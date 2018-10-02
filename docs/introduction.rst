@@ -1,4 +1,3 @@
-============
 Introduction
 ============
 
@@ -28,7 +27,6 @@ The Jolocom protocol is build using the following core components:
 
 We are currently working on diagrams to illustrate the main interaction flows, coming soon.
 
-#########################
 The Jolocom Library at a Glance
 #########################
 
@@ -39,7 +37,7 @@ The Jolocom library exposes a JolocomLib interface with four main entry points:
 * identityManager
 * unsigned
 
-Verifiable Credentials and DID/DidDocuments are JSON-LD data types. 
+Verifiable Credentials and DID/DidDocuments are JSON-LD data types.
 The Jolocom library exposes methods on their respective classes for serialization and deserialization.
 
 The parse functionality allows for the parsing of credential requests and responses 
@@ -77,7 +75,6 @@ The actual email claim would be:
 The Jolocom library tries to accomodate for commonly used credential types in order to make credential creation
 as simple as possible.
 
-##################################
 What is a Self-Sovereign Identity?
 ##################################
 
