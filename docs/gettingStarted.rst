@@ -6,7 +6,7 @@ How to install the Jolocom library
 
 The first step to start using the Jolocom protocol is to make sure to install the Jolocom library as a dependency in your project. You can use ``npm`` or ``yarn`` to do so:
 
-.. code-block:: terminal
+.. code-block:: bash
 
   # using npm
   npm install jolocom-lib --save
@@ -53,6 +53,7 @@ The ``identityManager`` instance we have created can now be used to derive furth
 Firstly, we need to derive the key pair that will be used to control your Jolocom Identity.
 
 .. code-block:: typescript
+
   const identityKeyDerivationPath = identityManager.getSchema().jolocomIdentityKey // Derivation path - 'm/73'/0'/0'/0'
   const identityKey = identityManager.deriveChildKey(path)
 
@@ -171,12 +172,8 @@ The returned ``identityWallet`` class allows for creating digital signatures, au
 What can I do now?
 #########################################
 
-Up to this point, you have successfully created and anchored a self-sovereign identity. Now you can use 
-this identity to:
+Up to this point, you have successfully created and anchored a digital self-sovereign identity. In the next sections we will look at how you can:
 
 * create a public profile and publish it through your DID document
 * make statements about yourself, and others in the form of verifiable credentials
 * authenticate against services, and share the aforementioned credentials with other identities.
-
-
-Please visit our usage section to find out more about possible usage patterns with the Jolocom Protocol.

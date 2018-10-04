@@ -1,4 +1,3 @@
-================================
 Credentials & Signed Credentials
 ================================
 
@@ -9,7 +8,7 @@ Any agent can ensure a credential is valid by verifying that the associated digi
 Create a Signed Credential
 ##################################
 
-In order to create a signed credential, we need an instance of an ``identityWallet``. We can create a new one as defined in the `Getting Started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html>`_ section.
+In order to create a signed credential, we need an instance of an ``identityWallet``. We can create a new one as defined in the `getting started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html>`_ section.
 
 In case you've already created an identity, you can get an instance of an ``identityWallet`` as follows:
 
@@ -110,7 +109,7 @@ Validate the signature on a Signed Credential
 #############################################
 
 Now that we have created a signed, we might want to present it to a service, or another identity. The receiver can then validate the signature on the credential.
-The simplest way to validate a signature, is to instantiate a new ``registry`` as described in `"Getting Started" <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html>`_ section, and call the associated ``validateSignature`` method:
+The simplest way to validate a signature, is to instantiate a new ``registry`` as described in `getting started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html>`_ section, and call the associated ``validateSignature`` method:
 
 .. code-block:: typescript
 
