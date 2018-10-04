@@ -36,6 +36,6 @@ export interface IJWTHeaderAttrs {
 export enum InteractionType {
   CredentialRequest = 'credentialRequest',
   CredentialResponse = 'credentialResponse',
-  CredentialsReceiving = 'credentialsReceiving',
+  CredentialsReceive = 'credentialsReceive',
   Authentication = 'authentication'
 }
