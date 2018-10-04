@@ -6,12 +6,10 @@ import { Identity } from '../identity/identity'
 import { privateKeyToPublicKey } from '../utils/crypto'
 import { ICredentialRequestPayloadCreationAttrs } from '../interactionFlows/credentialRequest/types'
 import { JSONWebToken } from '../interactionFlows/JSONWebToken'
-import { IAuthenticationResponsePayloadCreationAttrs } from '../interactionFlows/authenticationResponse/types'
-import { AuthenticationResponsePayload } from '../interactionFlows/authenticationResponse/authenticationResponsePayload'
+import { IAuthPayloadCreationAttrs } from '../interactionFlows/authentication/types'
+import { AuthenticationPayload } from '../interactionFlows/authentication/authenticationPayload'
 import { CredentialRequestPayload } from '../interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialResponsePayload } from '../interactionFlows/credentialResponse/credentialResponsePayload'
-import { IAuthenticationRequestPayloadCreationAttrs } from '../interactionFlows/authenticationRequest/types'
-import { AuthenticationRequestPayload } from '../interactionFlows/authenticationRequest/authenticationRequestPayload'
 import { ICredentialResponsePayloadCreationAttrs } from '../interactionFlows/credentialResponse/types'
 import { CredentialsReceivePayload } from '../interactionFlows/credentialsReceive/credentialsReceivePayload'
 import { ICredentialsReceivePayloadCreationAttrs } from '../interactionFlows/credentialsReceive/types'
@@ -51,19 +49,12 @@ export class IdentityWallet {
         {privateKey: this.privateIdentityKey, payload}
       ) as JSONWebToken<CredentialResponsePayload>
     },
-    authenticationResponseJSONWebToken: (
-      payload: IAuthenticationResponsePayloadCreationAttrs
-    ): JSONWebToken<AuthenticationResponsePayload> => {
+    authenticationJSONWebToken: (
+      payload: IAuthPayloadCreationAttrs
+    ): JSONWebToken<AuthenticationPayload> => {
       return JSONWebToken.create(
         {privateKey: this.privateIdentityKey, payload}
-      ) as JSONWebToken<AuthenticationResponsePayload>
-    },
-    authenticationRequestJSONWebToken: (
-      payload: IAuthenticationRequestPayloadCreationAttrs
-    ): JSONWebToken<AuthenticationRequestPayload> => {
-      return JSONWebToken.create({
-        privateKey: this.privateIdentityKey, payload
-      }) as JSONWebToken<AuthenticationRequestPayload> 
+      ) as JSONWebToken<AuthenticationPayload>
     },
     credentialsReceiveJSONWebToken: (
       payload: ICredentialsReceivePayloadCreationAttrs

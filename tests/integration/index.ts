@@ -28,9 +28,12 @@ import {
 } from './../data/interactionFlows/integrationTest'
 import { CredentialResponse } from './../../ts/interactionFlows/credentialResponse/credentialResponse'
 import * as jr from '../../ts/registries/jolocomRegistry'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential';
+import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
 import { CredentialResponsePayload } from '../../ts/interactionFlows/credentialResponse/credentialResponsePayload'
+import { Authentication } from '../../ts/interactionFlows/authentication/authentication'
+import { AuthenticationPayload } from '../../ts/interactionFlows/authentication/authenticationPayload'
+import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload';
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -193,6 +196,116 @@ describe('Integration Test', () => {
         .validateSignature(suppliedCredentials[0])  
       
       expect(valid).to.be.true
+    })
+  })
+
+  describe('Credential sharing flow ', () => {
+    let identityWalletUser
+    let identityWalletService
+    
+    before(async () => {
+      identityWalletUser = await jolocomRegistry.create({
+        privateIdentityKey: testPrivateIdentityKey,
+        privateEthereumKey: testPrivateEthereumKey
+      })
+      
+      identityWalletService = await jolocomRegistry.create({
+        privateIdentityKey: testPrivateIdentityKey3,
+        privateEthereumKey: testPrivateEthereumKey3
+      })
+    })
+
+    let authRequestJWTClass
+    let authRequestJWT
+    let authResponseJWTClass
+    let authResponseJWT
+
+    let credentialFromService
+    let credentialReceiveJWT
+
+    it('Should allow for simple generation of an authentication request by service', () => {
+      authRequestJWTClass = identityWalletService.create.authenticationJSONWebToken({
+        typ: InteractionType.Authentication,
+        authentication: {
+          challenge: 'jwnfoöwihvibvrjkn',
+          callbackURL: 'https://www.test.io/auth'
+        }
+      })
+      authRequestJWT = authRequestJWTClass.encode()
+
+      expect(authRequestJWTClass.getPayload()).to.be.an.instanceOf(AuthenticationPayload)
+      expect(authRequestJWTClass.getPayload().authentication).to.be.an.instanceOf(Authentication)
+    })
+
+    it('Should allow for simple consumption of authentication request and generate authentication response by user', async () => {
+      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
+      const authRequest = await JSONWebToken.decode(authRequestJWT)
+      sinon.restore()
+
+      authResponseJWTClass = identityWalletUser.create.authenticationJSONWebToken({
+        typ: InteractionType.Authentication,
+        authentication: authRequest.getAuthentication().toJSON()
+      })
+      authResponseJWT = authResponseJWTClass.encode()
+
+      expect(authRequest).to.be.an.instanceOf(AuthenticationPayload)
+      expect(authRequest.authentication).to.be.an.instanceOf(Authentication)
+      expect(authResponseJWTClass).to.be.instanceOf(JSONWebToken)
+    })
+
+    it('Should allow for authentication response consumption & validation and credentialsReceive creation by service', async () => {
+      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
+      const authResponse = await JSONWebToken.decode(authResponseJWT)
+      sinon.restore()
+
+      const validChallenge = authResponse.validateChallenge(authRequestJWTClass.getPayload())
+      
+      if (!validChallenge) {
+        throw new Error('Challenge does not match requested challenge')
+      }
+
+      expect(authResponse).to.be.an.instanceOf(AuthenticationPayload)
+      expect(authResponse.validateChallenge).to.exist
+      expect(validChallenge).to.be.true
+   
+      credentialFromService = await identityWalletService.create.signedCredential({
+        metadata: claimsMetadata.emailAddress,
+        claim: {
+          email: 'helloworld@test.com'
+        },
+        subject: authResponse.iss
+      })
+
+      const credReceiveJWTClass = identityWalletService.create.credentialsReceiveJSONWebToken({
+        typ: InteractionType.CredentialsReceive,
+        credentialsReceive: {
+          signedCredentials: [ credentialFromService ]
+        }
+      })
+      
+      credentialReceiveJWT = credReceiveJWTClass.encode()
+
+      expect(credentialFromService).to.be.an.instanceOf(SignedCredential)
+      expect(credReceiveJWTClass).to.be.an.instanceOf(JSONWebToken)
+      expect(credReceiveJWTClass.getPayload()).to.be.an.instanceOf(CredentialsReceivePayload)
+    })
+
+    it('Should allow for consumption of credentialsReceieve with correct signed credential by user', async () => {
+      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
+      const credReceive = await JSONWebToken.decode(credentialReceiveJWT)
+      sinon.restore()
+
+      const providedCredentials = credReceive.getSignedCredentials()
+      const validCredSignature = await jolocomRegistry
+        .validateSignature(providedCredentials[0])  
+
+      expect(credReceive).to.be.an.instanceOf(CredentialsReceivePayload)
+      expect(credReceive.getSignedCredentials).to.exist
+      expect(providedCredentials[0]).to.be.an.instanceOf(SignedCredential)
+      expect(validCredSignature).to.be.true
+      expect(providedCredentials[0].getIssuer()).to.deep.equal(credentialFromService.getIssuer())
+      expect(providedCredentials[0].getCredentialSection())
+        .to.deep.equal(credentialFromService.getCredentialSection())
     })
   })
 })

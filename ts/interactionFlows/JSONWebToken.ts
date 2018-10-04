@@ -11,14 +11,12 @@ import {
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
 import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload'
 import { CredentialsReceivePayload } from './credentialsReceive/credentialsReceivePayload'
-import { AuthenticationResponsePayload } from './authenticationResponse/authenticationResponsePayload'
-import { IAuthenticationResponsePayloadCreationAttrs } from './authenticationResponse/types'
-import { AuthenticationRequestPayload } from './authenticationRequest/authenticationRequestPayload'
+import { AuthenticationPayload } from './authentication/authenticationPayload'
+import { IAuthPayloadCreationAttrs } from './authentication/types'
 import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types'
 import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
 import { ICredentialsReceivePayloadCreationAttrs } from './credentialsReceive/types'
-import { IAuthenticationRequestPayloadCreationAttrs } from './authenticationRequest/types'
-import { createJolocomRegistry, JolocomRegistry } from '../registries/jolocomRegistry'
+import { createJolocomRegistry } from '../registries/jolocomRegistry'
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -143,15 +141,9 @@ export class JSONWebToken<T extends IPayload> {
         jwt.payload = CredentialsReceivePayload.create(payload as ICredentialsReceivePayloadCreationAttrs)
         break
       }
-      case InteractionType.AuthenticationResponse.toString(): {
-        jwt = new JSONWebToken<AuthenticationResponsePayload>()
-        jwt.payload = AuthenticationResponsePayload
-          .create(payload as IAuthenticationResponsePayloadCreationAttrs)
-        break
-      }
-      case InteractionType.AuthenticationRequest.toString(): {
-        jwt = new JSONWebToken<AuthenticationRequestPayload>()
-        jwt.payload = AuthenticationRequestPayload.create(payload as IAuthenticationRequestPayloadCreationAttrs)
+      case InteractionType.Authentication.toString(): {
+        jwt = new JSONWebToken<AuthenticationPayload>()
+        jwt.payload = AuthenticationPayload.create(payload as IAuthPayloadCreationAttrs)
         break
       }
       default: {
