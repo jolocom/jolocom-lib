@@ -1,4 +1,4 @@
-import { JSONWebToken } from './jsonWebToken';
+import { JSONWebToken } from './JSONWebToken';
 
 export const JSONWebTokenParser = {
  fromJSON : JSONWebToken.fromJSON
