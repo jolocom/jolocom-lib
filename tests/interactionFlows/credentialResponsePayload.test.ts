@@ -5,7 +5,7 @@ import {
 } from './../data/interactionFlows/credentialResponse'
 import { CredentialResponsePayload } from '../../ts/interactionFlows/credentialResponse/credentialResponsePayload'
 import { CredentialResponse } from '../../ts/interactionFlows/credentialResponse/credentialResponse'
-import { CredentialRequest } from '../../ts/interactionFlows/CredentialRequest/credentialRequest'
+import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
 import { credRequestCreationAttrs } from '../data/interactionFlows/credentialRequest'
 import { testSignedCredentialDefault } from '../data/credential/signedCredential'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'

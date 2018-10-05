@@ -3,7 +3,7 @@ import { mockPrivKey } from '../data/interactionFlows/credentialResponse'
 import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import { JSONWebToken } from '../../ts/interactionFlows/jsonWebToken'
+import { JSONWebToken } from '../../ts/interactionFlows/JSONWebToken'
 import {
   jwtJSON,
   jwtCreateArgs,
