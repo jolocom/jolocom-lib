@@ -1,7 +1,7 @@
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { privateKeyToDID, privateKeyToPublicKey, sha256, verifySignature, generateRandomID, sign } from '../../utils/crypto'
 import { IDidDocumentAttrs } from './types'
-import { canonize } from 'jsonld'
+import { canonize } from 'jsonld/dist/jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections'
 import { IVerifiable, ISigner } from '../../registries/types'
