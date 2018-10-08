@@ -144,4 +144,4 @@ What next?
 ###########
 
 Now that we understand the reasoning behind the credential request and response flows, it's time to test them out in action!
-Head to the next section to learn how to set up your own serbice so it can interact with Jolocom identities.
+Head to the next section to learn how to set up your own service so it can interact with Jolocom identities.
