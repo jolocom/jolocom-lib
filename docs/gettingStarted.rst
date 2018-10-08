@@ -55,7 +55,7 @@ Firstly, we need to derive the key pair that will be used to control your Joloco
 .. code-block:: typescript
 
   const identityKeyDerivationPath = identityManager.getSchema().jolocomIdentityKey // Derivation path - 'm/73'/0'/0'/0'
-  const identityKey = identityManager.deriveChildKey(path)
+  const identityKey = identityManager.deriveChildKey(identityKeyDerivationPath)
 
 .. seealso:: If any of your derived keys is compromised, you only lose one key. All other derived keys (including the most 
   important master key) remain secure. Go to `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ 
@@ -66,12 +66,6 @@ The only argument we need to pass to ``identityManager.deriveChildKey`` is the d
 The Jolocom library ships with a number of predefined paths for generating specific key pairs, which can be accessed as follows:
 
 .. code-block:: typescript
-
-  // identityManager.getScehma() returns all paths shipped with the library
-  //  {
-  //    jolocomIdentityKey: "m73'/0'/0'/0'",
-  //    ethereumKey: "m/44'/60'/0'/0/0'"
-  //  }
 
   const schema = identityManager.getSchema()
 
