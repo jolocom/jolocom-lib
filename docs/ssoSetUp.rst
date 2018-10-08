@@ -1,197 +1,52 @@
-=================================
 Single Sign On (SSO) with Jolocom
-=================================
+==================================
 
-This section shows how to implement a single sign on with the Jolocom library.
-This can be relevant for services, dApp developers, etc.
+The best way to get some hands on experience with the Jolocom library and identity protocol is to try it out yourself!
+In this section we will be looking at how we can deploy a demo service capable of interacting with Jolocom identities.
 
+Clone the Github Repository
+#########################################
 
+To begin, we need to clone the Jolocom demo sso repository and install all dependencies:
 
-########################################
-Step 1: Create a Self Sovereign Identity
-########################################
+.. code-block:: bash
 
-The following code snippet shows how to create a self-sovereign identity with the Jolocom Library. 
-For a higher level explanation of identity creation, as well as other usage patterns of the Jolocom 
-Library, please refer to the Usage section.
+  # clone the repository and navigate to the new folder
+  git clone https://github.com/jolocom/demo-sso.git; cd ./demo-sso
 
-.. note:: Please note that registry will be refactored to use jolocom connectors as default soon.
+  # install all dependencies
+  yarn install
+  # or
+  npm install
 
+.. note:: In order to ensure that the application works correctly, you will also need `redis <https://redis.io/topics/quickstart>`_ installed on your local machine. The demo application makes use of the ``redis-server`` and ``redis-cli`` commands to launch, and connect to a local database upon start.
+To ensure no errors occured during the instalation steps, we can attempt to start the service:
 
-.. code-block:: typescript
+.. code-block:: bash
 
-  import { JolocomLib, claimsMetadata } from 'jolocom-lib'
+  # Ensure you are in the 'demo-sso' folder
+  yarn start
 
-  import { defaultConfig } from 'jolocom-lib/js/defaultConfig'
-  import { IpfsStorageAgent } from 'jolocom-lib/js/ipfs'
-  import { EthResolver } from 'jolocom-lib/js/ethereum'
+If all goes fine, after a few seconds you should see the following printed message: *'Demo service started, listening on port 9000'*.
+This means we are ready to go on!
 
-  
-  
-  // create identity manager & derive keys
+Editing the service configuration file
+#######################################
 
-  const identityManager = JolocomLib.identityManager.create(seed)
+If we open the ``config.ts`` file located in the project root directory, we will notice that there are 3 options we can configure:
 
-  const schema = identityManager.getSchema()
+* ``privateIdentityKey`` - the key associated with the service's DID, in ``Buffer`` form. In case you don't have an identity, you can create one first as described in the `getting started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html>`_ section.
+* ``serviceUri`` - the url that can be used reach the deployed service, if you are testing locally, the default value should suffice.
+* ``credentialRequirements`` - the types of credentials required by the service. By default the service requires a ``ProofOfEmailCredential`` and a ``ProofOfNameCredential``, with no associated constraints.
 
-  const identityKey = identityManager.deriveChildKey(schema.jolocomIdentityKey)
+.. note:: Additional documentation on the ``credentialRequirements`` section will be added shortly.
 
-  const ethereumKey = identityManager.deriveChildKey(schema.ethereumKey)
+After the fields have been configured, the service can be started by running ``yarn start``
 
+Authenticating against the local service
+#########################################
 
+Now that we have the local service running, we can open our browsers and navigate to ``http://localhost:9000/`` to be presented with the landing page.
+If you tap the button to continue with Jolocom, the service will generate a credential request (as defined in section), encode it as a QR code, and display the resulting image
 
-
-  // initialize registry
-
-  const ipfsConnector  = new IpfsStorageAgent(defaultConfig.identity)
-  
-  const ethereumConnector = new EthResolver(defaultConfig.ipfs)
-
-  const registry = JolocomLib.registry.jolocom.create({ipfsConnector, ethereumConnector})
-
-  
-
-  // create identity
-
-  const identityWallet = await registry.create({
-    
-    privateIdentityKey: identityKey.privateKey,
-    
-    privateEthereumKey: ethereumKey.privateKey
-    
-  })
- 
-
-
-  // this should throw an expected error with 'No public Profile available'
-
-  const publicProfile = identityWallet.identity.publicProfile.get()
-
-
-#############################################################
-Step 2: Create a Public Profile and attach it to the identity
-#############################################################
-
-.. code-block:: typescript
-
-  // url and image fields are optional
-  
-  const myPublicProfile = {
-    
-    id: identityWallet.getIdentity().getDID(),
-    
-    name: 'Jolocom',
-    
-    about: 'We enable a global identity system',
-    
-    url: 'https://jolocom.com',
-
-    image: 'https://jolocom.com/logo'
-  
-  }
-
-
-
-  // here we create a signed credential
-
-  const publicProfileCred = identityWallet.create.signedCredential({
-   
-    metadata: claimsMetadata.publicProfile,
-   
-    claim: myPublicProfile
-  
-  })
-
-
-  
-  // add the signed credential as your public profile
-
-  identityWallet.identity.publicProfile.add(publicProfileCred)
-
-  
-  
-  // publish your updated DidDocument
-
-  await registry.commit({
-    
-    wallet: identityWallet,
-    
-    ethereumPrivateKey: ethereumKey.privateKey
-    
-  })
-
-
-
-###############################################
-Step 3: Define Your Criteria for Single Sign On
-###############################################
-
-.. note:: We use `JsonLogic <http://jsonlogic.com/>`_ for constraints definition in credentialRequirements. 
-In the example below, the user must provide a credential which is issued by 'did:jolo:showcase'.
-
-.. code-block:: typescript
-
-  const callbackURL = 'https://www.testSSO.com/myCallbackURL'
-
-  
-  
-  //  define what information you require from user for signing on
-  
-  
-  const credentialRequirements = {
-    
-    type: ['Credential', 'ProofOfEmailCredential']
-    
-    constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:showcase'] }]
-  
-  }  
-  
-  
-  
-  const credRequest = identityWallet.create.credentialRequest({callbackURL, credentialRequirements})
-
-  
-  const signedCredReq = identityWallet.sign.credentialRequest(credRequest)
-
-  
-  
-  // encode signed credential request as JWT and send it
-
-  
-  const signedCredReqJWT = signedCredReq.toJWT()
-
-
-############################################
-Step 4: Evaluate Response for Single Sign On
-############################################
-
-This is the last step of the Single Sign On process. Here, you can evaluate the response from a user 
-to your request.
-
-.. code-block:: typescript
-
-  // convert JWT to SignedCredentialResponse instance
-
-  const signedCredResp = JolocomLib.parse.signedCredentialResponse.fromJWT(receivedSignedCredResp)
-
-
-  const validSignature = signedCredResp.validateSignature(registry)
-  
-
-  const satisfiesRequest = signedCredResp.satisfiesRequest(credRequest)
-  
-
-  const receivedCreds = signedCredResp.getSuppliedCredentials()
-
-  
-  
-  // check signature of provided signed ProofOfEmailCredential
-
-  const validCred = await receivedCreds[0].validateSignature(registry)
-
-  // If the user has fulfilled the indicated requirements from the request, they can now be redirected 
-  // to the logged in section
-
-
-
-
+At this point the presented request can be scanned using the Jolocom SmartWallet in order to generate the corresponding credential response and share it with the service.

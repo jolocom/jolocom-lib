@@ -1,7 +1,7 @@
 import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
-import { privateKeyToDID, verifySignature } from '../utils/crypto'
+import { privateKeyToDID } from '../utils/crypto'
 import { DidDocument } from '../identity/didDocument'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
@@ -83,9 +83,7 @@ export class JolocomRegistry {
   public async resolve(did): Promise<Identity> {
     try {
       const ddoHash = await this.ethereumConnector.resolveDID(did)
-
       const ddo = (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs
-
       const identityData = {
         didDocument: ddo,
         profile: undefined

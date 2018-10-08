@@ -36,10 +36,13 @@ In its most simplistic form, the Jolocom Protocol can be used to:
 
 .. toctree::
   :maxdepth: 4
+  :numbered:
   :caption: Where to go next?
 
   introduction
   gettingStarted
-  usage
+  signedCredentials
+  publicProfile
+  interactionFlows
   ssoSetUp
   protocolComponents
