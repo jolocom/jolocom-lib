@@ -1,3 +1,4 @@
+import { JSONWebToken } from './JSONWebToken';
 import { IJWTHeader } from './types'
 import base64url from 'base64url'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
