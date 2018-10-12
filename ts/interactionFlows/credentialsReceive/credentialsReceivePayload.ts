@@ -12,17 +12,17 @@ export class CredentialsReceivePayload implements IPayload {
 
   public static create(attrs: ICredentialsReceivePayloadCreationAttrs): CredentialsReceivePayload {
     const credentialsReceive = attrs.credentialsReceive
-    
-    if(attrs.typ !== InteractionType.CredentialsReceive) {
-      throw new Error('Incorrect payload for CredentialReceive')
-    }
 
     const crp = new CredentialsReceivePayload()
-    crp.typ = attrs.typ
     crp.credentialsReceive = plainToClass(CredentialsReceive, credentialsReceive)
     crp.credentialsReceive.signedCredentials = credentialsReceive.signedCredentials
       .map(sCred => plainToClass(SignedCredential, sCred))
-    
+    crp.typ = InteractionType.CredentialsReceive
+
+    if (attrs.iss) {
+      crp.iss = attrs.iss
+    }
+
     return crp
   }
 
@@ -35,7 +35,7 @@ export class CredentialsReceivePayload implements IPayload {
     crp.credentialsReceive = plainToClass(CredentialsReceive, json.credentialsReceive)
     crp.credentialsReceive.signedCredentials = json.credentialsReceive.signedCredentials
       .map(sCred => plainToClass(SignedCredential, sCred))
-    
+
     return crp
   }
 

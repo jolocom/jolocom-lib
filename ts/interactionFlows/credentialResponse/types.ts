@@ -8,6 +8,7 @@ export interface ICredentialResponsePayloadAttrs {
 }
 
 export interface ICredentialResponsePayloadCreationAttrs {
+  iss?: string
   typ: string
   credentialResponse: ICredentialResponseAttrs
 }
@@ -15,4 +16,3 @@ export interface ICredentialResponsePayloadCreationAttrs {
 export interface ICredentialResponseAttrs {
   suppliedCredentials: ISignedCredentialAttrs[]
 }
-

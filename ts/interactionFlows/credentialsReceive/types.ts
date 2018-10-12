@@ -2,6 +2,7 @@ import { SignedCredential } from '../../credentials/signedCredential/signedCrede
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
 export interface ICredentialsReceivePayloadCreationAttrs {
+  iss?: string
   typ: string
   credentialsReceive: ICredentialsReceiveAttrs
 }
