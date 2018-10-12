@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
-import { canonize } from 'jsonld/dist/jsonld'
+import { canonize } from 'jsonld/dist/node6/lib'
 import { Credential } from '../credential/credential'
 import { generateRandomID, sign, sha256, verifySignature, privateKeyToDID } from '../../utils/crypto'
 import { ISignedCredentialAttrs } from './types'
@@ -73,7 +73,7 @@ export class SignedCredential implements IVerifiable {
       keyId: this.proof.creator
     }
   }
-  
+
   public getExpiryDate(): Date {
     return this.expires
   }
@@ -148,7 +148,7 @@ export class SignedCredential implements IVerifiable {
 
   public async validateSignatureWithPublicKey(pubKey: Buffer): Promise<boolean> {
     if (!pubKey) {
-      throw new Error("Please provide the issuer's public key")
+      throw new Error('Please provide the issuer\'s public key')
     }
 
     const docDigest = await this.digest()
