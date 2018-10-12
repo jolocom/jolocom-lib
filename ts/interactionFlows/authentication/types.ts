@@ -4,6 +4,7 @@ export interface IAuthenticationAttrs {
 }
 
 export interface IAuthPayloadCreationAttrs {
+  iss?: string
   typ: string
   authentication: IAuthenticationAttrs
 }
@@ -12,5 +13,5 @@ export interface IAuthentiactionPayloadAttrs {
   iat: number
   iss: string
   typ: string
-  authentication: IAuthenticationAttrs 
+  authentication: IAuthenticationAttrs
 }

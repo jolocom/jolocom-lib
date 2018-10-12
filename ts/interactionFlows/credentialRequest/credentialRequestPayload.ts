@@ -10,10 +10,15 @@ export class CredentialRequestPayload implements IPayload {
   public typ: InteractionType
   public credentialRequest: CredentialRequest
 
-  public static create(json: ICredentialRequestPayloadCreationAttrs): CredentialRequestPayload {
+  public static create(attrs: ICredentialRequestPayloadCreationAttrs): CredentialRequestPayload {
     const credentialRequestPayload = new CredentialRequestPayload()
-    credentialRequestPayload.credentialRequest = CredentialRequest.create(json.credentialRequest)
+    credentialRequestPayload.credentialRequest = CredentialRequest.create(attrs.credentialRequest)
     credentialRequestPayload.typ = InteractionType.CredentialRequest
+
+    if (attrs.iss) {
+      credentialRequestPayload.iss = attrs.iss
+    }
+
     return credentialRequestPayload
   }
 

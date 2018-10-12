@@ -40,7 +40,7 @@ const expect = chai.expect
 
 describe('Integration Test', () => {
   let jolocomRegistry
-  
+
   before(async function() {
     this.timeout(40000)
     const address = await integrationHelper.init()
@@ -67,7 +67,7 @@ describe('Integration Test', () => {
         privateEthereumKey: testPrivateEthereumKey
       })
       const didDocument = identityWallet.getIdentity().didDocument
-      
+
       expect(didDocument).to.be.an.instanceOf(DidDocument)
       expect(didDocument.getDID()).to.eq(sampleDid)
     })
@@ -76,7 +76,7 @@ describe('Integration Test', () => {
   describe('Authentication', () => {
     it('should return authenticated identity wallet', async () => {
       const identityWallet = await jolocomRegistry.authenticate(testPrivateIdentityKey)
-      
+
       expect(identityWallet).to.be.an.instanceOf(IdentityWallet)
       expect(identityWallet.getIdentity().getDID()).to.eq(sampleDid)
     })
@@ -107,7 +107,7 @@ describe('Integration Test', () => {
     it('should generate a valid DDO public profile', async () => {
       const committedProfile = await jolocomRegistry.resolve(sampleDid)
       const publicKey = committedProfile.getPublicKeySection()[0].getPublicKeyHex()
-
+      // tslint:disable-next-line:no-unused-expression
       expect(
         await committedProfile.publicProfile.get().validateSignatureWithPublicKey(Buffer.from(publicKey, 'hex')
       )).to.be.true
@@ -117,19 +117,19 @@ describe('Integration Test', () => {
   describe('SSO interaction flow', () => {
     let identityWalletUser
     let identityWalletService
-    
+
     before(async () => {
       identityWalletUser = await jolocomRegistry.create({
         privateIdentityKey: testPrivateIdentityKey,
         privateEthereumKey: testPrivateEthereumKey
       })
-      
+
       identityWalletService = await jolocomRegistry.create({
         privateIdentityKey: testPrivateIdentityKey3,
         privateEthereumKey: testPrivateEthereumKey3
       })
     })
-   
+
     let credRequestJWTClass
     let credRequestJWT
     let credResponseJWTClass
@@ -158,9 +158,11 @@ describe('Integration Test', () => {
       ])
 
       expect(credRequest).to.be.an.instanceOf(CredentialRequestPayload)
+      // tslint:disable
       expect(credRequest.getCallbackURL()).to.exist
       expect(credRequest.getRequestedCredentialTypes()).to.exist
       expect(credRequest.applyConstraints).to.exist
+      // tslint:enable
       expect(filteredCredentials).to.deep.equal([testSignedCredentialDefault])
     })
 
@@ -171,17 +173,18 @@ describe('Integration Test', () => {
           suppliedCredentials: [testSignedCredentialDefault]
         }
       })
-     
+
       credResponseJWT = credResponseJWTClass.encode()
-      
+
       sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
       const credRequest = await JSONWebToken.decode(credRequestJWT)
       sinon.restore()
-      
+
       expect(credResponseJWTClass.getPayload()).to.be.an.instanceof(CredentialResponsePayload)
       expect(credResponseJWTClass.getPayload().credentialResponse).to.be.an.instanceof(CredentialResponse)
       expect(credResponseJWTClass.getPayload().getSuppliedCredentials()[0])
         .to.be.an.instanceOf(SignedCredential)
+      // tslint:disable-next-line:no-unused-expression
       expect(credResponseJWTClass.getPayload().credentialResponse
         .satisfiesRequest(credRequest)).to.be.true
     })
@@ -193,8 +196,8 @@ describe('Integration Test', () => {
 
       const suppliedCredentials = credResponse.getSuppliedCredentials()
       const valid = await jolocomRegistry
-        .validateSignature(suppliedCredentials[0])  
-      
+        .validateSignature(suppliedCredentials[0])
+      // tslint:disable-next-line:no-unused-expression
       expect(valid).to.be.true
     })
   })
@@ -202,13 +205,13 @@ describe('Integration Test', () => {
   describe('Credential sharing flow ', () => {
     let identityWalletUser
     let identityWalletService
-    
+
     before(async () => {
       identityWalletUser = await jolocomRegistry.create({
         privateIdentityKey: testPrivateIdentityKey,
         privateEthereumKey: testPrivateEthereumKey
       })
-      
+
       identityWalletService = await jolocomRegistry.create({
         privateIdentityKey: testPrivateIdentityKey3,
         privateEthereumKey: testPrivateEthereumKey3
@@ -236,7 +239,7 @@ describe('Integration Test', () => {
       expect(authRequestJWTClass.getPayload()).to.be.an.instanceOf(AuthenticationPayload)
       expect(authRequestJWTClass.getPayload().authentication).to.be.an.instanceOf(Authentication)
     })
-
+    // tslint:disable-next-line
     it('Should allow for simple consumption of authentication request and generate authentication response by user', async () => {
       sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
       const authRequest = await JSONWebToken.decode(authRequestJWT)
@@ -252,22 +255,24 @@ describe('Integration Test', () => {
       expect(authRequest.authentication).to.be.an.instanceOf(Authentication)
       expect(authResponseJWTClass).to.be.instanceOf(JSONWebToken)
     })
-
+    // tslint:disable-next-line
     it('Should allow for authentication response consumption & validation and credentialsReceive creation by service', async () => {
       sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
       const authResponse = await JSONWebToken.decode(authResponseJWT)
       sinon.restore()
 
       const validChallenge = authResponse.validateChallenge(authRequestJWTClass.getPayload())
-      
+
       if (!validChallenge) {
         throw new Error('Challenge does not match requested challenge')
       }
 
       expect(authResponse).to.be.an.instanceOf(AuthenticationPayload)
+      // tslint:disable-next-line:no-unused-expression
       expect(authResponse.validateChallenge).to.exist
+      // tslint:disable-next-line:no-unused-expression
       expect(validChallenge).to.be.true
-   
+
       credentialFromService = await identityWalletService.create.signedCredential({
         metadata: claimsMetadata.emailAddress,
         claim: {
@@ -282,7 +287,7 @@ describe('Integration Test', () => {
           signedCredentials: [ credentialFromService ]
         }
       })
-      
+
       credentialReceiveJWT = credReceiveJWTClass.encode()
 
       expect(credentialFromService).to.be.an.instanceOf(SignedCredential)
@@ -297,11 +302,13 @@ describe('Integration Test', () => {
 
       const providedCredentials = credReceive.getSignedCredentials()
       const validCredSignature = await jolocomRegistry
-        .validateSignature(providedCredentials[0])  
+        .validateSignature(providedCredentials[0])
 
       expect(credReceive).to.be.an.instanceOf(CredentialsReceivePayload)
+      // tslint:disable-next-line:no-unused-expression
       expect(credReceive.getSignedCredentials).to.exist
       expect(providedCredentials[0]).to.be.an.instanceOf(SignedCredential)
+      // tslint:disable-next-line:no-unused-expression
       expect(validCredSignature).to.be.true
       expect(providedCredentials[0].getIssuer()).to.deep.equal(credentialFromService.getIssuer())
       expect(providedCredentials[0].getCredentialSection())

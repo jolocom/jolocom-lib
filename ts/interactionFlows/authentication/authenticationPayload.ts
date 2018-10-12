@@ -12,10 +12,14 @@ export class AuthenticationPayload implements IPayload {
   public typ: InteractionType
   public authentication: Authentication
 
-  public static create(json: IAuthPayloadCreationAttrs): AuthenticationPayload {
+  public static create(attrs: IAuthPayloadCreationAttrs): AuthenticationPayload {
     const authPayload = new AuthenticationPayload()
-    authPayload.authentication = plainToClass(Authentication, json.authentication)
+    authPayload.authentication = plainToClass(Authentication, attrs.authentication)
     authPayload.typ = InteractionType.Authentication
+
+    if (attrs.iss) {
+      authPayload.iss = attrs.iss
+    }
 
     return authPayload
   }

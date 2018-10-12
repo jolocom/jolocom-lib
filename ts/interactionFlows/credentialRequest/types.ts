@@ -6,6 +6,7 @@ export interface ICredentialRequestPayloadAttrs {
 }
 
 export interface ICredentialRequestPayloadCreationAttrs {
+  iss?: string
   typ: string
   credentialRequest: ICredentialRequestCreationAttrs
 }
