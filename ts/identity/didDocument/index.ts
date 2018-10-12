@@ -1,10 +1,19 @@
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
-import { privateKeyToDID, privateKeyToPublicKey, sha256, verifySignature, generateRandomID, sign } from '../../utils/crypto'
 import { IDidDocumentAttrs } from './types'
-import { canonize } from 'jsonld/dist/jsonld'
+import { canonize } from 'jsonld/dist/node6/lib'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections'
 import { IVerifiable, ISigner } from '../../registries/types'
+import { ContextEntry } from 'cred-types-jolocom-core'
+import { defaultContextIdentity } from '../../utils/contexts'
+import {
+  privateKeyToDID,
+  privateKeyToPublicKey,
+  sha256,
+  verifySignature,
+  generateRandomID,
+  sign
+} from '../../utils/crypto'
 
 @Exclude()
 export class DidDocument implements IVerifiable {
@@ -29,7 +38,7 @@ export class DidDocument implements IVerifiable {
   private proof = new EcdsaLinkedDataSignature()
 
   @Expose()
-  private '@context': string = 'https://w3id.org/did/v1'
+  private '@context': ContextEntry[] = defaultContextIdentity
 
   @Expose()
   private id: string
@@ -45,8 +54,8 @@ export class DidDocument implements IVerifiable {
     const keyId = `${did}#keys-1`
     const publicKeySection = new PublicKeySection().fromEcdsa(publicKey, keyId)
     const authenticationSection = new AuthenticationSection().fromEcdsa(publicKeySection)
-
     const didDocument = new DidDocument()
+
     didDocument.created = new Date()
     didDocument.id = did
     didDocument.publicKey.push(publicKeySection)

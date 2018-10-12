@@ -11,8 +11,8 @@ import {
 describe('CredentialReceivePayload', () => {
   const credentialsReceivePayload = CredentialsReceivePayload.create({
     typ: 'credentialsReceive',
-    credentialsReceive: jsonCredReceive 
-  }) 
+    credentialsReceive: jsonCredReceive
+  })
 
   it('Should implement static create method and return correct instance', () => {
     expect(credentialsReceivePayload).to.be.instanceOf(CredentialsReceivePayload)
@@ -27,14 +27,12 @@ describe('CredentialReceivePayload', () => {
     const credReceivePayloadRevived = CredentialsReceivePayload.fromJSON(mockJsonCredReceivePayload)
     credentialsReceivePayload.iss = mockJsonCredReceivePayload.iss
     credentialsReceivePayload.iat = mockJsonCredReceivePayload.iat
-    
+
     expect(credReceivePayloadRevived).to.be.instanceOf(CredentialsReceivePayload)
     expect(credReceivePayloadRevived.credentialsReceive).to.be.instanceOf(CredentialsReceive)
     expect(credentialsReceivePayload.getSignedCredentials()[0]).to.be.instanceOf(SignedCredential)
-    
+
     expect(credReceivePayloadRevived)
     .to.deep.equal(CredentialsReceivePayload.fromJSON(mockJsonCredReceivePayload))
   })
-
- 
 })

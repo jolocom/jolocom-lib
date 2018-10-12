@@ -11,7 +11,7 @@ export class CredentialResponse {
     const credentialResponse = new CredentialResponse()
     credentialResponse.suppliedCredentials = credentials
       .map((sCred) => plainToClass(SignedCredential, sCred))
-    
+
     return credentialResponse
   }
 
@@ -35,7 +35,7 @@ export class CredentialResponse {
     const credResponse = plainToClass(CredentialResponse, json)
     credResponse.suppliedCredentials = json.suppliedCredentials
       .map((sCred) => plainToClass(SignedCredential, sCred))
-    
+
     return credResponse
   }
 }
