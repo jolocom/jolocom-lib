@@ -1,6 +1,6 @@
 import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
-import { canonize } from 'jsonld/dist/node6/lib'
+import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections'
 import { IVerifiable, ISigner } from '../../registries/types'
