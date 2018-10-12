@@ -8,7 +8,7 @@ import {
   multipleClaimsCredentialJSON,
   customClaimMetadata,
   customCredentialJSON,
-  NestedAddressClaimInterface,
+  INestedAddressClaimInterface,
   nestedAddressClaimMetadata,
   addressCredentialJSON,
   addressClaimCreationArgs
@@ -39,7 +39,7 @@ describe('Credential', () => {
     })
 
     it('Should correctly assemble a credential given nested, multiline claims', () => {
-      const credential = Credential.create<NestedAddressClaimInterface>({
+      const credential = Credential.create<INestedAddressClaimInterface>({
         metadata: nestedAddressClaimMetadata,
         claim: addressClaimCreationArgs,
         subject: 'did:jolo:test'

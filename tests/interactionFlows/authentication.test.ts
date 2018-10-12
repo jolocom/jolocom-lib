@@ -21,7 +21,7 @@ describe('Authentication', () => {
 
   it('Should implement static fromJSON method', () => {
     const auth = Authentication.fromJSON(jsonAuthentication)
-    
+
     expect(auth).to.be.instanceOf(Authentication)
     expect(auth).to.deep.equal(authentication)
   })

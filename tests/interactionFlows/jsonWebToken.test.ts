@@ -88,8 +88,8 @@ describe('JSONWebToken', () => {
     })
     
     it('Should return a valid InteractionType payload class and pass signature validation', async () => {
-      const decoded = await JSONWebToken.decode(signedCredRequestJWT)
-      
+     const decoded = await JSONWebToken.decode(signedCredRequestJWT)
+
       expect(decoded).to.be.an.instanceof(CredentialRequestPayload)
     })
 
@@ -100,7 +100,7 @@ describe('JSONWebToken', () => {
         keyId: jsonWebToken.getPayload().iss,
         jwt: token
       })
-
+      // tslint:disable-next-line:no-unused-expression
       expect(valid).to.be.true
     })
 
@@ -110,7 +110,7 @@ describe('JSONWebToken', () => {
         keyId: jsonWebToken.getPayload().iss,
         jwt: signedCredRequestJWTIncorrect
       })
-
+      // tslint:disable-next-line:no-unused-expression
       expect(valid).to.be.false
     })
   })

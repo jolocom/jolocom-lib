@@ -15,7 +15,7 @@ describe('CredentialsReceive', () => {
 
   it('should return an array of signed credential on getSignedCredentials', () => {
     const creds = credentialsReceive.getSignedCredentials()
-    
+
     expect(creds).to.be.instanceOf(Array)
     expect(creds[0]).to.be.instanceOf(SignedCredential)
     expect(creds[0]).to.deep.equal(SignedCredential.fromJSON(testSignedCredential))
@@ -27,7 +27,7 @@ describe('CredentialsReceive', () => {
 
   it('Should implement static fromJSON method', () => {
     const credReceive = CredentialsReceive.fromJSON(credentialsReceive.toJSON())
-    
+
     expect(credReceive).to.be.instanceOf(CredentialsReceive)
     expect(credReceive.getSignedCredentials()[0]).to.be.instanceOf(SignedCredential)
     expect(credReceive).to.deep.equal(CredentialsReceive.fromJSON(jsonCredReceive))

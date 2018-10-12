@@ -1,5 +1,5 @@
 import { IJWTHeader } from './types'
-import base64url from 'base64url'
+import base64url from 'base64url/dist/base64url'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import { classToPlain } from 'class-transformer'
 import {
@@ -49,21 +49,21 @@ export class JSONWebToken<T extends IPayload> {
     jwt.payload.iat = Date.now()
     jwt.payload.iss = privateKey.id
     jwt.signature = jwt.sign(privateKey.key)
-    
+
     return jwt
   }
 
   public static async decode(jwt: string): Promise<IPayload> {
     const json = decodeToken(jwt)
     let valid
-    
+
     try {
       valid = await JSONWebToken
         .validateSignatureWithPublicKey({ keyId: json.payload.iss, jwt })
     } catch (error) {
       throw new Error(`Could not validate signature on decode. ${error.message}`)
     }
-    
+
     if (!valid) {
       throw new Error('JWT signature is invalid')
     }
@@ -79,7 +79,7 @@ export class JSONWebToken<T extends IPayload> {
     jwtParts.push(base64url.encode(JSON.stringify(this.header)))
     jwtParts.push(base64url.encode(JSON.stringify(this.payload)))
     jwtParts.push(this.signature)
-    
+
     return jwtParts.join('.')
   }
 
@@ -93,7 +93,7 @@ export class JSONWebToken<T extends IPayload> {
     const registry = createJolocomRegistry()
     const did = keyId.substring(0, keyId.indexOf('#'))
     let pubKey
-  
+
     try {
       const identity = await registry.resolve(did)
       pubKey = identity.getPublicKeySection()

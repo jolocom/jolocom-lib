@@ -23,7 +23,7 @@ describe('CredentialResponsePayload', () => {
 
   it('Should return true on credentialResponse.satisfiesRequest call', () => {
     const cr = CredentialRequest.create(credRequestCreationAttrs)
-  
+    // tslint:disable-next-line:no-unused-expression
     expect(crp.credentialResponse.satisfiesRequest(cr)).to.be.true
   })
 
@@ -31,11 +31,11 @@ describe('CredentialResponsePayload', () => {
     const credResPayload = CredentialResponsePayload.fromJSON(credResponsePayloadJSON)
     crp.iss = credResponsePayloadJSON.iss
     crp.iat = credResponsePayloadJSON.iat
-
     expect(credResPayload).to.be.instanceOf(CredentialResponsePayload)
     expect(credResPayload.credentialResponse).to.be.instanceOf(CredentialResponse)
     expect(credResPayload.credentialResponse.getSuppliedCredentials()[0]).to.be.instanceOf(SignedCredential)
-    expect(credResPayload).to.deep.equal(crp)
+    expect(credResPayload.credentialResponse.suppliedCredentials)
+      .to.deep.equal(crp.credentialResponse.suppliedCredentials)
     expect(credResPayload.credentialResponse.suppliedCredentials[0].getIssuer())
       .to.deep.equal(crp.credentialResponse.suppliedCredentials[0].getIssuer())
   })
@@ -49,6 +49,7 @@ describe('CredentialResponsePayload', () => {
   })
 
   it('Should expose CredentialResponse specific methods', () => {
+    // tslint:disable-next-line:no-unused-expression
     expect(crp.getSuppliedCredentials).to.exist
   })
 })

@@ -8,7 +8,7 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 
 describe('CredentialResponse', () => {
   const credentialResponse = CredentialResponse.create([testSignedCredentialDefault])
-  
+
   it('Should implement static create method', () => {
     expect(credentialResponse).to.be.instanceOf(CredentialResponse)
     expect(credentialResponse.getSuppliedCredentials()[0])
@@ -20,7 +20,7 @@ describe('CredentialResponse', () => {
   it('Should implement static fromJSON method', () => {
     const credResponse = CredentialResponse.fromJSON(credentialResponseJSON)
     const expectedCredentialResponse = CredentialResponse.create([testSignedCredentialDefault])
-    
+
     expect(credResponse).to.be.instanceOf(CredentialResponse)
     expect(credResponse.getSuppliedCredentials()[0]).to.be.instanceOf(SignedCredential)
     expect(credResponse).to.deep.equal(expectedCredentialResponse)
@@ -35,6 +35,7 @@ describe('CredentialResponse', () => {
   })
 
   it('Should implement all getter methods', () => {
+    // tslint:disable-next-line:no-unused-expression
     expect(credentialResponse.getSuppliedCredentials).to.exist
     expect(credentialResponse.getSuppliedCredentials().length).to.equal(1)
   })
@@ -45,8 +46,10 @@ describe('CredentialResponse', () => {
     const mixedCredentialResponse = CredentialResponse
       .create([testSignedCredentialDefault, secondMockCredential])
 
+    // tslint:disable:no-unused-expression
     expect(credentialResponse.satisfiesRequest(credentialRequest)).to.be.true
     expect(invalidCredentialResponse.satisfiesRequest(credentialRequest)).to.be.false
     expect(mixedCredentialResponse.satisfiesRequest(credentialRequest)).to.be.false
+    // tslint:enable:no-unused-expression
   })
 })

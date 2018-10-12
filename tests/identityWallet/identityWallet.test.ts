@@ -32,7 +32,6 @@ describe('IdentityWallet', () => {
 
   before(async () => {
     clock = sinon.useFakeTimers()
-
     ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
     identity = Identity.create({ didDocument: ddo.toJSON() })
     identityWallet = IdentityWallet.create({
@@ -114,11 +113,11 @@ describe('IdentityWallet', () => {
       expect(authPayload).to.be.an.instanceof(AuthenticationPayload)
       expect(authPayload.authentication).to.be.an.instanceof(Authentication)
     })
-    
+
     it('create.credentialReceiveJSONWebToken should return a correct credentialsReceive JWT', () => {
       const credReceiveJWT = identityWallet.create.credentialsReceiveJSONWebToken(jsonCredReceivePayload)
       const credReceivePayload = credReceiveJWT.getPayload()
-      
+
       expect(credReceivePayload).to.be.an.instanceof(CredentialsReceivePayload)
       expect(credReceivePayload.credentialsReceive).to.be.an.instanceof(CredentialsReceive)
     })

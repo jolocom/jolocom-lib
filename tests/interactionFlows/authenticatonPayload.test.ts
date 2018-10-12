@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { AuthenticationPayload } from '../../ts/interactionFlows/authentication/authenticationPayload'
 import { Authentication } from '../../ts/interactionFlows/authentication/authentication'
-import { 
+import {
   callbackURL,
   challenge,
   jsonAuthPayload,
@@ -13,20 +13,23 @@ describe('AuthenticationPayload', () => {
   const authPayload = AuthenticationPayload.create({
     typ: 'authentication',
     authentication: jsonAuthentication
-  }) 
+  })
 
   it('Should expose class specific methods on authenticationPayload', () => {
     expect(authPayload.getCallbackURL()).to.deep.equal(callbackURL)
     expect(authPayload.getChallenge()).to.deep.equal(challenge)
+    // tslint:disable-next-line:no-unused-expression
     expect(authPayload.getAuthentication).to.exist
+    // tslint:disable-next-line:no-unused-expression
     expect(authPayload.validateChallenge).to.exist
   })
-  
+
   it('Should return true on valid input on validateChallenge', () => {
     const authPayloadVerify = AuthenticationPayload.create({
       typ: 'authentication',
       authentication: jsonAuthentication
     })
+    // tslint:disable-next-line:no-unused-expression
     expect(authPayload.validateChallenge(authPayloadVerify)).to.be.true
   })
 
@@ -43,7 +46,7 @@ describe('AuthenticationPayload', () => {
   it('Should correctly implement static fromJSON method', () => {
     authPayload.iss = mockJsonAuthPayload.iss
     authPayload.iat = mockJsonAuthPayload.iat
-    
+
     expect(AuthenticationPayload.fromJSON(mockJsonAuthPayload))
       .to.deep.equal(authPayload)
   })
