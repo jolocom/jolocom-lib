@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { Type, plainToClass, classToPlain, Exclude, Expose } from 'class-transformer'
-import { canonize } from 'jsonld/dist/node6/lib'
+import { canonize } from 'jsonld'
 import { ILinkedDataSignature, proofTypes, ILinkedDataSignatureAttrs } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
