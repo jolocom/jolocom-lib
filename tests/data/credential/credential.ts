@@ -1,4 +1,5 @@
 import { BaseMetadata } from 'cred-types-jolocom-core'
+import { defaultContext } from '../../../ts/utils/contexts'
 
 export const singleClaimCreationArgs = {
   email: 'eugeniu@jolocom.com'
@@ -17,7 +18,7 @@ export const addressClaimCreationArgs = {
   }
 }
 
-export interface BirthDateClaimInterface extends BaseMetadata {
+export interface IBirthDateClaimInterface extends BaseMetadata {
   claimInterface?: {
     birthDate: number
     birthMonth: string
@@ -25,7 +26,7 @@ export interface BirthDateClaimInterface extends BaseMetadata {
   }
 }
 
-export interface NestedAddressClaimInterface extends BaseMetadata {
+export interface INestedAddressClaimInterface extends BaseMetadata {
   claimInterface?: {
     address: {
       street: string,
@@ -35,13 +36,13 @@ export interface NestedAddressClaimInterface extends BaseMetadata {
   }
 }
 
-export const customClaimMetadata: BirthDateClaimInterface = {
+export const customClaimMetadata: IBirthDateClaimInterface = {
   context: ['http://test.com', { test: 'http://test.com/terms' }],
   type: ['Credential', 'MockCredential'],
   name: 'Mock'
 }
 
-export const nestedAddressClaimMetadata: NestedAddressClaimInterface = {
+export const nestedAddressClaimMetadata: INestedAddressClaimInterface = {
   context: ['http://test.com', { test: 'http://test.com/terms' }],
   type: ['Credential', 'ProofOfAddressCredential'],
   name: 'Address'
@@ -52,13 +53,6 @@ export const customCredentialCreationArgs = {
   test: 'first',
   secondTest: 'second'
 }
-
-const defaultContext = [
-  'https://w3id.org/identity/v1',
-  {
-    proof: 'https://w3id.org/security#proof'
-  }
-]
 
 export const singleClaimCredentialJSON = {
   '@context': [
