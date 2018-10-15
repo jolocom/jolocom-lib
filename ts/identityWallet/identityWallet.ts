@@ -38,35 +38,34 @@ export class IdentityWallet {
     credentialRequestJSONWebToken: (
       payload: ICredentialRequestPayloadCreationAttrs
     ): JSONWebToken<CredentialRequestPayload> => {
-      return JSONWebToken.create(
-        {privateKey: this.privateIdentityKey, payload}
-      ) as JSONWebToken<CredentialRequestPayload>
+      return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
+        CredentialRequestPayload
+      >
     },
     credentialResponseJSONWebToken: (
       payload: ICredentialResponsePayloadCreationAttrs
     ): JSONWebToken<CredentialResponsePayload> => {
-      return JSONWebToken.create(
-        {privateKey: this.privateIdentityKey, payload}
-      ) as JSONWebToken<CredentialResponsePayload>
+      return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
+        CredentialResponsePayload
+      >
     },
-    authenticationJSONWebToken: (
-      payload: IAuthPayloadCreationAttrs
-    ): JSONWebToken<AuthenticationPayload> => {
-      return JSONWebToken.create(
-        {privateKey: this.privateIdentityKey, payload}
-      ) as JSONWebToken<AuthenticationPayload>
+    authenticationJSONWebToken: (payload: IAuthPayloadCreationAttrs): JSONWebToken<AuthenticationPayload> => {
+      return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
+        AuthenticationPayload
+      >
     },
     credentialsReceiveJSONWebToken: (
       payload: ICredentialsReceivePayloadCreationAttrs
-      ): JSONWebToken<CredentialsReceivePayload> => {
+    ): JSONWebToken<CredentialsReceivePayload> => {
       return JSONWebToken.create({
-        privateKey: this.privateIdentityKey, payload
+        privateKey: this.privateIdentityKey,
+        payload
       }) as JSONWebToken<CredentialsReceivePayload>
     }
   }
 
   public sign = {
-    credential: this.signCredential.bind(this),
+    credential: this.signCredential.bind(this)
   }
 
   public identity
@@ -80,6 +79,7 @@ export class IdentityWallet {
       key: privateIdentityKey,
       id: entry.getIdentifier()
     }
+
     identityWallet.identityDocument = identity
     identityWallet.setIdentity(identity)
 

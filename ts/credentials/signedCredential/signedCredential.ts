@@ -38,6 +38,8 @@ export class SignedCredential implements IVerifiable {
   private issued: Date
 
   @Type(() => Date)
+  @Transform((value: Date) => value.toISOString(), {toPlainOnly: true})
+  @Transform((value: string) => new Date(value), {toClassOnly: true})
   @Expose()
   private expires?: Date
 
@@ -141,7 +143,11 @@ export class SignedCredential implements IVerifiable {
   }
 
   public async generateSignature({ key, id }: { key: Buffer; id: string }) {
+    const inOneYear = new Date()
+    inOneYear.setFullYear(new Date().getFullYear() + 1)
+
     this.proof.created = new Date()
+    this.expires = inOneYear
     this.proof.creator = id
     this.proof.nonce = generateRandomID(8)
     this.setIssuer(privateKeyToDID(key))

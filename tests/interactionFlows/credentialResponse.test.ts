@@ -46,10 +46,8 @@ describe('CredentialResponse', () => {
     const mixedCredentialResponse = CredentialResponse
       .create([testSignedCredentialDefault, secondMockCredential])
 
-    // tslint:disable:no-unused-expression
     expect(credentialResponse.satisfiesRequest(credentialRequest)).to.be.true
     expect(invalidCredentialResponse.satisfiesRequest(credentialRequest)).to.be.false
     expect(mixedCredentialResponse.satisfiesRequest(credentialRequest)).to.be.false
-    // tslint:enable:no-unused-expression
   })
 })

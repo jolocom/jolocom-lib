@@ -11,10 +11,7 @@ import { Identity } from '../../ts/identity/identity'
 import { testIpfsHash, testEthereumConfig, testIpfsConfig } from '../data/registry'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { testPrivateIdentityKey, testPrivateEthereumKey } from '../data/keys'
-import {
-  testSignedCredentialDefault,
-  testSignedCredentialDefaultIncorrect
-} from '../data/credential/signedCredential'
+import { testSignedCredentialDefault, testSignedCredentialDefaultIncorrect } from '../data/credential/signedCredential'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -33,7 +30,7 @@ describe('JolocomRegistry', () => {
   describe('static create', () => {
     const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
     const ethereumConnector = new EthResolver(testEthereumConfig)
-    const jolocomRegistry = createJolocomRegistry({ipfsConnector, ethereumConnector})
+    const jolocomRegistry = createJolocomRegistry({ ipfsConnector, ethereumConnector })
 
     // TODO We should eventually check if we can plug in another connector
     it('should correctly create an instance of JolocomRegistry if connectors are passed ', () => {
@@ -231,16 +228,20 @@ describe('JolocomRegistry', () => {
     })
   })
 
-  describe('validateSignature', () => { 
+  describe('validateSignature', () => {
     const defaultJolocomRegistry = createJolocomRegistry()
     let ddo
 
     beforeEach(async () => {
-      ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
+      const privateIdentityKey = Buffer.from('7A59BC95029803EC082BFEBBA8094F9D6B58AAB1A23B7CA2D9C6B96F21E1A0A4', 'hex')
+
+      ddo = await new DidDocument().fromPrivateKey(privateIdentityKey)
+
+
       sandbox
         .stub(JolocomRegistry.prototype, 'resolve')
-        .withArgs(ddo.getDID())
-        .resolves(ddo)
+        .withArgs(ddo.getDID()).resolves(ddo)
+        .withArgs('did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af').resolves(ddo)
     })
 
     it('Should return true for valid signed DidDocument signature validation', async () => {
@@ -250,9 +251,10 @@ describe('JolocomRegistry', () => {
     })
 
     it('Should return false for invalid signed DidDocument signature validaton', async () => {
-      ddo.proof.signatureValue = 'hello969M2c5R80rEEMbhwKdTaHNVoWoUndx0EPZ1RdkaVwACa0jN4bMEnfOhBljUSL2ZI/pDlDveYXNiKaaew=='
+      ddo.proof.signatureValue =
+        'hello969M2c5R80rEEMbhwKdTaHNVoWoUndx0EPZ1RdkaVwACa0jN4bMEnfOhBljUSL2ZI/pDlDveYXNiKaaew=='
       const res = await defaultJolocomRegistry.validateSignature(ddo)
-      
+
       expect(res).to.be.false
     })
 
@@ -264,7 +266,7 @@ describe('JolocomRegistry', () => {
     })
 
     it('Should return false for invalid signed credential signature validation', async () => {
-      const sigCred = SignedCredential.fromJSON(testSignedCredentialDefaultIncorrect) 
+      const sigCred = SignedCredential.fromJSON(testSignedCredentialDefaultIncorrect)
       const res = await defaultJolocomRegistry.validateSignature(sigCred)
 
       expect(res).to.be.false
