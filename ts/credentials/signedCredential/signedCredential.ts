@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
+import { Transform, plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { canonize } from 'jsonld'
 import { Credential } from '../credential/credential'
 import { generateRandomID, sign, sha256, verifySignature, privateKeyToDID } from '../../utils/crypto'
@@ -33,6 +33,8 @@ export class SignedCredential implements IVerifiable {
 
   @Type(() => Date)
   @Expose()
+  @Transform((value: Date) => value.toISOString(), {toPlainOnly: true})
+  @Transform((value: string) => new Date(value), {toClassOnly: true})
   private issued: Date
 
   @Type(() => Date)
@@ -57,6 +59,10 @@ export class SignedCredential implements IVerifiable {
 
   public getId(): string {
     return this.id
+  }
+
+  public getIssued(): Date {
+    return this.issued
   }
 
   public getType(): string[] {
