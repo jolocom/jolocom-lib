@@ -66,10 +66,11 @@ export class DidDocument implements IVerifiable {
   }
 
   public async generateSignature({key, id}: {key: Buffer, id: string}) {
-    const docDigest = await this.digest()
     this.proof.created = new Date()
     this.proof.creator = id
     this.proof.nonce = generateRandomID(8)
+
+    const docDigest = await this.digest()
     this.proof.signatureValue = sign(`${docDigest}`, key)
   }
 
@@ -80,7 +81,6 @@ export class DidDocument implements IVerifiable {
 
     const docDigest = await this.digest()
     const sig = this.proof.getSigValue()
-
     return verifySignature(docDigest, pubKey, sig)
   }
 
