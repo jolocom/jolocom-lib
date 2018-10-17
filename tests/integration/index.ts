@@ -8,7 +8,7 @@ import {
   testPrivateIdentityKey3,
   testPrivateEthereumKey3
 } from '../data/keys'
-import { testSignedCredentialDefault, thirdMockCredential } from '../data/credential/signedCredential'
+import { thirdMockCredential } from '../data/credential/signedCredential'
 import { DidDocument } from '../../ts/identity/didDocument'
 import * as integrationHelper from './provision'
 import { IpfsStorageAgent } from '../../ts/ipfs'
@@ -24,7 +24,8 @@ import {
   sampleCredentialRequest,
   sampleDid,
   integrationTestIpfsConfig,
-  ethereumConfigProviderUrl
+  ethereumConfigProviderUrl,
+  testSignedCredentialIntegration
 } from './../data/interactionFlows/integrationTest'
 import { CredentialResponse } from './../../ts/interactionFlows/credentialResponse/credentialResponse'
 import * as jr from '../../ts/registries/jolocomRegistry'
@@ -33,7 +34,7 @@ import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRe
 import { CredentialResponsePayload } from '../../ts/interactionFlows/credentialResponse/credentialResponsePayload'
 import { Authentication } from '../../ts/interactionFlows/authentication/authentication'
 import { AuthenticationPayload } from '../../ts/interactionFlows/authentication/authenticationPayload'
-import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload';
+import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -154,7 +155,7 @@ describe('Integration Test', () => {
       sinon.restore()
 
       const filteredCredentials = credRequest.applyConstraints([
-        testSignedCredentialDefault, thirdMockCredential
+        testSignedCredentialIntegration, thirdMockCredential
       ])
 
       expect(credRequest).to.be.an.instanceOf(CredentialRequestPayload)
@@ -163,14 +164,14 @@ describe('Integration Test', () => {
       expect(credRequest.getRequestedCredentialTypes()).to.exist
       expect(credRequest.applyConstraints).to.exist
       // tslint:enable
-      expect(filteredCredentials).to.deep.equal([testSignedCredentialDefault])
+      expect(filteredCredentials).to.deep.equal([testSignedCredentialIntegration])
     })
 
     it('should allow for simple generation of appropriate credential response by user', async () => {
       credResponseJWTClass = identityWalletUser.create.credentialResponseJSONWebToken({
         typ: InteractionType.CredentialResponse,
         credentialResponse: {
-          suppliedCredentials: [testSignedCredentialDefault]
+          suppliedCredentials: [testSignedCredentialIntegration]
         }
       })
 
