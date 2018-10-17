@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { Type, plainToClass, classToPlain, Exclude, Expose } from 'class-transformer'
+import { Type, plainToClass, classToPlain, Exclude, Expose, Transform } from 'class-transformer'
 import { canonize } from 'jsonld'
 import { ILinkedDataSignature, proofTypes, ILinkedDataSignatureAttrs } from '../types'
 import { sha256 } from '../../utils/crypto'
@@ -11,6 +11,8 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature {
   public type = 'EcdsaKoblitzSignature2016'
 
   @Type(() => Date)
+  @Transform((value: Date) => value.toISOString(), {toPlainOnly: true})
+  @Transform((value: string) => new Date(value), {toClassOnly: true})
   @Expose()
   public created: Date
 

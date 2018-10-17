@@ -18,7 +18,7 @@ export const credentialRequestPayloadCreateAttrs = {
 
 export const credentialRequestPayloadJson = {
   iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
-  iat: 0,
+  iat: 1500000,
   typ: InteractionType.CredentialRequest.toString(),
   credentialRequest: {
     callbackURL: 'http://test.com',
@@ -68,7 +68,7 @@ export const credRequestCreationAttrs = {
   credentialRequirements: [
     {
       type: ['Credential', 'ProofOfEmailCredential'],
-      constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af'] }]
+      constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:b310d293aeac8a5ca680232b96901fe85988fde2860a1a5db69b49762923cc88'] }]
     }
   ]
 }
@@ -79,7 +79,7 @@ export const privKeyDID = 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c935
 export const signedCredReqJson = {
   header: { alg: 'ES256K', typ: 'JWT' },
   payload: {
-    iat: 0,
+    iat: 150000,
     iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
     typ:  InteractionType.CredentialRequest,
     credentialRequest: {

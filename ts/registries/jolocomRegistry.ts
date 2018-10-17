@@ -24,7 +24,6 @@ export class JolocomRegistry {
   public async create(args: IRegistryInstanceCreationArgs): Promise<IdentityWallet> {
     const { privateIdentityKey, privateEthereumKey } = args
     const ddo = await new DidDocument().fromPrivateKey(privateIdentityKey)
-
     const identity = Identity.create({ didDocument: ddo.toJSON() })
     const identityWallet = IdentityWallet.create({ privateIdentityKey: privateIdentityKey, identity })
 
@@ -120,17 +119,19 @@ export class JolocomRegistry {
   public async validateSignature(obj: IVerifiable): Promise<boolean> {
     const { did, keyId } = obj.getSigner()
     let pubKey
-    
+
     try {
       const identity = await this.resolve(did)
-      pubKey = identity.getPublicKeySection()
-        .find(pubKeySection => pubKeySection.getIdentifier() === keyId)
+      pubKey = identity.getPublicKeySection().find(pubKeySection => pubKeySection.getIdentifier() === keyId)
+
+      if (!pubKey) {
+        return false
+      }
     } catch (error) {
       throw new Error(`Could not validate signature with registry. ${error.message}`)
     }
 
-    return obj
-      .validateSignatureWithPublicKey(Buffer.from(pubKey.getPublicKeyHex(), 'hex'))
+    return obj.validateSignatureWithPublicKey(Buffer.from(pubKey.getPublicKeyHex(), 'hex'))
   }
 }
 

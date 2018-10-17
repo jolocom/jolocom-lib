@@ -1,5 +1,4 @@
 import { InteractionType } from '../../../ts/interactionFlows/types'
-import { defaultContext } from './../../../ts/utils/contexts'
 import { testSignedCredentialDefault } from '../credential/signedCredential'
 
 export const credentialResponsePayloadCreationAttrs = {
@@ -18,7 +17,7 @@ export const credResponsePayloadJSON = {
     suppliedCredentials: [ testSignedCredentialDefault ] 
   },
   typ: 'credentialResponse',
-  iat: 0,
+  iat: 150000000,
   iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
 }
 

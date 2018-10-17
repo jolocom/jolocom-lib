@@ -1,4 +1,4 @@
-import { plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
+import { Transform, plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
 import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
@@ -30,6 +30,8 @@ export class DidDocument implements IVerifiable {
   private service: ServiceEndpointsSection[] = []
 
   @Type(() => Date)
+  @Transform((value: Date) => value.toISOString(), { toPlainOnly: true })
+  @Transform((value: string) => new Date(value), { toClassOnly: true })
   @Expose()
   private created: Date
 
@@ -61,26 +63,26 @@ export class DidDocument implements IVerifiable {
     didDocument.publicKey.push(publicKeySection)
     didDocument.authentication.push(authenticationSection)
 
-    await didDocument.generateSignature({key: privateKey, id: keyId})
+    await didDocument.generateSignature({ key: privateKey, id: keyId })
     return didDocument
   }
 
-  public async generateSignature({key, id}: {key: Buffer, id: string}) {
-    const docDigest = await this.digest()
+  public async generateSignature({ key, id }: { key: Buffer; id: string }) {
     this.proof.created = new Date()
     this.proof.creator = id
     this.proof.nonce = generateRandomID(8)
+
+    const docDigest = await this.digest()
     this.proof.signatureValue = sign(`${docDigest}`, key)
   }
 
   public async validateSignatureWithPublicKey(pubKey: Buffer): Promise<boolean> {
     if (!pubKey) {
-      throw new Error('Please provide the issuer\'s public key')
+      throw new Error("Please provide the issuer's public key")
     }
 
     const docDigest = await this.digest()
     const sig = this.proof.getSigValue()
-
     return verifySignature(docDigest, pubKey, sig)
   }
 
@@ -93,7 +95,7 @@ export class DidDocument implements IVerifiable {
     const json = this.toJSON()
     delete json.proof
     return canonize(json)
-}
+  }
 
   public getDID(): string {
     return this.id
