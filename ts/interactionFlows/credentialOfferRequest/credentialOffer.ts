@@ -1,5 +1,5 @@
 import { plainToClass, classToPlain } from 'class-transformer'
-import { IOfferCreationAttrs } from './types'
+import { ICredentialOfferCreationAttrs } from './types'
 
 export class CredentialOffer {
   private challenge: string
@@ -9,7 +9,7 @@ export class CredentialOffer {
     [key: string]: string | null
   }
 
-  public static create(attrs: IOfferCreationAttrs): CredentialOffer {
+  public static create(attrs: ICredentialOfferCreationAttrs): CredentialOffer {
     const offer = new CredentialOffer()
     const { challenge, callbackUrl, instant, requestedInput } = attrs
 

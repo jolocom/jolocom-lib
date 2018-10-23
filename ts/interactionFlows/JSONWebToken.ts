@@ -2,12 +2,7 @@ import { IJWTHeader } from './types'
 import base64url from 'base64url'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import { classToPlain } from 'class-transformer'
-import {
-  IPayload,
-  IJSONWebTokenAttrs,
-  InteractionType,
-  IJSONWebTokenCreationAttrs,
-} from './types'
+import { IPayload, IJSONWebTokenAttrs, InteractionType, IJSONWebTokenCreationAttrs } from './types'
 import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
 import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload'
 import { CredentialsReceivePayload } from './credentialsReceive/credentialsReceivePayload'
@@ -16,7 +11,9 @@ import { IAuthPayloadCreationAttrs } from './authentication/types'
 import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/types'
 import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
 import { ICredentialsReceivePayloadCreationAttrs } from './credentialsReceive/types'
+import { ICredentialOfferReqPayloadCreationAttrs } from './credentialOfferRequest/types'
 import { createJolocomRegistry } from '../registries/jolocomRegistry'
+import { CredentialOfferRequestPayload } from './credentialOfferRequest/credentialOfferRequestPayload'
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -58,8 +55,7 @@ export class JSONWebToken<T extends IPayload> {
     let valid
 
     try {
-      valid = await JSONWebToken
-        .validateSignatureWithPublicKey({ keyId: json.payload.iss, jwt })
+      valid = await JSONWebToken.validateSignatureWithPublicKey({ keyId: json.payload.iss, jwt })
     } catch (error) {
       throw new Error(`Could not validate signature on decode. ${error.message}`)
     }
@@ -88,16 +84,14 @@ export class JSONWebToken<T extends IPayload> {
     return decodeToken(signed).signature
   }
 
-  public static async validateSignatureWithPublicKey(
-    {keyId, jwt}: {keyId: string, jwt: string}): Promise<boolean> {
+  public static async validateSignatureWithPublicKey({ keyId, jwt }: { keyId: string; jwt: string }): Promise<boolean> {
     const registry = createJolocomRegistry()
     const did = keyId.substring(0, keyId.indexOf('#'))
     let pubKey
 
     try {
       const identity = await registry.resolve(did)
-      pubKey = identity.getPublicKeySection()
-        .find(pubKeySection => pubKeySection.getIdentifier() === keyId)
+      pubKey = identity.getPublicKeySection().find(pubKeySection => pubKeySection.getIdentifier() === keyId)
     } catch (error) {
       throw new Error(`Could not validate signature on JWT. ${error.message}`)
     }
@@ -106,8 +100,7 @@ export class JSONWebToken<T extends IPayload> {
       throw new Error('No matching public key found.')
     }
 
-    return new TokenVerifier('ES256K', pubKey.getPublicKeyHex())
-      .verify(jwt)
+    return new TokenVerifier('ES256K', pubKey.getPublicKeyHex()).verify(jwt)
   }
 
   public toJSON(): IJSONWebTokenAttrs {
@@ -122,28 +115,34 @@ export class JSONWebToken<T extends IPayload> {
     return jwt
   }
 
+  // TODO REMOVED TO STRING MIGHT BREAK
   private static payloadToJWT(payload: IPayload): JSONWebToken<IPayload> {
     let jwt
 
     switch (payload.typ) {
-      case InteractionType.CredentialRequest.toString(): {
+      case InteractionType.CredentialRequest: {
         jwt = new JSONWebToken<CredentialRequestPayload>()
         jwt.payload = CredentialRequestPayload.create(payload as ICredentialRequestPayloadCreationAttrs)
         break
       }
-      case InteractionType.CredentialResponse.toString(): {
+      case InteractionType.CredentialResponse: {
         jwt = new JSONWebToken<CredentialResponsePayload>()
         jwt.payload = CredentialResponsePayload.create(payload as ICredentialResponsePayloadCreationAttrs)
         break
       }
-      case InteractionType.CredentialsReceive.toString(): {
+      case InteractionType.CredentialsReceive: {
         jwt = new JSONWebToken<CredentialsReceivePayload>()
         jwt.payload = CredentialsReceivePayload.create(payload as ICredentialsReceivePayloadCreationAttrs)
         break
       }
-      case InteractionType.Authentication.toString(): {
+      case InteractionType.Authentication: {
         jwt = new JSONWebToken<AuthenticationPayload>()
         jwt.payload = AuthenticationPayload.create(payload as IAuthPayloadCreationAttrs)
+        break
+      }
+      case InteractionType.CredentialOfferRequest: {
+        jwt = new JSONWebToken<CredentialOfferRequestPayload>()
+        jwt.payload = CredentialOfferRequestPayload.create(payload as ICredentialOfferReqPayloadCreationAttrs)
         break
       }
       default: {

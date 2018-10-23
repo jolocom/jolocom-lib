@@ -1,7 +1,7 @@
 import { IPayload, InteractionType } from '../types'
 import { classToPlain, plainToClass, Type } from 'class-transformer'
 import { CredentialOffer } from './credentialOffer'
-import { ICredentialOfferCreationArgs } from './types'
+import { ICredentialOfferReqPayloadCreationAttrs } from './types'
 
 export class CredentialOfferRequestPayload implements IPayload {
   public iss: string
@@ -12,7 +12,7 @@ export class CredentialOfferRequestPayload implements IPayload {
   @Type(() => CredentialOffer)
   public credentialOffer: CredentialOffer
 
-  public static create(attrs: ICredentialOfferCreationArgs): CredentialOfferRequestPayload {
+  public static create(attrs: ICredentialOfferReqPayloadCreationAttrs): CredentialOfferRequestPayload {
     const credOfferPayload = new CredentialOfferRequestPayload()
     // TODO MIGHT BREAK THINGS
     const { iss, credentialOffer } = attrs
@@ -43,11 +43,11 @@ export class CredentialOfferRequestPayload implements IPayload {
     return this.credentialOffer.getCallbackURL()
   }
 
-  public static fromJSON(json: ICredentialOfferCreationArgs): CredentialOfferRequestPayload {
+  public static fromJSON(json: ICredentialOfferReqPayloadCreationAttrs): CredentialOfferRequestPayload {
     return plainToClass(CredentialOfferRequestPayload, json)
   }
 
-  public toJSON(): ICredentialOfferCreationArgs {
-    return classToPlain(this) as ICredentialOfferCreationArgs
+  public toJSON(): ICredentialOfferReqPayloadCreationAttrs {
+    return classToPlain(this) as ICredentialOfferReqPayloadCreationAttrs
   }
 }

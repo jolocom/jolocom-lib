@@ -1,4 +1,4 @@
-export interface IOfferCreationAttrs {
+export interface ICredentialOfferCreationAttrs {
   challenge: string
   callbackUrl: string
   instant: boolean
@@ -7,8 +7,8 @@ export interface IOfferCreationAttrs {
   }
 }
 
-export interface ICredentialOfferCreationArgs {
+export interface ICredentialOfferReqPayloadCreationAttrs {
   iss?: string
   typ: string
-  credentialOffer: IOfferCreationAttrs
+  credentialOffer: ICredentialOfferCreationAttrs
 }

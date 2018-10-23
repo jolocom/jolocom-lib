@@ -5,6 +5,7 @@ import { CredentialResponseParser } from '../interactionFlows/credentialResponse
 import { JSONWebTokenParser } from '../interactionFlows/JSONWebTokenParser'
 import { CredentialsReceiveParser } from '../interactionFlows/credentialsReceive/credentialsReceiveParser'
 import { AuthenticationParser } from '../interactionFlows/authentication/authenticationParser'
+import { CredentialOfferReqParser } from '../interactionFlows/credentialOfferRequest/credentialOfferRequestParser';
 
 export const parse = {
   interactionJSONWebToken: JSONWebTokenParser,
@@ -13,5 +14,6 @@ export const parse = {
   credentialResponse: CredentialResponseParser,
   credentialsReceive: CredentialsReceiveParser,
   signedCredential : SignedCredentialParser,
-  authentication: AuthenticationParser
+  authentication: AuthenticationParser,
+  credentialOfferRequest: CredentialOfferReqParser
 }
