@@ -13,6 +13,10 @@ import { CredentialResponsePayload } from '../interactionFlows/credentialRespons
 import { ICredentialResponsePayloadCreationAttrs } from '../interactionFlows/credentialResponse/types'
 import { CredentialsReceivePayload } from '../interactionFlows/credentialsReceive/credentialsReceivePayload'
 import { ICredentialsReceivePayloadCreationAttrs } from '../interactionFlows/credentialsReceive/types'
+import { ICredentialOfferReqPayloadCreationAttrs } from '../interactionFlows/credentialOfferRequest/types'
+import { ICredentialOfferResPayloadCreationAttrs } from '../interactionFlows/credentialOfferResponse/types'
+import { CredentialOfferRequestPayload } from '../interactionFlows/credentialOfferRequest/credentialOfferRequestPayload'
+import { CredentialOfferResponsePayload } from '../interactionFlows/credentialOfferResponse/credentialOfferResponsePayload'
 
 export class IdentityWallet {
   private identityDocument: Identity
@@ -61,6 +65,20 @@ export class IdentityWallet {
         privateKey: this.privateIdentityKey,
         payload
       }) as JSONWebToken<CredentialsReceivePayload>
+    },
+    credentialOfferRequestJSONWebToken: (
+      payload: ICredentialOfferReqPayloadCreationAttrs
+    ): JSONWebToken<CredentialOfferRequestPayload> => {
+      return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
+        CredentialOfferRequestPayload
+      >
+    },
+    credentialOfferResponseJSONWebToken: (
+      payload: ICredentialOfferResPayloadCreationAttrs
+    ): JSONWebToken<CredentialOfferResponsePayload> => {
+      return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
+        CredentialOfferResponsePayload
+      >
     }
   }
 
