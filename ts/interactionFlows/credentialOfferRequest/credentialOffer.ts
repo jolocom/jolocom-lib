@@ -11,10 +11,10 @@ export class CredentialOffer {
 
   public static create(attrs: ICredentialOfferCreationAttrs): CredentialOffer {
     const offer = new CredentialOffer()
-    const { challenge, callbackUrl, instant, requestedInput } = attrs
+    const { challenge, callbackURL, instant, requestedInput } = attrs
 
     offer.challenge = challenge
-    offer.callbackURL = callbackUrl
+    offer.callbackURL = callbackURL
     offer.instant = instant
     offer.requestedInput = requestedInput
 

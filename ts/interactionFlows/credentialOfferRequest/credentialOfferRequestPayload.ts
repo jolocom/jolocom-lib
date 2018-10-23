@@ -8,7 +8,6 @@ export class CredentialOfferRequestPayload implements IPayload {
   public iat: number
   public typ: InteractionType
 
-  // TODO MIGHT BREAK THINGS
   @Type(() => CredentialOffer)
   public credentialOffer: CredentialOffer
 
