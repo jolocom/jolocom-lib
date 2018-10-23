@@ -14,6 +14,8 @@ import { ICredentialsReceivePayloadCreationAttrs } from './credentialsReceive/ty
 import { ICredentialOfferReqPayloadCreationAttrs } from './credentialOfferRequest/types'
 import { createJolocomRegistry } from '../registries/jolocomRegistry'
 import { CredentialOfferRequestPayload } from './credentialOfferRequest/credentialOfferRequestPayload'
+import { ICredentialOfferResPayloadCreationAttrs } from './credentialOfferResponse/types'
+import { CredentialOfferResponsePayload } from './credentialOfferResponse/credentialOfferResponsePayload'
 
 export class JSONWebToken<T extends IPayload> {
   private header: IJWTHeader = {
@@ -143,6 +145,11 @@ export class JSONWebToken<T extends IPayload> {
       case InteractionType.CredentialOfferRequest: {
         jwt = new JSONWebToken<CredentialOfferRequestPayload>()
         jwt.payload = CredentialOfferRequestPayload.create(payload as ICredentialOfferReqPayloadCreationAttrs)
+        break
+      }
+      case InteractionType.CredentialOfferResponse: {
+        jwt = new JSONWebToken<CredentialOfferResponsePayload>()
+        jwt.payload = CredentialOfferResponsePayload.create(payload as ICredentialOfferResPayloadCreationAttrs)
         break
       }
       default: {

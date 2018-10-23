@@ -14,7 +14,9 @@ import { ICredentialResponsePayloadCreationAttrs } from '../interactionFlows/cre
 import { CredentialsReceivePayload } from '../interactionFlows/credentialsReceive/credentialsReceivePayload'
 import { ICredentialsReceivePayloadCreationAttrs } from '../interactionFlows/credentialsReceive/types'
 import { ICredentialOfferReqPayloadCreationAttrs } from '../interactionFlows/credentialOfferRequest/types'
+import { ICredentialOfferResPayloadCreationAttrs } from '../interactionFlows/credentialOfferResponse/types'
 import { CredentialOfferRequestPayload } from '../interactionFlows/credentialOfferRequest/credentialOfferRequestPayload'
+import { CredentialOfferResponsePayload } from '../interactionFlows/credentialOfferResponse/credentialOfferResponsePayload'
 
 export class IdentityWallet {
   private identityDocument: Identity
@@ -69,6 +71,13 @@ export class IdentityWallet {
     ): JSONWebToken<CredentialOfferRequestPayload> => {
       return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
         CredentialOfferRequestPayload
+      >
+    },
+    credentialOfferResponeJSONWebToken: (
+      payload: ICredentialOfferResPayloadCreationAttrs
+    ): JSONWebToken<CredentialOfferResponsePayload> => {
+      return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
+        CredentialOfferResponsePayload
       >
     }
   }
