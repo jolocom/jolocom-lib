@@ -73,7 +73,7 @@ export class IdentityWallet {
         CredentialOfferRequestPayload
       >
     },
-    credentialOfferResponeJSONWebToken: (
+    credentialOfferResponseJSONWebToken: (
       payload: ICredentialOfferResPayloadCreationAttrs
     ): JSONWebToken<CredentialOfferResponsePayload> => {
       return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
