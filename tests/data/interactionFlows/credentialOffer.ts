@@ -1,9 +1,26 @@
-export const jsonCredentialOfferRequest = {
+export const credOfferRequestPayloadCreateArgs = {
   typ: 'credentialOfferRequest',
   credentialOffer: {
-    challenge: 'zg5fkv,il',
-    callbackUrl: 'www.test.com/get-credential',
+    challenge: 'wbfnk',
+    callbackURL: 'https://test.de/external-cred',
     instant: true,
     requestedInput: {}
   }
+}
+
+export const credentialOfferCreateAttrs = {
+  challenge: 'wbfnk',
+  callbackURL: 'https://test.de/external-cred',
+  instant: true,
+  requestedInput: {}
+}
+
+export const credOfferResponsePayloadCreateArgs = {
+  credentialOffer: {
+    challenge: 'wbfnk',
+    callbackURL: 'https://test.de/external-cred',
+    instant: true,
+    requestedInput: {}
+  },
+  typ: 'credentialOfferResponse'
 }
