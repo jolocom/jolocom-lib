@@ -1,13 +1,5 @@
 import { plainToClass, classToPlain } from 'class-transformer'
-
-interface OfferCreationAttrs {
-  challenge: string
-  callbackUrl: string
-  instant: boolean
-  requestedInput: {
-    [key: string]: string | null
-  }
-}
+import { IOfferCreationAttrs } from './types'
 
 export class CredentialOffer {
   private challenge: string
@@ -17,7 +9,7 @@ export class CredentialOffer {
     [key: string]: string | null
   }
 
-  public static create(attrs: OfferCreationAttrs): CredentialOffer {
+  public static create(attrs: IOfferCreationAttrs): CredentialOffer {
     const offer = new CredentialOffer()
     const { challenge, callbackUrl, instant, requestedInput } = attrs
 
