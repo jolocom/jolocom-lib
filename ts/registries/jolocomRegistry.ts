@@ -1,7 +1,7 @@
 import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
-import { privateKeyToDID } from '../utils/crypto'
+import { privateKeyToDID, requestEth, wifToAddress } from '../utils/crypto'
 import { DidDocument } from '../identity/didDocument'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
@@ -12,6 +12,7 @@ import { jolocomIpfsStorageAgent } from '../ipfs'
 import { jolocomEthereumResolver } from '../ethereum'
 import { ServiceEndpointsSection } from '../identity/didDocument/sections'
 import { IVerifiable } from './types'
+import { JolocomLib } from '..'
 
 /** Jolocom specific Registry, which uses IPFS
  *  and Ethereum for registering the indentity and the resolution
@@ -20,6 +21,23 @@ import { IVerifiable } from './types'
 export class JolocomRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
+
+  public async createIdentity(entropy: Buffer): Promise<{identityWallet: IdentityWallet, privateIdentityKey: Buffer, did: string}> {
+    const keyManager = JolocomLib.identityManager.create(entropy)
+
+    const ethKey = keyManager.deriveChildKey(keyManager.getSchema().ethereumKey)
+    const identityKey = keyManager.deriveChildKey(keyManager.getSchema().jolocomIdentityKey).privateKey
+
+    const ethAddr = wifToAddress(ethKey.wif)
+    await requestEth(ethAddr)
+
+    const ddo = await new DidDocument().fromPrivateKey(identityKey)
+    const identity = Identity.create({ didDocument: ddo.toJSON() })
+    const identityWallet = IdentityWallet.create({ privateIdentityKey: identityKey, identity })
+
+    await this.commit({ wallet: identityWallet, privateEthereumKey: ethKey.privateKey })
+    return {identityWallet, privateIdentityKey: ethKey.privateKey, did: ddo.getDID()}
+  }
 
   public async create(args: IRegistryInstanceCreationArgs): Promise<IdentityWallet> {
     const { privateIdentityKey, privateEthereumKey } = args

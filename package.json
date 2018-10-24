@@ -67,7 +67,8 @@
     "reflect-metadata": "^0.1.12",
     "secp256k1": "^3.5.0",
     "sinon-chai": "^3.2.0",
-    "sjcl": "^1.0.7"
+    "sjcl": "^1.0.7",
+    "wif": "^2.0.6"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",

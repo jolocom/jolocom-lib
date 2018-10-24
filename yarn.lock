@@ -7995,7 +7995,7 @@ widest-line@^2.0.0:
   dependencies:
     string-width "^2.1.1"
 
-wif@^2.0.1:
+wif@^2.0.1, wif@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/wif/-/wif-2.0.6.tgz#08d3f52056c66679299726fade0d432ae74b4704"
   dependencies:
