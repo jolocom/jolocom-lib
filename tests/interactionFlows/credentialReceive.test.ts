@@ -8,7 +8,7 @@ describe('CredentialsReceive', () => {
   const credentialsReceive = CredentialsReceive
     .create([SignedCredential.fromJSON(testSignedCredential)])
 
-  it('Should create instace of CredentialsReceive on static create', () => {  
+  it('Should create instace of CredentialsReceive on static create', () => {
     expect(credentialsReceive).to.be.instanceOf(CredentialsReceive)
     expect(credentialsReceive).to.deep.equal(CredentialsReceive.fromJSON(jsonCredReceive))
   })

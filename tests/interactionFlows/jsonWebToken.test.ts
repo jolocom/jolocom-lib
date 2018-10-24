@@ -86,9 +86,9 @@ describe('JSONWebToken', () => {
       sandbox.stub(JolocomRegistry.prototype, 'resolve')
         .resolves(ddo)
     })
-    
+
     it('Should return a valid InteractionType payload class and pass signature validation', async () => {
-     const decoded = await JSONWebToken.decode(signedCredRequestJWT)
+      const decoded = await JSONWebToken.decode(signedCredRequestJWT)
 
       expect(decoded).to.be.an.instanceof(CredentialRequestPayload)
     })

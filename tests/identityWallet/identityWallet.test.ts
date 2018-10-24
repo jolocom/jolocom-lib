@@ -19,11 +19,17 @@ import { jsonAuthPayload } from '../data/interactionFlows/authentication'
 import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload'
 import { CredentialsReceive } from '../../ts/interactionFlows/credentialsReceive/credentialsReceive'
 import { jsonCredReceivePayload } from '../data/interactionFlows/credentialReceive'
-import { jsonCredentialOfferRequest } from '../data/interactionFlows/credentialOffer'
+import { CredentialOffer } from '../../ts/interactionFlows/credentialOfferRequest/credentialOffer'
+import {
+  credOfferRequestPayloadCreateArgs,
+  credOfferResponsePayloadCreateArgs
+} from '../data/interactionFlows/credentialOffer'
 import {
   CredentialOfferRequestPayload
 } from '../../ts/interactionFlows/credentialOfferRequest/credentialOfferRequestPayload'
-import { CredentialOffer } from '../../ts/interactionFlows/credentialOfferRequest/credentialOffer'
+import {
+  CredentialOfferResponsePayload
+} from '../../ts/interactionFlows/credentialOfferResponse/credentialOfferResponsePayload'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -130,11 +136,21 @@ describe('IdentityWallet', () => {
     })
 
     it('create.credentialOfferRequestJSONWebToken should return a correct credentialOfferRequest JWT', () => {
-      const credOfferReqJWT = identityWallet.create.credentialOfferRequestJSONWebToken(jsonCredentialOfferRequest)
+      const credOfferReqJWT = identityWallet.create
+        .credentialOfferRequestJSONWebToken(credOfferRequestPayloadCreateArgs)
       const credOfferRequestPayload = credOfferReqJWT.getPayload()
 
       expect(credOfferRequestPayload).to.be.an.instanceof(CredentialOfferRequestPayload)
       expect(credOfferRequestPayload.credentialOffer).to.be.an.instanceof(CredentialOffer)
+    })
+
+    it('create.credentialOfferResponseJSONWebToken should return a correct credentialOfferResponse JWT', () => {
+      const credOfferResJWT = identityWallet.create
+        .credentialOfferResponseJSONWebToken(credOfferResponsePayloadCreateArgs)
+      const credOfferResponsePayload = credOfferResJWT.getPayload()
+
+      expect(credOfferResponsePayload).to.be.an.instanceof(CredentialOfferResponsePayload)
+      expect(credOfferResponsePayload.credentialOffer).to.be.an.instanceof(CredentialOffer)
     })
 
     it('create.signedCredential should return a correct signed credential', async () => {

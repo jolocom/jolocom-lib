@@ -16,7 +16,9 @@ import { ICredentialsReceivePayloadCreationAttrs } from '../interactionFlows/cre
 import { ICredentialOfferReqPayloadCreationAttrs } from '../interactionFlows/credentialOfferRequest/types'
 import { ICredentialOfferResPayloadCreationAttrs } from '../interactionFlows/credentialOfferResponse/types'
 import { CredentialOfferRequestPayload } from '../interactionFlows/credentialOfferRequest/credentialOfferRequestPayload'
-import { CredentialOfferResponsePayload } from '../interactionFlows/credentialOfferResponse/credentialOfferResponsePayload'
+import {
+  CredentialOfferResponsePayload
+} from '../interactionFlows/credentialOfferResponse/credentialOfferResponsePayload'
 
 export class IdentityWallet {
   private identityDocument: Identity
