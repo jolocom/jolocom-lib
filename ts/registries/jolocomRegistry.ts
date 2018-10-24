@@ -36,7 +36,7 @@ export class JolocomRegistry {
     const identityWallet = IdentityWallet.create({ privateIdentityKey: identityKey, identity })
 
     await this.commit({ wallet: identityWallet, privateEthereumKey: ethKey.privateKey })
-    return {identityWallet, privateIdentityKey: ethKey.privateKey, did: ddo.getDID()}
+    return {identityWallet, privateIdentityKey: identityKey, did: ddo.getDID()}
   }
 
   public async create(args: IRegistryInstanceCreationArgs): Promise<IdentityWallet> {
