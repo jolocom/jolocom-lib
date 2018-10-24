@@ -16,7 +16,7 @@ import { IEthereumResolverConfig } from '../../ts/ethereum/types'
 import { EthResolver } from '../../ts/ethereum'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
-import { claimsMetadata } from '../../ts/index'
+import { claimsMetadata, JolocomLib } from '../../ts/index'
 import { JSONWebToken } from './../../ts/interactionFlows/JSONWebToken'
 import { CredentialRequest } from './../../ts/interactionFlows/credentialRequest/credentialRequest'
 import {
@@ -35,6 +35,12 @@ import { CredentialResponsePayload } from '../../ts/interactionFlows/credentialR
 import { Authentication } from '../../ts/interactionFlows/authentication/authentication'
 import { AuthenticationPayload } from '../../ts/interactionFlows/authentication/authenticationPayload'
 import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload'
+import {
+  CredentialOfferRequestPayload
+} from '../../ts/interactionFlows/credentialOfferRequest/credentialOfferRequestPayload'
+import {
+  CredentialOfferResponsePayload
+} from '../../ts/interactionFlows/credentialOfferResponse/credentialOfferResponsePayload'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -315,5 +321,78 @@ describe('Integration Test', () => {
       expect(providedCredentials[0].getCredentialSection())
         .to.deep.equal(credentialFromService.getCredentialSection())
     })
+  })
+
+  describe('Instant credential exchange flow for third party credential', () => {
+    let identityWalletUser
+    let identityWalletService
+
+    before(async () => {
+      identityWalletUser = await jolocomRegistry.create({
+        privateIdentityKey: testPrivateIdentityKey,
+        privateEthereumKey: testPrivateEthereumKey
+      })
+
+      identityWalletService = await jolocomRegistry.create({
+        privateIdentityKey: testPrivateIdentityKey3,
+        privateEthereumKey: testPrivateEthereumKey3
+      })
+    })
+
+    let credentialOfferRequestJWT
+    let credentialOfferResponseJWT
+
+    it('Should create a correct credential offer request JWT', () => {
+      const credOfferRequest = identityWalletService.create.credentialOfferRequestJSONWebToken({
+        typ: 'credentialOfferRequest',
+        credentialOffer: {
+          challenge: 'zgbioH42',
+          callbackURL: 'https://test.de/external-cred',
+          instant: true,
+          requestedInput: {}
+        }
+      })
+      credentialOfferRequestJWT = credOfferRequest.encode()
+
+      expect(credOfferRequest.getPayload()).to.be.an.instanceOf(CredentialOfferRequestPayload)
+    })
+
+    it('Should allow for consumption of credential offer request JWT', async () => {
+      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
+      const credOfferRequest = await JolocomLib.parse.interactionJSONWebToken.decode(credentialOfferRequestJWT)
+      sinon.restore()
+
+      expect(credOfferRequest).to.be.an.instanceOf(CredentialOfferRequestPayload)
+    })
+
+    it('Should correctly create a credential offer response JWT', async () => {
+      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
+      const credOfferRequest = await JolocomLib.parse.interactionJSONWebToken.decode(credentialOfferRequestJWT)
+      sinon.restore()
+
+      const credOfferResponse = identityWalletUser.create.credentialOfferResponseJSONWebToken({
+        typ: 'credentialOfferResponse',
+        credentialOffer: {
+          challenge: credOfferRequest.getChallenge(),
+          callbackURL: credOfferRequest.getCallbackURL(),
+          instant: true,
+          requestedInput: {}
+        }
+      })
+      credentialOfferResponseJWT = credOfferResponse.encode()
+
+      expect(credOfferResponse.getPayload()).to.be.an.instanceOf(CredentialOfferResponsePayload)
+    })
+
+    it('Should allow for consumption of credential offer response JWT', async () => {
+      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
+      const credOfferResponse = await JolocomLib.parse.interactionJSONWebToken.decode(credentialOfferResponseJWT)
+      sinon.restore()
+
+      expect(credOfferResponse).to.be.an.instanceOf(CredentialOfferResponsePayload)
+    })
+    /* After a succesfull credential offer exchange the credential receive flow would be triggered
+      see the "Credential sharing flow" for more details
+    */
   })
 })
