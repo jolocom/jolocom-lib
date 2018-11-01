@@ -1,13 +1,23 @@
 import { fromSeed } from 'bip32'
 import { randomBytes, createCipher, createDecipher } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
+import { IDigestable } from '../linkedDataSignature/types';
 
-interface IKeyDerivationArgs {
+export interface IKeyDerivationArgs {
   encryptionPass: string
   derivationPath: string
 }
 
-export class SoftwareKeyProvider {
+export interface IVaultedKeyProvider {
+  // getRandom: (nr: number) => Buffer 
+  getPublicKey:(derivationArgs: IKeyDerivationArgs)=> Buffer
+  getPrivateKey:(derivationArgs: IKeyDerivationArgs)=> Buffer
+  sign: (derivationArgs: IKeyDerivationArgs, digest: Buffer) => Buffer
+  verify: (publicKey: Buffer, signature: Buffer, digest: Buffer) => Boolean
+  signDigestable: (derivationArgs: IKeyDerivationArgs, toSign: IDigestable) => Promise<Buffer>
+  verifyDigestable: (publicKey: Buffer, toVerify: IDigestable) => Promise<boolean>
+}
+export class SoftwareKeyProvider implements IVaultedKeyProvider {
   private encryptedSeed: Buffer
 
   /*
@@ -35,13 +45,14 @@ export class SoftwareKeyProvider {
   }
 
   /*
-   * @TODO - use csprng implementation
-   * @description - returns 32 bytes of random data
-   * @returns {Buffer} - 32 random bytes
+   * @TODO - Use csprng implementation
+   * @description - Returns N bytes of random data
+   * @param nrBytes - Number of bytes to verify
+   * @returns {Buffer} - N random bytes
   */
 
-  getRandom(): Buffer {
-    return randomBytes(32)
+  static getRandom(nr): Buffer {
+    return randomBytes(nr)
   }
 
   /*
@@ -50,7 +61,7 @@ export class SoftwareKeyProvider {
    * @param derivationArgs.encryptionPass - The encryption password
    * @param derivationArgs.derivationPath - The bip32 derivation path
    * @param digest - The data to sign, 256 bits
-   * @returns {Buffer} - signature
+   * @returns {Buffer} - computed signature
   */
 
   sign(derivationArgs: IKeyDerivationArgs, digest: Buffer): Buffer {
@@ -69,8 +80,50 @@ export class SoftwareKeyProvider {
    * @
   */
 
-  verify(publicKey: Buffer, signature: Buffer, digest: Buffer): Boolean {
+  verify(digest: Buffer, publicKey: Buffer, signature: Buffer): boolean {
     return eccVerify(digest, publicKey, signature)
+  }
+
+  /*
+   * Method will be deprecated soon, currently used for signing
+   *  ethereum transactions, where normal secp256k1 signatures
+   *  and the sign method exposed by this class are not enough
+   * @description - returns child public key at specified path
+   * @param derivationArgs - Data needed to derive child key
+   * @param derivationArgs.encryptionPass - Password used to create the aes cipher
+   * @param derivationArgs.derivationPath - The bip32 derivation path
+   * @returns {Buffer} - public key at corresponding path
+  */
+
+  getPrivateKey(derivationArgs: IKeyDerivationArgs) {
+    const { encryptionPass, derivationPath } = derivationArgs
+    const seed = this.decrypt(encryptionPass, this.encryptedSeed)
+
+    console.warn('METHOD WILL BE DEPRECATED SOON, ANTIPATTERN')
+    return fromSeed(seed).derivePath(derivationPath).privateKey
+  }
+
+  /*
+   * @description - digest the passed object, and computes the signature
+   * @param derivationArgs - Data needed to derive child key
+   * @param  toSign - Instance of class that implements IDigestable
+   * @param derivationArgs.encryptionPass - The encryption password
+   * @param derivationArgs.derivationPath - The bip32 derivation path
+   * @returns {Buffer} - computed signature
+  */
+
+  async signDigestable(derivationArgs: IKeyDerivationArgs, toSign: IDigestable): Promise<Buffer> {
+    const digest = await toSign.digest()
+    return this.sign(derivationArgs, digest)
+  }
+
+  /*
+   * @TODO - implement
+   */
+  async verifyDigestable(publicKey: Buffer, toVerify: IDigestable) : Promise<boolean>{
+    const digest = await toVerify.digest()
+    const signature = toVerify.getSignatureValue()
+    return this.verify(publicKey, digest, signature)
   }
 
   /*

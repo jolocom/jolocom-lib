@@ -1,9 +1,5 @@
 import EthereumResolver from 'jolocom-registry-contract'
-import {
-  IEthereumResolverConfig,
-  IEthereumConnector,
-  IEthereumResolverUpdateDIDArgs
-} from './types'
+import { IEthereumResolverConfig, IEthereumConnector, IEthereumResolverUpdateDIDArgs } from './types'
 
 export class EthResolver implements IEthereumConnector {
   private ethResolver: any
@@ -21,9 +17,7 @@ export class EthResolver implements IEthereumConnector {
   }
 }
 
-export const jolocomEthereumResolver = new EthResolver(
-  {
-    providerUrl: 'https://rinkeby.infura.io/',
-    contractAddress: '0xd4351c3f383d79ba378ed1875275b1e7b960f120'
-  }
-)
+export const jolocomEthereumResolver = new EthResolver({
+  providerUrl: 'https://rinkeby.infura.io/',
+  contractAddress: '0xd4351c3f383d79ba378ed1875275b1e7b960f120'
+})

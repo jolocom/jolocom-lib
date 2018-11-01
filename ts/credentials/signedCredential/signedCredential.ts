@@ -1,23 +1,30 @@
 import 'reflect-metadata'
 import { Transform, plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
 import { canonize } from 'jsonld'
-import { Credential } from '../credential/credential'
-import { generateRandomID, sign, sha256, verifySignature, privateKeyToDID } from '../../utils/crypto'
+import { generateRandomID, sha256 } from '../../utils/crypto'
 import { ISignedCredentialAttrs } from './types'
-import { ILinkedDataSignature } from '../../linkedDataSignature/types'
+import { ILinkedDataSignature, IDigestable } from '../../linkedDataSignature/types'
 import { ContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
-import { IVerifiable, ISigner } from '../../registries/types'
-import { IPrivateKeyWithId } from '../../identityWallet/types'
+import { ISigner } from '../../registries/types'
+import { SoftwareKeyProvider } from '../../crypto/softwareProvider'
+import { ISignedCredCreationArgs, IKeyMetadata } from '../../identityWallet/identityWallet'
+import { Credential } from '../credential/credential'
+
+interface IExtendedCreationArgs<T extends BaseMetadata> extends ISignedCredCreationArgs<T> {
+  publicKeyMetadata: IKeyMetadata
+  issuerDid: string
+}
 
 @Exclude()
-export class SignedCredential implements IVerifiable {
+export class SignedCredential implements IDigestable {
   @Expose()
   private '@context': ContextEntry[]
 
   @Expose()
-  private id: string
+  @Transform((value: string) => value || generateRandomID(8), { toClassOnly: true })
+  private id: string = `claimId:${this.generateClaimId()}`
 
   @Expose()
   private name: string
@@ -31,32 +38,32 @@ export class SignedCredential implements IVerifiable {
   @Expose()
   private claim: IClaimSection
 
-  @Type(() => Date)
   @Expose()
-  @Transform((value: Date) => value.toISOString(), {toPlainOnly: true})
-  @Transform((value: string) => new Date(value), {toClassOnly: true})
+  @Type(() => Date)
+  @Transform((value: Date) => value.toISOString(), { toPlainOnly: true })
+  @Transform((value: string) => (value ? new Date(value) : new Date()), { toClassOnly: true })
   private issued: Date
 
-  @Type(() => Date)
-  @Transform((value: Date) => value.toISOString(), {toPlainOnly: true})
-  @Transform((value: string) => new Date(value), {toClassOnly: true})
   @Expose()
+  @Type(() => Date)
+  @Transform((value: Date) => value.toISOString(), { toPlainOnly: true })
+  @Transform((value: string) => new Date(value), { toClassOnly: true })
   private expires?: Date
 
-  @Type(() => EcdsaLinkedDataSignature)
   @Expose()
+  @Type(() => EcdsaLinkedDataSignature)
+  @Transform((value: EcdsaLinkedDataSignature) => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
   private proof = new EcdsaLinkedDataSignature()
 
   public setIssuer(issuer: string) {
     this.issuer = issuer
   }
 
-  public setId() {
-    this.id = this.generateClaimId()
-  }
-
   public setIssued(issued: Date) {
     this.issued = issued
+  }
+  public setExpiry(expiry: Date) {
+    this.expires = expiry
   }
 
   public getId(): string {
@@ -75,10 +82,17 @@ export class SignedCredential implements IVerifiable {
     return this.issuer
   }
 
+  public getSignatureValue()  {
+    return this.proof.getSignatureValue()
+  }
+  public setSignatureValue(signature: Buffer) {
+    this.proof.setSignatureValue(signature)
+  }
+
   public getSigner(): ISigner {
     return {
       did: this.issuer,
-      keyId: this.proof.creator
+      keyId: this.proof.getCreator()
     }
   }
 
@@ -112,64 +126,26 @@ export class SignedCredential implements IVerifiable {
     return customType.replace(/([A-Z])/g, ' $1').trim()
   }
 
-  public static async create<T extends BaseMetadata>({
-    metadata,
-    claim,
-    privateIdentityKey,
-    subject
-  }: {
-    metadata: T
-    claim: typeof metadata['claimInterface']
-    privateIdentityKey: IPrivateKeyWithId
-    subject: string
-  }): Promise<SignedCredential> {
-    const credential = Credential.create<T>({ metadata, claim, subject })
-    const signedCredential = SignedCredential.fromCredential(credential)
-    await signedCredential.generateSignature(privateIdentityKey)
+  public static async create<T extends BaseMetadata>(params: IExtendedCreationArgs<T>): Promise<SignedCredential> {
+    const credential = Credential.create(params)
+    const json = credential.toJSON() as ISignedCredentialAttrs
+    const signedCredential = SignedCredential.fromJSON(json)
 
+    signedCredential.generateSignature(params.publicKeyMetadata)
+    signedCredential.setIssuer(params.issuerDid)
+
+    console.log(signedCredential)
     return signedCredential
   }
 
-  public static fromCredential(credential: Credential): SignedCredential {
-    const signedCredential = new SignedCredential()
-    signedCredential['@context'] = credential.getContext()
-    signedCredential.type = credential.getType()
-    signedCredential.claim = credential.getClaim()
-    signedCredential.name = credential.getName()
-    signedCredential.setId()
-    signedCredential.setIssued(new Date())
-
-    return signedCredential
-  }
-
-  public async generateSignature({ key, id }: { key: Buffer; id: string }) {
+  public async generateSignature(keyMetadata: IKeyMetadata) {
     const inOneYear = new Date()
     inOneYear.setFullYear(new Date().getFullYear() + 1)
 
-    this.proof.created = new Date()
-    this.expires = inOneYear
-    this.proof.creator = id
-    this.proof.nonce = generateRandomID(8)
-    this.setIssuer(privateKeyToDID(key))
+    this.setExpiry(inOneYear)
 
-    const docDigest = await this.digest()
-    const sigDigest = await this.proof.digest()
-
-    this.proof.signatureValue = sign(`${sigDigest}${docDigest}`, key)
-  }
-
-  public async validateSignatureWithPublicKey(pubKey: Buffer): Promise<boolean> {
-    if (!pubKey) {
-      throw new Error('Please provide the issuer\'s public key')
-    }
-
-    const docDigest = await this.digest()
-    const sigDigest = await this.proof.digest()
-
-    const tbv = sigDigest + docDigest
-    const sig = this.proof.getSigValue()
-
-    return verifySignature(tbv, pubKey, sig)
+    this.proof.setCreator(keyMetadata.keyId)
+    this.proof.setNonce(SoftwareKeyProvider.getRandom(8).toString('hex'))
   }
 
   public static fromJSON(json: ISignedCredentialAttrs): SignedCredential {
@@ -180,9 +156,9 @@ export class SignedCredential implements IVerifiable {
     return classToPlain(this) as ISignedCredentialAttrs
   }
 
-  public async digest(): Promise<string> {
+  public async digest(): Promise<Buffer> {
     const normalized = await this.normalize()
-    return sha256(Buffer.from(normalized)).toString('hex')
+    return sha256(Buffer.from(normalized))
   }
 
   private generateClaimId(): string {
@@ -197,3 +173,17 @@ export class SignedCredential implements IVerifiable {
     return canonize(json)
   }
 }
+
+// public async validateSignatureWithPublicKey(pubKey: Buffer): Promise<boolean> {
+//   if (!pubKey) {
+//     throw new Error('Please provide the issuer\'s public key')
+//   }
+
+//   const docDigest = await this.digest()
+//   const sigDigest = await this.proof.digest()
+
+//   const tbv = sigDigest + docDigest
+//   const sig = this.proof.getSignatureValue()
+
+//   return verifySignature(tbv, pubKey, sig)
+// }

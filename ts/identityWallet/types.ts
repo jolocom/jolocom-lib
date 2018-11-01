@@ -1,8 +1,11 @@
 import { Identity } from '../identity/identity'
+import { IVaultedKeyProvider } from '../crypto/softwareProvider'
+import { IKeyMetadata } from './identityWallet'
 
 export interface IIdentityWalletCreateArgs {
-  privateIdentityKey: Buffer
+  vaultedKeyProvider: IVaultedKeyProvider
   identity: Identity
+  publicKeyMetadata: IKeyMetadata
 }
 
 export interface IPrivateKeyWithId {

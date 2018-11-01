@@ -1,6 +1,11 @@
+import 'reflect-metadata'
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { IPublicKeySectionAttrs } from './types'
-import 'reflect-metadata'
+
+/*
+ * Class representing a DidDocument Public Key section
+ * see: https://w3c-ccg.github.io/did-spec/#public-keys
+ */
 
 @Exclude()
 export class PublicKeySection {
@@ -8,18 +13,16 @@ export class PublicKeySection {
   private id: string
 
   @Expose()
-  private 'type': string
+  private type: string
+
+  @Expose()
+  private owner: string
 
   @Expose()
   private publicKeyHex: string
 
-  public fromEcdsa(publicKey: Buffer, id: string): PublicKeySection {
-    const publicKeySection = new PublicKeySection()
-    publicKeySection.id = id
-    publicKeySection.type = 'Secp256k1VerificationKey2018'
-    publicKeySection.publicKeyHex = publicKey.toString('hex')
-
-    return publicKeySection
+  public getOnwer(): string {
+    return this.owner
   }
 
   public getIdentifier(): string {
@@ -32,6 +35,24 @@ export class PublicKeySection {
 
   public getPublicKeyHex(): string {
     return this.publicKeyHex
+  }
+
+  /*
+   * @description - Generates a boilerplate Public Key section based on the passed public key
+   * @param publicKey - A secp256k1 public key to be listed in the "publicKey" section of the did document
+   * @param id - An identifier for the public key, normally #keys-X
+   * @param did - The did listed in the did document, used to compute the full key id
+   * @returns {Object} - Instance of the PublicKeySection class
+  */
+
+  public static fromEcdsa(publicKey: Buffer, id: string, did: string): PublicKeySection {
+    const publicKeySecion = new PublicKeySection()
+    publicKeySecion.owner = did
+    publicKeySecion.id = id
+    publicKeySecion.type = 'Secp256k1VerificationKey2018'
+    publicKeySecion.publicKeyHex = publicKey.toString('hex')
+
+    return publicKeySecion
   }
 
   public toJSON(): IPublicKeySectionAttrs {

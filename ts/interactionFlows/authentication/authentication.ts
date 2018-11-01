@@ -1,6 +1,5 @@
 import { plainToClass, classToPlain } from 'class-transformer'
 import { IAuthenticationAttrs } from './types'
-import { AuthenticationPayload } from './authenticationPayload'
 
 export class Authentication {
   public challenge: string

@@ -1,7 +1,7 @@
 import { BaseMetadata } from 'cred-types-jolocom-core'
 import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { IIdentityWalletCreateArgs, IPrivateKeyWithId } from './types'
+import { IIdentityWalletCreateArgs } from './types'
 import { Identity } from '../identity/identity'
 import { privateKeyToPublicKey } from '../utils/crypto'
 import { ICredentialRequestPayloadCreationAttrs } from '../interactionFlows/credentialRequest/types'
@@ -16,114 +16,120 @@ import { ICredentialsReceivePayloadCreationAttrs } from '../interactionFlows/cre
 import { ICredentialOfferReqPayloadCreationAttrs } from '../interactionFlows/credentialOfferRequest/types'
 import { ICredentialOfferResPayloadCreationAttrs } from '../interactionFlows/credentialOfferResponse/types'
 import { CredentialOfferRequestPayload } from '../interactionFlows/credentialOfferRequest/credentialOfferRequestPayload'
-import {
-  CredentialOfferResponsePayload
-} from '../interactionFlows/credentialOfferResponse/credentialOfferResponsePayload'
+import { CredentialOfferResponsePayload } from '../interactionFlows/credentialOfferResponse/credentialOfferResponsePayload'
+import { IVaultedKeyProvider } from '../crypto/softwareProvider'
+import { DidDocument } from '../identity/didDocument'
+
+export interface ISignedCredCreationArgs<T extends BaseMetadata> {
+  metadata: T
+  claim: T['claimInterface']
+  subject: string
+}
+
+export interface IKeyMetadata {
+  derivationPath: string
+  keyId: string
+}
 
 export class IdentityWallet {
-  private identityDocument: Identity
-  private privateIdentityKey: IPrivateKeyWithId
+  private identity: Identity
+  private publicKeyMetadata: IKeyMetadata
+  private vaultedKeyProvider: IVaultedKeyProvider
 
-  public create = {
-    credential: Credential.create,
-    signedCredential: async <T extends BaseMetadata>({
-      metadata,
-      claim,
-      subject
-    }: {
-      metadata: T
-      claim: typeof metadata['claimInterface']
-      subject?: string
-    }) => {
-      if (!subject) {
-        subject = this.getIdentity().getDID()
-      }
-
-      return await SignedCredential.create({ metadata, claim, privateIdentityKey: this.privateIdentityKey, subject })
-    },
-    credentialRequestJSONWebToken: (
-      payload: ICredentialRequestPayloadCreationAttrs
-    ): JSONWebToken<CredentialRequestPayload> => {
-      return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
-        CredentialRequestPayload
-      >
-    },
-    credentialResponseJSONWebToken: (
-      payload: ICredentialResponsePayloadCreationAttrs
-    ): JSONWebToken<CredentialResponsePayload> => {
-      return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
-        CredentialResponsePayload
-      >
-    },
-    authenticationJSONWebToken: (payload: IAuthPayloadCreationAttrs): JSONWebToken<AuthenticationPayload> => {
-      return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
-        AuthenticationPayload
-      >
-    },
-    credentialsReceiveJSONWebToken: (
-      payload: ICredentialsReceivePayloadCreationAttrs
-    ): JSONWebToken<CredentialsReceivePayload> => {
-      return JSONWebToken.create({
-        privateKey: this.privateIdentityKey,
-        payload
-      }) as JSONWebToken<CredentialsReceivePayload>
-    },
-    credentialOfferRequestJSONWebToken: (
-      payload: ICredentialOfferReqPayloadCreationAttrs
-    ): JSONWebToken<CredentialOfferRequestPayload> => {
-      return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
-        CredentialOfferRequestPayload
-      >
-    },
-    credentialOfferResponseJSONWebToken: (
-      payload: ICredentialOfferResPayloadCreationAttrs
-    ): JSONWebToken<CredentialOfferResponsePayload> => {
-      return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
-        CredentialOfferResponsePayload
-      >
-    }
+  public getDid(): string {
+    return this.identity.getDid()
   }
 
-  public sign = {
-    credential: this.signCredential.bind(this)
-  }
-
-  public identity
-
-  public static create({ privateIdentityKey, identity }: IIdentityWalletCreateArgs): IdentityWallet {
-    const identityWallet = new IdentityWallet()
-    const pubKey = privateKeyToPublicKey(privateIdentityKey).toString('hex')
-    const entry = identity.getPublicKeySection().find(pubKeySec => pubKeySec.getPublicKeyHex() === pubKey)
-
-    identityWallet.privateIdentityKey = {
-      key: privateIdentityKey,
-      id: entry.getIdentifier()
-    }
-
-    identityWallet.identityDocument = identity
-    identityWallet.setIdentity(identity)
-
-    return identityWallet
+  public getDidDocument(): DidDocument {
+    return this.identity.getDidDocument()
   }
 
   public getIdentity(): Identity {
-    return this.identityDocument
+    return this.identity
   }
 
-  private setIdentity(identity: Identity): void {
-    this.identity = {
-      publicProfile: identity.publicProfile
+  public getKeyReference(): string {
+    return this.publicKeyMetadata.derivationPath
+  }
+
+  public getKeyId(): string {
+    return this.publicKeyMetadata.keyId
+  }
+
+  constructor(creationArgs: IIdentityWalletCreateArgs) {
+    const { identity, publicKeyMetadata, vaultedKeyProvider } = creationArgs
+    this.identity = identity
+    this.publicKeyMetadata = publicKeyMetadata
+    this.vaultedKeyProvider = vaultedKeyProvider
+  }
+
+  private createSignedCred = async <T extends BaseMetadata>(params: ISignedCredCreationArgs<T>, encryptionPass: string) => {
+    const { derivationPath } = this.publicKeyMetadata
+
+    const vCred = await SignedCredential.create({
+      ...params,
+      subject: params.subject || this.getDid(),
+      publicKeyMetadata: this.publicKeyMetadata,
+      issuerDid: this.getDid()
+    })
+
+    const signature = await this.vaultedKeyProvider.signDigestable({ derivationPath, encryptionPass }, vCred)
+
+    vCred.setSignatureValue(signature)
+
+    return vCred
+  }
+
+  private createCredReq = (payload: ICredentialRequestPayloadCreationAttrs): JSONWebToken<CredentialRequestPayload> => {
+    return JSONWebToken.create(payload, this.getKeyId()) as JSONWebToken<CredentialRequestPayload>
+  }
+
+  public create = {
+    credential: Credential.create,
+    signedCredential: this.createSignedCred,
+    interactionTokens: {
+      credentialRequest: this.createCredReq
     }
   }
 
-  public getIdentityKey(): { key: Buffer; id: string } {
-    return this.privateIdentityKey
-  }
-
-  public async signCredential(credential: Credential): Promise<SignedCredential> {
-    const signedCredential = SignedCredential.fromCredential(credential)
-    await signedCredential.generateSignature(this.privateIdentityKey)
-
-    return signedCredential
-  }
 }
+
+//   credentialResponseJSONWebToken: (
+//     payload: ICredentialResponsePayloadCreationAttrs
+//   ): JSONWebToken<CredentialResponsePayload> => {
+//     return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
+//       CredentialResponsePayload
+//     >
+//   },
+//   authenticationJSONWebToken: (payload: IAuthPayloadCreationAttrs): JSONWebToken<AuthenticationPayload> => {
+//     return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
+//       AuthenticationPayload
+//     >
+//   },
+//   credentialsReceiveJSONWebToken: (
+//     payload: ICredentialsReceivePayloadCreationAttrs
+//   ): JSONWebToken<CredentialsReceivePayload> => {
+//     return JSONWebToken.create({
+//       privateKey: this.privateIdentityKey,
+//       payload
+//     }) as JSONWebToken<CredentialsReceivePayload>
+//   },
+//   credentialOfferRequestJSONWebToken: (
+//     payload: ICredentialOfferReqPayloadCreationAttrs
+//   ): JSONWebToken<CredentialOfferRequestPayload> => {
+//     return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
+//       CredentialOfferRequestPayload
+//     >
+//   },
+//   credentialOfferResponseJSONWebToken: (
+//     payload: ICredentialOfferResPayloadCreationAttrs
+//   ): JSONWebToken<CredentialOfferResponsePayload> => {
+//     return JSONWebToken.create({ privateKey: this.privateIdentityKey, payload }) as JSONWebToken<
+//       CredentialOfferResponsePayload
+//     >
+//   }
+// }
+
+// public sign = {
+//   credential: this.signCredential.bind(this)
+// }

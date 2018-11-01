@@ -3,41 +3,35 @@ import { IDidDocumentAttrs } from './types'
 import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections'
-import { IVerifiable, ISigner } from '../../registries/types'
+import { ISigner } from '../../registries/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
-import {
-  privateKeyToDID,
-  privateKeyToPublicKey,
-  sha256,
-  verifySignature,
-  generateRandomID,
-  sign
-} from '../../utils/crypto'
+import { sha256, publicKeyToDID } from '../../utils/crypto'
+import { ILinkedDataSignature, IDigestable } from '../../linkedDataSignature/types'
 
 @Exclude()
-export class DidDocument implements IVerifiable {
-  @Type(() => AuthenticationSection)
+export class DidDocument implements IDigestable {
   @Expose()
+  @Type(() => AuthenticationSection)
   private authentication: AuthenticationSection[] = []
 
-  @Type(() => PublicKeySection)
   @Expose()
+  @Type(() => PublicKeySection)
   private publicKey: PublicKeySection[] = []
 
-  @Type(() => ServiceEndpointsSection)
   @Expose()
+  @Type(() => ServiceEndpointsSection)
   private service: ServiceEndpointsSection[] = []
 
+  @Expose()
   @Type(() => Date)
   @Transform((value: Date) => value.toISOString(), { toPlainOnly: true })
   @Transform((value: string) => new Date(value), { toClassOnly: true })
-  @Expose()
-  private created: Date
+  private created: Date = new Date()
 
-  @Type(() => EcdsaLinkedDataSignature)
   @Expose()
-  private proof = new EcdsaLinkedDataSignature()
+  @Type(() => EcdsaLinkedDataSignature)
+  private proof: ILinkedDataSignature
 
   @Expose()
   private '@context': ContextEntry[] = defaultContextIdentity
@@ -45,75 +39,98 @@ export class DidDocument implements IVerifiable {
   @Expose()
   private id: string
 
+  public getDid(): string {
+    return this.id
+  }
+
+  public getAuthSections(): AuthenticationSection[] {
+    return this.authentication
+  }
+
+  public getPublicKeySections(): PublicKeySection[] {
+    return this.publicKey
+  }
+
+  public getServiceEndpointSections(): ServiceEndpointsSection[] {
+    return this.service
+  }
+
+  public getCreationDate(): Date {
+    return this.created
+  }
+
+  public getContext(): ContextEntry[] {
+    return this['@context']
+  }
+
+  public getProof(): ILinkedDataSignature {
+    return this.proof
+  }
+
+  public getSigner(): ISigner {
+    return {
+      did: this.getDid(),
+      keyId: this.proof.getCreator()
+    }
+  }
+
+  public setDid(did: string) {
+    this.id = did
+  }
+
+  public async setProof(proof: ILinkedDataSignature) {
+    this.proof = proof
+  }
+
+  public addAuthSection(section: AuthenticationSection) {
+    this.authentication.push(section)
+  }
+
+  public addPublicKeySection(section: PublicKeySection) {
+    this.publicKey.push(section)
+  }
+
   public addServiceEndpoint(endpoint: ServiceEndpointsSection) {
     this.service = [endpoint]
   }
 
-  public async fromPrivateKey(privateKey: Buffer): Promise<DidDocument> {
-    const did = privateKeyToDID(privateKey)
-    const publicKey = privateKeyToPublicKey(privateKey)
+  /*
+   * @description - Generates a boilerplate DID Document based on a public key
+   * @param publicKey - A secp256k1 public key that will be listed in the did document
+   * @returns {Object} - Instance of the DidDocument class
+  */
 
+  public static fromPublicKey(publicKey: Buffer): DidDocument {
+    const did = publicKeyToDID(publicKey)
     const keyId = `${did}#keys-1`
-    const publicKeySection = new PublicKeySection().fromEcdsa(publicKey, keyId)
-    const authenticationSection = new AuthenticationSection().fromEcdsa(publicKeySection)
+
     const didDocument = new DidDocument()
-
-    didDocument.created = new Date()
-    didDocument.id = did
-    didDocument.publicKey.push(publicKeySection)
-    didDocument.authentication.push(authenticationSection)
-
-    await didDocument.generateSignature({ key: privateKey, id: keyId })
+    didDocument.setDid(did)
+    didDocument.addPublicKeySection(PublicKeySection.fromEcdsa(publicKey, keyId, did))
+    didDocument.addAuthSection(AuthenticationSection.fromEcdsa(didDocument.getPublicKeySections()[0]))
     return didDocument
   }
 
-  public async generateSignature({ key, id }: { key: Buffer; id: string }) {
-    this.proof.created = new Date()
-    this.proof.creator = id
-    this.proof.nonce = generateRandomID(8)
+  /*
+   * @description - Normalizes the JSON-LD representation of the class instance,
+   *   and computes it's sha256 hash
+   * @returns {Buffer} - sha256 hash of the normalized document
+  */
 
-    const docDigest = await this.digest()
-    this.proof.signatureValue = sign(`${docDigest}`, key)
-  }
-
-  public async validateSignatureWithPublicKey(pubKey: Buffer): Promise<boolean> {
-    if (!pubKey) {
-      throw new Error("Please provide the issuer's public key")
-    }
-
-    const docDigest = await this.digest()
-    const sig = this.proof.getSigValue()
-    return verifySignature(docDigest, pubKey, sig)
-  }
-
-  public async digest(): Promise<string> {
+  public async digest(): Promise<Buffer> {
     const normalized = await this.normalize()
-    return sha256(Buffer.from(normalized)).toString('hex')
+    return sha256(Buffer.from(normalized))
   }
+
+  /*
+   * @description - Converts JSON-LD document to canonical form, see https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm
+   * @returns {Object} - Document in normalized form, quads
+  */
 
   private async normalize(): Promise<string> {
     const json = this.toJSON()
     delete json.proof
     return canonize(json)
-  }
-
-  public getDID(): string {
-    return this.id
-  }
-
-  public getSigner(): ISigner {
-    return {
-      did: this.id,
-      keyId: this.proof.creator
-    }
-  }
-
-  public getServiceEndpoints(): ServiceEndpointsSection[] {
-    return this.service
-  }
-
-  public getPublicKeySection() {
-    return this.publicKey
   }
 
   public toJSON(): IDidDocumentAttrs {

@@ -1,34 +1,80 @@
 import 'reflect-metadata'
 import { Type, plainToClass, classToPlain, Exclude, Expose, Transform } from 'class-transformer'
 import { canonize } from 'jsonld'
-import { ILinkedDataSignature, proofTypes, ILinkedDataSignatureAttrs } from '../types'
+import { ILinkedDataSignature, ILinkedDataSignatureAttrs, IDigestable } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
 
 @Exclude()
-export class EcdsaLinkedDataSignature implements ILinkedDataSignature {
+export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestable {
   @Expose()
   public type = 'EcdsaKoblitzSignature2016'
 
+  @Expose()
+  private creator: string
+
+  @Expose()
+  private nonce: string
+
+  @Expose()
+  @Transform((value:Buffer) => value && value.toString('hex'), {toPlainOnly: true})
+  @Transform((value:string) => Buffer.from(value, 'hex'), {toClassOnly: true})
+  private signatureValue: Buffer
+
+  @Expose()
   @Type(() => Date)
-  @Transform((value: Date) => value.toISOString(), {toPlainOnly: true})
-  @Transform((value: string) => new Date(value), {toClassOnly: true})
-  @Expose()
-  public created: Date
+  @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
+  @Transform((value: string) => new Date(value), { toClassOnly: true })
+  private created: Date = new Date()
 
-  public proofSectionType: proofTypes
+  public getCreator(): string {
+    return this.creator
+  }
 
-  @Expose()
-  public creator: string
+  public getType(): string {
+    return this.type
+  }
 
-  @Expose()
-  public nonce: string
+  public getNonce(): string {
+    return this.nonce
+  }
 
-  @Expose()
-  public signatureValue: string
+  public getSignatureValue(): Buffer {
+    return this.signatureValue
+  }
 
-  public getProofSectionType(): string {
-    return this.proofSectionType
+  public getCreationDate(): Date {
+    return this.created
+  }
+
+  public setCreator(creator: string): void {
+    this.creator = creator
+  }
+
+  public setNonce(nonce: string): void {
+    this.nonce = nonce
+  }
+
+  public setSignatureValue(signatureValue: Buffer): void {
+    this.signatureValue = signatureValue
+  }
+
+  public setCreationDate(creation: Date): void {
+    this.created = creation
+  }
+
+  private async normalize(): Promise<string> {
+    const json: ILinkedDataSignatureAttrs = this.toJSON()
+
+    json['@context'] = defaultContext
+    delete json.signatureValue
+
+    return canonize(json)
+  }
+
+  public async digest(): Promise<Buffer> {
+    const normalized = await this.normalize()
+    return sha256(Buffer.from(normalized))
   }
 
   public fromJSON(json: ILinkedDataSignatureAttrs): EcdsaLinkedDataSignature {
@@ -39,23 +85,4 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature {
     return classToPlain(this) as ILinkedDataSignatureAttrs
   }
 
-  public getSigValue(): Buffer {
-    return Buffer.from(this.signatureValue, 'base64')
-  }
-
-  public async digest(): Promise<string> {
-    const normalized = await this.normalize()
-    return sha256(Buffer.from(normalized)).toString('hex')
-  }
-
-  private async normalize(): Promise<string> {
-    const json: ILinkedDataSignatureAttrs = this.toJSON()
-
-    json['@context'] = defaultContext
-
-    delete json.signatureValue
-    delete json.type
-
-    return canonize(json)
-  }
 }
