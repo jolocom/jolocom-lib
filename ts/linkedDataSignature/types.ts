@@ -4,7 +4,7 @@ export interface ILinkedDataSignature extends IDigestable {
   getCreationDate: () => Date
   setCreator: (creator: string) => void
   setNonce: (nonce: string) => void
-  setSignatureValue: (signatureValue: Buffer) => void
+  setSignatureValue: (signatureValue: string) => void
   setCreationDate: (creation: Date) => void
   toJSON: () => ILinkedDataSignatureAttrs
   fromJSON: (json: ILinkedDataSignatureAttrs) => ILinkedDataSignature

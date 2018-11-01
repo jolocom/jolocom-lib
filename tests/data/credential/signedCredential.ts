@@ -1,18 +1,65 @@
-import { singleClaimCreationArgs } from './credential'
-import { testPrivateIdentityKey } from '../keys'
+import { mockEmailCredCreationAttrs } from './credential'
 import { claimsMetadata } from 'cred-types-jolocom-core'
 import { defaultContext } from '../../../ts/utils/contexts'
 
+export const mockKeyId = 'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa#keys-1'
+export const mockSubjectKey = 'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+export const mockIssuerDid = 'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+
 export const testSignedCredentialCreateArgs = {
   metadata: claimsMetadata.emailAddress,
-  claim: singleClaimCreationArgs,
-  privateIdentityKey: {
-    key: testPrivateIdentityKey,
-    id: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#keys-1'
-  },
-  subject: 'did:jolo:test'
+  claim: mockEmailCredCreationAttrs.claim,
+  issuerDid: mockIssuerDid,
+  keyId: mockKeyId,
+  subject: mockSubjectKey
 }
 
+export const emailVerifiableCredentialHash = '3f374ae2978e56cdcd985dd27f0067ff31929a45350e61cb09985b3c8dd50d0a'
+export const emailVerifiableCredential = {
+  '@context': [
+    {
+      id: '@id',
+      type: '@type',
+      cred: 'https://w3id.org/credentials#',
+      schema: 'http://schema.org/',
+      dc: 'http://purl.org/dc/terms/',
+      xsd: 'http://www.w3.org/2001/XMLSchema#',
+      sec: 'https://w3id.org/security#',
+      Credential: 'cred:Credential',
+      issuer: { '@id': 'cred:issuer', '@type': '@id' },
+      issued: { '@id': 'cred:issued', '@type': 'xsd:dateTime' },
+      claim: { '@id': 'cred:claim', '@type': '@id' },
+      credential: { '@id': 'cred:credential', '@type': '@id' },
+      expires: { '@id': 'sec:expiration', '@type': 'xsd:dateTime' },
+      proof: { '@id': 'sec:proof', '@type': '@id' },
+      EcdsaKoblitzSignature2016: 'sec:EcdsaKoblitzSignature2016',
+      created: { '@id': 'dc:created', '@type': 'xsd:dateTime' },
+      creator: { '@id': 'dc:creator', '@type': '@id' },
+      domain: 'sec:domain',
+      nonce: 'sec:nonce',
+      signatureValue: 'sec:signatureValue'
+    },
+    {
+      ProofOfEmailCredential: 'https://identity.jolocom.com/terms/ProofOfEmailCredential',
+      schema: 'http://schema.org/',
+      email: 'schema:email'
+    }
+  ],
+  id: 'claimId:567e6e0c6570a',
+  name: 'Email address',
+  issuer: 'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  type: ['Credential', 'ProofOfEmailCredential'],
+  claim: { email: 'test@jolocom.io', id: 'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' },
+  issued: '1970-01-01T00:00:00.000Z',
+  expires: '1971-01-01T00:00:00.000Z',
+  proof: {
+    type: 'EcdsaKoblitzSignature2016',
+    creator: 'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa#keys-1',
+    nonce: '1842fb5f567dd532',
+    signatureValue: '',
+    created: '1970-01-01T00:00:00.000Z'
+  }
+}
 export const testSignedCredential = {
   '@context': [
     'https://w3id.org/identity/v1',

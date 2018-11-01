@@ -15,9 +15,9 @@ import {
   birthdayCredentialJSON
 } from '../data/credential/credential'
 
-describe.only('Credential', () => {
+describe('Credential', () => {
   describe('static create method', () => {
-    it('Should correctly instantiate given a single claim credential', () => {
+    it('Should correctly instantiate given a single claim', () => {
       const credential = Credential.create<EmailClaimMetadata>(mockEmailCredCreationAttrs)
       const credentialFromJSON = Credential.fromJSON(emailCredentialJSON)
       expect(credential).to.deep.equal(credentialFromJSON)
@@ -44,8 +44,8 @@ describe.only('Credential', () => {
   it('Should implement all getter methods', () => {
     const credential = Credential.create<EmailClaimMetadata>(mockEmailCredCreationAttrs)
 
-    expect(credential.getClaim()).to.deep.equal(mockEmailCredCreationAttrs.claim)
     expect(credential.getContext()).to.deep.equal([...defaultContext, ...claimsMetadata.emailAddress.context])
+    expect(credential.getClaim()).to.deep.equal(mockEmailCredCreationAttrs.claim)
     expect(credential.getName()).to.deep.equal(claimsMetadata.emailAddress.name)
     expect(credential.getType()).to.deep.equal(claimsMetadata.emailAddress.type)
   })

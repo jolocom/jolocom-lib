@@ -56,6 +56,14 @@ const mockBirthday = {
   birthYear: 1984
 }
 
+export const mockUserData = {
+  mockSubject,
+  mockEmail,
+  mockName,
+  mockAddress,
+  mockBirthday
+}
+
 /* Preparing credential creation attributes for easy instantiation */
 
 export const mockEmailCredCreationAttrs = {
