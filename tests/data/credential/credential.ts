@@ -1,22 +1,7 @@
-import { BaseMetadata } from 'cred-types-jolocom-core'
+import { BaseMetadata, claimsMetadata } from 'cred-types-jolocom-core'
 import { defaultContext } from '../../../ts/utils/contexts'
 
-export const singleClaimCreationArgs = {
-  email: 'eugeniu@jolocom.com'
-}
-
-export const multipleClaimsCreationArgs = {
-  givenName: 'Eugeniu',
-  familyName: 'Rusu'
-}
-
-export const addressClaimCreationArgs = {
-  address: {
-    street: 'Kopenicker Str 147',
-    postalCode: '10829',
-    city: 'Berlin'
-  }
-}
+/* Defining custom metadata objects for custom credentials */
 
 export interface IBirthDateClaimInterface extends BaseMetadata {
   claimInterface?: {
@@ -29,32 +14,79 @@ export interface IBirthDateClaimInterface extends BaseMetadata {
 export interface INestedAddressClaimInterface extends BaseMetadata {
   claimInterface?: {
     address: {
-      street: string,
-      postalCode: string,
+      street: string
+      postalCode: string
       city: string
     }
   }
 }
 
-export const customClaimMetadata: IBirthDateClaimInterface = {
+const customClaimMetadata: IBirthDateClaimInterface = {
   context: ['http://test.com', { test: 'http://test.com/terms' }],
   type: ['Credential', 'MockCredential'],
   name: 'Mock'
 }
 
-export const nestedAddressClaimMetadata: INestedAddressClaimInterface = {
+const nestedAddressClaimMetadata: INestedAddressClaimInterface = {
   context: ['http://test.com', { test: 'http://test.com/terms' }],
   type: ['Credential', 'ProofOfAddressCredential'],
   name: 'Address'
 }
 
-export const customCredentialCreationArgs = {
-  id: 'did:jolo:test',
-  test: 'first',
-  secondTest: 'second'
+/* Defining mock user data to reuse later */
+
+const mockSubject = 'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+const mockEmail = 'test@jolocom.io'
+const mockName = {
+  givenName: 'MockName',
+  familyName: 'MockFamName'
 }
 
-export const singleClaimCredentialJSON = {
+const mockAddress = {
+  address: {
+    street: 'Kopenicker Str 147',
+    postalCode: '10829',
+    city: 'Berlin'
+  }
+}
+
+const mockBirthday = {
+  birthDate: 20,
+  birthMonth: 'april',
+  birthYear: 1984
+}
+
+/* Preparing credential creation attributes for easy instantiation */
+
+export const mockEmailCredCreationAttrs = {
+  metadata: claimsMetadata.emailAddress,
+  subject: mockSubject,
+  claim: {
+    email: mockEmail
+  }
+}
+
+export const mockNameCredCreationAttrs = {
+  metadata: claimsMetadata.name,
+  subject: mockSubject,
+  claim: mockName
+}
+
+export const mockAddrCredCreationAttrs = {
+  metadata: nestedAddressClaimMetadata,
+  subject: mockSubject,
+  claim: mockAddress
+}
+
+export const mockBirthdayCredCreationAttrs = {
+  metadata: customClaimMetadata,
+  subject: mockSubject,
+  claim: mockBirthday
+}
+
+/* JSON form to ensure TOJSON and FROMJSON work as intended */
+
+export const emailCredentialJSON = {
   '@context': [
     ...defaultContext,
     {
@@ -65,13 +97,13 @@ export const singleClaimCredentialJSON = {
   ],
   type: ['Credential', 'ProofOfEmailCredential'],
   claim: {
-    id: 'did:jolo:test',
-    email: 'eugeniu@jolocom.com'
+    email: mockEmail,
+    id: mockSubject
   },
   name: 'Email address'
 }
 
-export const multipleClaimsCredentialJSON = {
+export const nameCredentialJSON = {
   '@context': [
     ...defaultContext,
     {
@@ -83,21 +115,18 @@ export const multipleClaimsCredentialJSON = {
   ],
   type: ['Credential', 'ProofOfNameCredential'],
   claim: {
-    id: 'did:jolo:test',
-    givenName: 'Eugeniu',
-    familyName: 'Rusu'
+    ...mockName,
+    id: mockSubject
   },
   name: 'Name'
 }
 
-export const customCredentialJSON = {
+export const birthdayCredentialJSON = {
   '@context': [...defaultContext, 'http://test.com', { test: 'http://test.com/terms' }],
   type: ['Credential', 'MockCredential'],
   claim: {
-    id: 'did:jolo:test',
-    birthDate: 20,
-    birthMonth: 'april',
-    birthYear: 1984
+    ...mockBirthday,
+    id: mockSubject
   },
   name: 'Mock'
 }
@@ -106,12 +135,8 @@ export const addressCredentialJSON = {
   '@context': [...defaultContext, 'http://test.com', { test: 'http://test.com/terms' }],
   type: ['Credential', 'ProofOfAddressCredential'],
   claim: {
-    address: {
-      street: 'Kopenicker Str 147',
-      postalCode: '10829',
-      city: 'Berlin'
-    },
-    id: 'did:jolo:test'
+    ...mockAddress,
+    id: mockSubject
   },
   name: 'Address'
 }

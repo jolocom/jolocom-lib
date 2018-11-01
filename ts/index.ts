@@ -6,12 +6,12 @@ import { IdentityManager, KeyTypes } from './identityManager/identityManager'
 
 export const JolocomLib = {
   parse,
-  registry : registries,
-  identityManager : {
+  registry: registries,
+  identityManager: {
     create: IdentityManager.create
   },
-  unsigned : {
-    createCredential: Credential.create,
+  unsigned: {
+    createCredential: Credential.create
   },
   KeyTypes
 }
