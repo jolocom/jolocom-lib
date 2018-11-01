@@ -1,43 +1,18 @@
-import { plainToClass, classToPlain } from 'class-transformer'
 import * as jsonlogic from 'json-logic-js'
-import { areCredTypesEqual } from '../../utils/credentials'
+import { plainToClass, classToPlain } from 'class-transformer'
+import { areCredTypesEqual } from '../utils/credentials'
 import {
   ICredentialRequestAttrs,
   Comparable,
   IExposedConstraintFunctions,
   ICredentialRequest,
   IConstraint,
-  ICredentialRequestCreationAttrs
-} from './types'
-import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
+} from './credentialRequest/types'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 export class CredentialRequest {
-  public callbackURL: string
-  public credentialRequirements: ICredentialRequest[] = []
-
-  public static create(args: ICredentialRequestCreationAttrs): CredentialRequest {
-    const credentialRequest = new CredentialRequest()
-    credentialRequest.setCallbackURL(args.callbackURL)
-    args.credentialRequirements.forEach((req) => {
-      credentialRequest.addCredentialRequirement(req)
-    })
-    return credentialRequest
-  }
-
-  private addCredentialRequirement({constraints, type}: {type: string[], constraints: IConstraint[]}) {
-    const credConstraints = {
-      and: [
-        { '==': [true, true] },
-        ...constraints
-      ]
-    }
-
-    this.credentialRequirements.push({ type, constraints: credConstraints })
-  }
-
-  public setCallbackURL(url: string) {
-    this.callbackURL = url
-  }
+  private callbackURL: string
+  private credentialRequirements: ICredentialRequest[] = []
 
   public getCallbackURL(): string {
     return this.callbackURL
@@ -48,12 +23,16 @@ export class CredentialRequest {
   }
 
   public getRequestedCredentialTypes(): string[][] {
-    return this.credentialRequirements.map((credential) => credential.type)
+    return this.credentialRequirements.map(credential => credential.type)
+  }
+
+  public setCallbackURL(url: string) {
+    this.callbackURL = url
   }
 
   public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
-    return credentials.filter((credential) => {
-      const relevantConstraints = this.credentialRequirements.find((section) =>
+    return credentials.filter(credential => {
+      const relevantConstraints = this.credentialRequirements.find(section =>
         areCredTypesEqual(section.type, credential.type)
       )
 

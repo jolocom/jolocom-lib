@@ -1,4 +1,4 @@
-export interface ILinkedDataSignature {
+export interface ILinkedDataSignature extends IDigestable {
   getCreator: () => string
   getNonce: () => string
   getCreationDate: () => Date

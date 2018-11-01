@@ -67,6 +67,10 @@ export class DidDocument implements IDigestable {
     return this.proof
   }
 
+  public getSignatureValue() : Buffer {
+    return this.proof.getSignatureValue()
+  }
+
   public getSigner(): ISigner {
     return {
       did: this.getDid(),

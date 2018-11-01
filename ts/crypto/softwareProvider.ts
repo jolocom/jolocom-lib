@@ -123,7 +123,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   async verifyDigestable(publicKey: Buffer, toVerify: IDigestable) : Promise<boolean>{
     const digest = await toVerify.digest()
     const signature = toVerify.getSignatureValue()
-    return this.verify(publicKey, digest, signature)
+    return this.verify(digest, publicKey, signature)
   }
 
   /*

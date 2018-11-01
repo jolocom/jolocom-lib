@@ -5,12 +5,6 @@ export interface ICredentialRequestPayloadAttrs {
   credentialRequest: ICredentialRequestAttrs
 }
 
-export interface ICredentialRequestPayloadCreationAttrs {
-  iss?: string
-  typ: string
-  credentialRequest: ICredentialRequestCreationAttrs
-}
-
 export type RequestedCredentialAttrs = Array<{type: string[], constraints: IConstraint[]}>
 
 export interface ICredentialRequestCreationAttrs {
@@ -26,9 +20,7 @@ export interface IConstraint {
 
 export interface ICredentialRequest {
   type: string[]
-  constraints: {
-    and: IConstraint[]
-  }
+  constraints: IConstraint[]
 }
 
 export type Comparable = number | Date

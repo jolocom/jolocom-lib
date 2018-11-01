@@ -1,18 +1,31 @@
-import { IJWTHeader, IPayloadCreationAttrs } from './types'
+import { IJWTHeader } from './types'
 import base64url from 'base64url'
 import { decodeToken } from 'jsontokens'
 import { classToPlain, plainToClass, Exclude, Expose, Transform } from 'class-transformer'
-import { IPayload, IJSONWebTokenAttrs, InteractionType } from './types'
-import { CredentialRequestPayload } from './credentialRequest/credentialRequestPayload'
-import { CredentialResponsePayload } from './credentialResponse/credentialResponsePayload'
-import { CredentialsReceivePayload } from './credentialsReceive/credentialsReceivePayload'
-import { AuthenticationPayload } from './authentication/authenticationPayload'
-import { CredentialOfferRequestPayload } from './credentialOfferRequest/credentialOfferRequestPayload'
-import { CredentialOfferResponsePayload } from './credentialOfferResponse/credentialOfferResponsePayload'
+import { IJSONWebTokenAttrs, InteractionType } from './types'
 import { sha256 } from '../utils/crypto'
 import { IDigestable } from '../linkedDataSignature/types'
+import { CredentialOffer } from './credentialOffer'
+import { CredentialResponse } from './credentialResponse'
+import { CredentialRequest } from './credentialRequest'
+import { Authentication } from './authentication'
+import { CredentialsReceive } from './credentialsReceive'
+
+export type JWTEncodable = CredentialResponse | CredentialRequest | Authentication | CredentialOffer
+
+export interface IJWTEncodable {
+  [key: string]: any
+}
+
+interface IPayloadSection<T> {
+  iat?: number
+  iss?: string
+  typ?: InteractionType
+  interactionToken?: T
+}
+
 @Exclude()
-export class JSONWebToken<T extends IPayload> implements IDigestable {
+export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
   @Expose()
   private header: IJWTHeader = {
     typ: 'JWT',
@@ -20,8 +33,16 @@ export class JSONWebToken<T extends IPayload> implements IDigestable {
   }
 
   @Expose()
-  @Transform((value: IPayload) => payloadToJWT(value))
-  private payload: T
+  @Transform(
+    (value: { interactionToken: IJWTEncodable, typ: InteractionType }) => ({
+      ...value,
+      interactionToken: payloadToJWT<T>(value.interactionToken, value.typ)
+    }),
+    { toClassOnly: true }
+  )
+
+  private payload: IPayloadSection<T> = { iat: Date.now()
+  }
 
   @Expose()
   private signature: string
@@ -34,30 +55,37 @@ export class JSONWebToken<T extends IPayload> implements IDigestable {
     return this.payload.iat
   }
 
-  public getPayload(): T {
-    return this.payload
+  public getInteractionToken() {
+    return this.payload.interactionToken
+  }
+
+  public static fromJWTEncodable<T extends JWTEncodable>(toEncode: T): JSONWebToken<T> {
+    const jwt = new JSONWebToken<T>()
+    jwt.setTokenContent(toEncode)
+    return jwt
   }
 
   public getSignatureValue(): Buffer {
     return Buffer.from(this.signature, 'hex')
   }
 
-  public setPayload(payload: T) {
-    this.payload = payload
+  public setTokenIssuer(iss: string) {
+    this.payload.iss = iss
+  }
+
+  public setTokenContent(payload: T) {
+    this.payload.interactionToken = payload
+  }
+
+  public setTokenType(typ: InteractionType) {
+    this.payload.typ = typ
   }
 
   public setSignature(signature: string) {
     this.signature = signature
   }
 
-  public static create(payload: IPayloadCreationAttrs, iss: string): JSONWebToken<IPayload> {
-    const jwt = new JSONWebToken()
-    jwt.setPayload(payloadToJWT(payload))
-    jwt.payload.iat = Date.now()
-    return jwt
-  }
-
-  public static decode(jwt: string): JSONWebToken<IPayload> {
+  public static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T> {
     return JSONWebToken.fromJSON(decodeToken(jwt))
   }
 
@@ -83,26 +111,27 @@ export class JSONWebToken<T extends IPayload> implements IDigestable {
     return classToPlain(this) as IJSONWebTokenAttrs
   }
 
-  public static fromJSON(json: IJSONWebTokenAttrs): JSONWebToken<IPayload> {
-    return plainToClass(this, json)
+  public static fromJSON<T extends JWTEncodable>(json: IJSONWebTokenAttrs): JSONWebToken<T> {
+    return plainToClass<JSONWebToken<T>, IJSONWebTokenAttrs>(JSONWebToken, json)
   }
 }
 
-const payloadToJWT = (payload: IPayload): IPayload => {
+const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: InteractionType): T => {
   const payloadParserMap = {
-    [InteractionType.Authentication]: AuthenticationPayload,
-    [InteractionType.CredentialOfferRequest]: CredentialOfferRequestPayload,
-    [InteractionType.CredentialOfferResponse]: CredentialOfferResponsePayload,
-    [InteractionType.CredentialRequest]: CredentialRequestPayload,
-    [InteractionType.CredentialResponse]: CredentialResponsePayload,
-    [InteractionType.CredentialsReceive]: CredentialsReceivePayload
+    // [InteractionType.Authentication]: Authentication,
+    [InteractionType.CredentialOfferRequest]: CredentialOffer,
+    [InteractionType.CredentialOfferResponse]: CredentialOffer,
+    [InteractionType.CredentialRequest]: CredentialRequest,
+    [InteractionType.CredentialResponse]: CredentialResponse,
+    [InteractionType.CredentialsReceive]: CredentialsReceive
+
   }
 
-  const correspondingClass = payloadParserMap[payload.typ]
+  const correspondingClass = payloadParserMap[typ]
 
   if (!correspondingClass) {
     throw new Error('Interaction type not recognized!')
   }
 
-  return plainToClass(correspondingClass, payload) as typeof correspondingClass
+  return plainToClass<typeof correspondingClass, IJWTEncodable>(correspondingClass, payload)
 }

@@ -6,9 +6,3 @@ export interface ICredentialOfferCreationAttrs {
     [key: string]: string | null
   }
 }
-
-export interface ICredentialOfferReqPayloadCreationAttrs {
-  iss?: string
-  typ: string
-  credentialOffer: ICredentialOfferCreationAttrs
-}

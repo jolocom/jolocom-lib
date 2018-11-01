@@ -25,6 +25,7 @@ export interface IJSONWebTokenAttrs {
 
 export interface IPayloadCreationAttrs {
   typ: string
+  iss: string
   [x: string]: any
 }
 

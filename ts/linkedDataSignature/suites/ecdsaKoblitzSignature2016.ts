@@ -17,9 +17,7 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
   private nonce: string
 
   @Expose()
-  @Transform((value:Buffer) => value && value.toString('hex'), {toPlainOnly: true})
-  @Transform((value:string) => Buffer.from(value, 'hex'), {toClassOnly: true})
-  private signatureValue: Buffer
+  private signatureValue: string
 
   @Expose()
   @Type(() => Date)
@@ -40,7 +38,7 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
   }
 
   public getSignatureValue(): Buffer {
-    return this.signatureValue
+    return Buffer.from(this.signatureValue, 'hex')
   }
 
   public getCreationDate(): Date {
@@ -56,7 +54,7 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
   }
 
   public setSignatureValue(signatureValue: Buffer): void {
-    this.signatureValue = signatureValue
+    this.signatureValue = signatureValue.toString('hex')
   }
 
   public setCreationDate(creation: Date): void {
@@ -84,5 +82,4 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
   public toJSON(): ILinkedDataSignatureAttrs {
     return classToPlain(this) as ILinkedDataSignatureAttrs
   }
-
 }

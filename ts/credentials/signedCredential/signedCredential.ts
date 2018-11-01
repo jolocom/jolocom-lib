@@ -52,7 +52,7 @@ export class SignedCredential implements IDigestable {
 
   @Expose()
   @Type(() => EcdsaLinkedDataSignature)
-  @Transform((value: EcdsaLinkedDataSignature) => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
+  @Transform((value) => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
   private proof = new EcdsaLinkedDataSignature()
 
   public setIssuer(issuer: string) {
@@ -82,9 +82,10 @@ export class SignedCredential implements IDigestable {
     return this.issuer
   }
 
-  public getSignatureValue()  {
+  public getSignatureValue() {
     return this.proof.getSignatureValue()
   }
+
   public setSignatureValue(signature: Buffer) {
     this.proof.setSignatureValue(signature)
   }
@@ -119,11 +120,11 @@ export class SignedCredential implements IDigestable {
 
     const customType = this.type.find(t => t !== 'Credential')
 
-    if (!customType) {
-      return 'Credential'
+    if (customType) {
+      return customType.replace(/([A-Z])/g, ' $1').trim()
     }
 
-    return customType.replace(/([A-Z])/g, ' $1').trim()
+    return 'Credential'
   }
 
   public static async create<T extends BaseMetadata>(params: IExtendedCreationArgs<T>): Promise<SignedCredential> {
@@ -131,14 +132,13 @@ export class SignedCredential implements IDigestable {
     const json = credential.toJSON() as ISignedCredentialAttrs
     const signedCredential = SignedCredential.fromJSON(json)
 
-    signedCredential.generateSignature(params.publicKeyMetadata)
+    signedCredential.prepareSignature(params.publicKeyMetadata)
     signedCredential.setIssuer(params.issuerDid)
 
-    console.log(signedCredential)
     return signedCredential
   }
 
-  public async generateSignature(keyMetadata: IKeyMetadata) {
+  private async prepareSignature(keyMetadata: IKeyMetadata) {
     const inOneYear = new Date()
     inOneYear.setFullYear(new Date().getFullYear() + 1)
 
@@ -148,17 +148,17 @@ export class SignedCredential implements IDigestable {
     this.proof.setNonce(SoftwareKeyProvider.getRandom(8).toString('hex'))
   }
 
+  public async digest(): Promise<Buffer> {
+    const normalized = await this.normalize()
+    return sha256(Buffer.from(normalized))
+  }
+
   public static fromJSON(json: ISignedCredentialAttrs): SignedCredential {
     return plainToClass(SignedCredential, json)
   }
 
   public toJSON(): ISignedCredentialAttrs {
     return classToPlain(this) as ISignedCredentialAttrs
-  }
-
-  public async digest(): Promise<Buffer> {
-    const normalized = await this.normalize()
-    return sha256(Buffer.from(normalized))
   }
 
   private generateClaimId(): string {
@@ -173,17 +173,3 @@ export class SignedCredential implements IDigestable {
     return canonize(json)
   }
 }
-
-// public async validateSignatureWithPublicKey(pubKey: Buffer): Promise<boolean> {
-//   if (!pubKey) {
-//     throw new Error('Please provide the issuer\'s public key')
-//   }
-
-//   const docDigest = await this.digest()
-//   const sigDigest = await this.proof.digest()
-
-//   const tbv = sigDigest + docDigest
-//   const sig = this.proof.getSignatureValue()
-
-//   return verifySignature(tbv, pubKey, sig)
-// }

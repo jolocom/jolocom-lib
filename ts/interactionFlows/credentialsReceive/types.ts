@@ -1,4 +1,3 @@
-import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
 import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
 
 export interface ICredentialsReceivePayloadCreationAttrs {
