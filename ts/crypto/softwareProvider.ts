@@ -1,7 +1,7 @@
 import { fromSeed } from 'bip32'
 import { randomBytes, createCipher, createDecipher } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
-import { IDigestable } from '../linkedDataSignature/types';
+import { IDigestable } from '../linkedDataSignature/types'
 
 export interface IKeyDerivationArgs {
   encryptionPass: string
@@ -104,9 +104,9 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   }
 
   /*
-   * @description - digest the passed object, and computes the signature
+   * @description - Digest the passed object, and computes the signature
    * @param derivationArgs - Data needed to derive child key
-   * @param  toSign - Instance of class that implements IDigestable
+   * @param toSign - Instance of class that implements IDigestable
    * @param derivationArgs.encryptionPass - The encryption password
    * @param derivationArgs.derivationPath - The bip32 derivation path
    * @returns {Buffer} - computed signature
@@ -118,8 +118,12 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   }
 
   /*
-   * @TODO - implement
+   * @description- Digest the passed object, and validate the signature using a public key
+   * @param toVerify - Instance of class that implements IDigestable
+   * @param publicKey - Public key used to generate the signature
+   * *returns {Promise<boolean>} - the validity of the signature
    */
+
   async verifyDigestable(publicKey: Buffer, toVerify: IDigestable) : Promise<boolean>{
     const digest = await toVerify.digest()
     const signature = toVerify.getSignatureValue()
