@@ -15,18 +15,7 @@ import { ICredentialResponseAttrs } from '../interactionFlows/credentialResponse
 import { CredentialRequest } from '../interactionFlows/credentialRequest'
 import { CredentialResponse } from '../interactionFlows/credentialResponse'
 import { IVaultedKeyProvider } from '../vaultedKeyProvider/softwareProvider'
-
-/* Allows for neat claim autocompletion based on metadata type */
-export interface ISignedCredCreationArgs<T extends BaseMetadata> {
-  metadata: T
-  claim: T['claimInterface']
-  subject: string
-}
-
-export interface IKeyMetadata {
-  derivationPath: string
-  keyId: string
-}
+import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types'
 
 /*
  * Developer facing class with initialized instance of the key provider as member.

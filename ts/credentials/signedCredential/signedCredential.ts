@@ -8,7 +8,6 @@ import { ContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { ISigner } from '../../registries/types'
-import { ISignedCredCreationArgs } from '../../identityWallet/identityWallet'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 

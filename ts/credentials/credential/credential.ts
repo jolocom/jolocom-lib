@@ -2,7 +2,7 @@ import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { ICredentialAttrs, IClaimSection } from './types'
 import { BaseMetadata, ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContext } from '../../utils/contexts'
-import { ISignedCredCreationArgs } from '../../identityWallet/identityWallet'
+import { ISignedCredCreationArgs } from '../signedCredential/types';
 
 /*
  * Class representing an unsigned JSON LD credential. Used together with a
