@@ -1,55 +1,76 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
-import * as crypto from 'crypto'
 import { publicProfileCredJSON } from '../data/identity'
 import { DidDocument } from '../../ts/identity/didDocument'
 import { testPublicIdentityKey } from '../data/keys'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-import { didDocumentJSON } from '../data/didDocument'
+import { Identity } from '../../ts/identity/identity'
 const expect = chai.expect
 
 describe('Identity', () => {
-  const sandbox = sinon.createSandbox()
   let clock
-  let referenceDidDocument: DidDocument
+  const mockDidDocument = DidDocument.fromPublicKey(testPublicIdentityKey)
+  const mockPublicProfile = SignedCredential.fromJSON(publicProfileCredJSON)
 
   before(() => {
     clock = sinon.useFakeTimers()
-    sandbox.stub(crypto, 'randomBytes').returns(Buffer.from('1842fb5f567dd532', 'hex'))
-    referenceDidDocument = DidDocument.fromPublicKey(testPublicIdentityKey)
   })
 
   after(() => {
-    sandbox.restore()
     clock.restore()
   })
 
-  it('Should correctly instantiate from did document', () => {
-    const didDocFromJSON = DidDocument.fromJSON(didDocumentJSON)
-    expect(referenceDidDocument).to.deep.eq(didDocFromJSON)
+  it('Should correctly instantiate from did document without public profile', () => {
+    const identity = Identity.fromDidDocument({ didDocument: mockDidDocument })
+    expect(identity.getDidDocument()).to.deep.eq(mockDidDocument)
+    expect(identity.publicProfile.get()).to.be.undefined
   })
 
-  it('Should correctly implement toJSON', () => {
-    expect(referenceDidDocument.toJSON()).to.deep.eq(didDocumentJSON)
+  it('Should correctly instantiate from did document including public profile', () => {
+    const identity = Identity.fromDidDocument({ didDocument: mockDidDocument, publicProfile: mockPublicProfile })
+    expect(identity.getDidDocument()).to.deep.eq(mockDidDocument)
+    expect(identity.publicProfile.get()).to.deep.eq(mockPublicProfile)
   })
 
-  it('Non trivial getters should work', () => {
-    expect(referenceDidDocument.getSigner()).to.deep.eq({
-      did: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af',
-      keyId: 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af#keys-1'
-    })
-  })
+  /*
+   * Following tests are quite repetitive, because all opperations are essentially getters and setters
+   * once public profile logic becomes more complexe they should differ more
+   */
 
-  describe('Public Profile', () => {
-    const referencePublicProfileDoc = SignedCredential.fromJSON(publicProfileCredJSON)
+  describe('Public profile', () => {
+    let mockIdentity: Identity
+
     beforeEach(() => {
+      mockIdentity = Identity.fromDidDocument({ didDocument: mockDidDocument })
+    })
 
+    it('Should correctly get public profile when present', () => {
+      expect(mockIdentity.publicProfile.get()).to.be.undefined
+      mockIdentity.publicProfile.set(mockPublicProfile)
+      expect(mockIdentity.publicProfile.get()).to.deep.eq(mockPublicProfile)
+    })
+
+    it('Should correctly get public profile when missing', () => {
+      expect(mockIdentity.publicProfile.get()).to.be.undefined
     })
 
     it('Should correctly set public profile', () => {
-
+      expect(mockIdentity.publicProfile.get()).to.be.undefined
+      mockIdentity.publicProfile.set(mockPublicProfile)
+      expect(mockIdentity.publicProfile.get()).to.deep.eq(mockPublicProfile)
     })
-    it('Should correctly get public profile')
-    it('Should correctly remove public profile')
+
+    it('Should correctly delete public profile when present', () => {
+      mockIdentity.publicProfile.set(mockPublicProfile)
+      expect(mockIdentity.publicProfile.get()).to.deep.eq(mockPublicProfile)
+      mockIdentity.publicProfile.delete()
+      expect(mockIdentity.publicProfile.get()).to.be.undefined
+    })
+
+    it('Should correctly delete public profile when missing', () => {
+      expect(mockIdentity.publicProfile.get()).to.be.undefined
+      mockIdentity.publicProfile.delete()
+      expect(mockIdentity.publicProfile.get()).to.be.undefined
+    })
   })
 })
