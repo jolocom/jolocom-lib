@@ -8,7 +8,7 @@ import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
 import { sha256, publicKeyToDID } from '../../utils/crypto'
 import { ILinkedDataSignature, IDigestable } from '../../linkedDataSignature/types'
-import { SoftwareKeyProvider } from '../../crypto/softwareProvider'
+import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 
 @Exclude()
 export class DidDocument implements IDigestable {
