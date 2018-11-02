@@ -1,6 +1,7 @@
 import { classToPlain, plainToClass, Expose, Exclude } from 'class-transformer'
 import { ICredentialOfferCreationAttrs } from './credentialOfferRequest/types'
 
+/* Class representing a credential offer. Encodable in JWT */
 @Exclude()
 export class CredentialOffer {
   @Expose()

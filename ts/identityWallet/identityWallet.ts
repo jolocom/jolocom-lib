@@ -9,8 +9,7 @@ import { InteractionType } from '../interactionFlows/types'
 import { ICredentialOfferCreationAttrs } from '../interactionFlows/credentialOfferRequest/types'
 import { CredentialOffer } from '../interactionFlows/credentialOffer'
 import { ICredentialRequestCreationAttrs } from '../interactionFlows/credentialRequest/types'
-import { IAuthenticationAttrs } from '../interactionFlows/authentication/types'
-import { Authentication } from '../interactionFlows/authentication'
+import { Authentication, IAuthenticationAttrs } from '../interactionFlows/authentication'
 import { ICredentialResponseAttrs } from '../interactionFlows/credentialResponse/types'
 import { CredentialRequest } from '../interactionFlows/credentialRequest'
 import { CredentialResponse } from '../interactionFlows/credentialResponse'
@@ -57,6 +56,10 @@ export class IdentityWallet {
    */
 
   constructor({ identity, publicKeyMetadata, vaultedKeyProvider }: IIdentityWalletCreateArgs) {
+    if (!identity || !publicKeyMetadata || !vaultedKeyProvider) {
+      throw new Error('Missing argunments! Expected identity, publicKeyMetadata, and vaulterKeyProvider')
+    }
+
     this.identity = identity
     this.publicKeyMetadata = publicKeyMetadata
     this.vaultedKeyProvider = vaultedKeyProvider

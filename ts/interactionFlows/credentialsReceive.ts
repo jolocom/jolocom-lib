@@ -11,9 +11,6 @@ export class CredentialsReceive {
 
     return credentialsReceive
   }
-  // TODO: add method
-  // public async validateCredentials(did: string): Promise<boolean> {
-  // }
 
   public getSignedCredentials(): SignedCredential[] {
     return this.signedCredentials

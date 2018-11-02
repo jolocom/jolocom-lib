@@ -1,5 +1,29 @@
 import { plainToClass, classToPlain, Expose } from 'class-transformer'
-import { IAuthenticationAttrs } from './authentication/types'
+
+/* TODO CLEAN UP */
+export interface IAuthenticationAttrs {
+  challenge: string
+  callbackURL: string
+}
+export interface IAuthPayloadCreationAttrs {
+  iss?: string
+  typ: string
+  authentication: IAuthenticationAttrs
+}
+
+export interface IAuthentiactionPayloadAttrs {
+  iat: number
+  iss: string
+  typ: string
+  authentication: IAuthenticationAttrs
+}
+
+/*
+ * Class representing a challenge string and callback url for challenge-response
+ * authentication did authentication, encodable in JWT
+ * 
+ * Currently unused
+ */
 
 @Expose()
 export class Authentication {

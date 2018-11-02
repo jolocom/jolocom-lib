@@ -9,10 +9,10 @@ import { Identity } from '../identity/identity'
 import { IRegistryCommitArgs, IRegistryStaticCreationArgs } from './types'
 import { jolocomIpfsStorageAgent } from '../ipfs'
 import { jolocomEthereumResolver } from '../ethereum'
-import { IVaultedKeyProvider, IKeyDerivationArgs } from '../crypto/softwareProvider'
-import { KeyTypes } from '../identityManager/identityManager'
 import { PublicProfileServiceEndpoint } from '../identity/didDocument/sections/serviceEndpointsSection'
-import { publicKeyToDID } from '../utils/crypto';
+import { publicKeyToDID } from '../utils/crypto'
+import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/softwareProvider'
+import { KeyTypes } from '../vaultedKeyProvider/types'
 
 /*
  * Jolocom specific Registry, which uses IPFS
