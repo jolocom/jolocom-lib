@@ -5,8 +5,8 @@ import { defaultContext } from '../../../ts/utils/contexts'
 /* Defining custom metadata objects for custom credentials */
 
 export const mockKeyId = 'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa#keys-1'
-export const mockSubjectKey = 'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 export const mockIssuerDid = 'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+export const mockSubjectKey = 'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 export const testSignedCredentialCreateArgs = {
   metadata: claimsMetadata.emailAddress,

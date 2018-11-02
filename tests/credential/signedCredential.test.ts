@@ -3,7 +3,6 @@ import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import {
-  testSignedCredentialCreateArgs,
   mockKeyId,
   mockIssuerDid,
   emailVerifiableCredential,
@@ -29,10 +28,9 @@ describe('SignedCredential', () => {
     sandbox.stub(crypto, 'randomBytes').returns(Buffer.from('1842fb5f567dd532', 'hex'))
 
     clock = sinon.useFakeTimers()
-    vCred = vCred = await SignedCredential.create<EmailClaimMetadata>({
+    vCred = vCred = await SignedCredential.create<EmailClaimMetadata>(mockEmailCredCreationAttrs, {
       keyId: mockKeyId,
-      issuerDid: mockIssuerDid,
-      ...mockEmailCredCreationAttrs
+      issuerDid: mockIssuerDid
     })
   })
 
@@ -43,7 +41,7 @@ describe('SignedCredential', () => {
 
   describe('static create method', () => {
     it('Should correctly reference Credential construction', async () => {
-      sandbox.assert.calledWith(create, testSignedCredentialCreateArgs)
+      sandbox.assert.calledWith(create, mockEmailCredCreationAttrs)
     })
 
     it('Should correctly assemble signature on create', async () => {
@@ -60,7 +58,7 @@ describe('SignedCredential', () => {
     expect(fromJson).to.deep.eq(vCred)
   })
 
-  it('Should produce expected digest', async() => {
+  it('Should produce expected digest', async () => {
     const normalized = (await vCred.digest()).toString('hex')
     expect(normalized).to.eq(emailVerifiableCredentialHash)
   })
