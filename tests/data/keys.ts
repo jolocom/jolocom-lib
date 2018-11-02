@@ -1,33 +1,32 @@
+/* 
+ * Key related information for testing signing / verification / authentication functionality
+ * The mock Eth and Identity keys have been derived form the mock test seed and are valid
+ * child keys
+ */
+
 export const testSeed = Buffer.from(
-  '316AF5B648D7E1DF31B73729E8E6628AEB8060CC4389C2B2A81BD56E92E9228D',
+  'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
   'hex'
 )
 
 export const testPrivateIdentityKey = Buffer.from(
-  'f4952882df8c67447ba0955ec8d59fb360dcdc94e114de9949ab8a4d09c0eaf6',
+  '38a2eb228140a343696431939eedc14b937b0041872541df095c1b266fb55aea',
   'hex'
 )
+
 export const testPublicIdentityKey = Buffer.from(
-  '039ab801fef81ad6928c62ca885b1f62c01a493daf58a0f7c76026d44d1d31f163',
+  '03848af62bffceb57631780ac0e0726106ee1c23262d6fd7ef906559d68f53a551',
   'hex'
 )
 
 export const testPrivateEthereumKey = Buffer.from(
-  'abf82ff96b463e9d82b83cb9bb450fe87e6166d4db6d7021d0c71d7e960d5abe',
+  '204878ffe22c92f4aa7714aba37d6c0dcc43c45f67205b161b73c78e21dbf512<Paste>',
   'hex'
 )
 
-export const testPublicIdentityKey2 = Buffer.from(
-  'f4952882df8c67447ba0955ec8d59fb360dcdc94e114de9949ab8a4d09c0eabb',
-  'hex'
-)
 
-export const testSeed3 = Buffer.from(
-  '316AF5B648D7E1DF31B73729E8E6628AEB8060CC4389C2B2A81BD56E92E9228F',
-  'hex'
-)
+/* Keys used in integration test */
 
-// used for integration tests
 export const testPrivateIdentityKey3 = Buffer.from(
   'a8736629c00011bc18b226eb0ce274c37d6042641eac768b5a4352227affda0e',
   'hex'

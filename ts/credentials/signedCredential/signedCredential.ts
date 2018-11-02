@@ -12,7 +12,9 @@ import { SoftwareKeyProvider } from '../../crypto/softwareProvider'
 import { ISignedCredCreationArgs } from '../../identityWallet/identityWallet'
 import { Credential } from '../credential/credential'
 
-interface IExtendedCreationArgs<T extends BaseMetadata> extends ISignedCredCreationArgs<T> {
+/* Data needed to prepare signature on credential */
+
+interface IIssInfo {
   keyId: string
   issuerDid: string
 }
@@ -149,24 +151,27 @@ export class SignedCredential implements IDigestable {
   }
 
   /*
+   * @TODO - better way to pass arguments
    * @description - Instantiates a Signed Credential based on passed configuration
    * @param params - Options for creating credential, and for deriving public signing key
    * @param params.metadata - Metadata necessary to create a valid JSON-LD document
    *   see - https://jolocom-lib.readthedocs.io/en/latest/signedCredentials.html
    * @param params.claim - Data to store in claim, e.g. { email: 'test@gmail.com' }
    * @param params.subject - Did of the credential subject
-   * @param keyId - Id of the public key creating the signature, e.g. did:jolo...#keys-1
-   * @param issuerDid: The did of the credential issuer
+   * 
+   * @param issInfo - Public data related to credential issuer
+   * @param issInfo.keyId - Id of the public key creating the signature, e.g. did:jolo...#keys-1
+   * @param issInfo.issuerDid: The did of the credential issuer
    * @returns {Object} - Instance of Credential class
   */
 
-  public static async create<T extends BaseMetadata>(params: IExtendedCreationArgs<T>): Promise<SignedCredential> {
+  public static async create<T extends BaseMetadata>(params: ISignedCredCreationArgs<T>, issInfo: IIssInfo) {
     const credential = Credential.create(params)
     const json = credential.toJSON() as ISignedCredentialAttrs
     const signedCredential = SignedCredential.fromJSON(json)
 
-    signedCredential.prepareSignature(params.keyId)
-    signedCredential.setIssuer(params.issuerDid)
+    signedCredential.prepareSignature(issInfo.keyId)
+    signedCredential.setIssuer(issInfo.issuerDid)
 
     return signedCredential
   }

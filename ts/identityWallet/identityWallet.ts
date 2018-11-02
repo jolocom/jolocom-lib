@@ -61,15 +61,19 @@ export class IdentityWallet {
   private createSignedCred = async <T extends BaseMetadata>(params: ISignedCredCreationArgs<T>, pass: string) => {
     const { derivationPath } = this.publicKeyMetadata
 
-    const vCred = await SignedCredential.create({
-      publicKeyMetadata: this.publicKeyMetadata,
-      subject: params.subject || this.getDid(),
-      issuerDid: this.getDid(),
-      ...params
-    })
+    const vCred = await SignedCredential.create(
+      {
+        subject: params.subject || this.getDid(),
+        ...params
+      },
+      {
+        keyId: this.publicKeyMetadata.keyId,
+        issuerDid: this.getDid()
+      }
+    )
 
     const signature = await this.vaultedKeyProvider.signDigestable({ derivationPath, encryptionPass: pass }, vCred)
-    vCred.setSignatureValue(signature)
+    vCred.setSignatureValue(signature.toString('hex'))
     return vCred
   }
 

@@ -8,6 +8,7 @@ import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
 import { sha256, publicKeyToDID } from '../../utils/crypto'
 import { ILinkedDataSignature, IDigestable } from '../../linkedDataSignature/types'
+import { SoftwareKeyProvider } from '../../crypto/softwareProvider'
 
 @Exclude()
 export class DidDocument implements IDigestable {
@@ -22,6 +23,11 @@ export class DidDocument implements IDigestable {
   @Expose()
   @Type(() => ServiceEndpointsSection)
   private service: ServiceEndpointsSection[] = []
+
+  /*
+   * When toJSON is called, convert date to ISO string format, 
+   * when fromJSON is called, parse value if exists, else default to now 
+   */
 
   @Expose()
   @Type(() => Date)
@@ -82,17 +88,31 @@ export class DidDocument implements IDigestable {
     this.id = did
   }
 
-  public async setProof(proof: ILinkedDataSignature) {
-    this.proof = proof
-  }
+  /*
+   * @description - Adds a new Authentication section to the DID Document
+   * @param section - Instance of the AuthenticationSection class
+   * @returns {void}
+  */
 
   public addAuthSection(section: AuthenticationSection) {
     this.authentication.push(section)
   }
 
+  /*
+   * @description - Adds a new Public Key section to the DID Document
+   * @param section - Instance of the PublicKeySection class
+   * @returns {void}
+  */
+
   public addPublicKeySection(section: PublicKeySection) {
     this.publicKey.push(section)
   }
+
+  /*
+   * @description - Adds a new service endpoint section to the DID Document
+   * @param section - Instance of the ServiceEndpointSection class
+   * @returns {void}
+  */
 
   public addServiceEndpoint(endpoint: ServiceEndpointsSection) {
     this.service = [endpoint]
@@ -112,7 +132,26 @@ export class DidDocument implements IDigestable {
     didDocument.setDid(did)
     didDocument.addPublicKeySection(PublicKeySection.fromEcdsa(publicKey, keyId, did))
     didDocument.addAuthSection(AuthenticationSection.fromEcdsa(didDocument.getPublicKeySections()[0]))
+    didDocument.prepareSignature(keyId)
+
     return didDocument
+  }
+
+  /*
+   * @description - Populates all fields necessary to compute signaturea, signature
+   *  is computed at a later point due to restricted access to private keys
+   * @param keyId - Public key identifier, e.g. did:jolo:abcdef...ff#keys-1
+   * @returns {void} - Mutates the instance
+  */
+
+  private async prepareSignature(keyId: string) {
+    const inOneYear = new Date()
+    inOneYear.setFullYear(new Date().getFullYear() + 1)
+
+    this.proof = new EcdsaLinkedDataSignature()
+    this.proof.setCreator(keyId)
+    this.proof.setSignatureValue('')
+    this.proof.setNonce(SoftwareKeyProvider.getRandom(8).toString('hex'))
   }
 
   /*

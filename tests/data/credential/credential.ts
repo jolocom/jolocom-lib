@@ -84,7 +84,7 @@ export const mockBirthdayCredCreationAttrs = {
   claim: mockBirthday
 }
 
-/* JSON form to ensure TOJSON and FROMJSON work as intended */
+/* JSON form to ensure toJSON and fromJSON work as intended */
 
 export const emailCredentialJSON = {
   '@context': [

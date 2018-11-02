@@ -62,11 +62,26 @@ export class ServiceEndpointsSection {
   }
 }
 
+/*
+ * Class representing a specialized service endpoint entry configuration pointing
+ *   to a Jolocom public profile credential.
+ * see: https://w3c-ccg.github.io/did-spec/#service-endpoints
+ */
+
 export class PublicProfileServiceEndpoint extends ServiceEndpointsSection {
-  public static create(did: string, endpoint: string) {
+
+  /*
+  * @description - Instantiates class based on passed arguments
+  * @param did - The did of the did document owner
+  * @param pubProfIpfsHash - IPFS hash that can be used to dereference
+  *   the public profile credential
+  * @returns {Object} - Populated service endpoint entry instance
+  */
+
+  public static create(did: string, pubProfIpfsHash: string) {
     const PubProfSec = new PublicProfileServiceEndpoint()
     PubProfSec.setId(`${did};jolocomPubProfile`)
-    PubProfSec.setEndpoint(`ipfs://${endpoint}`)
+    PubProfSec.setEndpoint(`ipfs://${pubProfIpfsHash}`)
     PubProfSec.setDescription('Verifiable Credential describing entity profile')
     PubProfSec.setType('JolocomPublicProfile')
     return PubProfSec

@@ -1,7 +1,6 @@
 import { DidDocument } from './didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { IIdentityCreateArgs } from './types'
-import { PublicProfileServiceEndpoint } from './didDocument/sections/serviceEndpointsSection';
 
 /*
  * Class representing an identity, includes a didDocument and public profile
@@ -27,6 +26,7 @@ export class Identity {
   public getPublicKeySection() {
     return this.didDocument.getPublicKeySections()
   }
+
   public setDidDocument(didDocument: DidDocument) {
     this.didDocument = didDocument
   }
@@ -53,7 +53,7 @@ export class Identity {
   public publicProfile = {
     get: this.getPublicProfile.bind(this),
     set: this.setPublicProfile.bind(this),
-    delete: this.deletePublicProfile.bind(this),
+    delete: this.deletePublicProfile.bind(this)
   }
 
   private getPublicProfile() {
@@ -61,10 +61,6 @@ export class Identity {
   }
 
   private setPublicProfile(publicProfile: SignedCredential) {
-    this.publicProfileCredential = publicProfile
-  }
-
-  private updatePublicProfile(publicProfile: SignedCredential) {
     this.publicProfileCredential = publicProfile
   }
 
