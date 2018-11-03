@@ -1,23 +1,23 @@
 import { expect } from 'chai'
-import { mockPrivKey } from '../data/interactionFlows/credentialResponse'
 import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { JSONWebToken } from '../../ts/interactionFlows/JSONWebToken'
-import {
-  jwtJSON,
-  jwtCreateArgs,
-  signedCredRequestJWT,
-  signedCredRequestJWTIncorrect
-} from '../data/interactionFlows/jsonWebToken'
-import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
-import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
-import { DidDocument } from '../../ts/identity/didDocument'
+import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest'
+import { simpleCredRequestJSON } from '../data/interactionFlows/credentialRequest'
+import { signedSimpleCredReqJWT, encodedSimpleCredReqJWT, hashedSimpleCredReqJWT } from '../data/interactionFlows/jsonWebToken'
+import { InteractionType } from '../../ts/interactionFlows/types'
 chai.use(sinonChai)
 
 describe('JSONWebToken', () => {
   let clock
   let sandbox
+  const credReq = CredentialRequest.fromJSON(simpleCredRequestJSON)
+
+  /* Saves some typing later */
+
+  const { iss, typ, iat } = signedSimpleCredReqJWT.payload
+  const { signature, payload } = signedSimpleCredReqJWT
 
   before(() => {
     clock = sinon.useFakeTimers()
@@ -29,89 +29,64 @@ describe('JSONWebToken', () => {
     sandbox.restore()
   })
 
-  describe('Static create method', () => {
-    clock = sinon.useFakeTimers()
-    const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
+  /*
+   * We don't need to test with all tokenizable objects, it's a simple setter for now
+   * When we fromJWTEncodable, some data, such as issuer, typ and signature is not available, 
+   */
 
-    it('Should return a correctly assembled instance of JSONWebToken class', () => {
-      expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
-      expect(jsonWebToken.toJSON().payload).to.deep.equal(jwtJSON.payload)
-      expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
-    })
+  it('Should correctly implement fromJWTEncodable object', () => {
+    const unsignedPayload = { ...payload, iat: 0 }
+    delete unsignedPayload.typ
+    delete unsignedPayload.iss
 
-    it('The type of the payload should be the correct payload class that exposes class specific methods', () => {
-      expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
-      expect(jsonWebToken.getPayload().applyConstraints).to.be.an.instanceof(Function)
-    })
+    const simplified = {
+      ...signedSimpleCredReqJWT,
+      payload: unsignedPayload
+    }
+
+    delete simplified.signature
+
+    const jwt = JSONWebToken.fromJWTEncodable(credReq)
+    expect(jwt.toJSON()).to.deep.eq(simplified)
   })
 
-  describe('Static fromJSON method', () => {
-    clock = sinon.useFakeTimers()
-    const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
+  /* Tests getters as well */
 
-    it('Should return a correctly assembled instance of JSONWebToken class', () => {
-      expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
-      expect(jsonWebToken.toJSON()).to.deep.equal(jwtJSON)
-      expect(jsonWebToken).to.be.an.instanceof(JSONWebToken)
-    })
-
-    it('The type of the payload should be the correct playload class', () => {
-      expect(jsonWebToken.getPayload()).to.be.an.instanceof(CredentialRequestPayload)
-    })
+  it('Should implement fromJSON', () => {
+    const jwt = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
+    expect(jwt.getInteractionToken()).to.deep.eq(credReq)
+    expect(jwt.getIssuer()).to.eq(iss)
+    expect(jwt.getIssueTime()).to.eq(0)
+    expect(jwt.getSignatureValue().toString('hex')).to.eq(signature)
   })
 
-  describe('toJSON method', () => {
-    clock = sinon.useFakeTimers()
-    const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
-    const json = jsonWebToken.toJSON()
+  it('Should implement all setters', () => {
+    const jwt = new JSONWebToken()
 
-    it('Should return a correctly structured JSON object', () => {
-      expect(json).to.deep.equal(jwtJSON)
-    })
+    jwt.setSignature(signature)
+    jwt.setTokenContent(credReq)
+    jwt.setTokenIssuer(iss)
+    jwt.setTokenType(typ as InteractionType)
+
+    expect(jwt.getSignatureValue().toString('hex')).to.eq(signature)
+    expect(jwt.getIssuer()).to.eq(iss)
+    expect(jwt.getInteractionToken()).to.deep.eq(credReq)
+    expect(jwt.getIssueTime()).to.eq(iat)
   })
 
-  describe('encode method', () => {
-    clock = sinon.useFakeTimers()
-    const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
-    const encodedJWT = jsonWebToken.encode()
-
-    it('Should return a JWT', () => {
-      expect(encodedJWT).to.deep.equal(signedCredRequestJWT)
-    })
+  it('Should implement static decode', () => {
+    const referenceJWT = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
+    const decodedJWT = JSONWebToken.decode(encodedSimpleCredReqJWT)
+    expect(decodedJWT).to.deep.eq(referenceJWT)
+  })
+  it('Should implement encode', () => {
+    const jwt = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
+    expect(jwt.encode()).to.deep.eq(encodedSimpleCredReqJWT)
   })
 
-  describe('decode method', () => {
-    before( async () => {
-      const ddo = await new DidDocument().fromPrivateKey(Buffer.from(mockPrivKey, 'hex'))
-      sandbox.stub(JolocomRegistry.prototype, 'resolve')
-        .resolves(ddo)
-    })
-
-    it('Should return a valid InteractionType payload class and pass signature validation', async () => {
-      const decoded = await JSONWebToken.decode(signedCredRequestJWT)
-
-      expect(decoded).to.be.an.instanceof(CredentialRequestPayload)
-    })
-
-    it('validateSignatureWithPublicKey should return true with valid inputs', async () => {
-      const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
-      const token = jsonWebToken.encode()
-      const valid = await JSONWebToken.validateSignatureWithPublicKey({
-        keyId: jsonWebToken.getPayload().iss,
-        jwt: token
-      })
-      // tslint:disable-next-line:no-unused-expression
-      expect(valid).to.be.true
-    })
-
-    it('validateSignatureWithPublicKey should return false with invalid JWT signature', async () => {
-      const jsonWebToken = JSONWebToken.create(jwtCreateArgs)
-      const valid = await JSONWebToken.validateSignatureWithPublicKey({
-        keyId: jsonWebToken.getPayload().iss,
-        jwt: signedCredRequestJWTIncorrect
-      })
-      // tslint:disable-next-line:no-unused-expression
-      expect(valid).to.be.false
-    })
+  it('Should implement digest', async () => {
+    const jwt = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
+    const digest = await jwt.digest()
+    expect(digest.toString('hex')).to.eq(hashedSimpleCredReqJWT)
   })
 })

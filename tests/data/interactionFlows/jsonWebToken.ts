@@ -1,42 +1,31 @@
-import { credentialRequestJson, mockPrivKey } from './credentialRequest'
-import { InteractionType, IJSONWebTokenCreationAttrs } from '../../../ts/interactionFlows/types'
+import { simpleCredRequestJSON } from './credentialRequest'
+import { mockKeyId } from '../didDocument'
 
-export const jwtJSON = {
+/* Credential request wrapped in signed JWT*/
+
+export const signedSimpleCredReqJWT = {
   header: { typ: 'JWT', alg: 'ES256K' },
   payload: {
-    iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb#keys-1',
     iat: 0,
-    typ: InteractionType.CredentialRequest,
-    credentialRequest: credentialRequestJson
+    interactionToken: simpleCredRequestJSON,
+    iss: mockKeyId,
+    typ: 'credentialRequest'
   },
-  signature: 'SfiPhps9_hSCzuuVPWk9pA9s7oBymqag7b_1yibMCdXlQI2scrZY8v1V66Zlgd1j2cHme0VfMbJiKqoUsx-X1Q'
+  signature:
+    '4fe903a33015a63a6d6e8a1054584e54b9f6e7ffea5ab196f940c29b7ffa14ef18a19af87c4d848db5dfa6d70e3a4d9b194da83e7eeaa3db0602e9d2d65c53d6'
 }
 
-export const jwtCreateArgs = {
-  privateKey: {
-    key: Buffer.from(mockPrivKey, 'hex'),
-    id: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb#keys-1'
-  },
-  payload: {
-    typ: InteractionType.CredentialRequest,
-    credentialRequest: {
-      callbackURL: 'http://test.com',
-      credentialRequirements: [
-        {
-          type: ['Credential', 'MockCredential'],
-          constraints: [
-            { '==': [{ var: 'issuer' }, 'did:jolo:issuer']}
-          ]
-        }
-      ]
-    }
-  }
-} as IJSONWebTokenCreationAttrs
+/* Same credential request in base64 encoded form */
 
-export const signedCredRequestJWT =
-// tslint:disable-next-line
-'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjcmVkZW50aWFsUmVxdWVzdCI6eyJjcmVkZW50aWFsUmVxdWlyZW1lbnRzIjpbeyJ0eXBlIjpbIkNyZWRlbnRpYWwiLCJNb2NrQ3JlZGVudGlhbCJdLCJjb25zdHJhaW50cyI6eyJhbmQiOlt7Ij09IjpbdHJ1ZSx0cnVlXX0seyI9PSI6W3sidmFyIjoiaXNzdWVyIn0sImRpZDpqb2xvOmlzc3VlciJdfV19fV0sImNhbGxiYWNrVVJMIjoiaHR0cDovL3Rlc3QuY29tIn0sInR5cCI6ImNyZWRlbnRpYWxSZXF1ZXN0IiwiaWF0IjowLCJpc3MiOiJkaWQ6am9sbzo4Zjk3N2U1MGI3ZTVjYmRmZWI1M2EwM2M4MTI5MTNiNzI5NzhjYTM1YzkzNTcxZjg1ZTg2Mjg2MmJhYzhjZGViI2tleXMtMSJ9.SfiPhps9_hSCzuuVPWk9pA9s7oBymqag7b_1yibMCdXlQI2scrZY8v1V66Zlgd1j2cHme0VfMbJiKqoUsx-X1Q'
+export const encodedSimpleCredReqJWT =
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.\
+eyJpYXQiOjAsImludGVyYWN0aW9uVG9rZW4iOnsiY3JlZGVudGlhbFJlcXVpcmVtZW50cyI6W3sidHlw\
+ZSI6WyJDcmVkZW50aWFsIiwiUHJvb2ZPZkVtYWlsQ3JlZGVudGlhbCJdLCJjb25zdHJhaW50cyI6W3si\
+PT0iOlt7InZhciI6Imlzc3VlciJ9LCJkaWQ6am9sbzphYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\
+YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIl19XX1dLCJjYWxsYmFja1VSTCI6Imh0\
+dHA6Ly90ZXN0LmNvbSJ9LCJpc3MiOiJkaWQ6am9sbzpiMmQ1ZDhkNmNjMTQwMDMzNDE5YjU0YTIzN2E1\
+ZGI1MTcxMDQzOWY5ZjQ2MmQxZmM5OGY2OThlY2E3Y2U5Nzc3I2tleXMtMSIsInR5cCI6ImNyZWRlbnRp\
+YWxSZXF1ZXN0In0.4fe903a33015a63a6d6e8a1054584e54b9f6e7ffea5ab196f940c29b7ffa14ef\
+18a19af87c4d848db5dfa6d70e3a4d9b194da83e7eeaa3db0602e9d2d65c53d6'
 
-export const signedCredRequestJWTIncorrect =
-// tslint:disable-next-line
-'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjcmVkZW50aWFsUmVxdWVzdCI6eyJjcmVkZW50aWFsUmVxdWlyZW1lbnRzIjpbeyJ0eXBlIjpbIkNyZWRlbnRpYWwiLCJNb2NrQ3JlZGVudGlhbCJdLCJjb25zdHJhaW50cyI6eyJhbmQiOlt7Ij09IjpbdHJ1ZSx0cnVlXX0seyI9PSI6W3sidmFyIjoiaXNzdWVyIn0sImRpZDpqb2xvOmlzc3VlciJdfV19fV0sImNhbGxiYWNrVVJMIjoiaHR0cDovL3Rlc3QuY29tIn0sInR5cCI6ImNyZWRlbnRpYWxSZXF1ZXN0IiwiaWF0IjowLCJpc3MiOiJkaWQ6am9sbzo4Zjk3N2U1MGI3ZTVjYmRmZWI1M2EwM2M4MTI5MTNiNzI5NzhjYTM1YzkzNTcxZjg1ZTg2Mjg2MmJhYzhjZGViI2tleXMtMSJ9.SfiPhps9_hSCzuuVPWk9pA9s7oBymqag7b_1yibMCdXlQI2scrZY8v1V66Zlgd1j2cHme0VfMbJiKqoUss-X1R'
+export const hashedSimpleCredReqJWT = 'e1d101408223fa76fa2cb3d51e06c0192116e031e4fefb098251e1891085ef9f'
