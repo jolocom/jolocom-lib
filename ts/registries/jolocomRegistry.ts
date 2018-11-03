@@ -20,7 +20,7 @@ import { KeyTypes } from '../vaultedKeyProvider/types'
  * mechanism.
  */
 
-class JolocomRegistry {
+export class JolocomRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
 
