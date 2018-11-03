@@ -12,7 +12,7 @@ import { ICredentialResponsePayloadCreationAttrs } from './credentialResponse/ty
 import { ICredentialRequestPayloadCreationAttrs } from './credentialRequest/types'
 import { ICredentialsReceivePayloadCreationAttrs } from './credentialsReceive/types'
 import { ICredentialOfferReqPayloadCreationAttrs } from './credentialOfferRequest/types'
-import { createJolocomRegistry } from '../registries/jolocomRegistry'
+import { createJolocomRegistry, JolocomRegistry } from '../registries/jolocomRegistry'
 import { CredentialOfferRequestPayload } from './credentialOfferRequest/credentialOfferRequestPayload'
 import { ICredentialOfferResPayloadCreationAttrs } from './credentialOfferResponse/types'
 import { CredentialOfferResponsePayload } from './credentialOfferResponse/credentialOfferResponsePayload'
@@ -52,12 +52,12 @@ export class JSONWebToken<T extends IPayload> {
     return jwt
   }
 
-  public static async decode(jwt: string): Promise<IPayload> {
+  public static async decode(jwt: string, registry?: JolocomRegistry): Promise<IPayload> {
     const json = decodeToken(jwt)
     let valid
 
     try {
-      valid = await JSONWebToken.validateSignatureWithPublicKey({ keyId: json.payload.iss, jwt })
+      valid = await JSONWebToken.validateSignatureWithPublicKey({ keyId: json.payload.iss, jwt }, registry)
     } catch (error) {
       throw new Error(`Could not validate signature on decode. ${error.message}`)
     }
@@ -86,8 +86,8 @@ export class JSONWebToken<T extends IPayload> {
     return decodeToken(signed).signature
   }
 
-  public static async validateSignatureWithPublicKey({ keyId, jwt }: { keyId: string; jwt: string }): Promise<boolean> {
-    const registry = createJolocomRegistry()
+  public static async validateSignatureWithPublicKey({ keyId, jwt }: { keyId: string; jwt: string }, _registry?: JolocomRegistry): Promise<boolean> {
+    const registry = _registry || createJolocomRegistry()
     const did = keyId.substring(0, keyId.indexOf('#'))
     let pubKey
 
