@@ -1,26 +1,33 @@
-import { plainToClass, classToPlain } from 'class-transformer'
+import { plainToClass, classToPlain, Expose, Type } from 'class-transformer'
 import { ICredentialResponseAttrs } from './credentialResponse/types'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { CredentialRequest } from './credentialRequest'
 
+/* Class representing a credential response. encodable in jwt */
+@Expose()
 export class CredentialResponse {
-  public suppliedCredentials: SignedCredential[]
+  private callbackURL: string
 
-  public static create(credentials: ISignedCredentialAttrs[]): CredentialResponse {
-    const credentialResponse = new CredentialResponse()
-    credentialResponse.suppliedCredentials = credentials.map(sCred => plainToClass(SignedCredential, sCred))
-
-    return credentialResponse
-  }
+  /* Automatically instantiate SignedCredential class on fromJSON, and serialize on fromJSON */
+  @Type(() => SignedCredential)
+  private suppliedCredentials: SignedCredential[]
 
   public getSuppliedCredentials(): SignedCredential[] {
     return this.suppliedCredentials
   }
 
+  public getCallbackURL(): string {
+    return this.callbackURL
+  }
+
+  /*
+   * @description - Evaluates if the current response satisfies the requirements in a request
+   * @param cr - Credential request to evaluate against
+   * @return{boolean} - Whether the requirements in the request are satisfied
+   */
+
   public satisfiesRequest(cr: CredentialRequest): boolean {
     const credentials = this.suppliedCredentials.map(sCredClass => sCredClass.toJSON())
-
     const validCredentials = cr.applyConstraints(credentials)
     return this.suppliedCredentials.length === validCredentials.length
   }
@@ -30,9 +37,6 @@ export class CredentialResponse {
   }
 
   public static fromJSON(json: ICredentialResponseAttrs): CredentialResponse {
-    const credResponse = plainToClass(CredentialResponse, json)
-    credResponse.suppliedCredentials = json.suppliedCredentials.map(sCred => plainToClass(SignedCredential, sCred))
-
-    return credResponse
+    return plainToClass(this, json)
   }
 }

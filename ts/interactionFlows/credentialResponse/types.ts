@@ -14,5 +14,6 @@ export interface ICredentialResponsePayloadCreationAttrs {
 }
 
 export interface ICredentialResponseAttrs {
+  callbackURL: string,
   suppliedCredentials: ISignedCredentialAttrs[]
 }

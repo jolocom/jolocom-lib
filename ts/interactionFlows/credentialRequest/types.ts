@@ -5,6 +5,8 @@ export interface ICredentialRequestPayloadAttrs {
   credentialRequest: ICredentialRequestAttrs
 }
 
+export type Operator = '==' | '!=' | '<' | '>'
+
 export type RequestedCredentialAttrs = Array<{type: string[], constraints: IConstraint[]}>
 
 export interface ICredentialRequestCreationAttrs {

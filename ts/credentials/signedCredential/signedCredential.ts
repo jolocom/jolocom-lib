@@ -23,27 +23,20 @@ interface IIssInfo {
  *  linked data signature, and methods to aid digesting / signing.
  */
 
-@Exclude()
+@Expose()
 export class SignedCredential implements IDigestable {
-  @Expose()
   private '@context': ContextEntry[]
 
   /* If value is not defined when we revive this class from JSON, default to 8 char random id */
-
-  @Expose()
   @Transform((value: string) => value || generateClaimId(8), { toClassOnly: true })
   private id: string = generateClaimId(8)
 
-  @Expose()
   private name: string
 
-  @Expose()
   private issuer: string
 
-  @Expose()
   private type: string[]
 
-  @Expose()
   private claim: IClaimSection
 
   /*
@@ -51,13 +44,11 @@ export class SignedCredential implements IDigestable {
    * when fromJSON is called, parse value if exists, else default to now 
    */
 
-  @Expose()
   @Type(() => Date)
   @Transform((value: Date) => value.toISOString(), { toPlainOnly: true })
   @Transform((value: string) => (value ? new Date(value) : new Date()), { toClassOnly: true })
   private issued: Date
 
-  @Expose()
   @Type(() => Date)
   @Transform((value: Date) => value.toISOString(), { toPlainOnly: true })
   @Transform((value: string) => new Date(value), { toClassOnly: true })
@@ -65,7 +56,6 @@ export class SignedCredential implements IDigestable {
 
   /* when fromJSON is called, parse value if exists, else default to new EcdsaLinkedDataSignature */
 
-  @Expose()
   @Type(() => EcdsaLinkedDataSignature)
   @Transform(value => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
   private proof = new EcdsaLinkedDataSignature()
@@ -229,6 +219,12 @@ export class SignedCredential implements IDigestable {
     return classToPlain(this) as ISignedCredentialAttrs
   }
 }
+
+/*
+  * @description - Helper function generating a random claim id
+  * @param length - The length of the random part of the identifier
+  * @returns {string} - The identifier
+*/
 
 const generateClaimId = (length: number): string => {
   return `claimId:${generateRandomID(length)}`

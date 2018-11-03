@@ -1,108 +1,62 @@
-import { InteractionType } from '../../../ts/interactionFlows/types'
+import { emailVerifiableCredential, mockIssuerDid, mockKeyId } from '../credential/signedCredential'
 
-export const credentialRequestPayloadCreateAttrs = {
-  typ: InteractionType.CredentialRequest.toString(),
-  credentialRequest: {
-    callbackURL: 'http://test.com',
-    credentialRequirements: [
-      {
-        type: ['Credential', 'MockCredential'],
-        constraints: [{ '==': [
-          { var: 'issuer' },
-          'did:jolo:issuer'
-        ] }]
-      }
-    ]
-  }
-}
+/* Used to test if matching against issuer works */
 
-export const credentialRequestPayloadJson = {
-  iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
-  iat: 1500000,
-  typ: InteractionType.CredentialRequest.toString(),
-  credentialRequest: {
-    callbackURL: 'http://test.com',
-    credentialRequirements: [
-      {
-        type: ['Credential', 'MockCredential'],
-        constraints: {
-          and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
-        }
-      }
-    ]
-  }
-}
+const invalidIssuer = 'did:jolo:16661'
+const tweakedEmailVerifiableCredential = { ...emailVerifiableCredential, issuer: invalidIssuer }
+export const credentialSet = [tweakedEmailVerifiableCredential, emailVerifiableCredential]
 
-export const credentialRequestJson = {
-  callbackURL: 'http://test.com',
-  credentialRequirements: [
-    {
-      constraints: {
-        and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
-      },
-      type: ['Credential', 'MockCredential']
-    }
-  ]
-}
+/* Defining JSON fixtures for testing fromJSON, toJSON methods */
 
-export const expectedRequestedCredentials = {
-  type: ['Credential', 'MockCredential'],
-  constraints: {
-    and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
-  }
-}
-
-//TODO remove
-export const credentialRequestCreationAttrs = {
-  callbackURL: 'http://test.com',
-  credentialRequirements: [
-    {
-      type: ['Credential', 'MockCredential'],
-      constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
-    }
-  ]
-}
-
-export const credRequestCreationAttrs = {
+export const simpleCredRequestJSON = {
   callbackURL: 'http://test.com',
   credentialRequirements: [
     {
       type: ['Credential', 'ProofOfEmailCredential'],
-      constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:b310d293aeac8a5ca680232b96901fe85988fde2860a1a5db69b49762923cc88'] }]
+      constraints: [{ '==': [{ var: 'issuer' }, mockIssuerDid] }]
     }
   ]
 }
 
-export const mockPrivKey = '3a1076bf45ab87712ad64ccb3b10217737f7faacbf2872e88fdd9a537d8fe266'
-export const privKeyDID = 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb'
+/* Fixture to test if validating against an empty constraint set returns true */
 
-export const signedCredReqJson = {
-  header: { alg: 'ES256K', typ: 'JWT' },
-  payload: {
-    iat: 150000,
-    iss: 'did:jolo:8f977e50b7e5cbdfeb53a03c812913b72978ca35c93571f85e862862bac8cdeb',
-    typ:  InteractionType.CredentialRequest,
-    credentialRequest: {
-      credentialRequirements: [
-        {
-          type: ['Credential', 'MockCredential'],
-          constraints: {
-            and: [{ '==': [true, true] }, { '==': [{ var: 'issuer' }, 'did:jolo:issuer'] }]
-          }
-        }
-      ],
-      callbackURL: 'http://test.com'
+export const emptyConstraintsRequestJSON = {
+  ...simpleCredRequestJSON,
+  credentialRequirements: [
+    {
+      type: ['Credential', 'ProofOfEmailCredential'],
+      constraints: []
     }
-  },
-  signature: 'lBcEgnfpORwlZGZ1HanoW2d3Ngm2qox-JI4T0iL-m1fBt5f6ihAvaoj0Z2usZiXwO5UtKXvvcvJTEP6rxI_MDQ'
+  ]
 }
 
-export const signedCredReqJWT =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.\
-eyJpYXQiOjAsImlzcyI6ImRpZDpqb2xvOjhmOTc3ZTUwYjdlNWNiZGZlYjUzYTAzYzgxMjkxM2I3Mjk3\
-OGNhMzVjOTM1NzFmODVlODYyODYyYmFjOGNkZWIiLCJjcmVkZW50aWFsUmVxdWVzdCI6eyJjcmVkZW50\
-aWFsUmVxdWlyZW1lbnRzIjpbeyJ0eXBlIjpbIkNyZWRlbnRpYWwiLCJNb2NrQ3JlZGVudGlhbCJdLCJj\
-b25zdHJhaW50cyI6eyJhbmQiOlt7Ij09IjpbdHJ1ZSx0cnVlXX0seyI9PSI6W3sidmFyIjoiaXNzdWVy\
-In0sImRpZDpqb2xvOmlzc3VlciJdfV19fV0sImNhbGxiYWNrVVJMIjoiaHR0cDovL3Rlc3QuY29tIn19\
-.lBcEgnfpORwlZGZ1HanoW2d3Ngm2qox-JI4T0iL-m1fBt5f6ihAvaoj0Z2usZiXwO5UtKXvvcvJTEP6\
-rxI_MDQ'
+/* Request with two credential requirements, for fromJSON, toJSON, getRequestedTypes tests */
+
+export const extendedCredRequestJSON = {
+  ...simpleCredRequestJSON,
+  credentialRequirements: [
+    simpleCredRequestJSON.credentialRequirements[0],
+    {
+      type: ['Credential', 'ProofOfPassportCredential'],
+      constraints: []
+    }
+  ]
+}
+
+/* Expected outputs of constraint creation functions */
+
+export const expectedIsOutput = {
+  '==': [{ var: 'claim.id' }, mockKeyId]
+}
+
+export const expectedNotOutput = {
+  '!=': [{ var: 'claim.id' }, mockKeyId]
+}
+
+export const expectedGreaterOutput = {
+  '>': [{ var: 'issued' }, new Date(0)]
+}
+
+export const expectedSmallerOutput = {
+  '<': [{ var: 'issued' }, new Date(100)]
+}
