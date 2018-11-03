@@ -1,7 +1,5 @@
 import { InteractionType } from './../../ts/interactionFlows/types'
 import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
-import * as sinon from 'sinon'
 import {
   testPrivateIdentityKey,
   testPrivateEthereumKey,
@@ -42,7 +40,6 @@ import {
   CredentialOfferResponsePayload
 } from '../../ts/interactionFlows/credentialOfferResponse/credentialOfferResponsePayload'
 
-chai.use(sinonChai)
 const expect = chai.expect
 
 describe('Integration Test', () => {
@@ -156,9 +153,7 @@ describe('Integration Test', () => {
     })
 
     it('should allow for simple consumption of signed credential requests by user', async () => {
-      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
-      const credRequest = await JSONWebToken.decode(credRequestJWT)
-      sinon.restore()
+      const credRequest = await JSONWebToken.decode(credRequestJWT, jolocomRegistry)
 
       const filteredCredentials = credRequest.applyConstraints([
         testSignedCredentialIntegration, thirdMockCredential
@@ -183,9 +178,7 @@ describe('Integration Test', () => {
 
       credResponseJWT = credResponseJWTClass.encode()
 
-      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
-      const credRequest = await JSONWebToken.decode(credRequestJWT)
-      sinon.restore()
+      const credRequest = await JSONWebToken.decode(credRequestJWT, jolocomRegistry)
 
       expect(credResponseJWTClass.getPayload()).to.be.an.instanceof(CredentialResponsePayload)
       expect(credResponseJWTClass.getPayload().credentialResponse).to.be.an.instanceof(CredentialResponse)
@@ -197,9 +190,7 @@ describe('Integration Test', () => {
     })
 
     it('should validate signature of signed credential on credential response', async () => {
-      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
-      const credResponse = await JSONWebToken.decode(credResponseJWT)
-      sinon.restore()
+      const credResponse = await JSONWebToken.decode(credResponseJWT, jolocomRegistry)
 
       const suppliedCredentials = credResponse.getSuppliedCredentials()
       const valid = await jolocomRegistry
@@ -248,9 +239,7 @@ describe('Integration Test', () => {
     })
     // tslint:disable-next-line
     it('Should allow for simple consumption of authentication request and generate authentication response by user', async () => {
-      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
-      const authRequest = await JSONWebToken.decode(authRequestJWT)
-      sinon.restore()
+      const authRequest = await JSONWebToken.decode(authRequestJWT, jolocomRegistry)
 
       authResponseJWTClass = identityWalletUser.create.authenticationJSONWebToken({
         typ: InteractionType.Authentication,
@@ -264,9 +253,7 @@ describe('Integration Test', () => {
     })
     // tslint:disable-next-line
     it('Should allow for authentication response consumption & validation and credentialsReceive creation by service', async () => {
-      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
-      const authResponse = await JSONWebToken.decode(authResponseJWT)
-      sinon.restore()
+      const authResponse = await JSONWebToken.decode(authResponseJWT, jolocomRegistry)
 
       const validChallenge = authResponse.validateChallenge(authRequestJWTClass.getPayload())
 
@@ -303,9 +290,7 @@ describe('Integration Test', () => {
     })
 
     it('Should allow for consumption of credentialsReceieve with correct signed credential by user', async () => {
-      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
-      const credReceive = await JSONWebToken.decode(credentialReceiveJWT)
-      sinon.restore()
+      const credReceive = await JSONWebToken.decode(credentialReceiveJWT, jolocomRegistry)
 
       const providedCredentials = credReceive.getSignedCredentials()
       const validCredSignature = await jolocomRegistry
@@ -358,17 +343,13 @@ describe('Integration Test', () => {
     })
 
     it('Should allow for consumption of credential offer request JWT', async () => {
-      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
-      const credOfferRequest = await JolocomLib.parse.interactionJSONWebToken.decode(credentialOfferRequestJWT)
-      sinon.restore()
+      const credOfferRequest = await JolocomLib.parse.interactionJSONWebToken.decode(credentialOfferRequestJWT, jolocomRegistry)
 
       expect(credOfferRequest).to.be.an.instanceOf(CredentialOfferRequestPayload)
     })
 
     it('Should correctly create a credential offer response JWT', async () => {
-      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
-      const credOfferRequest = await JolocomLib.parse.interactionJSONWebToken.decode(credentialOfferRequestJWT)
-      sinon.restore()
+      const credOfferRequest = await JolocomLib.parse.interactionJSONWebToken.decode(credentialOfferRequestJWT, jolocomRegistry)
 
       const credOfferResponse = identityWalletUser.create.credentialOfferResponseJSONWebToken({
         typ: 'credentialOfferResponse',
@@ -385,9 +366,7 @@ describe('Integration Test', () => {
     })
 
     it('Should allow for consumption of credential offer response JWT', async () => {
-      sinon.stub(jr, 'createJolocomRegistry').returns(jolocomRegistry)
-      const credOfferResponse = await JolocomLib.parse.interactionJSONWebToken.decode(credentialOfferResponseJWT)
-      sinon.restore()
+      const credOfferResponse = await JolocomLib.parse.interactionJSONWebToken.decode(credentialOfferResponseJWT, jolocomRegistry)
 
       expect(credOfferResponse).to.be.an.instanceOf(CredentialOfferResponsePayload)
     })
