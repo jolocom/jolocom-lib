@@ -33,7 +33,7 @@ export class CredentialRequest {
    */
 
   public getRequestedCredentialTypes(): string[][] {
-    return this.credentialRequirements.map(credential => credential.type)
+    return this.credentialRequirements.map((credential) => credential.type)
   }
 
   /*
@@ -43,8 +43,8 @@ export class CredentialRequest {
    */
 
   public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
-    return credentials.filter(credential => {
-      const relevantConstraints = this.credentialRequirements.find(section =>
+    return credentials.filter((credential) => {
+      const relevantConstraints = this.credentialRequirements.find((section) =>
         areCredTypesEqual(section.type, credential.type)
       )
 

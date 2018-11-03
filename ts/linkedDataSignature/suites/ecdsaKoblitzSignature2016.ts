@@ -16,13 +16,13 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
   @Expose()
   private nonce: string
 
-  /* 
-   * In case we are parsing a JSON LD doc with no signature, default to empty string 
+  /*
+   * In case we are parsing a JSON LD doc with no signature, default to empty string
    * In case sig is undefined on instance and we run toJSON, default to empty string
   */
 
   @Expose()
-  @Transform(value => value || '', { toPlainOnly: true })
+  @Transform((value) => value || '', { toPlainOnly: true })
   private signatureValue: string
 
   @Expose()

@@ -1,5 +1,5 @@
 import { defaultContext } from './../../../ts/utils/contexts'
-import { IIpfsConfig } from '../../../js/ipfs/types';
+import { IIpfsConfig } from '../../../ts/ipfs/types'
 
 export const ethereumConfigProviderUrl = 'http://127.0.0.1:8945'
 

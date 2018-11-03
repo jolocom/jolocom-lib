@@ -3,7 +3,7 @@ import * as fetchNode from 'node-fetch'
 import { IIpfsConnector, IIpfsConfig } from './types'
 import { isRunningInNode } from '../utils/general'
 
-export class IpfsStorageAgent implements IIpfsConnector {
+class IpfsStorageAgent implements IIpfsConnector {
   private endpoint: string
   private inNode: boolean
 
@@ -16,7 +16,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
     const endpoint = `${this.endpoint}/api/v0/add?pin=${pin}`
 
     const serializedData = this.serializeJSON(data)
-    const { Hash } = await this.postRequest(endpoint, serializedData).then(res => res.json())
+    const { Hash } = await this.postRequest(endpoint, serializedData).then((res) => res.json())
     return Hash
   }
 

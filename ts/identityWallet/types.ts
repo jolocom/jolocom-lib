@@ -7,8 +7,3 @@ export interface IIdentityWalletCreateArgs {
   identity: Identity
   publicKeyMetadata: IKeyMetadata
 }
-
-export interface IPrivateKeyWithId {
-  key: Buffer
-  id: string
-}

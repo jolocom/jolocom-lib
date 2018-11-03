@@ -1,20 +1,13 @@
-import { IPrivateKeyWithId } from '../identityWallet/types'
-
 export interface IJWTHeader {
   alg: string
   typ: string
 }
 
-export interface IPayload {
+interface IPayload {
   iss?: string
   iat?: number
   typ: string
   [x: string]: any
-}
-
-export interface IJSONWebTokenCreationAttrs {
-  privateKey: IPrivateKeyWithId
-  payload: IPayloadCreationAttrs
 }
 
 export interface IJSONWebTokenAttrs {
@@ -23,13 +16,7 @@ export interface IJSONWebTokenAttrs {
   signature: string
 }
 
-export interface IPayloadCreationAttrs {
-  typ: string
-  iss: string
-  [x: string]: any
-}
-
-export interface IJWTHeaderAttrs {
+interface IJWTHeaderAttrs {
   alg: string
   typ: string
 }

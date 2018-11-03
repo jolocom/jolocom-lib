@@ -5,7 +5,7 @@
   "main": "js/index.js",
   "typings": "js/index.d.ts",
   "scripts": {
-    "test": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts ./tests/**/*.test.ts",
+    "test": "nyc mocha --opts ./mocha.opts",
     "prepublish": "rm -rf ./js/; ./node_modules/.bin/tsc -p ./tsconfig.json",
     "test:watch": "./node_modules/.bin/mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
     "test:single": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts",
@@ -13,7 +13,7 @@
   },
   "nyc": {
     "include": [
-      "tests/**/*.test.ts"
+      "./ts/**/*.ts"
     ],
     "extension": [
       ".ts"
@@ -22,9 +22,9 @@
       "ts-node/register"
     ],
     "reporter": [
-      "text-summary",
-      "html"
+      "text"
     ],
+    "all":true,
     "sourceMap": true,
     "instrument": true
   },

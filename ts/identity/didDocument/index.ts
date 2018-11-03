@@ -25,8 +25,8 @@ export class DidDocument implements IDigestable {
   private service: ServiceEndpointsSection[] = []
 
   /*
-   * When toJSON is called, convert date to ISO string format, 
-   * when fromJSON is called, parse value if exists, else default to now 
+   * When toJSON is called, convert date to ISO string format,
+   * when fromJSON is called, parse value if exists, else default to now
    */
 
   @Expose()
@@ -73,7 +73,7 @@ export class DidDocument implements IDigestable {
     return this.proof
   }
 
-  public getSignatureValue() : Buffer {
+  public getSignatureValue(): Buffer {
     return this.proof.getSignatureValue()
   }
 

@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { Transform, plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
+import { Transform, plainToClass, classToPlain, Type, Expose } from 'class-transformer'
 import { canonize } from 'jsonld'
 import { generateRandomID, sha256 } from '../../utils/crypto'
 import { ISignedCredentialAttrs, ISignedCredCreationArgs } from './types'
@@ -40,8 +40,8 @@ export class SignedCredential implements IDigestable {
   private claim: IClaimSection
 
   /*
-   * When toJSON is called, convert date to ISO string format, 
-   * when fromJSON is called, parse value if exists, else default to now 
+   * When toJSON is called, convert date to ISO string format,
+   * when fromJSON is called, parse value if exists, else default to now
    */
 
   @Type(() => Date)
@@ -57,7 +57,7 @@ export class SignedCredential implements IDigestable {
   /* when fromJSON is called, parse value if exists, else default to new EcdsaLinkedDataSignature */
 
   @Type(() => EcdsaLinkedDataSignature)
-  @Transform(value => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
+  @Transform((value) => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
   private proof = new EcdsaLinkedDataSignature()
 
   public setIssuer(issuer: string) {
@@ -129,7 +129,7 @@ export class SignedCredential implements IDigestable {
     }
 
     /* Find first detailed cred type, e.g. ProofOfEmailCredential */
-    const customType = this.type.find(t => t !== 'Credential')
+    const customType = this.type.find((t) => t !== 'Credential')
 
     if (customType) {
       /* Split pascal cased title along uppercase letters */
@@ -147,7 +147,7 @@ export class SignedCredential implements IDigestable {
    *   see - https://jolocom-lib.readthedocs.io/en/latest/signedCredentials.html
    * @param params.claim - Data to store in claim, e.g. { email: 'test@gmail.com' }
    * @param params.subject - Did of the credential subject
-   * 
+   *
    * @param issInfo - Public data related to credential issuer
    * @param issInfo.keyId - Id of the public key creating the signature, e.g. did:jolo...#keys-1
    * @param issInfo.issuerDid: The did of the credential issuer
@@ -176,6 +176,7 @@ export class SignedCredential implements IDigestable {
     const inOneYear = new Date()
     inOneYear.setFullYear(new Date().getFullYear() + 1)
 
+    this.setIssued(new Date())
     this.setExpiry(inOneYear)
 
     this.proof.setCreator(keyId)

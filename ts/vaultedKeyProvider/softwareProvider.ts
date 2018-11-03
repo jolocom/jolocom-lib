@@ -9,9 +9,9 @@ export interface IKeyDerivationArgs {
 }
 
 export interface IVaultedKeyProvider {
-  // getRandom: (nr: number) => Buffer 
-  getPublicKey:(derivationArgs: IKeyDerivationArgs)=> Buffer
-  getPrivateKey:(derivationArgs: IKeyDerivationArgs)=> Buffer
+  // getRandom: (nr: number) => Buffer
+  getPublicKey: (derivationArgs: IKeyDerivationArgs) => Buffer
+  getPrivateKey: (derivationArgs: IKeyDerivationArgs) => Buffer
   sign: (derivationArgs: IKeyDerivationArgs, digest: Buffer) => Buffer
   verify: (publicKey: Buffer, signature: Buffer, digest: Buffer) => Boolean
   signDigestable: (derivationArgs: IKeyDerivationArgs, toSign: IDigestable) => Promise<Buffer>
@@ -38,7 +38,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @returns {Buffer} - public key at corresponding path
   */
 
-  getPublicKey(derivationArgs: IKeyDerivationArgs): Buffer {
+  public getPublicKey(derivationArgs: IKeyDerivationArgs): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
     const seed = this.decrypt(encryptionPass, this.encryptedSeed)
     return fromSeed(seed).derivePath(derivationPath).publicKey
@@ -51,7 +51,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @returns {Buffer} - N random bytes
   */
 
-  static getRandom(nr): Buffer {
+  public static getRandom(nr): Buffer {
     return randomBytes(nr)
   }
 
@@ -64,7 +64,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @returns {Buffer} - computed signature
   */
 
-  sign(derivationArgs: IKeyDerivationArgs, digest: Buffer): Buffer {
+  public sign(derivationArgs: IKeyDerivationArgs, digest: Buffer): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
     const seed = this.decrypt(encryptionPass, this.encryptedSeed)
     const signingKey = fromSeed(seed).derivePath(derivationPath)
@@ -80,7 +80,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @
   */
 
-  verify(digest: Buffer, publicKey: Buffer, signature: Buffer): boolean {
+  public verify(digest: Buffer, publicKey: Buffer, signature: Buffer): boolean {
     return eccVerify(digest, publicKey, signature)
   }
 
@@ -95,7 +95,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @returns {Buffer} - public key at corresponding path
   */
 
-  getPrivateKey(derivationArgs: IKeyDerivationArgs) {
+  public getPrivateKey(derivationArgs: IKeyDerivationArgs) {
     const { encryptionPass, derivationPath } = derivationArgs
     const seed = this.decrypt(encryptionPass, this.encryptedSeed)
 
@@ -112,7 +112,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @returns {Buffer} - computed signature
   */
 
-  async signDigestable(derivationArgs: IKeyDerivationArgs, toSign: IDigestable): Promise<Buffer> {
+  public async signDigestable(derivationArgs: IKeyDerivationArgs, toSign: IDigestable): Promise<Buffer> {
     const digest = await toSign.digest()
     return this.sign(derivationArgs, digest)
   }
@@ -124,7 +124,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * *returns {Promise<boolean>} - the validity of the signature
    */
 
-  async verifyDigestable(publicKey: Buffer, toVerify: IDigestable) : Promise<boolean>{
+  public async verifyDigestable(publicKey: Buffer, toVerify: IDigestable): Promise<boolean> {
     const digest = await toVerify.digest()
     const signature = toVerify.getSignatureValue()
     return this.verify(digest, publicKey, signature)

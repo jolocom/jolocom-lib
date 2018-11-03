@@ -20,7 +20,7 @@ import { KeyTypes } from '../vaultedKeyProvider/types'
  * mechanism.
  */
 
-export class JolocomRegistry {
+class JolocomRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
 
@@ -75,7 +75,7 @@ export class JolocomRegistry {
    * @param commitargs.identityWallet - Wallet containing did document and public profile
    * @return { void }
   */
-  
+
   public async commit(commitArgs: IRegistryCommitArgs) {
     const { identityWallet, keyMetadata, vaultedKeyProvider } = commitArgs
 
@@ -115,7 +115,7 @@ export class JolocomRegistry {
 
       const publicProfileSection = didDocument
         .getServiceEndpointSections()
-        .find(endpoint => endpoint.getType() === 'JolocomPublicProfile')
+        .find((endpoint) => endpoint.getType() === 'JolocomPublicProfile')
 
       const publicProfile = publicProfileSection && (await this.fetchPublicProfile(publicProfileSection.getEndpoint()))
 
@@ -137,7 +137,10 @@ export class JolocomRegistry {
    * @return { Object } - Instance of Identity class containing did document and public profile
   */
 
-  public async authenticate(vaultedKeyProvider: IVaultedKeyProvider, derivationArgs: IKeyDerivationArgs): Promise<IdentityWallet> {
+  public async authenticate(
+    vaultedKeyProvider: IVaultedKeyProvider,
+    derivationArgs: IKeyDerivationArgs
+  ): Promise<IdentityWallet> {
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
     const did = publicKeyToDID(publicIdentityKey)
     const identity = await this.resolve(did)
@@ -166,34 +169,15 @@ export class JolocomRegistry {
 
     return SignedCredential.fromJSON(publicProfile)
   }
-
-  private async unpin(did): Promise<void> {
-    try {
-      const hash = await this.ethereumConnector.resolveDID(did)
-      await this.ipfsConnector.removePinnedHash(hash)
-    } catch (err) {
-      return
-    }
-  }
-
-  // public async validateSignature(obj: IVerifiable): Promise<boolean> {
-  //   const { did, keyId } = obj.getSigner()
-  //   let pubKey
-
-  //   try {
-  //     const identity = await this.resolve(did)
-  //     pubKey = identity.getPublicKeySection().find(pubKeySection => pubKeySection.getIdentifier() === keyId)
-
-  //     if (!pubKey) {
-  //       return false
-  //     }
-  //   } catch (error) {
-  //     throw new Error(`Could not validate signature with registry. ${error.message}`)
-  //   }
-
-  //   return obj.validateSignatureWithPublicKey(Buffer.from(pubKey.getPublicKeyHex(), 'hex'))
-  // }
 }
+
+/*
+   * @description - Returns a instance of the Jolocom registry given connector, defaults to
+   *   Jolocom defined connectors.
+   * @param ipfsConnector - Instance of class implementing the IIpfsConnector interface
+   * @param ethereumConnector - Instance of class implementing the IEthereumConnector interface
+   * @return { Object } - Instantiated registry
+  */
 
 export const createJolocomRegistry = (
   { ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs = {

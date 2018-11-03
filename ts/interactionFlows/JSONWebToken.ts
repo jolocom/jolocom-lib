@@ -1,7 +1,7 @@
 import { IJWTHeader } from './types'
 import base64url from 'base64url'
 import { decodeToken } from 'jsontokens'
-import { classToPlain, plainToClass, Exclude, Expose, Transform } from 'class-transformer'
+import { classToPlain, plainToClass, Expose, Transform } from 'class-transformer'
 import { IJSONWebTokenAttrs, InteractionType } from './types'
 import { sha256 } from '../utils/crypto'
 import { IDigestable } from '../linkedDataSignature/types'
@@ -11,9 +11,10 @@ import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
 import { CredentialsReceive } from './credentialsReceive'
 
-export type JWTEncodable = CredentialResponse | CredentialRequest | Authentication | CredentialOffer
+/* Local interfaces / types to save on typing later */
 
-export interface IJWTEncodable {
+export type JWTEncodable = CredentialResponse | CredentialRequest | Authentication | CredentialOffer
+interface IJWTEncodable {
   [key: string]: any
 }
 
@@ -24,7 +25,7 @@ interface IPayloadSection<T> {
   interactionToken?: T
 }
 
-type TransformArgs = {
+interface TransformArgs {
   interactionToken: IJWTEncodable
   typ: InteractionType
   iat: Date
@@ -51,18 +52,18 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
    * the appropriate interaction token class dynamically based on a key in the parsed json
   */
 
-  @Transform(value => convertPayload(value), { toClassOnly: true })
+  @Transform((value) => convertPayload(value), { toClassOnly: true })
   private payload: IPayloadSection<T> = {
     iat: Date.now()
   }
 
-  /* 
+  /*
    * In case we are parsing a JWT with no signature, default to empty Buffer
    * In case sig is undefined on instance and we run toJSON, default to empty string
   */
 
-  @Transform(value => value || '', { toPlainOnly: true })
-  @Transform(value => value || Buffer.from(''), { toClassOnly: true })
+  @Transform((value) => value || '', { toPlainOnly: true })
+  @Transform((value) => value || Buffer.from(''), { toClassOnly: true })
   private signature: string
 
   public getIssuer(): string {
