@@ -1,11 +1,15 @@
 
 import { claimsMetadata } from '../../ts/index'
-import { singleClaimCreationArgs } from '../data/credential/credential'
+import { KeyTypes } from '../../ts/vaultedKeyProvider/types';
 
 export const credentialAttr = {
   metadata:  claimsMetadata.emailAddress,
-  claim: singleClaimCreationArgs,
   subject: 'did:jolo:test'
+}
+
+export const keyDerivationArgs = {
+  derivationPath: KeyTypes.jolocomIdentityKey,
+  encryptionPass: 'test'
 }
 
 export const testSubject = 'did:jolo:5dcbd50085819b40b93efc4f13fb002119534e9374274b10edce88df8cb311af'

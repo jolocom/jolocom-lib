@@ -1,14 +1,14 @@
 export const jsonAuthentication = {
-  challenge: 'erhbgiö3jrewlprg',
+  challenge: '5d14e699fac',
   callbackURL: 'https://me.test.io'
 }
 
-export const challenge = 'erhbgiö3jrewlprg'
+export const challenge = '5d14e699fac'
 export const callbackURL = 'https://me.test.io'
 
 export const jsonAuthPayload = {
   authentication: {
-    challenge: 'erhbgiö3jrewlprg',
+    challenge: '5d14e699fac',
     callbackURL: 'https://me.test.io'
   },
   typ: 'authentication'
@@ -16,7 +16,7 @@ export const jsonAuthPayload = {
 
 export const mockJsonAuthPayload = {
   authentication: {
-    challenge: 'erhbgiö3jrewlprg',
+    challenge: '5d14e699fac',
     callbackURL: 'https://me.test.io'
   },
   typ: 'authentication',

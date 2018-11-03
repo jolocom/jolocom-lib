@@ -6,66 +6,74 @@ import { DidDocument } from '../../ts/identity/didDocument'
 import { Credential } from '../../ts/credentials/credential/credential'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
-import { didDocumentJSON, mockKeyId } from '../data/didDocument'
+import { didDocumentJSON, mockKeyId, mockDid } from '../data/didDocument'
 import { IVaultedKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { mockNameCredCreationAttrs } from '../data/credential/credential'
-import { jsonAuthentication } from '../data/interactionFlows/authentication';
-import { Authentication } from '../../ts/interactionFlows/authentication';
+import { JSONWebToken } from '../../ts/interactionFlows/JSONWebToken'
+import { signedSimpleCredReqJWT } from '../data/interactionFlows/jsonWebToken'
+import { simpleCredRequestJSON } from '../data/interactionFlows/credentialRequest'
+import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest'
 
 chai.use(sinonChai)
 const expect = chai.expect
+
+/* Saves some space during stubbing, helper functions */
+
+const stubbedKeyProvider = {
+  signDigestable: sinon.stub().callsFake(attributes => Buffer.from(signedSimpleCredReqJWT.signature, 'hex'))
+} as IVaultedKeyProvider
+
+const stubbedFromJWTEncodable = args => {
+  const jwt = new JSONWebToken()
+  jwt.setTokenContent(args)
+  return jwt
+}
+
+const stubbedCredential = {
+  setSignatureValue: value => {
+    expect(value).to.eq(signedSimpleCredReqJWT.signature)
+  }
+}
 
 describe('IdentityWallet', () => {
   const encryptionPass = 'secret'
   const didDocument = DidDocument.fromJSON(didDocumentJSON)
   const identity = Identity.fromDidDocument({ didDocument })
 
-  const vaultedKeyProvider = {
-    signDigestable: sinon.stub().callsFake(attrs => {
-      expect(attrs).to.deep.eq({ encryptionPass, derivationPath: KeyTypes.jolocomIdentityKey })
-      return Buffer.from(
-        'ed3fac7fcc3d83623e368dc90ac377e14441a400019d57f9479b833f1211acbb0dffb4cf189ed1335dad1f1e0f0a99f0527b6befab44c55f7323116b9f60bfb1',
-        'hex'
-      )
-    })
-  } as IVaultedKeyProvider
-
-  const iw: IdentityWallet = new IdentityWallet({
-    identity,
-    vaultedKeyProvider,
-    publicKeyMetadata: {
-      derivationPath: KeyTypes.jolocomIdentityKey,
-      keyId: mockKeyId
-    }
-  })
+  let iw: IdentityWallet
 
   describe('constructor', () => {
-    it('Should correctly initialize', () => {})
-    it('Should throw if arguments are missing', () => {})
-  })
-
-  describe('create', () => {
-    let stubSignedCredential
-
-    before(() => {
-      stubSignedCredential = sinon.stub(SignedCredential, 'create').callsFake(attrs => {
-        expect(attrs).to.deep.eq(mockNameCredCreationAttrs)
-        return {
-          digest: async () => Buffer.from('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'hex'),
-          setSignatureValue: value => {
-            expect(value).to.eq(
-              'ed3fac7fcc3d83623e368dc90ac377e14441a400019d57f9479b833f1211acbb0dffb4cf189ed1335dad1f1e0f0a99f0527b6befab44c55f7323116b9f60bfb1'
-            )
-          }
+    it('Should correctly initialize', () => {
+      iw = new IdentityWallet({
+        identity,
+        vaultedKeyProvider: stubbedKeyProvider,
+        publicKeyMetadata: {
+          derivationPath: KeyTypes.jolocomIdentityKey,
+          keyId: mockKeyId
         }
       })
 
-      // stubAuth = sinon.stub(Authentication, '')
+      expect(iw.getDid()).to.eq(mockDid)
+    })
+  })
+
+  describe('create', () => {
+    const sandbox = sinon.createSandbox()
+    let stubCredCreate
+    let stubFromJWTEncodable
+
+    before(() => {
+      stubCredCreate = sandbox.stub(SignedCredential, 'create').callsFake(() => stubbedCredential)
+      stubFromJWTEncodable = sandbox.stub(JSONWebToken, 'fromJWTEncodable').callsFake(stubbedFromJWTEncodable)
+    })
+
+    afterEach(() => {
+      sandbox.resetHistory()
     })
 
     after(() => {
-      stubSignedCredential.restore()
+      sandbox.restore()
     })
 
     it('Should expose aggregated creation methods', () => {
@@ -85,178 +93,17 @@ describe('IdentityWallet', () => {
 
     it('Should attempt to create signedCredential', async () => {
       await iw.create.signedCredential(mockNameCredCreationAttrs, encryptionPass)
+
+      sandbox.assert.calledOnce(stubCredCreate)
+      sandbox.assert.calledWith(stubCredCreate, mockNameCredCreationAttrs)
     })
 
-    describe('authenticationRequest', async() => {
-      console.log(await iw.create.interactionTokens.request.auth(jsonAuthentication, encryptionPass))
+    /* All interaction tokens follow the same flow. Would still be good to cover all cases in the future. */
+
+    it('Should attempt to create an interaction token', async () => {
+      await iw.create.interactionTokens.request.share(simpleCredRequestJSON, encryptionPass)
+      sandbox.assert.calledOnce(stubFromJWTEncodable)
+      sandbox.assert.calledWith(stubFromJWTEncodable, CredentialRequest.fromJSON(simpleCredRequestJSON))
     })
-    describe('authenticationResponse', () => {})
-
-    describe('credentialRequest', () => {})
-    describe('credentialResponse', () => {})
-
-    describe('credentialOfferRequest', () => {})
-    describe('credentialOfferResponse', () => {})
-
-    describe('credentialReceive', () => {})
   })
-  // let create
-  // let iWallet: IdentityWallet
-  // before(() => {
-  //   create = sandbox.spy(IdentityWallet, 'create')
-  //   iWallet = IdentityWallet.create({ privateIdentityKey: testPrivateIdentityKey, identity })
-  // })
-
-  // after(() => {
-  //   sandbox.restore()
-  // })
-
-  //   it('should be correctly called with correct arguments ', () => {
-  //     sandbox.assert.calledOnce(create)
-  //     sandbox.assert.calledWith(create, { privateIdentityKey: testPrivateIdentityKey, identity })
-  //   })
-
-  //   it('should correctly return an instance of identityWallet', () => {
-  //     expect(iWallet).to.be.instanceof(IdentityWallet)
-  //   })
-
-  //   it('should expose properties key and id on identityWallet.privateIdentityKey', () => {
-  //     expect(Object.keys((iWallet as any).privateIdentityKey)).to.deep.equal([
-  //       'key',
-  //       'id'
-  //     ])
-  //   })
-  // })
-
-  // describe('create', () => {
-  //   it('should expose credential, signedCredential & JWT options', () => {
-  //     const mockProps = [
-  //       'credential',
-  //       'signedCredential',
-  //       'credentialRequestJSONWebToken',
-  //       'credentialResponseJSONWebToken',
-  //       'authenticationJSONWebToken',
-  //       'credentialsReceiveJSONWebToken',
-  //       'credentialOfferRequestJSONWebToken',
-  //       'credentialOfferResponseJSONWebToken'
-  //     ]
-
-  //     expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
-  //   })
-
-  //   it('create.credential should return a correct credential', () => {
-  //     const credential = identityWallet.create.credential({
-  //       metadata: claimsMetadata.emailAddress,
-  //       claim: singleClaimCreationArgs,
-  //       subject: 'did:jolo:test'
-  //     })
-  //     const credentialFromJSON = Credential.fromJSON(singleClaimCredentialJSON)
-
-  //     expect(credential).to.deep.equal(credentialFromJSON)
-  //   })
-
-  //   it('create.credentialRequestJSONWebToken should return a correct credentialRequest JWT', () => {
-  //     const credRequestJWT = identityWallet.create.credentialRequestJSONWebToken(credentialRequestPayloadJson)
-  //     const credRequestPayload = credRequestJWT.getPayload()
-
-  //     expect(credRequestPayload).to.be.an.instanceof(CredentialRequestPayload)
-  //     expect(credRequestPayload.credentialRequest).to.be.an.instanceof(CredentialRequest)
-  //   })
-
-  //   it('create.authenticationJSONWebToken should return a correct authentication JWT', () => {
-  //     const authJWT = identityWallet.create.authenticationJSONWebToken(jsonAuthPayload)
-  //     const authPayload = authJWT.getPayload()
-
-  //     expect(authPayload).to.be.an.instanceof(AuthenticationPayload)
-  //     expect(authPayload.authentication).to.be.an.instanceof(Authentication)
-  //   })
-
-  //   it('create.credentialReceiveJSONWebToken should return a correct credentialsReceive JWT', () => {
-  //     const credReceiveJWT = identityWallet.create.credentialsReceiveJSONWebToken(jsonCredReceivePayload)
-  //     const credReceivePayload = credReceiveJWT.getPayload()
-
-  //     expect(credReceivePayload).to.be.an.instanceof(CredentialsReceivePayload)
-  //     expect(credReceivePayload.credentialsReceive).to.be.an.instanceof(CredentialsReceive)
-  //   })
-
-  //   it('create.credentialOfferRequestJSONWebToken should return a correct credentialOfferRequest JWT', () => {
-  //     const credOfferReqJWT = identityWallet.create
-  //       .credentialOfferRequestJSONWebToken(credOfferRequestPayloadCreateArgs)
-  //     const credOfferRequestPayload = credOfferReqJWT.getPayload()
-
-  //     expect(credOfferRequestPayload).to.be.an.instanceof(CredentialOfferRequestPayload)
-  //     expect(credOfferRequestPayload.credentialOffer).to.be.an.instanceof(CredentialOffer)
-  //   })
-
-  //   it('create.credentialOfferResponseJSONWebToken should return a correct credentialOfferResponse JWT', () => {
-  //     const credOfferResJWT = identityWallet.create
-  //       .credentialOfferResponseJSONWebToken(credOfferResponsePayloadCreateArgs)
-  //     const credOfferResponsePayload = credOfferResJWT.getPayload()
-
-  //     expect(credOfferResponsePayload).to.be.an.instanceof(CredentialOfferResponsePayload)
-  //     expect(credOfferResponsePayload.credentialOffer).to.be.an.instanceof(CredentialOffer)
-  //   })
-
-  //   it('create.signedCredential should return a correct signed credential', async () => {
-  //     const credAttr = { metadata: claimsMetadata.emailAddress, claim: singleClaimCreationArgs, subject: testSubject }
-  //     const signedCred = await identityWallet.create.signedCredential(credAttr)
-  //     const mockSignedCred = SignedCredential.fromJSON(testSignedCred)
-
-  //     expect(signedCred.getIssuer()).to.deep.equal(mockSignedCred.getIssuer())
-  //     expect(signedCred.getCredentialSection()).to.deep.equal(mockSignedCred.getCredentialSection())
-  //     expect(signedCred.getType()).to.deep.equal(mockSignedCred.getType())
-  //   })
-  // })
-
-  // describe('sign', () => {
-  //   let signCredential
-  //   let iWallet
-
-  //   before(() => {
-  //     signCredential = sandbox.spy(IdentityWallet.prototype, 'signCredential')
-  //     iWallet = IdentityWallet.create({
-  //       privateIdentityKey: testPrivateIdentityKey,
-  //       identity
-  //     })
-  //   })
-
-  //   after(() => {
-  //     sandbox.restore()
-  //   })
-
-  //   it('sign.credential should call signCredential with correct params', () => {
-  //     const credential = iWallet.create.credential({
-  //       metadata: claimsMetadata.emailAddress,
-  //       claim: singleClaimCreationArgs,
-  //       subject: testSubject
-  //     })
-  //     iWallet.sign.credential(credential)
-
-  //     sandbox.assert.calledOnce(signCredential)
-  //     sandbox.assert.calledWith(signCredential, credential)
-  //   })
-  // })
-
-  // describe('getter and setter for Identity', () => {
-  //   it('getIdentity should return a correct instance of identity class ', () => {
-  //     expect(identityWallet.getIdentity()).to.be.instanceof(Identity)
-  //   })
-  // })
-
-  // describe('signCredential', () => {
-
-  //   it('should return a correct signed credential', async () => {
-  //     const credential = identityWallet.create.credential({
-  //       metadata: claimsMetadata.emailAddress,
-  //       claim: singleClaimCreationArgs,
-  //       subject: testSubject
-  //     })
-  //     const signedCred = await identityWallet.signCredential(credential)
-  //     const mockSignedCred = SignedCredential.fromJSON(testSignedCred)
-
-  //     expect(signedCred.getIssuer()).to.deep.equal(mockSignedCred.getIssuer())
-  //     expect(signedCred.getCredentialSection()).to.deep.equal(mockSignedCred.getCredentialSection())
-  //     expect(signedCred.getType()).to.deep.equal(mockSignedCred.getType())
-  //   })
-  // })
 })

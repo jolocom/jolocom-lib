@@ -4,7 +4,6 @@ import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { testSeed, testPublicIdentityKey, testIncorrectPublicIdentityKey, testPrivateIdentityKey } from '../data/keys'
 import { expect } from 'chai'
 import {
@@ -18,42 +17,37 @@ import {
 } from '../data/keyProvider.data'
 import { IDigestable } from '../../ts/linkedDataSignature/types'
 import { publicProfileCredJSON } from '../data/identity'
+import { keyDerivationArgs } from '../data/identityWallet';
 
 chai.use(sinonChai)
-
-const derArgs = {
-  derivationPath: KeyTypes.jolocomIdentityKey,
-  encryptionPass: 'test'
-}
-
 describe('Software Vaulted Key Provider', () => {
-  const vault = new SoftwareKeyProvider(testSeed, derArgs.encryptionPass)
+  const vault = new SoftwareKeyProvider(testSeed, keyDerivationArgs.encryptionPass)
 
   describe('constructor', () => {
     it('Should fail to instantiate if entropy too short', () => {
-      const faultyVault = new SoftwareKeyProvider(Buffer.from('a'), derArgs.encryptionPass)
-      expect(() => faultyVault.getPrivateKey(derArgs)).to.throw(TypeError, 'Seed should be at least 128 bits')
+      const faultyVault = new SoftwareKeyProvider(Buffer.from('a'), keyDerivationArgs.encryptionPass)
+      expect(() => faultyVault.getPrivateKey(keyDerivationArgs)).to.throw(TypeError, 'Seed should be at least 128 bits')
     })
 
     it('Should fail to instantiate if entropy too long', () => {
       const longEntropy = Buffer.concat([testSeed, testSeed, testSeed])
-      const faultyVault = new SoftwareKeyProvider(longEntropy, derArgs.encryptionPass)
-      expect(() => faultyVault.getPrivateKey(derArgs)).to.throw(TypeError, 'Seed should be at most 512 bits')
+      const faultyVault = new SoftwareKeyProvider(longEntropy, keyDerivationArgs.encryptionPass)
+      expect(() => faultyVault.getPrivateKey(keyDerivationArgs)).to.throw(TypeError, 'Seed should be at most 512 bits')
     })
   })
 
   describe('getPublicKey', () => {
     it('Should correctly derive public key given path and pasword', () => {
-      expect(vault.getPublicKey(derArgs)).to.deep.eq(testPublicIdentityKey)
+      expect(vault.getPublicKey(keyDerivationArgs)).to.deep.eq(testPublicIdentityKey)
     })
 
     it('Should fail if password is missing', () => {
-      const faultyArgs = { ...derArgs, encryptionPass: '' }
+      const faultyArgs = { ...keyDerivationArgs, encryptionPass: '' }
       expect(() => vault.getPublicKey(faultyArgs)).to.throw()
     })
 
     it('Should fail if path is missing', () => {
-      const faultyArgs = { ...derArgs, derivationPath: '' }
+      const faultyArgs = { ...keyDerivationArgs, derivationPath: '' }
       expect(() => vault.getPublicKey(faultyArgs)).to.throw(Error, 'Expected BIP32Path, got String ""')
     })
   })
@@ -73,16 +67,16 @@ describe('Software Vaulted Key Provider', () => {
 
   describe('sign', () => {
     it('Should correctly compute signature given digest and key data', () => {
-      expect(vault.sign(derArgs, msgToSign)).to.deep.eq(msgSignature)
+      expect(vault.sign(keyDerivationArgs, msgToSign)).to.deep.eq(msgSignature)
     })
 
     it('Should fail to compute signature if digest or key data are invalid', () => {
-      expect(() => vault.sign(derArgs, invalidMsgToSign)).to.throw(TypeError, 'Expected Hash')
+      expect(() => vault.sign(keyDerivationArgs, invalidMsgToSign)).to.throw(TypeError, 'Expected Hash')
     })
   })
 
   describe('verify', () => {
-    const pubKey = vault.getPublicKey(derArgs)
+    const pubKey = vault.getPublicKey(keyDerivationArgs)
 
     it('Should correctly validate signature given digest signature, and public key', () => {
       expect(vault.verify(msgToSign, pubKey, msgSignature)).to.be.true
@@ -106,7 +100,7 @@ describe('Software Vaulted Key Provider', () => {
 
   describe('getPrivateKey', () => {
     it('Should correctly derive public key given path and pasword', () => {
-      expect(vault.getPrivateKey(derArgs)).to.deep.eq(testPrivateIdentityKey)
+      expect(vault.getPrivateKey(keyDerivationArgs)).to.deep.eq(testPrivateIdentityKey)
     })
   })
 
@@ -123,10 +117,10 @@ describe('Software Vaulted Key Provider', () => {
     })
 
     it('Should correctly digest passed object and call compute signature', async () => {
-      await vault.signDigestable(derArgs, credentialToSign)
+      await vault.signDigestable(keyDerivationArgs, credentialToSign)
       const [argPubKey, argDigest] = sign.getCall(0).args
 
-      expect(argPubKey).to.deep.eq(derArgs)
+      expect(argPubKey).to.deep.eq(keyDerivationArgs)
       expect(argDigest).to.deep.eq(credentialDigest)
     })
 
@@ -134,7 +128,7 @@ describe('Software Vaulted Key Provider', () => {
 
     it('Should fail to compute signature if object or key data is invalid', async () => {
       try {
-        await vault.signDigestable(derArgs, {} as IDigestable)
+        await vault.signDigestable(keyDerivationArgs, {} as IDigestable)
         expect(false).to.be.true
       } catch (err) {
         expect(err.message).to.eq('toSign.digest is not a function')
@@ -146,7 +140,7 @@ describe('Software Vaulted Key Provider', () => {
 
   describe('validateDigestable', () => {
     const credentialToSign = SignedCredential.fromJSON(publicProfileCredJSON)
-    const pubKey = vault.getPublicKey(derArgs)
+    const pubKey = vault.getPublicKey(keyDerivationArgs)
 
     it('Should correctly digest passed object and validate the signature', async () => {
       expect(await vault.verifyDigestable(pubKey, credentialToSign)).to.be.true
