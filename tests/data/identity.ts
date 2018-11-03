@@ -1,8 +1,8 @@
 import { defaultContext } from '../../ts/utils/contexts'
 
-/* Defining mock arguments to pass to creation functions in tests */
+/* Saves space later */
 
-export const publicProfileCreationArgs = {
+const publicProfileCreationArgs = {
   name: 'User name',
   description: 'User description',
   url: 'http://mock.com',

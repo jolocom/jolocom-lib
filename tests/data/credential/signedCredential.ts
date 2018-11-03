@@ -1,4 +1,3 @@
-import { mockEmailCredCreationAttrs } from './credential'
 import { claimsMetadata } from 'cred-types-jolocom-core'
 import { defaultContext } from '../../../ts/utils/contexts'
 
@@ -6,15 +5,7 @@ import { defaultContext } from '../../../ts/utils/contexts'
 
 export const mockKeyId = 'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa#keys-1'
 export const mockIssuerDid = 'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-export const mockSubject = 'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-
-export const testSignedCredentialCreateArgs = {
-  metadata: claimsMetadata.emailAddress,
-  claim: mockEmailCredCreationAttrs.claim,
-  issuerDid: mockIssuerDid,
-  keyId: mockKeyId,
-  subject: mockSubject
-}
+const mockSubject = 'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 /* Defining fixture for a signedCredential in JSON form */
 

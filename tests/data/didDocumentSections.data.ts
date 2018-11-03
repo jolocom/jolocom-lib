@@ -19,11 +19,6 @@ export const mockAuthSectionJSON = {
   type: 'Secp256k1SignatureAuthentication2018'
 }
 
-export const mockServiceEndpointCreationAttrs = {
-  did: mockKeyId,
-  ipfsHash: mockIpfsHash
-}
-
 export const mockPubProfServiceEndpointJSON = {
   id: `${mockDid};jolocomPubProfile`,
   serviceEndpoint: `ipfs://${mockIpfsHash}`,

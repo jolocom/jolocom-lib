@@ -3,7 +3,7 @@ import { defaultContext } from '../../../ts/utils/contexts'
 
 /* Defining custom metadata objects for custom credentials */
 
-export interface IBirthDateClaimInterface extends BaseMetadata {
+interface IBirthDateClaimInterface extends BaseMetadata {
   claimInterface?: {
     birthDate: number
     birthMonth: string
