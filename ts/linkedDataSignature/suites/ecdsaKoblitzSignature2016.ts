@@ -25,10 +25,13 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
   @Transform(value => value || '', { toPlainOnly: true })
   private signatureValue: string
 
+  /*
+   * When we run toJSON, convert date to iso string as opposed to default format
+  */
+
   @Expose()
   @Type(() => Date)
   @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
-  @Transform((value: string) => new Date(value), { toClassOnly: true })
   private created: Date = new Date()
 
   public getCreator(): string {
@@ -42,6 +45,10 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
   public getNonce(): string {
     return this.nonce
   }
+
+  /*
+   * Working with buffers is easier when verifying signatures
+  */
 
   public getSignatureValue(): Buffer {
     return Buffer.from(this.signatureValue, 'hex')
@@ -67,6 +74,12 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
     this.created = creation
   }
 
+  /*
+   * @description - Converts JSON-LD signature to canonical form
+   *  see https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm
+   * @returns {Object} - Document in normalized form, quads
+  */
+
   private async normalize(): Promise<string> {
     const json: ILinkedDataSignatureAttrs = this.toJSON()
 
@@ -75,6 +88,11 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
 
     return canonize(json)
   }
+
+  /*
+   * @description - Computes a 256 bit digest that can be signed later
+   * @returns {Buffer} - 32 byte sha256 digest of normalized JSON-LD signature
+  */
 
   public async digest(): Promise<Buffer> {
     const normalized = await this.normalize()

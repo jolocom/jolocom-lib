@@ -195,7 +195,8 @@ export class SignedCredential implements IDigestable {
   }
 
   /*
-   * @description - Converts JSON-LD document to canonical form, see https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm
+   * @description - Converts JSON-LD document to canonical form
+   *   see https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm
    * @returns {Object} - Document in normalized form, quads
   */
 

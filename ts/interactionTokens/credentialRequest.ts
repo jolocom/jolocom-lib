@@ -1,13 +1,12 @@
 import * as jsonlogic from 'json-logic-js'
 import { plainToClass, classToPlain, Expose } from 'class-transformer'
-import { areCredTypesEqual } from '../utils/credentials'
 import {
   ICredentialRequestAttrs,
   Comparable,
   IExposedConstraintFunctions,
   ICredentialRequest,
   IConstraint,
-  Operator,
+  Operator
 } from './credentialRequestTypes'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
@@ -79,7 +78,7 @@ export const constraintFunctions: IExposedConstraintFunctions = {
   is: (field: string, value: string) => assembleStatement('==', field, value),
   not: (field: string, value: string) => assembleStatement('!=', field, value),
   greater: (field: string, value: Comparable) => assembleStatement('>', field, value),
-  smaller: (field: string, value: Comparable) => assembleStatement('<', field, value),
+  smaller: (field: string, value: Comparable) => assembleStatement('<', field, value)
 }
 
 /*
@@ -87,9 +86,20 @@ export const constraintFunctions: IExposedConstraintFunctions = {
    * @param operator - Comparison function, i.e. ==, !=, <, >
    * @param field - Credential field, e.g. 'issued', 'claim.id'
    * @param value - Value to compare to, currently static
-   * @return{Object - JSON encoded conditional statement
+   * @return{Object} - JSON encoded conditional statement
    */
 
 const assembleStatement = (operator: Operator, field: string, value: string | Comparable): IConstraint => {
   return { [operator]: [{ var: field }, value] } as IConstraint
+}
+
+/*
+   * @description - Compares two arrays by going through the elements
+   * @param first - First array to compare
+   * @param second - Second array to compare
+   * @return{boolean} - Whether arrays are equal
+   */
+
+const areCredTypesEqual = (first: string[], second: string[]): boolean => {
+  return first.every((el, index) => el === second[index])
 }
