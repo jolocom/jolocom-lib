@@ -89,17 +89,17 @@ export class JolocomRegistry {
     const remote = await this.resolveSafe(didDocument.getDid())
     const remotePubProf = remote && remote.publicProfile.get()
 
-    if (publicProfile) {
-      const publicProfileHash = await this.ipfsConnector.storeJSON({ data: publicProfile.toJSON(), pin: true })
-      const publicProfileSection = PublicProfileServiceEndpoint.create(didDocument.getDid(), publicProfileHash)
-      didDocument.addServiceEndpoint(publicProfileSection)
-    }
-
-    if (remotePubProf && !publicProfile) {
-      didDocument.resetServiceEndpoints()
-    }
-
     try {
+      if (publicProfile) {
+        const publicProfileHash = await this.ipfsConnector.storeJSON({ data: publicProfile.toJSON(), pin: true })
+        const publicProfileSection = PublicProfileServiceEndpoint.create(didDocument.getDid(), publicProfileHash)
+        didDocument.addServiceEndpoint(publicProfileSection)
+      }
+
+      if (remotePubProf && !publicProfile) {
+        didDocument.resetServiceEndpoints()
+      }
+
       const ipfsHash = await this.ipfsConnector.storeJSON({ data: didDocument.toJSON(), pin: true })
       const privateEthKey = vaultedKeyProvider.getPrivateKey(keyMetadata)
 
