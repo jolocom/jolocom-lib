@@ -1,5 +1,5 @@
-import { simpleCredRequestJSON } from './credentialRequest'
-import { mockKeyId } from '../didDocument'
+import { simpleCredRequestJSON } from './credentialRequest.data'
+import { mockKeyId } from '../didDocument.data'
 
 /* Credential request wrapped in signed JWT*/
 

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { CredentialRequest, constraintFunctions } from '../../ts/interactionFlows/credentialRequest'
-import { mockKeyId } from '../data/credential/signedCredential'
+import { CredentialRequest, constraintFunctions } from '../../ts/interactionTokens/credentialRequest'
+import { mockKeyId } from '../data/credential/signedCredential.data'
 import {
   credentialSet,
   extendedCredRequestJSON,
@@ -10,7 +10,7 @@ import {
   expectedNotOutput,
   expectedGreaterOutput,
   expectedSmallerOutput
-} from '../data/interactionFlows/credentialRequest'
+} from '../data/interactionTokens/credentialRequest.data'
 
 describe('CredentialRequest', () => {
   let credReq: CredentialRequest

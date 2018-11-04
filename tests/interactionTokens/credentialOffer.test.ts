@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { credentialOfferCreateAttrs } from '../data/interactionFlows/credentialOffer'
-import { CredentialOffer } from '../../ts/interactionFlows/credentialOffer'
+import { credentialOfferCreateAttrs } from '../data/interactionTokens/credentialOffer.data'
+import { CredentialOffer } from '../../ts/interactionTokens/credentialOffer'
 
 describe('CredentialOffer', () => {
   let credentialOffer: CredentialOffer

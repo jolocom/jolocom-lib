@@ -2,18 +2,18 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
-import { DidDocument } from '../../ts/identity/didDocument'
 import { Credential } from '../../ts/credentials/credential/credential'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
-import { didDocumentJSON, mockKeyId, mockDid } from '../data/didDocument'
+import { didDocumentJSON, mockKeyId, mockDid } from '../data/didDocument.data'
 import { IVaultedKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
-import { mockNameCredCreationAttrs } from '../data/credential/credential'
-import { JSONWebToken } from '../../ts/interactionFlows/JSONWebToken'
-import { signedSimpleCredReqJWT } from '../data/interactionFlows/jsonWebToken'
-import { simpleCredRequestJSON } from '../data/interactionFlows/credentialRequest'
-import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest'
+import { mockNameCredCreationAttrs } from '../data/credential/credential.data'
+import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
+import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
+import { DidDocument } from '../../ts/identity/didDocument/didDocument'
+import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
+import { signedSimpleCredReqJWT } from '../data/interactionTokens/jsonWebToken.data'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -87,8 +87,10 @@ describe('IdentityWallet', () => {
       expect(Object.keys(iw.create.interactionTokens.response)).to.deep.eq(tokenTypes)
     })
 
+    /* A bit hacky, but deep eq for functions is tricky. Should work most of the time */
+
     it('Should attempt to create credential', () => {
-      expect(iw.create.credential).to.eq(Credential.create)
+      expect(iw.create.credential.toString()).to.eq(Credential.create.toString())
     })
 
     it('Should attempt to create signedCredential', async () => {

@@ -12,7 +12,7 @@ import {
   PublicProfileServiceEndpoint,
   ServiceEndpointsSection
 } from '../../ts/identity/didDocument/sections/serviceEndpointsSection'
-import { mockDid, mockIpfsHash } from '../data/didDocument'
+import { mockDid, mockIpfsHash } from '../data/didDocument.data'
 const expect = chai.expect
 
 describe('DidDocumentSections', () => {

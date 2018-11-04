@@ -1,4 +1,4 @@
-import { credentialSet } from "./credentialRequest"
+import { credentialSet } from "./credentialRequest.data"
 
 export const jsonCredReceive = {
   signedCredentials: credentialSet

@@ -1,5 +1,5 @@
-import { publicProfileCredJSON } from "./identity";
-import { ISignedCredentialAttrs } from "../../ts/credentials/signedCredential/types";
+import { publicProfileCredJSON } from "./identity.data"
+import { ISignedCredentialAttrs } from "../../ts/credentials/signedCredential/types"
 
 export const msgToSign = Buffer.from('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 'hex')
 export const msgSignature = Buffer.from('f46ffee01f80b8b861e364f46b1f971599d7597949d76f5883fbd306aa34bb8132b31f08cf037eabe79c7de2506f75b9a08924eb685853ceab57f92dc3fd7e29', 'hex')

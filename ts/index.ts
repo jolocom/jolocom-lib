@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { parse } from './parse/parser'
+import { parse } from './parse/parse'
 import { Credential } from './credentials/credential/credential'
 import { registries } from './registries'
 import { SoftwareKeyProvider } from './vaultedKeyProvider/softwareProvider'

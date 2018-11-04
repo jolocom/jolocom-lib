@@ -1,5 +1,5 @@
-import { testPublicIdentityKey } from './keys'
-import { mockDid, mockKeyId, mockPublicKeyHex, mockIpfsHash } from './didDocument'
+import { testPublicIdentityKey } from './keys.data'
+import { mockDid, mockKeyId, mockPublicKeyHex, mockIpfsHash } from './didDocument.data'
 
 export const mockPubKeySectionCreationAttrs = {
   publicKey: testPublicIdentityKey,

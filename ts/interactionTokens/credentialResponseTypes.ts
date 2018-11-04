@@ -1,4 +1,4 @@
-import { ISignedCredentialAttrs } from '../../credentials/signedCredential/types'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 export interface ICredentialResponseAttrs {
   callbackURL: string

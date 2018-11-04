@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import { jsonAuthentication } from '../data/interactionFlows/authentication'
-import { Authentication } from '../../ts/interactionFlows/authentication'
+import { jsonAuthentication } from '../data/interactionTokens/authentication.data'
+import { Authentication } from '../../ts/interactionTokens/authentication'
 
 describe('Authentication', () => {
   let auth: Authentication

@@ -13,7 +13,7 @@ import {
   mockAddrCredCreationAttrs,
   mockBirthdayCredCreationAttrs,
   birthdayCredentialJSON
-} from '../data/credential/credential'
+} from '../data/credential/credential.data'
 
 describe('Credential', () => {
   describe('static create method', () => {

@@ -1,10 +1,10 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
-import { publicProfileCredJSON } from '../data/identity'
-import { DidDocument } from '../../ts/identity/didDocument'
-import { testPublicIdentityKey } from '../data/keys'
+import { publicProfileCredJSON } from '../data/identity.data'
+import { testPublicIdentityKey } from '../data/keys.data'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
+import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 const expect = chai.expect
 
 describe('Identity', () => {
@@ -30,6 +30,14 @@ describe('Identity', () => {
     const identity = Identity.fromDidDocument({ didDocument: mockDidDocument, publicProfile: mockPublicProfile })
     expect(identity.getDidDocument()).to.deep.eq(mockDidDocument)
     expect(identity.publicProfile.get()).to.deep.eq(mockPublicProfile)
+  })
+
+  it('Should implement all getters', () => {
+    const identity = Identity.fromDidDocument({ didDocument: mockDidDocument })
+    expect(identity.getDid()).to.eq(mockDidDocument.getDid())
+    expect(identity.getDidDocument()).to.eq(mockDidDocument)
+    expect(identity.getPublicKeySection()).to.eq(mockDidDocument.getPublicKeySections())
+    expect(identity.getServiceEndpointSections()).to.eq(mockDidDocument.getServiceEndpointSections())
   })
 
   /*

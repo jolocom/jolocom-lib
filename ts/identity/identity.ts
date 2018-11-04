@@ -1,4 +1,4 @@
-import { DidDocument } from './didDocument'
+import { DidDocument } from './didDocument/didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { IIdentityCreateArgs } from './types'
 

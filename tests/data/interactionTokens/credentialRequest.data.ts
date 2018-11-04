@@ -1,4 +1,4 @@
-import { emailVerifiableCredential, mockIssuerDid, mockKeyId } from '../credential/signedCredential'
+import { emailVerifiableCredential, mockIssuerDid, mockKeyId } from "../credential/signedCredential.data"
 
 /* Used to test if matching against issuer works */
 

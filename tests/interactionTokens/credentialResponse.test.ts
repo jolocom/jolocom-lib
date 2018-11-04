@@ -1,10 +1,10 @@
 import * as sinon from 'sinon'
-import { credentialResponseJSON } from './../data/interactionFlows/credentialResponse'
+import { credentialResponseJSON } from './../data/interactionTokens/credentialResponse.data'
 import { expect } from 'chai'
-import { CredentialResponse } from '../../ts/interactionFlows/credentialResponse'
-import { credentialSet, simpleCredRequestJSON } from '../data/interactionFlows/credentialRequest'
+import { CredentialResponse } from '../../ts/interactionTokens/credentialResponse'
+import { credentialSet, simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest'
+import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 
 describe('CredentialResponse', () => {
   let credRes: CredentialResponse

@@ -2,11 +2,11 @@ import { expect } from 'chai'
 import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import { JSONWebToken } from '../../ts/interactionFlows/JSONWebToken'
-import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest'
-import { simpleCredRequestJSON } from '../data/interactionFlows/credentialRequest'
-import { signedSimpleCredReqJWT, encodedSimpleCredReqJWT, hashedSimpleCredReqJWT } from '../data/interactionFlows/jsonWebToken'
-import { InteractionType } from '../../ts/interactionFlows/types'
+import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
+import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
+import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
+import { signedSimpleCredReqJWT, encodedSimpleCredReqJWT, hashedSimpleCredReqJWT } from '../data/interactionTokens/jsonWebToken.data'
+import { InteractionType } from '../../ts/interactionTokens/types'
 chai.use(sinonChai)
 
 describe('JSONWebToken', () => {

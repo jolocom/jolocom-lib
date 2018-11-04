@@ -2,7 +2,7 @@ import * as ganache from 'ganache-cli'
 import * as registryContract from 'jolocom-registry-contract'
 import {
   testPrivateEthereumKey, testPrivateEthereumKey3,
-} from '../data/keys'
+} from '../data/keys.data'
 const Web3 = require('web3')
 const IPFSFactory = require('ipfsd-ctl')
 

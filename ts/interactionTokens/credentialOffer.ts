@@ -1,5 +1,5 @@
 import { classToPlain, plainToClass, Expose, Exclude } from 'class-transformer'
-import { ICredentialOfferCreationAttrs } from './credentialOfferRequest/types'
+import { ICredentialOfferCreationAttrs } from './credentialOfferTypes';
 
 /* Class representing a credential offer. Encodable in JWT */
 

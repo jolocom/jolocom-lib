@@ -16,6 +16,9 @@
     "include": [
       "./ts/**/*.ts"
     ],
+    "exclude": [
+      "./**/types.ts"
+    ],
     "extension": [
       ".ts"
     ],
@@ -23,7 +26,8 @@
       "ts-node/register"
     ],
     "reporter": [
-      "text"
+      "text",
+      "text-summary"
     ],
     "all": true,
     "sourceMap": true,

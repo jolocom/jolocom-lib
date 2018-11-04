@@ -170,7 +170,7 @@ export class DidDocument implements IDigestable {
    * @returns {Object} - Document in normalized form, quads
   */
 
-  private async normalize(): Promise<string> {
+  public async normalize(): Promise<string> {
     const json = this.toJSON()
     delete json.proof
     return canonize(json)

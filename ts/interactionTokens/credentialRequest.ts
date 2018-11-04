@@ -8,7 +8,7 @@ import {
   ICredentialRequest,
   IConstraint,
   Operator
-} from './credentialRequest/types'
+} from './credentialRequestTypes'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 /* Class representing a credential request, includes requested types and constraints. Encodable in JWT */

@@ -1,22 +1,20 @@
 import * as FormDataNode from 'form-data'
 import * as fetchNode from 'node-fetch'
 import { IIpfsConnector, IIpfsConfig } from './types'
-import { isRunningInNode } from '../utils/general'
+const isNode = require('detect-node')
 
 class IpfsStorageAgent implements IIpfsConnector {
   private endpoint: string
-  private inNode: boolean
 
   constructor(config: IIpfsConfig) {
     this.endpoint = `${config.protocol}://${config.host}:${config.port}`
-    this.inNode = isRunningInNode()
   }
 
   public async storeJSON({ data, pin }: { data: object; pin: boolean }): Promise<string> {
     const endpoint = `${this.endpoint}/api/v0/add?pin=${pin}`
 
     const serializedData = this.serializeJSON(data)
-    const { Hash } = await this.postRequest(endpoint, serializedData).then((res) => res.json())
+    const { Hash } = await this.postRequest(endpoint, serializedData).then(res => res.json())
     return Hash
   }
 
@@ -49,7 +47,7 @@ class IpfsStorageAgent implements IIpfsConnector {
   }
 
   private async postRequest(endpoint: string, data: object) {
-    const fetchImplementation = isRunningInNode() ? fetchNode : window.fetch
+    const fetchImplementation = isNode ? fetchNode : window.fetch
 
     return fetchImplementation(endpoint, {
       method: 'POST',
@@ -58,7 +56,7 @@ class IpfsStorageAgent implements IIpfsConnector {
   }
 
   private async getRequest(endpoint: string) {
-    const fetchImplementation = isRunningInNode() ? fetchNode : window.fetch
+    const fetchImplementation = isNode ? fetchNode : window.fetch
     return fetchImplementation(endpoint)
   }
 
@@ -67,7 +65,7 @@ class IpfsStorageAgent implements IIpfsConnector {
       throw new Error(`JSON expected, received ${typeof data}`)
     }
 
-    if (this.inNode) {
+    if (isNode) {
       const formData = new FormDataNode()
       formData.append('file', Buffer.from(JSON.stringify(data)))
 
