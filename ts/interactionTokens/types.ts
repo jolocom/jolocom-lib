@@ -27,5 +27,5 @@ export enum InteractionType {
   CredentialsReceive = 'credentialsReceive',
   Authentication = 'authentication',
   CredentialOfferRequest = 'credentialOfferRequest',
-  CredentialOfferResponse = 'credentialOfferResponse'
+  CredentialOfferResponse = 'credentialOfferResponse',
 }

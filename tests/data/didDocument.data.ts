@@ -11,16 +11,16 @@ export const didDocumentJSON = {
   authentication: [
     {
       publicKey: mockKeyId,
-      type: 'Secp256k1SignatureAuthentication2018'
-    }
+      type: 'Secp256k1SignatureAuthentication2018',
+    },
   ],
   publicKey: [
     {
       id: mockKeyId,
       type: 'Secp256k1VerificationKey2018',
       owner: mockDid,
-      publicKeyHex: mockPublicKeyHex
-    }
+      publicKeyHex: mockPublicKeyHex,
+    },
   ],
   service: [],
   created: '1970-01-01T00:00:00.000Z',
@@ -29,13 +29,14 @@ export const didDocumentJSON = {
     creator: mockKeyId,
     nonce: '1842fb5f567dd532',
     signatureValue: '',
-    created: '1970-01-01T00:00:00.000Z'
+    created: '1970-01-01T00:00:00.000Z',
   },
   '@context': defaultContextIdentity,
-  id: mockDid
+  id: mockDid,
 }
 
-export const normalized ='\
+export const normalized =
+  '\
 <did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777#keys-1> <https://w3id.org/security#owner> <did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777> .\n\
 <did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777> <http://purl.org/dc/terms/created> "1970-01-01T00:00:00.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .\n\
 <did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777> <https://w3id.org/security#authenticationMethod> _:c14n0 .\n\

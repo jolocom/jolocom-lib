@@ -80,7 +80,7 @@ export class DidDocument implements IDigestable {
   public getSigner(): ISigner {
     return {
       did: this.getDid(),
-      keyId: this.proof.getCreator()
+      keyId: this.proof.getCreator(),
     }
   }
 

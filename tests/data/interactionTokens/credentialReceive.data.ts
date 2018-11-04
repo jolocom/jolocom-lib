@@ -1,5 +1,5 @@
-import { credentialSet } from "./credentialRequest.data"
+import { credentialSet } from './credentialRequest.data'
 
 export const jsonCredReceive = {
-  signedCredentials: credentialSet
+  signedCredentials: credentialSet,
 }

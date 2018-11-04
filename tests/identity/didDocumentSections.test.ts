@@ -6,11 +6,11 @@ import {
   mockPubKeySectionCreationAttrs,
   mockPubKeySectionJSON,
   mockAuthSectionJSON,
-  mockPubProfServiceEndpointJSON
+  mockPubProfServiceEndpointJSON,
 } from '../data/didDocumentSections.data'
 import {
   PublicProfileServiceEndpoint,
-  ServiceEndpointsSection
+  ServiceEndpointsSection,
 } from '../../ts/identity/didDocument/sections/serviceEndpointsSection'
 import { mockDid, mockIpfsHash } from '../data/didDocument.data'
 const expect = chai.expect

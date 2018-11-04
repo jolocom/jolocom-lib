@@ -24,6 +24,6 @@ export const emailVerifiableCredential = {
     creator: mockKeyId,
     nonce: '1842fb5f567dd532',
     signatureValue: '',
-    created: '1970-01-01T00:00:00.000Z'
-  }
+    created: '1970-01-01T00:00:00.000Z',
+  },
 }

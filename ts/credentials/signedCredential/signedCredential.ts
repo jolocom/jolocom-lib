@@ -57,7 +57,7 @@ export class SignedCredential implements IDigestable {
   /* when fromJSON is called, parse value if exists, else default to new EcdsaLinkedDataSignature */
 
   @Type(() => EcdsaLinkedDataSignature)
-  @Transform((value) => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
+  @Transform(value => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
   private proof = new EcdsaLinkedDataSignature()
 
   public setIssuer(issuer: string) {
@@ -98,7 +98,7 @@ export class SignedCredential implements IDigestable {
   public getSigner(): ISigner {
     return {
       did: this.issuer,
-      keyId: this.proof.getCreator()
+      keyId: this.proof.getCreator(),
     }
   }
 
@@ -129,7 +129,7 @@ export class SignedCredential implements IDigestable {
     }
 
     /* Find first detailed cred type, e.g. ProofOfEmailCredential */
-    const customType = this.type.find((t) => t !== 'Credential')
+    const customType = this.type.find(t => t !== 'Credential')
 
     if (customType) {
       /* Split pascal cased title along uppercase letters */

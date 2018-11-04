@@ -5,9 +5,9 @@ export interface IIpfsConfig {
 }
 
 export interface IIpfsConnector {
-  storeJSON: ({data, pin}: {data: object, pin: boolean}) => Promise<string>
+  storeJSON: ({ data, pin }: { data: object; pin: boolean }) => Promise<string>
   catJSON: (hash: string) => Promise<object>
   removePinnedHash: (hash: string) => Promise<void>
-  createDagObject: ({data, pin}: {data: object, pin: boolean}) => Promise<string>
+  createDagObject: ({ data, pin }: { data: object; pin: boolean }) => Promise<string>
   resolveIpldPath: (pathToResolve: string) => Promise<object>
 }

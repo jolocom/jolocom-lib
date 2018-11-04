@@ -9,7 +9,7 @@ export interface IRegistryStaticCreationArgs {
 }
 
 export interface IRegistryCommitArgs {
-  vaultedKeyProvider: IVaultedKeyProvider,
+  vaultedKeyProvider: IVaultedKeyProvider
   keyMetadata: IKeyDerivationArgs
   identityWallet: IdentityWallet
 }

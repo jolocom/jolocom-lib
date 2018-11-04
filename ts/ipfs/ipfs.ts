@@ -51,7 +51,7 @@ class IpfsStorageAgent implements IIpfsConnector {
 
     return fetchImplementation(endpoint, {
       method: 'POST',
-      body: data
+      body: data,
     })
   }
 
@@ -84,5 +84,5 @@ class IpfsStorageAgent implements IIpfsConnector {
 export const jolocomIpfsStorageAgent = new IpfsStorageAgent({
   host: 'ipfs.jolocom.com',
   port: 443,
-  protocol: 'https'
+  protocol: 'https',
 })

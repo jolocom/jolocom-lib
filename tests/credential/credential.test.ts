@@ -12,7 +12,7 @@ import {
   mockNameCredCreationAttrs,
   mockAddrCredCreationAttrs,
   mockBirthdayCredCreationAttrs,
-  birthdayCredentialJSON
+  birthdayCredentialJSON,
 } from '../data/credential/credential.data'
 
 describe('Credential', () => {

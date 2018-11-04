@@ -7,5 +7,5 @@ import { SignedCredential } from '../credentials/signedCredential/signedCredenti
 export const parse = {
   interactionToken: JSONWebTokenParser,
   credential: Credential.fromJSON,
-  signedCredential : SignedCredential.fromJSON,
+  signedCredential: SignedCredential.fromJSON,
 }

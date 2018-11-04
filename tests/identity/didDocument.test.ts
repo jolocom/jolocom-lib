@@ -72,7 +72,7 @@ describe('DidDocument', () => {
       it('implements getSigner', () => {
         expect(referenceDidDocument.getSigner()).to.deep.eq({
           did: mockDid,
-          keyId: mockKeyId
+          keyId: mockKeyId,
         })
       })
   })

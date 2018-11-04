@@ -6,7 +6,7 @@ import {
   mockKeyId,
   mockIssuerDid,
   emailVerifiableCredential,
-  emailVerifiableCredentialHash
+  emailVerifiableCredentialHash,
 } from '../data/credential/signedCredential.data'
 import { EmailClaimMetadata } from 'cred-types-jolocom-core/js/types'
 import { Credential } from '../../ts/credentials/credential/credential'
@@ -30,7 +30,7 @@ describe('SignedCredential', () => {
     clock = sinon.useFakeTimers()
     vCred = vCred = await SignedCredential.create<EmailClaimMetadata>(mockEmailCredCreationAttrs, {
       keyId: mockKeyId,
-      issuerDid: mockIssuerDid
+      issuerDid: mockIssuerDid,
     })
   })
 
@@ -83,7 +83,7 @@ describe('SignedCredential', () => {
     it('Implements getSigner', () => {
       expect(vCred.getSigner()).to.deep.eq({
         did: issuer,
-        keyId: proof.creator
+        keyId: proof.creator,
       })
     })
     it('Implements getExpiryDate', () => {

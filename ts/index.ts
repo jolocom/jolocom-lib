@@ -10,9 +10,9 @@ export const JolocomLib = {
   registry: registries,
   keyProvider: SoftwareKeyProvider,
   unsigned: {
-    createCredential: Credential.create
+    createCredential: Credential.create,
   },
-  KeyTypes
+  KeyTypes,
 }
 
 export { claimsMetadata } from 'cred-types-jolocom-core'

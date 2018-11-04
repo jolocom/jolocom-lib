@@ -5,7 +5,11 @@ import * as sinonChai from 'sinon-chai'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
-import { signedSimpleCredReqJWT, encodedSimpleCredReqJWT, hashedSimpleCredReqJWT } from '../data/interactionTokens/jsonWebToken.data'
+import {
+  signedSimpleCredReqJWT,
+  encodedSimpleCredReqJWT,
+  hashedSimpleCredReqJWT,
+} from '../data/interactionTokens/jsonWebToken.data'
 import { InteractionType } from '../../ts/interactionTokens/types'
 chai.use(sinonChai)
 
@@ -41,7 +45,7 @@ describe('JSONWebToken', () => {
 
     const simplified = {
       ...signedSimpleCredReqJWT,
-      payload: unsignedPayload
+      payload: unsignedPayload,
     }
 
     delete simplified.signature

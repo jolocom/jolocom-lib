@@ -3,7 +3,7 @@ import { IAuthenticationSectionAttrs } from './types'
 import { PublicKeySection } from './publicKeySection'
 
 const typeToAuthType = {
-  Secp256k1VerificationKey2018: 'Secp256k1SignatureAuthentication2018'
+  Secp256k1VerificationKey2018: 'Secp256k1SignatureAuthentication2018',
 }
 
 /*

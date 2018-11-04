@@ -7,7 +7,7 @@ import {
   IExposedConstraintFunctions,
   ICredentialRequest,
   IConstraint,
-  Operator
+  Operator,
 } from './credentialRequestTypes'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
@@ -33,7 +33,7 @@ export class CredentialRequest {
    */
 
   public getRequestedCredentialTypes(): string[][] {
-    return this.credentialRequirements.map((credential) => credential.type)
+    return this.credentialRequirements.map(credential => credential.type)
   }
 
   /*
@@ -43,8 +43,8 @@ export class CredentialRequest {
    */
 
   public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
-    return credentials.filter((credential) => {
-      const relevantConstraints = this.credentialRequirements.find((section) =>
+    return credentials.filter(credential => {
+      const relevantConstraints = this.credentialRequirements.find(section =>
         areCredTypesEqual(section.type, credential.type)
       )
 
@@ -79,7 +79,7 @@ export const constraintFunctions: IExposedConstraintFunctions = {
   is: (field: string, value: string) => assembleStatement('==', field, value),
   not: (field: string, value: string) => assembleStatement('!=', field, value),
   greater: (field: string, value: Comparable) => assembleStatement('>', field, value),
-  smaller: (field: string, value: Comparable) => assembleStatement('<', field, value)
+  smaller: (field: string, value: Comparable) => assembleStatement('<', field, value),
 }
 
 /*

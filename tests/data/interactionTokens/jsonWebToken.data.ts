@@ -9,10 +9,10 @@ export const signedSimpleCredReqJWT = {
     iat: 0,
     interactionToken: simpleCredRequestJSON,
     iss: mockKeyId,
-    typ: 'credentialRequest'
+    typ: 'credentialRequest',
   },
   signature:
-    '4fe903a33015a63a6d6e8a1054584e54b9f6e7ffea5ab196f940c29b7ffa14ef18a19af87c4d848db5dfa6d70e3a4d9b194da83e7eeaa3db0602e9d2d65c53d6'
+    '4fe903a33015a63a6d6e8a1054584e54b9f6e7ffea5ab196f940c29b7ffa14ef18a19af87c4d848db5dfa6d70e3a4d9b194da83e7eeaa3db0602e9d2d65c53d6',
 }
 
 /* Same credential request in base64 encoded form */

@@ -4,7 +4,12 @@ import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-import { testSeed, testPublicIdentityKey, testIncorrectPublicIdentityKey, testPrivateIdentityKey } from '../data/keys.data'
+import {
+  testSeed,
+  testPublicIdentityKey,
+  testIncorrectPublicIdentityKey,
+  testPrivateIdentityKey,
+} from '../data/keys.data'
 import { expect } from 'chai'
 import {
   msgToSign,
@@ -13,7 +18,7 @@ import {
   incorrectSignature,
   invalidtSignature,
   credentialDigest,
-  corruptedSignedCredentialJSON
+  corruptedSignedCredentialJSON,
 } from '../data/keyProvider.data'
 import { IDigestable } from '../../ts/linkedDataSignature/types'
 import { publicProfileCredJSON } from '../data/identity.data'

@@ -4,10 +4,7 @@
  * child keys
  */
 
-export const testSeed = Buffer.from(
-  'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-  'hex'
-)
+export const testSeed = Buffer.from('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'hex')
 
 export const testPrivateIdentityKey = Buffer.from(
   '38a2eb228140a343696431939eedc14b937b0041872541df095c1b266fb55aea',

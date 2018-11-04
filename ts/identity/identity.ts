@@ -53,7 +53,7 @@ export class Identity {
   public publicProfile = {
     get: this.getPublicProfile.bind(this),
     set: this.setPublicProfile.bind(this),
-    delete: this.deletePublicProfile.bind(this)
+    delete: this.deletePublicProfile.bind(this),
   }
 
   private getPublicProfile() {

@@ -38,7 +38,7 @@ export class JolocomRegistry {
 
     const publicIdentityKey = vaultedKeyProvider.getPublicKey({
       derivationPath: jolocomIdentityKey,
-      encryptionPass: decryptionPassword
+      encryptionPass: decryptionPassword,
     })
 
     const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
@@ -49,8 +49,8 @@ export class JolocomRegistry {
       vaultedKeyProvider,
       publicKeyMetadata: {
         derivationPath: jolocomIdentityKey,
-        keyId: didDocument.getPublicKeySections()[0].getIdentifier()
-      }
+        keyId: didDocument.getPublicKeySections()[0].getIdentifier(),
+      },
     })
 
     await this.commit({
@@ -58,8 +58,8 @@ export class JolocomRegistry {
       vaultedKeyProvider,
       keyMetadata: {
         encryptionPass: decryptionPassword,
-        derivationPath: ethereumKey
-      }
+        derivationPath: ethereumKey,
+      },
     })
 
     return identityWallet
@@ -95,7 +95,7 @@ export class JolocomRegistry {
       await this.ethereumConnector.updateDIDRecord({
         ethereumKey: privateEthKey,
         did: didDocument.getDid(),
-        newHash: ipfsHash
+        newHash: ipfsHash,
       })
     } catch (error) {
       throw new Error(`Error occured while persisting identity data: ${error.message}`)
@@ -115,13 +115,13 @@ export class JolocomRegistry {
 
       const publicProfileSection = didDocument
         .getServiceEndpointSections()
-        .find((endpoint) => endpoint.getType() === 'JolocomPublicProfile')
+        .find(endpoint => endpoint.getType() === 'JolocomPublicProfile')
 
       const publicProfile = publicProfileSection && (await this.fetchPublicProfile(publicProfileSection.getEndpoint()))
 
       return Identity.fromDidDocument({
         didDocument,
-        publicProfile
+        publicProfile,
       })
     } catch (error) {
       throw new Error(`Could not retrieve DID Document. ${error.message}`)
@@ -147,13 +147,13 @@ export class JolocomRegistry {
 
     const publicKeyMetadata = {
       derivationPath: derivationArgs.derivationPath,
-      keyId: identity.getPublicKeySection()[0].getIdentifier()
+      keyId: identity.getPublicKeySection()[0].getIdentifier(),
     }
 
     return new IdentityWallet({
       vaultedKeyProvider,
       identity,
-      publicKeyMetadata
+      publicKeyMetadata,
     })
   }
 
@@ -182,7 +182,7 @@ export class JolocomRegistry {
 export const createJolocomRegistry = (
   { ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs = {
     ipfsConnector: jolocomIpfsStorageAgent,
-    ethereumConnector: jolocomEthereumResolver
+    ethereumConnector: jolocomEthereumResolver,
   }
 ): JolocomRegistry => {
   const jolocomRegistry = new JolocomRegistry()

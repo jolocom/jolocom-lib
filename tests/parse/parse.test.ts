@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { JolocomLib } from '../../ts/index'
 import { Credential } from '../../ts/credentials/credential/credential'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential';
+import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 
 describe('Parse', () => {
   it('Should expose correct interface', () => {

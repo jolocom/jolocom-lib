@@ -21,8 +21,8 @@ export const defaultContext: ContextEntry[] = [
     creator: { '@id': 'dc:creator', '@type': '@id' },
     domain: 'sec:domain',
     nonce: 'sec:nonce',
-    signatureValue: 'sec:signatureValue'
-  }
+    signatureValue: 'sec:signatureValue',
+  },
 ]
 
 export const defaultContextIdentity: ContextEntry[] = [
@@ -41,27 +41,27 @@ export const defaultContextIdentity: ContextEntry[] = [
     LinkedDataSignature2016: 'sec:LinkedDataSignature2016',
 
     authentication: 'sec:authenticationMethod',
-    created: {'@id': 'dc:created', '@type': 'xsd:dateTime'},
-    creator: {'@id': 'dc:creator', '@type': '@id'},
+    created: { '@id': 'dc:created', '@type': 'xsd:dateTime' },
+    creator: { '@id': 'dc:creator', '@type': '@id' },
     digestAlgorithm: 'sec:digestAlgorithm',
     digestValue: 'sec:digestValue',
     domain: 'sec:domain',
     entity: 'sec:entity',
-    expires: {'@id': 'sec:expiration', '@type': 'xsd:dateTime'},
+    expires: { '@id': 'sec:expiration', '@type': 'xsd:dateTime' },
     name: 'schema:name',
     nonce: 'sec:nonce',
     normalizationAlgorithm: 'sec:normalizationAlgorithm',
-    owner: {'@id': 'sec:owner', '@type': '@id'},
-    privateKey: {'@id': 'sec:privateKey', '@type': '@id'},
+    owner: { '@id': 'sec:owner', '@type': '@id' },
+    privateKey: { '@id': 'sec:privateKey', '@type': '@id' },
     proof: 'sec:proof',
     proofAlgorithm: 'sec:proofAlgorithm',
     proofType: 'sec:proofType',
     proofValue: 'sec:proofValue',
-    publicKey: {'@id': 'sec:publicKey', '@type': '@id', '@container': '@set'},
+    publicKey: { '@id': 'sec:publicKey', '@type': '@id', '@container': '@set' },
     requiredProof: 'sec:requiredProof',
-    revoked: {'@id': 'sec:revoked', '@type': 'xsd:dateTime'},
+    revoked: { '@id': 'sec:revoked', '@type': 'xsd:dateTime' },
     signature: 'sec:signature',
     signatureAlgorithm: 'sec:signatureAlgorithm',
-    signatureValue: 'sec:signatureValue'
-  }
+    signatureValue: 'sec:signatureValue',
+  },
 ]

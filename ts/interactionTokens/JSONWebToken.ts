@@ -34,7 +34,7 @@ interface TransformArgs {
 
 const convertPayload = <T extends JWTEncodable>(args: TransformArgs) => ({
   ...args,
-  interactionToken: payloadToJWT<T>(args.interactionToken, args.typ)
+  interactionToken: payloadToJWT<T>(args.interactionToken, args.typ),
 })
 
 /* Generic class encoding and decodes various interaction tokens as and from JSON web tokens */
@@ -44,7 +44,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
   /* ES256K stands for ec signatures on secp256k1, de facto standard */
   private header: IJWTHeader = {
     typ: 'JWT',
-    alg: 'ES256K'
+    alg: 'ES256K',
   }
 
   /*
@@ -52,9 +52,9 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
    * the appropriate interaction token class dynamically based on a key in the parsed json
   */
 
-  @Transform((value) => convertPayload(value), { toClassOnly: true })
+  @Transform(value => convertPayload(value), { toClassOnly: true })
   private payload: IPayloadSection<T> = {
-    iat: Date.now()
+    iat: Date.now(),
   }
 
   /*
@@ -62,8 +62,8 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
    * In case sig is undefined on instance and we run toJSON, default to empty string
   */
 
-  @Transform((value) => value || '', { toPlainOnly: true })
-  @Transform((value) => value || Buffer.from(''), { toClassOnly: true })
+  @Transform(value => value || '', { toPlainOnly: true })
+  @Transform(value => value || Buffer.from(''), { toClassOnly: true })
   private signature: string
 
   public getIssuer(): string {
@@ -133,7 +133,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     return [
       base64url.encode(JSON.stringify(this.header)),
       base64url.encode(JSON.stringify(this.payload)),
-      this.signature
+      this.signature,
     ].join('.')
   }
 
@@ -170,7 +170,7 @@ const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: Inter
     [InteractionType.CredentialOfferResponse]: CredentialOffer,
     [InteractionType.CredentialRequest]: CredentialRequest,
     [InteractionType.CredentialResponse]: CredentialResponse,
-    [InteractionType.CredentialsReceive]: CredentialsReceive
+    [InteractionType.CredentialsReceive]: CredentialsReceive,
   }
 
   const correspondingClass = payloadParserMap[typ]

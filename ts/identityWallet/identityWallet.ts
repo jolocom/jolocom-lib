@@ -78,11 +78,11 @@ export class IdentityWallet {
     const vCred = await SignedCredential.create(
       {
         subject: params.subject || this.getDid(),
-        ...params
+        ...params,
       },
       {
         keyId: this.publicKeyMetadata.keyId,
-        issuerDid: this.getDid()
+        issuerDid: this.getDid(),
       }
     )
 
@@ -169,13 +169,13 @@ export class IdentityWallet {
       request: {
         auth: this.createAuth,
         offer: this.createCredOffer,
-        share: this.createCredReq
+        share: this.createCredReq,
       },
       response: {
         auth: this.createAuth,
         offer: this.createCredOffer,
-        share: this.createCredResp
-      }
-    }
+        share: this.createCredResp,
+      },
+    },
   }
 }

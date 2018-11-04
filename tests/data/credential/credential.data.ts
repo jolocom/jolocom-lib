@@ -24,13 +24,13 @@ export interface INestedAddressClaimInterface extends BaseMetadata {
 const customClaimMetadata: IBirthDateClaimInterface = {
   context: ['http://test.com', { test: 'http://test.com/terms' }],
   type: ['Credential', 'MockCredential'],
-  name: 'Mock'
+  name: 'Mock',
 }
 
 const nestedAddressClaimMetadata: INestedAddressClaimInterface = {
   context: ['http://test.com', { test: 'http://test.com/terms' }],
   type: ['Credential', 'ProofOfAddressCredential'],
-  name: 'Address'
+  name: 'Address',
 }
 
 /* Defining mock user data to reuse later */
@@ -39,21 +39,21 @@ const mockSubject = 'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffff
 const mockEmail = 'test@jolocom.io'
 const mockName = {
   givenName: 'MockName',
-  familyName: 'MockFamName'
+  familyName: 'MockFamName',
 }
 
 const mockAddress = {
   address: {
     street: 'Kopenicker Str 147',
     postalCode: '10829',
-    city: 'Berlin'
-  }
+    city: 'Berlin',
+  },
 }
 
 const mockBirthday = {
   birthDate: 20,
   birthMonth: 'april',
-  birthYear: 1984
+  birthYear: 1984,
 }
 
 /* Preparing credential creation attributes for easy instantiation */
@@ -62,26 +62,26 @@ export const mockEmailCredCreationAttrs = {
   metadata: claimsMetadata.emailAddress,
   subject: mockSubject,
   claim: {
-    email: mockEmail
-  }
+    email: mockEmail,
+  },
 }
 
 export const mockNameCredCreationAttrs = {
   metadata: claimsMetadata.name,
   subject: mockSubject,
-  claim: mockName
+  claim: mockName,
 }
 
 export const mockAddrCredCreationAttrs = {
   metadata: nestedAddressClaimMetadata,
   subject: mockSubject,
-  claim: mockAddress
+  claim: mockAddress,
 }
 
 export const mockBirthdayCredCreationAttrs = {
   metadata: customClaimMetadata,
   subject: mockSubject,
-  claim: mockBirthday
+  claim: mockBirthday,
 }
 
 /* JSON form to ensure toJSON and fromJSON work as intended */
@@ -92,15 +92,15 @@ export const emailCredentialJSON = {
     {
       email: 'schema:email',
       schema: 'http://schema.org/',
-      ProofOfEmailCredential: 'https://identity.jolocom.com/terms/ProofOfEmailCredential'
-    }
+      ProofOfEmailCredential: 'https://identity.jolocom.com/terms/ProofOfEmailCredential',
+    },
   ],
   type: ['Credential', 'ProofOfEmailCredential'],
   claim: {
     email: mockEmail,
-    id: mockSubject
+    id: mockSubject,
   },
-  name: 'Email address'
+  name: 'Email address',
 }
 
 export const nameCredentialJSON = {
@@ -110,15 +110,15 @@ export const nameCredentialJSON = {
       ProofOfNameCredential: 'https://identity.jolocom.com/terms/ProofOfNameCredential',
       familyName: 'schema:familyName',
       givenName: 'schema:givenName',
-      schema: 'http://schema.org/'
-    }
+      schema: 'http://schema.org/',
+    },
   ],
   type: ['Credential', 'ProofOfNameCredential'],
   claim: {
     ...mockName,
-    id: mockSubject
+    id: mockSubject,
   },
-  name: 'Name'
+  name: 'Name',
 }
 
 export const birthdayCredentialJSON = {
@@ -126,9 +126,9 @@ export const birthdayCredentialJSON = {
   type: ['Credential', 'MockCredential'],
   claim: {
     ...mockBirthday,
-    id: mockSubject
+    id: mockSubject,
   },
-  name: 'Mock'
+  name: 'Mock',
 }
 
 export const addressCredentialJSON = {
@@ -136,7 +136,7 @@ export const addressCredentialJSON = {
   type: ['Credential', 'ProofOfAddressCredential'],
   claim: {
     ...mockAddress,
-    id: mockSubject
+    id: mockSubject,
   },
-  name: 'Address'
+  name: 'Address',
 }

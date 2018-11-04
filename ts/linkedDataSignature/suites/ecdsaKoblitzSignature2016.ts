@@ -22,7 +22,7 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
   */
 
   @Expose()
-  @Transform((value) => value || '', { toPlainOnly: true })
+  @Transform(value => value || '', { toPlainOnly: true })
   private signatureValue: string
 
   @Expose()

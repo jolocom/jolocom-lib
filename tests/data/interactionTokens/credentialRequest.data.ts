@@ -1,4 +1,4 @@
-import { emailVerifiableCredential, mockIssuerDid, mockKeyId } from "../credential/signedCredential.data"
+import { emailVerifiableCredential, mockIssuerDid, mockKeyId } from '../credential/signedCredential.data'
 
 /* Used to test if matching against issuer works */
 
@@ -13,9 +13,9 @@ export const simpleCredRequestJSON = {
   credentialRequirements: [
     {
       type: ['Credential', 'ProofOfEmailCredential'],
-      constraints: [{ '==': [{ var: 'issuer' }, mockIssuerDid] }]
-    }
-  ]
+      constraints: [{ '==': [{ var: 'issuer' }, mockIssuerDid] }],
+    },
+  ],
 }
 
 /* Fixture to test if validating against an empty constraint set returns true */
@@ -25,9 +25,9 @@ export const emptyConstraintsRequestJSON = {
   credentialRequirements: [
     {
       type: ['Credential', 'ProofOfEmailCredential'],
-      constraints: []
-    }
-  ]
+      constraints: [],
+    },
+  ],
 }
 
 /* Request with two credential requirements, for fromJSON, toJSON, getRequestedTypes tests */
@@ -38,25 +38,25 @@ export const extendedCredRequestJSON = {
     simpleCredRequestJSON.credentialRequirements[0],
     {
       type: ['Credential', 'ProofOfPassportCredential'],
-      constraints: []
-    }
-  ]
+      constraints: [],
+    },
+  ],
 }
 
 /* Expected outputs of constraint creation functions */
 
 export const expectedIsOutput = {
-  '==': [{ var: 'claim.id' }, mockKeyId]
+  '==': [{ var: 'claim.id' }, mockKeyId],
 }
 
 export const expectedNotOutput = {
-  '!=': [{ var: 'claim.id' }, mockKeyId]
+  '!=': [{ var: 'claim.id' }, mockKeyId],
 }
 
 export const expectedGreaterOutput = {
-  '>': [{ var: 'issued' }, new Date(0)]
+  '>': [{ var: 'issued' }, new Date(0)],
 }
 
 export const expectedSmallerOutput = {
-  '<': [{ var: 'issued' }, new Date(100)]
+  '<': [{ var: 'issued' }, new Date(100)],
 }

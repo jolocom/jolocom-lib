@@ -9,7 +9,7 @@ import {
   expectedIsOutput,
   expectedNotOutput,
   expectedGreaterOutput,
-  expectedSmallerOutput
+  expectedSmallerOutput,
 } from '../data/interactionTokens/credentialRequest.data'
 
 describe('CredentialRequest', () => {
@@ -26,7 +26,7 @@ describe('CredentialRequest', () => {
     expect(credReq.getRequestedCredentials()).to.deep.eq(credentialRequirements)
     expect(credReq.getRequestedCredentialTypes()).to.deep.eq([
       credentialRequirements[0].type,
-      credentialRequirements[1].type
+      credentialRequirements[1].type,
     ])
   })
 

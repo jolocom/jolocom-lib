@@ -21,7 +21,7 @@ const expect = chai.expect
 /* Saves some space during stubbing, helper functions */
 
 const stubbedKeyProvider = {
-  signDigestable: sinon.stub().callsFake(attributes => Buffer.from(signedSimpleCredReqJWT.signature, 'hex'))
+  signDigestable: sinon.stub().callsFake(attributes => Buffer.from(signedSimpleCredReqJWT.signature, 'hex')),
 } as IVaultedKeyProvider
 
 const stubbedFromJWTEncodable = args => {
@@ -33,7 +33,7 @@ const stubbedFromJWTEncodable = args => {
 const stubbedCredential = {
   setSignatureValue: value => {
     expect(value).to.eq(signedSimpleCredReqJWT.signature)
-  }
+  },
 }
 
 describe('IdentityWallet', () => {
@@ -50,8 +50,8 @@ describe('IdentityWallet', () => {
         vaultedKeyProvider: stubbedKeyProvider,
         publicKeyMetadata: {
           derivationPath: KeyTypes.jolocomIdentityKey,
-          keyId: mockKeyId
-        }
+          keyId: mockKeyId,
+        },
       })
 
       expect(iw.getDid()).to.eq(mockDid)

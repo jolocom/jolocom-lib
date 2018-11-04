@@ -69,7 +69,6 @@ export class ServiceEndpointsSection {
  */
 
 export class PublicProfileServiceEndpoint extends ServiceEndpointsSection {
-
   /*
   * @description - Instantiates class based on passed arguments
   * @param did - The did of the did document owner
