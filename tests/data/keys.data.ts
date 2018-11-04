@@ -30,16 +30,6 @@ export const testIncorrectPublicIdentityKey = Buffer.from(
 
 /* Keys used in integration test */
 
-export const testPrivateIdentityKey3 = Buffer.from(
-  'a8736629c00011bc18b226eb0ce274c37d6042641eac768b5a4352227affda0e',
-  'hex'
-)
-
-export const testPublicIdentityKey3 = Buffer.from(
-  '036b3dd49a48ee790646014ba4e98664dd328097710ac02bbe8e3a0e9bc824a8ca',
-  'hex'
-)
-
 export const testPrivateEthereumKey3 = Buffer.from(
   'ae084ea439ae5eecdccbf43b188567bbf23adfd11928fb6268071225048140bc',
   'hex'

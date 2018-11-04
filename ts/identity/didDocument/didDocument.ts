@@ -88,6 +88,10 @@ export class DidDocument implements IDigestable {
     this.id = did
   }
 
+  public setSignatureValue(signature: string) {
+    this.proof.setSignatureValue(signature)
+  }
+
   /*
    * @description - Adds a new Authentication section to the DID Document
    * @param section - Instance of the AuthenticationSection class
@@ -116,6 +120,15 @@ export class DidDocument implements IDigestable {
 
   public addServiceEndpoint(endpoint: ServiceEndpointsSection) {
     this.service = [endpoint]
+  }
+
+  /*
+   * @description - Clears the service endpoints section, usefull when removing public profile
+   * @returns {void}
+  */
+
+  public resetServiceEndpoints() {
+    this.service = []
   }
 
   /*

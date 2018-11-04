@@ -1,129 +1,78 @@
-// import { expect } from 'chai'
-// import * as nock from 'nock'
-// import { IpfsStorageAgent } from '../../ts/ipfs/index'
-// import {
-//   localHostStorage,
-//   pinBoolean,
-//   testDataString,
-//   testHash,
-//   testDDO,
-// } from '../data/ipfs'
-// import { singleClaimCredentialJSON } from '../data/credential/credential'
+import * as sinon from 'sinon'
+import { expect } from 'chai'
+import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
+import { testHash, mockConfig, mockBaseUri, mockAddUrl, mockCatUrl, mockPinUrl } from '../data/ipfs.data'
+import { didDocumentJSON } from '../data/didDocument.data';
 
-// describe('IpfsStorageAgent', () => {
-//   let storageAgent
+describe('IpfsStorageAgent', () => {
+  let storageAgent = new IpfsStorageAgent(mockConfig)
 
-//   beforeEach(() => {
-//     storageAgent = new IpfsStorageAgent({
-//       host: 'localhost',
-//       port: 5001,
-//       protocol: 'http'
-//     })
-//   })
+  const stubbedFetch = sinon.stub().resolves({ json: sinon.stub().resolves({ Hash: testHash }) })
+  storageAgent.changeFetchImplementation(stubbedFetch)
 
-//   // it('should attempt to store the data', async () => {
-//   //   nock(localHostStorage)
-//   //     .post(`/api/v0/add?pin=${pinBoolean}`)
-//   //     .reply(200, {
-//   //       Name: 'testFile',
-//   //       Hash: testHash,
-//   //       Bytes: '12345',
-//   //       Size: '12345'
-//   //     })
+  afterEach(() => {
+    stubbedFetch.resetHistory()
+  })
 
-//   //   const resultingHash = await storageAgent.storeJSON({data: testDDO, pin: pinBoolean})
-//   //   expect(resultingHash).to.equal(testHash)
-//   // })
+  it('should correctly instantiate', () => {
+    expect(storageAgent.getEndpoint()).to.eq(mockBaseUri)
+  })
 
-//   it('should throw an error if submitted data is not an object', async () => {
-//     nock(localHostStorage)
-//       .post(`/api/v0/add?pin=${pinBoolean}`)
-//       .reply(200, {
-//         Name: 'testFile',
-//         Hash: testHash,
-//         Bytes: '12345',
-//         Size: '12345'
-//       })
+  /* We decode the did document from the form data to compare, otherwise we have to rely on form data here */
 
-//     try {
-//       await storageAgent.storeJSON({data: testDataString, pin: pinBoolean})
-//     } catch (err) {
-//       expect(err.message).to.equal('JSON expected, received string')
-//     }
-//   })
+  it('should attempt to store the data', async () => {
+    await storageAgent.storeJSON({ data: didDocumentJSON, pin: true })
+    const formData = stubbedFetch.getCall(0).args[1].body
 
-//   it('should attempt to retrieve the data', async () => {
-//     nock(localHostStorage)
-//       .get(`/api/v0/cat/${testHash}`)
-//       .reply(200, {
-//         file: testDDO
-//       })
+    compareFormData(formData, didDocumentJSON)
+    expect(stubbedFetch.getCall(0).args[0]).to.eq(mockAddUrl)
+  })
 
-//     const resultingFile = await storageAgent.catJSON(testHash)
-//     expect(resultingFile).to.deep.equal({ file: testDDO })
-//   })
+  it('should throw an error if submitted data is not an object', async () => {
+    try {
+      await storageAgent.storeJSON({
+        data: 5 as Object,
+        pin: false
+      })
+      expect(true).to.be.false
+    } catch (err) {
+      expect(err.message).to.contain('JSON expected')
+    }
+  })
 
-//   it('should attempt to remove a pinned hash', async () => {
-//     nock(localHostStorage)
-//       .get(`/api/v0/pin/rm?arg=${testHash}`)
-//       .reply(200, {
-//         Pins: [`${testHash}`]
-//       })
+  it('should attempt to retrieve the data', async () => {
+    await storageAgent.catJSON(testHash)
+    expect(stubbedFetch.getCall(0).args).to.deep.eq([mockCatUrl])
+  })
 
-//     const removePinnedHashCall = () => {
-//       storageAgent.removePinnedHash(testHash)
-//     }
-//     await expect(removePinnedHashCall).to.not.throw()
-//   })
+  it('should attempt to remove a pinned hash', async () => {
+    const successRespMock = sinon.stub().returns({ ok: true })
 
-//   it('should throw an error if removing the pinned hash failed', async () => {
-//     nock(localHostStorage)
-//       .get(`/api/v0/pin/rm?arg=${testHash}`)
-//       .reply(400, {
-//         error: 'Error'
-//       })
+    storageAgent.changeFetchImplementation(successRespMock)
+    await storageAgent.removePinnedHash(testHash)
+    expect(successRespMock.getCall(0).args).to.deep.eq([mockPinUrl])
+  })
 
-//     try {
-//       await storageAgent.removePinnedHash(testHash)
-//     } catch (err) {
-//       expect(err.message).to.equal('Removing pinned hash Qm12345 failed, status code: 400')
-//     }
-//   })
+  it('should throw an error if removing the pinned hash failed', async () => {
+    const errorRespMock = sinon.stub().returns({ ok: false, status: 500 })
+    storageAgent.changeFetchImplementation(errorRespMock)
+    try {
+      await storageAgent.removePinnedHash(testHash)
+      expect(false).to.be.true
+    } catch (err) {
+      expect(err.message).to.contain(`Removing pinned hash ${testHash} failed`)
+    }
+  })
+})
 
-//   // it('should attempt to create a DAG object and put via IPLD', async () => {
-//   //   nock(localHostStorage)
-//   //     .post(`/api/v0/dag/put?pin=${pinBoolean}`)
-//   //     .reply(200, {
-//   //       Cid: { '/': testHash }
-//   //     })
+/*
+ * @description - Helper method to decode the payload of form data and compare it to json
+ * @param formData - Form data instance containing encoded data
+ * @param reference - JSON document to compare to
+ * @returns {void}
+ */
 
-//   //   const resultingHash = await storageAgent.createDagObject({data: testDataObject, pin: pinBoolean})
-//   //   expect(resultingHash).to.deep.equal(testHash)
-//   // })
-
-//   // it('should throw an error if submitted data is not an object', async () => {
-//   //   try {
-//   //     await storageAgent.createDagObject({data: testDataString, pin: pinBoolean})
-//   //   } catch (err) {
-//   //     expect(err.message).to.equal('Object expected, received string')
-//   //   }
-//   // })
-
-//   it('should attempt to retrieve the DAG object', async () => {
-//     nock(localHostStorage)
-//       .get(`/api/v0/dag/get?arg=${testHash}`)
-//       .reply(200, singleClaimCredentialJSON)
-
-//     const resultingFile = await storageAgent.resolveIpldPath(testHash)
-//     expect(resultingFile).to.deep.equal(singleClaimCredentialJSON)
-//   })
-
-//   it('should resolve nested DAG objects', async () => {
-//     nock(localHostStorage)
-//       .get(`/api/v0/dag/get?arg=${testHash}/claim`)
-//       .reply(200, singleClaimCredentialJSON.claim)
-
-//     const resultingFile = await storageAgent.resolveIpldPath(`${testHash}/claim`)
-//     expect(resultingFile).to.deep.equal(singleClaimCredentialJSON.claim)
-//   })
-// })
+const compareFormData = (formData, reference) => {
+  const decodedMsg = formData._streams[1].toString()
+  expect(JSON.parse(decodedMsg)).to.deep.eq(reference)
+}

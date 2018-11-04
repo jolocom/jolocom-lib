@@ -1,126 +1,109 @@
-// import { InteractionType } from './../../ts/interactionFlows/types'
-// import * as chai from 'chai'
-// import * as sinonChai from 'sinon-chai'
-// import * as sinon from 'sinon'
-// import {
-//   testPrivateIdentityKey,
-//   testPrivateEthereumKey,
-//   testPrivateIdentityKey3,
-//   testPrivateEthereumKey3
-// } from '../data/keys'
-// import { thirdMockCredential } from '../data/credential/signedCredential'
-// import { DidDocument } from '../../ts/identity/didDocument'
-// import * as integrationHelper from './provision'
-// import { IpfsStorageAgent } from '../../ts/ipfs'
-// import { IEthereumResolverConfig } from '../../ts/ethereum/types'
-// import { EthResolver } from '../../ts/ethereum'
-// import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
-// import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
-// import { claimsMetadata, JolocomLib } from '../../ts/index'
-// import { JSONWebToken } from './../../ts/interactionFlows/JSONWebToken'
-// import { CredentialRequest } from './../../ts/interactionFlows/credentialRequest/credentialRequest'
-// import {
-//   testClaim,
-//   sampleCredentialRequest,
-//   sampleDid,
-//   integrationTestIpfsConfig,
-//   ethereumConfigProviderUrl,
-//   testSignedCredentialIntegration
-// } from './../data/interactionFlows/integrationTest'
-// import { CredentialResponse } from './../../ts/interactionFlows/credentialResponse/credentialResponse'
-// import * as jr from '../../ts/registries/jolocomRegistry'
-// import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-// import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
-// import { CredentialResponsePayload } from '../../ts/interactionFlows/credentialResponse/credentialResponsePayload'
-// import { Authentication } from '../../ts/interactionFlows/authentication/authentication'
-// import { AuthenticationPayload } from '../../ts/interactionFlows/authentication/authenticationPayload'
-// import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload'
-// import {
-//   CredentialOfferRequestPayload
-// } from '../../ts/interactionFlows/credentialOfferRequest/credentialOfferRequestPayload'
-// import {
-//   CredentialOfferResponsePayload
-// } from '../../ts/interactionFlows/credentialOfferResponse/credentialOfferResponsePayload'
+import * as chai from 'chai'
+import * as sinonChai from 'sinon-chai'
+import * as integrationHelper from './provision'
+import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
+import { IEthereumResolverConfig } from '../../ts/ethereum/types'
+import { EthResolver } from '../../ts/ethereum/ethereum'
+import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
+import { createJolocomRegistry, JolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import {
+  integrationTestIpfsConfig,
+  ethereumConfigProviderUrl,
+} from '../data/interactionTokens/integrationTest.data'
+import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
+import { testSeed } from '../data/keys.data'
+import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
+import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import { publicProfileCredJSON } from '../data/identity.data'
+import { ADDRGETNETWORKPARAMS } from 'dns'
+import { emailVerifiableCredential } from '../data/credential/signedCredential.data'
 
-// chai.use(sinonChai)
-// const expect = chai.expect
+chai.use(sinonChai)
+const expect = chai.expect
 
-// describe('Integration Test', () => {
-//   let jolocomRegistry
+describe('Integration Test', () => {
+  let jolocomRegistry: JolocomRegistry
+  let identityWallet: IdentityWallet
+  const vault = new SoftwareKeyProvider(testSeed, 'pass')
 
-//   before(async function() {
-//     this.timeout(40000)
-//     const address = await integrationHelper.init()
+  before(async function() {
+    const ethereumConfig: IEthereumResolverConfig = {
+      providerUrl: ethereumConfigProviderUrl,
+      contractAddress: await integrationHelper.init()
+    }
 
-//     const ethereumConfig: IEthereumResolverConfig = {
-//       providerUrl: ethereumConfigProviderUrl,
-//       contractAddress: address
-//     }
+    jolocomRegistry = createJolocomRegistry({
+      ipfsConnector: new IpfsStorageAgent(integrationTestIpfsConfig),
+      ethereumConnector: new EthResolver(ethereumConfig)
+    })
+  })
 
-//     const ipfsConnector = new IpfsStorageAgent(integrationTestIpfsConfig)
-//     const ethereumConnector = new EthResolver(ethereumConfig)
+  after(() => {
+    process.exit(0)
+  })
 
-//     jolocomRegistry = createJolocomRegistry({ ipfsConnector, ethereumConnector })
-//   })
+  it('correctly creates identities an identity', async () => {
+    identityWallet = await jolocomRegistry.create(vault, 'pass')
 
-//   after(() => {
-//     process.exit(0)
-//   })
+    const resolvedIdentity = await jolocomRegistry.resolve(identityWallet.getDid())
+    expect(resolvedIdentity.getDidDocument()).to.deep.eq(identityWallet.getDidDocument())
+  })
 
-//   describe('Creation of identity', () => {
-//     it('should generate a valid DDO', async () => {
-//       const identityWallet: IdentityWallet = await jolocomRegistry.create({
-//         privateIdentityKey: testPrivateIdentityKey,
-//         privateEthereumKey: testPrivateEthereumKey
-//       })
-//       const didDocument = identityWallet.getIdentity().didDocument
+  it('Should correctly add and commit public profile', async () => {
+    const pubProf = SignedCredential.fromJSON(publicProfileCredJSON)
+    identityWallet.getIdentity().publicProfile.set(pubProf)
 
-//       expect(didDocument).to.be.an.instanceOf(DidDocument)
-//       expect(didDocument.getDID()).to.eq(sampleDid)
-//     })
-//   })
+    await jolocomRegistry.commit({
+      vaultedKeyProvider: vault,
+      identityWallet: identityWallet,
+      keyMetadata: {
+        derivationPath: KeyTypes.ethereumKey,
+        encryptionPass: 'pass'
+      }
+    })
 
-//   describe('Authentication', () => {
-//     it('should return authenticated identity wallet', async () => {
-//       const identityWallet = await jolocomRegistry.authenticate(testPrivateIdentityKey)
+    const resolved = await jolocomRegistry.resolve(identityWallet.getDid())
+    const pubKey = resolved.getPublicKeySection()[0].getPublicKeyHex()
 
-//       expect(identityWallet).to.be.an.instanceOf(IdentityWallet)
-//       expect(identityWallet.getIdentity().getDID()).to.eq(sampleDid)
-//     })
-//   })
+    expect(await vault.verifyDigestable(Buffer.from(pubKey, 'hex'), resolved.getDidDocument()))
+    expect(await vault.verifyDigestable(Buffer.from(pubKey, 'hex'), resolved.publicProfile.get()))
 
-//   describe('Public Profile', () => {
-//     it('should correctly add and commit public profile credential', async () => {
-//       const identityWallet = await jolocomRegistry.authenticate(testPrivateIdentityKey)
-//       const publicProfileCredential = await identityWallet.create.signedCredential({
-//         metadata: claimsMetadata.publicProfile,
-//         claim: testClaim
-//       })
+    expect(resolved.getDidDocument().toJSON()).to.deep.eq(identityWallet.getDidDocument().toJSON())
+    expect(resolved.publicProfile.get()).to.deep.eq(identityWallet.getIdentity().publicProfile.get())
+  })
 
-//       identityWallet.getIdentity().publicProfile.add(publicProfileCredential)
-//       await jolocomRegistry.commit({ wallet: identityWallet, privateEthereumKey: testPrivateEthereumKey })
+  it('Should correctly update and commit public profile', async () => {
+    const newPubProf = SignedCredential.fromJSON(emailVerifiableCredential)
+    identityWallet.getIdentity().publicProfile.set(newPubProf)
 
-//       const committedProfile = await jolocomRegistry.resolve(sampleDid)
+    await jolocomRegistry.commit({
+      vaultedKeyProvider: vault,
+      identityWallet: identityWallet,
+      keyMetadata: {
+        derivationPath: KeyTypes.ethereumKey,
+        encryptionPass: 'pass'
+      }
+    })
 
-//       expect(committedProfile.publicProfile.get().getCredentialSection()).to.deep.equal({
-//         id: sampleDid,
-//         name: 'Test Name',
-//         description: 'Test Description'
-//       })
-//     })
-//   })
+    const resolved = await jolocomRegistry.resolve(identityWallet.getDid())
+    expect(resolved.publicProfile.get()).to.deep.eq(identityWallet.getIdentity().publicProfile.get())
+  })
 
-//   describe('Signature verification', () => {
-//     it('should generate a valid DDO public profile', async () => {
-//       const committedProfile = await jolocomRegistry.resolve(sampleDid)
-//       const publicKey = committedProfile.getPublicKeySection()[0].getPublicKeyHex()
-//       // tslint:disable-next-line:no-unused-expression
-//       expect(
-//         await committedProfile.publicProfile.get().validateSignatureWithPublicKey(Buffer.from(publicKey, 'hex')
-//       )).to.be.true
-//     })
-//   })
+  it('Should correctly delete and commit public profile', async () => {
+    identityWallet.getIdentity().publicProfile.delete()
+    await jolocomRegistry.commit({
+      vaultedKeyProvider: vault,
+      identityWallet: identityWallet,
+      keyMetadata: {
+        derivationPath: KeyTypes.ethereumKey,
+        encryptionPass: 'pass'
+      }
+    })
 
+    const resolved = await jolocomRegistry.resolve(identityWallet.getDid())
+    expect(resolved.publicProfile.get()).to.deep.eq(identityWallet.getIdentity().publicProfile.get())
+  })
+})
 //   describe('SSO interaction flow', () => {
 //     let identityWalletUser
 //     let identityWalletService

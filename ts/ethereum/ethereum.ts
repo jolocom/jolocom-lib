@@ -3,7 +3,7 @@ import { IEthereumResolverConfig, IEthereumConnector, IEthereumResolverUpdateDID
 
 /* Class encapsulating methods for interacting with the registry smart contract */
 
-class EthResolver implements IEthereumConnector {
+export class EthResolver implements IEthereumConnector {
   private ethResolver: EthereumResolver
 
   /*

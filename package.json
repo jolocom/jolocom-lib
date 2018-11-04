@@ -5,11 +5,11 @@
   "main": "js/index.js",
   "typings": "js/index.d.ts",
   "scripts": {
-    "test": "yarn clean; nyc mocha --opts ./mocha.opts",
+    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts",
     "clean": "rm -rf ./js",
-    "prepublish": "yarn clean; ./node_modules/.bin/tsc -p ./tsconfig.json",
-    "test:watch": "./node_modules/.bin/mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
-    "test:single": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts",
+    "prepublish": "yarn clean; tsc -p ./tsconfig.json",
+    "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
+    "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
     "test:integration": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts ./tests/integration/index.ts"
   },
   "nyc": {
@@ -17,7 +17,8 @@
       "./ts/**/*.ts"
     ],
     "exclude": [
-      "./**/types.ts"
+      "./**/types.ts",
+      "./**/*Types.ts"
     ],
     "extension": [
       ".ts"
@@ -81,7 +82,6 @@
     "ipfsd-ctl": "^0.39.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.0.0",
-    "nock": "^9.3.3",
     "nyc": "^12.0.2",
     "sinon": "^6.0.0",
     "source-map-support": "^0.4.18",
