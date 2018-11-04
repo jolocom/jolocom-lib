@@ -1,6 +1,6 @@
 import { plainToClass, classToPlain, Type, Expose } from 'class-transformer'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { ICredentialsReceiveAttrs } from './credentialsReceiveTypes'
+import { ICredentialsReceiveAttrs } from './interactionTokens.types'
 
 /*
  * Class representing a credential response. encodable in JWT,

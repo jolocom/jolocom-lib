@@ -1,5 +1,5 @@
 import { plainToClass, classToPlain, Expose, Type } from 'class-transformer'
-import { ICredentialResponseAttrs } from './credentialResponseTypes'
+import { ICredentialResponseAttrs } from './interactionTokens.types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { CredentialRequest } from './credentialRequest'
 

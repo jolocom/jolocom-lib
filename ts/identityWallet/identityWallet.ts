@@ -6,11 +6,11 @@ import { Identity } from '../identity/identity'
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { InteractionType } from '../interactionTokens/types'
-import { ICredentialOfferCreationAttrs } from '../interactionTokens/credentialOfferTypes'
+import { ICredentialOfferCreationAttrs } from '../interactionTokens/interactionTokens.types'
 import { CredentialOffer } from '../interactionTokens/credentialOffer'
-import { ICredentialRequestCreationAttrs } from '../interactionTokens/credentialRequestTypes'
+import { ICredentialRequestAttrs } from '../interactionTokens/interactionTokens.types'
 import { Authentication, IAuthenticationAttrs } from '../interactionTokens/authentication'
-import { ICredentialResponseAttrs } from '../interactionTokens/credentialResponseTypes'
+import { ICredentialResponseAttrs } from '../interactionTokens/interactionTokens.types'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { IVaultedKeyProvider } from '../vaultedKeyProvider/softwareProvider'
@@ -124,7 +124,7 @@ export class IdentityWallet {
    * @returns {Object} -  Instance of CredentialRequest class
   */
 
-  private createCredReq = async (credReq: ICredentialRequestCreationAttrs, pass: string) => {
+  private createCredReq = async (credReq: ICredentialRequestAttrs, pass: string) => {
     const credentialRequest = CredentialRequest.fromJSON(credReq)
     const jwt = JSONWebToken.fromJWTEncodable(credentialRequest)
     return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass)
