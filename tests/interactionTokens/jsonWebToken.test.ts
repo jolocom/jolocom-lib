@@ -14,7 +14,7 @@ import {
 import { InteractionType } from '../../ts/interactionTokens/types'
 chai.use(sinonChai)
 
-describe.only('JSONWebToken', () => {
+describe('JSONWebToken', () => {
   let clock
   let sandbox
   const credReq = CredentialRequest.fromJSON(simpleCredRequestJSON)
@@ -71,11 +71,14 @@ describe.only('JSONWebToken', () => {
 
   it('Should implement all setters', () => {
     const jwt = new JSONWebToken()
-
+    const nonce = Math.random().toString(36)
+    
     jwt.setSignature(signature)
     jwt.setTokenContent(credReq)
     jwt.setTokenIssuer(iss)
     jwt.setTokenTimeStamps()
+    jwt.setTokenNonce(nonce)
+    jwt.setTokenAudience('did:jolo:testauddid')
     jwt.setTokenType(typ as InteractionType)
 
     expect(jwt.getSignatureValue().toString('hex')).to.eq(signature)
@@ -83,6 +86,8 @@ describe.only('JSONWebToken', () => {
     expect(jwt.getInteractionToken()).to.deep.eq(credReq)
     expect(jwt.getIssueTime()).to.eq(iat)
     expect(jwt.getExpirationTime()).to.eq(exp)
+    expect(jwt.getAudience()).to.eq('did:jolo:testauddid')
+    expect(jwt.getTokenNonce()).to.eq(nonce)
   })
 
   it('Should implement static decode', () => {

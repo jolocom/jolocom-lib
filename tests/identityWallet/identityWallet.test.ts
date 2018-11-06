@@ -10,10 +10,12 @@ import { IVaultedKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvide
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { mockNameCredCreationAttrs } from '../data/credential/credential.data'
 import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
+import { credentialResponseJSON } from '../data/interactionTokens/credentialResponse.data'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { signedSimpleCredReqJWT } from '../data/interactionTokens/jsonWebToken.data'
+import { keyIdToDid } from '../../ts/utils/helper';
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -56,6 +58,7 @@ describe('IdentityWallet', () => {
     const sandbox = sinon.createSandbox()
     let stubCredCreate
     let spyFromJWTEncodable
+    let interactionToken
 
     before(() => {
       stubCredCreate = sandbox.stub(SignedCredential, 'create').callsFake(() => stubbedCredential)
@@ -97,9 +100,18 @@ describe('IdentityWallet', () => {
     /* All interaction tokens follow the same flow. Would still be good to cover all cases in the future. */
 
     it('Should attempt to create an interaction token', async () => {
-      await iw.create.interactionTokens.request.share(simpleCredRequestJSON, encryptionPass)
+      interactionToken = await iw.create.interactionTokens.request.share(simpleCredRequestJSON, encryptionPass)
+
       sandbox.assert.calledOnce(spyFromJWTEncodable)
       sandbox.assert.calledWith(spyFromJWTEncodable, CredentialRequest.fromJSON(simpleCredRequestJSON))
+    })
+
+    it('Should create an interaction token as a response', async () => {
+      const decodedToken = JSONWebToken.decode(interactionToken.encode())
+      const interactionResponeToken = await iw.create.interactionTokens.response.share(credentialResponseJSON, encryptionPass, decodedToken)
+
+      expect(interactionResponeToken.getTokenNonce()).to.eq(decodedToken.getTokenNonce())
+      expect(interactionResponeToken.getAudience()).to.eq(keyIdToDid(decodedToken.getIssuer()))
     })
   })
 })
