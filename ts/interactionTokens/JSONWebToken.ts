@@ -22,7 +22,9 @@ interface IJWTEncodable {
 interface IPayloadSection<T> {
   iat?: number
   exp?: number
+  jti?: string
   iss?: string
+  aud?: string
   typ?: InteractionType
   interactionToken?: T
 }
@@ -32,7 +34,9 @@ interface TransformArgs {
   typ: InteractionType
   iat: Date
   exp: Date
+  jti: string
   iss: string
+  aud: string
 }
 
 const convertPayload = <T extends JWTEncodable>(args: TransformArgs) => ({
@@ -71,12 +75,20 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     return this.payload.iss
   }
 
+  public getAudience(): string {
+    return this.payload.aud
+  }
+
   public getIssueTime(): number {
     return this.payload.iat
   }
 
   public getExpirationTime(): number {
     return this.payload.exp
+  }
+
+  public getTokenNonce(): string {
+    return this.payload.jti
   }
 
   public getInteractionToken() {
@@ -104,8 +116,16 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     this.payload.exp = Date.now() + 3600000
   }
 
+  public setTokenNonce(nonce: string) {
+    this.payload.jti = nonce
+  }
+
   public setTokenIssuer(iss: string) {
     this.payload.iss = iss
+  }
+
+  public setTokenAudience(aud: string) {
+    this.payload.aud = aud
   }
 
   public setTokenContent(payload: T) {

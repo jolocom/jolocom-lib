@@ -95,26 +95,28 @@ export class IdentityWallet {
    * @description - Creates and signs an authentication request / response
    * @param authArgs - Authentication  creation attributes
    * @param pass - Password to decrypt the vaulted seed
+   * @param receivedJWT - optional received authentication JSONWebToken Class
    * @returns {Object} -  Instance of Authentication class
   */
 
-  private createAuth = async (authArgs: IAuthenticationAttrs, pass: string) => {
+  private createAuth = async (authArgs: IAuthenticationAttrs, pass: string, receivedJWT?: JSONWebToken<Authentication>) => {
     const authenticationReq = Authentication.fromJSON(authArgs)
     const jwt = JSONWebToken.fromJWTEncodable(authenticationReq)
-    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass)
+    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
   }
 
   /*
    * @description - Creates and signs a credential offer request / response
    * @param credOffer - Credential offer creation attributes
    * @param pass - Password to decrypt the vaulted seed
+   * @param receivedJWT - optional received credential offer JSONWebToken Class
    * @returns {Object} -  Instance of CredentialOffer class
   */
 
-  private createCredOffer = async (credOffer: ICredentialOfferCreationAttrs, pass: string) => {
+  private createCredOffer = async (credOffer: ICredentialOfferCreationAttrs, pass: string, receivedJWT?: JSONWebToken<CredentialOffer>) => {
     const offer = CredentialOffer.fromJSON(credOffer)
     const jwt = JSONWebToken.fromJWTEncodable(offer)
-    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass)
+    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
   }
 
   /*
@@ -134,27 +136,32 @@ export class IdentityWallet {
    * @description - Creates and signs a credential response
    * @param credResp - Credential response creation attributes
    * @param pass - Password to decrypt the vaulted seed
+   * @param receivedJWT - received credential request JSONWebToken Class
    * @returns {Object} -  Instance of credential response class
   */
 
-  private createCredResp = async (credResp: ICredentialResponseAttrs, pass: string) => {
+  private createCredResp = async (credResp: ICredentialResponseAttrs, pass: string, receivedJWT: JSONWebToken<CredentialResponse>) => {
     const credentialResponse = CredentialResponse.fromJSON(credResp)
     const jwt = JSONWebToken.fromJWTEncodable(credentialResponse)
-    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass)
+    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
   }
 
   /*
    * @description - Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
-   * @param jwt - JSONWebRToken Class
+   * @param jwt - JSONWebToken Class
    * @param derivationPath - Derivation Path for identity keys
    * @param pass - Password to decrypt the vaulted seed
+   * @param receivedJWT - optional received JSONWebToken Class
    * @returns {Object} -  Instance of JWT class which is initialized and has a signature
   */
 
-  private async initializeAndSign<T extends JWTEncodable>(jwt: JSONWebToken<T>, derivationPath: string, pass: string) {
+  private async initializeAndSign<T extends JWTEncodable>(jwt: JSONWebToken<T>, derivationPath: string, pass: string, receivedJWT?: JSONWebToken<T>) {
     jwt.setTokenTimeStamps()
     jwt.setTokenIssuer(this.getKeyId())
     jwt.setTokenType(InteractionType.CredentialRequest)
+
+    receivedJWT ? jwt.setTokenAudience(receivedJWT.getIssuer()) : null
+    receivedJWT ? jwt.setTokenNonce(receivedJWT.getTokenNonce()) : jwt.setTokenNonce(Math.random().toString(36))
 
     const signature = await this.vaultedKeyProvider.signDigestable({ derivationPath, encryptionPass: pass }, jwt)
     jwt.setSignature(signature.toString('hex'))
