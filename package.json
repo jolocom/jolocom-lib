@@ -78,7 +78,7 @@
     "@types/mocha": "^2.2.43",
     "@types/node": "^9.4.0",
     "chai": "^4.1.2",
-    "ganache-cli": "^6.1.6",
+    "ganache-core": "^2.2.1",
     "ipfsd-ctl": "^0.39.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.0.0",
