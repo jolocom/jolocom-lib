@@ -7,7 +7,6 @@ export interface ILinkedDataSignature extends IDigestable {
   setSignatureValue: (signatureValue: string) => void
   setCreationDate: (creation: Date) => void
   toJSON: () => ILinkedDataSignatureAttrs
-  fromJSON: (json: ILinkedDataSignatureAttrs) => ILinkedDataSignature
 }
 
 export interface IDigestable {
