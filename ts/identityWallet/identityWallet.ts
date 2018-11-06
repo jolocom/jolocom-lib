@@ -148,7 +148,7 @@ export class IdentityWallet {
    * @param jwt - JSONWebRToken Class
    * @param derivationPath - Derivation Path for identity keys
    * @param pass - Password to decrypt the vaulted seed
-   * @returns {Object} -  Instance of credential response class
+   * @returns {Object} -  Instance of JWT class which is initialized and has a signature
   */
 
   private async initializeAndSign<T extends JWTEncodable>(jwt: JSONWebToken<T>, derivationPath: string, pass: string) {

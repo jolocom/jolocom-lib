@@ -8,12 +8,13 @@ import { simpleCredRequestJSON } from '../data/interactionTokens/credentialReque
 import {
   signedSimpleCredReqJWT,
   encodedSimpleCredReqJWT,
+  expiredEncodedSimpleCredReqJWT,
   hashedSimpleCredReqJWT,
 } from '../data/interactionTokens/jsonWebToken.data'
 import { InteractionType } from '../../ts/interactionTokens/types'
 chai.use(sinonChai)
 
-describe('JSONWebToken', () => {
+describe.only('JSONWebToken', () => {
   let clock
   let sandbox
   const credReq = CredentialRequest.fromJSON(simpleCredRequestJSON)
@@ -89,6 +90,7 @@ describe('JSONWebToken', () => {
     const decodedJWT = JSONWebToken.decode(encodedSimpleCredReqJWT)
     expect(decodedJWT).to.deep.eq(referenceJWT)
   })
+
   it('Should implement encode', () => {
     const jwt = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
     expect(jwt.encode()).to.deep.eq(encodedSimpleCredReqJWT)
@@ -98,5 +100,10 @@ describe('JSONWebToken', () => {
     const jwt = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
     const digest = await jwt.digest()
     expect(digest.toString('hex')).to.eq(hashedSimpleCredReqJWT)
+  })
+
+  it('Should thow error on expired JWT during decode', () => {
+    signedSimpleCredReqJWT.payload.exp = 0
+    expect(() => JSONWebToken.decode(expiredEncodedSimpleCredReqJWT)).to.throw('Token expired')
   })
 })
