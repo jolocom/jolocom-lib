@@ -10,7 +10,7 @@
     "prepublish": "yarn clean; tsc -p ./tsconfig.json",
     "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
     "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
-    "test:integration": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts ./tests/integration/index.ts"
+    "test:integration": "mocha --opts ./mocha.opts ./tests/integration/integration.ts"
   },
   "nyc": {
     "include": [

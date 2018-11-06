@@ -11,7 +11,7 @@
         "sourceMap": true,
         "suppressImplicitAnyIndexErrors": true,
         "outDir": "./js/",
-        "rootDir": "./tests",
+        "rootDir": "./ts",
         "experimentalDecorators": true
     },
     "filesGlob": [
@@ -19,6 +19,7 @@
         "!./node_modules/**/*.ts"
     ],
     "exclude": [
-        "./js"
+        "./js",
+        "./tests/**/*"
     ]
 }
