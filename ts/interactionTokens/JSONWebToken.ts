@@ -13,13 +13,15 @@ import { CredentialsReceive } from './credentialsReceive'
 
 /* Local interfaces / types to save on typing later */
 
-export type JWTEncodable = CredentialResponse | CredentialRequest | Authentication | CredentialOffer
+export type JWTEncodable = CredentialResponse | CredentialRequest | Authentication | CredentialOffer | CredentialsReceive
+
 interface IJWTEncodable {
   [key: string]: any
 }
 
 interface IPayloadSection<T> {
   iat?: number
+  exp?: number
   iss?: string
   typ?: InteractionType
   interactionToken?: T
@@ -29,6 +31,7 @@ interface TransformArgs {
   interactionToken: IJWTEncodable
   typ: InteractionType
   iat: Date
+  exp: Date
   iss: string
 }
 
@@ -53,10 +56,8 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
   */
 
   @Transform(value => convertPayload(value), { toClassOnly: true })
-  private payload: IPayloadSection<T> = {
-    iat: Date.now(),
-  }
-
+  private payload: IPayloadSection<T> = {}
+  
   /*
    * In case we are parsing a JWT with no signature, default to empty Buffer
    * In case sig is undefined on instance and we run toJSON, default to empty string
@@ -74,6 +75,10 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     return this.payload.iat
   }
 
+  public getExpirationTime(): number {
+    return this.payload.exp
+  }
+
   public getInteractionToken() {
     return this.payload.interactionToken
   }
@@ -83,7 +88,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
   }
 
   /*
-   * @description - Instantiates the class and stores the passed interaction token as a memger
+   * @description - Instantiates the class and stores the passed interaction token as a member
    * @param toEncode - An instance of a class encodable as a JWT, e.g. credential request
    * @returns {Object} - A json web token instance
   */
@@ -92,6 +97,11 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     const jwt = new JSONWebToken<T>()
     jwt.setTokenContent(toEncode)
     return jwt
+  }
+
+  public setTokenTimeStamps() {
+    this.payload.iat = Date.now()
+    this.payload.exp = Date.now() + 3600000
   }
 
   public setTokenIssuer(iss: string) {
@@ -117,7 +127,14 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
   */
 
   public static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T> {
-    return JSONWebToken.fromJSON(decodeToken(jwt))
+    const jwtClass = JSONWebToken.fromJSON(decodeToken(jwt))
+    const validTimePeriod = jwtClass.getExpirationTime() - jwtClass.getIssueTime() > 1
+
+    if (!validTimePeriod) {
+      throw new Error('Token expired')
+    }
+
+    return jwtClass as JSONWebToken<T>
   }
 
   /*
@@ -158,11 +175,11 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 }
 
 /*
-   * @description - Instantiates a specific interaction class based on a key in the received JSON
-   * @param payload - Interaction token in JSON form
-   * @param typ - Interaction type
-   * @returns {Object} - Instantiated class based on defined map
-  */
+  * @description - Instantiates a specific interaction class based on a key in the received JSON
+  * @param payload - Interaction token in JSON form
+  * @param typ - Interaction type
+  * @returns {Object} - Instantiated class based on defined map
+*/
 
 const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: InteractionType): T => {
   const payloadParserMap = {

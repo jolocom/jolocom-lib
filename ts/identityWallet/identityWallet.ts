@@ -144,13 +144,15 @@ export class IdentityWallet {
   }
 
   /*
-   * @description - Creates and signs a credential response
-   * @param credResp - Credential response creation attributes
+   * @description - Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
+   * @param jwt - JSONWebRToken Class
+   * @param derivationPath - Derivation Path for identity keys
    * @param pass - Password to decrypt the vaulted seed
    * @returns {Object} -  Instance of credential response class
   */
 
   private async initializeAndSign<T extends JWTEncodable>(jwt: JSONWebToken<T>, derivationPath: string, pass: string) {
+    jwt.setTokenTimeStamps()
     jwt.setTokenIssuer(this.getKeyId())
     jwt.setTokenType(InteractionType.CredentialRequest)
 

@@ -24,12 +24,6 @@ const stubbedKeyProvider = {
   signDigestable: sinon.stub().callsFake(attributes => Buffer.from(signedSimpleCredReqJWT.signature, 'hex')),
 } as IVaultedKeyProvider
 
-const stubbedFromJWTEncodable = args => {
-  const jwt = new JSONWebToken()
-  jwt.setTokenContent(args)
-  return jwt
-}
-
 const stubbedCredential = {
   setSignatureValue: value => {
     expect(value).to.eq(signedSimpleCredReqJWT.signature)
@@ -61,11 +55,11 @@ describe('IdentityWallet', () => {
   describe('create', () => {
     const sandbox = sinon.createSandbox()
     let stubCredCreate
-    let stubFromJWTEncodable
+    let spyFromJWTEncodable
 
     before(() => {
       stubCredCreate = sandbox.stub(SignedCredential, 'create').callsFake(() => stubbedCredential)
-      stubFromJWTEncodable = sandbox.stub(JSONWebToken, 'fromJWTEncodable').callsFake(stubbedFromJWTEncodable)
+      spyFromJWTEncodable = sandbox.spy(JSONWebToken, 'fromJWTEncodable')
     })
 
     afterEach(() => {
@@ -104,8 +98,8 @@ describe('IdentityWallet', () => {
 
     it('Should attempt to create an interaction token', async () => {
       await iw.create.interactionTokens.request.share(simpleCredRequestJSON, encryptionPass)
-      sandbox.assert.calledOnce(stubFromJWTEncodable)
-      sandbox.assert.calledWith(stubFromJWTEncodable, CredentialRequest.fromJSON(simpleCredRequestJSON))
+      sandbox.assert.calledOnce(spyFromJWTEncodable)
+      sandbox.assert.calledWith(spyFromJWTEncodable, CredentialRequest.fromJSON(simpleCredRequestJSON))
     })
   })
 })

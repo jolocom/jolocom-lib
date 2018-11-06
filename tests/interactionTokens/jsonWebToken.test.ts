@@ -20,7 +20,7 @@ describe('JSONWebToken', () => {
 
   /* Saves some typing later */
 
-  const { iss, typ, iat } = signedSimpleCredReqJWT.payload
+  const { iss, typ, iat, exp } = signedSimpleCredReqJWT.payload
   const { signature, payload } = signedSimpleCredReqJWT
 
   before(() => {
@@ -42,6 +42,8 @@ describe('JSONWebToken', () => {
     const unsignedPayload = { ...payload, iat: 0 }
     delete unsignedPayload.typ
     delete unsignedPayload.iss
+    delete unsignedPayload.exp
+    delete unsignedPayload.iat
 
     const simplified = {
       ...signedSimpleCredReqJWT,
@@ -51,6 +53,7 @@ describe('JSONWebToken', () => {
     delete simplified.signature
 
     const jwt = JSONWebToken.fromJWTEncodable(credReq)
+
     expect(jwt.toJSON()).to.deep.eq(simplified)
   })
 
@@ -58,6 +61,7 @@ describe('JSONWebToken', () => {
 
   it('Should implement fromJSON', () => {
     const jwt = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
+
     expect(jwt.getInteractionToken()).to.deep.eq(credReq)
     expect(jwt.getIssuer()).to.eq(iss)
     expect(jwt.getIssueTime()).to.eq(0)
@@ -70,12 +74,14 @@ describe('JSONWebToken', () => {
     jwt.setSignature(signature)
     jwt.setTokenContent(credReq)
     jwt.setTokenIssuer(iss)
+    jwt.setTokenTimeStamps()
     jwt.setTokenType(typ as InteractionType)
 
     expect(jwt.getSignatureValue().toString('hex')).to.eq(signature)
     expect(jwt.getIssuer()).to.eq(iss)
     expect(jwt.getInteractionToken()).to.deep.eq(credReq)
     expect(jwt.getIssueTime()).to.eq(iat)
+    expect(jwt.getExpirationTime()).to.eq(exp)
   })
 
   it('Should implement static decode', () => {
