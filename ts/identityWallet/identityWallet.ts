@@ -14,8 +14,9 @@ import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { IVaultedKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types'
-import { keyIdToDid } from '../utils/helper'
+import { keyIdToDid, getIssuerPublicKey, handleValidationStatus } from '../utils/helper'
 import { generateRandomID } from '../utils/crypto'
+import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
 
 /*
  * Developer facing class with initialized instance of the key provider as member.
@@ -168,6 +169,16 @@ export class IdentityWallet {
     jwt.setSignature(signature.toString('hex'))
 
     return jwt
+  }
+
+  public async validateJWT<T extends JWTEncodable>(jwtReceived: JSONWebToken<T>, customRegistry?: JolocomRegistry, jwtSend?: JSONWebToken<T>): Promise<void> {
+    const registry = customRegistry || createJolocomRegistry()
+    const ddo = await registry.resolve(keyIdToDid(jwtReceived.getIssuer()))
+    const pubKey  = getIssuerPublicKey(jwtReceived.getIssuer(), ddo.getDidDocument())
+    
+    handleValidationStatus(await this.vaultedKeyProvider.verifyDigestable(pubKey, jwtReceived), 'sig')
+    jwtSend && handleValidationStatus(jwtReceived.getAudience() === this.identity.getDid(), 'aud')
+    jwtSend && handleValidationStatus(jwtSend.getTokenNonce() === jwtReceived.getTokenNonce(), 'nonce')
   }
 
   /* Gathering creation methods in an easier to use public interface */

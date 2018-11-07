@@ -15,7 +15,7 @@ import { InteractionType } from '../../ts/interactionTokens/types'
 import { mockDid } from '../data/didDocument.data'
 chai.use(sinonChai)
 
-describe('JSONWebToken', () => {
+describe.only('JSONWebToken', () => {
   let clock
   let sandbox
   const credReq = CredentialRequest.fromJSON(simpleCredRequestJSON)

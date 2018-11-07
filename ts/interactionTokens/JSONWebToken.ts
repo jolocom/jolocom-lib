@@ -10,6 +10,7 @@ import { CredentialResponse } from './credentialResponse'
 import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
 import { CredentialsReceive } from './credentialsReceive'
+import { handleValidationStatus } from '../utils/helper'
 
 /* Local interfaces / types to save on typing later */
 
@@ -153,10 +154,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
   public static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T> {
     const jwtClass = JSONWebToken.fromJSON(decodeToken(jwt))
-
-    if (jwtClass.getExpirationTime() < Date.now() + 1) {
-      throw new Error('Token expired')
-    }
+    handleValidationStatus((jwtClass.getExpirationTime() - 1 > Date.now()), 'exp')
 
     return jwtClass as JSONWebToken<T>
   }
