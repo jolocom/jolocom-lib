@@ -2,217 +2,110 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
-import { testPrivateIdentityKey } from '../data/keys'
-import { DidDocument } from '../../ts/identity/didDocument'
-import { claimsMetadata } from '../../ts/index'
-import { singleClaimCreationArgs, singleClaimCredentialJSON } from '../data/credential/credential'
 import { Credential } from '../../ts/credentials/credential/credential'
-import { testSignedCred, testSubject } from '../data/identityWallet'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
-import { CredentialRequestPayload } from '../../ts/interactionFlows/credentialRequest/credentialRequestPayload'
-import { CredentialRequest } from '../../ts/interactionFlows/credentialRequest/credentialRequest'
-import { credentialRequestPayloadJson } from '../data/interactionFlows/credentialRequest'
-import { AuthenticationPayload } from '../../ts/interactionFlows/authentication/authenticationPayload'
-import { Authentication } from '../../ts/interactionFlows/authentication/authentication'
-import { jsonAuthPayload } from '../data/interactionFlows/authentication'
-import { CredentialsReceivePayload } from '../../ts/interactionFlows/credentialsReceive/credentialsReceivePayload'
-import { CredentialsReceive } from '../../ts/interactionFlows/credentialsReceive/credentialsReceive'
-import { jsonCredReceivePayload } from '../data/interactionFlows/credentialReceive'
-import { CredentialOffer } from '../../ts/interactionFlows/credentialOfferRequest/credentialOffer'
-import {
-  credOfferRequestPayloadCreateArgs,
-  credOfferResponsePayloadCreateArgs
-} from '../data/interactionFlows/credentialOffer'
-import {
-  CredentialOfferRequestPayload
-} from '../../ts/interactionFlows/credentialOfferRequest/credentialOfferRequestPayload'
-import {
-  CredentialOfferResponsePayload
-} from '../../ts/interactionFlows/credentialOfferResponse/credentialOfferResponsePayload'
+import { didDocumentJSON, mockKeyId, mockDid } from '../data/didDocument.data'
+import { IVaultedKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
+import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
+import { mockNameCredCreationAttrs } from '../data/credential/credential.data'
+import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
+import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
+import { DidDocument } from '../../ts/identity/didDocument/didDocument'
+import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
+import { signedSimpleCredReqJWT } from '../data/interactionTokens/jsonWebToken.data'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
+/* Saves some space during stubbing, helper functions */
+
+const stubbedKeyProvider = {
+  signDigestable: sinon.stub().callsFake(attributes => Buffer.from(signedSimpleCredReqJWT.signature, 'hex')),
+} as IVaultedKeyProvider
+
+const stubbedFromJWTEncodable = args => {
+  const jwt = new JSONWebToken()
+  jwt.setTokenContent(args)
+  return jwt
+}
+
+const stubbedCredential = {
+  setSignatureValue: value => {
+    expect(value).to.eq(signedSimpleCredReqJWT.signature)
+  },
+}
+
 describe('IdentityWallet', () => {
-  const sandbox = sinon.createSandbox()
-  let ddo
-  let identity
-  let identityWallet
-  let clock
+  const encryptionPass = 'secret'
+  const didDocument = DidDocument.fromJSON(didDocumentJSON)
+  const identity = Identity.fromDidDocument({ didDocument })
 
-  before(async () => {
-    clock = sinon.useFakeTimers()
-    ddo = await new DidDocument().fromPrivateKey(testPrivateIdentityKey)
-    identity = Identity.create({ didDocument: ddo.toJSON() })
-    identityWallet = IdentityWallet.create({
-      privateIdentityKey: testPrivateIdentityKey,
-      identity
-    })
-  })
+  let iw: IdentityWallet
 
-  after(() => {
-    clock.restore()
-  })
+  describe('constructor', () => {
+    it('Should correctly initialize', () => {
+      iw = new IdentityWallet({
+        identity,
+        vaultedKeyProvider: stubbedKeyProvider,
+        publicKeyMetadata: {
+          derivationPath: KeyTypes.jolocomIdentityKey,
+          keyId: mockKeyId,
+        },
+      })
 
-  describe('static create', () => {
-    let create
-    let iWallet: IdentityWallet
-    before(() => {
-      create = sandbox.spy(IdentityWallet, 'create')
-      iWallet = IdentityWallet.create({ privateIdentityKey: testPrivateIdentityKey, identity })
-    })
-
-    after(() => {
-      sandbox.restore()
-    })
-
-    it('should be correctly called with correct arguments ', () => {
-      sandbox.assert.calledOnce(create)
-      sandbox.assert.calledWith(create, { privateIdentityKey: testPrivateIdentityKey, identity })
-    })
-
-    it('should correctly return an instance of identityWallet', () => {
-      expect(iWallet).to.be.instanceof(IdentityWallet)
-    })
-
-    it('should expose properties key and id on identityWallet.privateIdentityKey', () => {
-      expect(Object.keys((iWallet as any).privateIdentityKey)).to.deep.equal([
-        'key',
-        'id'
-      ])
+      expect(iw.getDid()).to.eq(mockDid)
     })
   })
 
   describe('create', () => {
-    it('should expose credential, signedCredential & JWT options', () => {
-      const mockProps = [
-        'credential',
-        'signedCredential',
-        'credentialRequestJSONWebToken',
-        'credentialResponseJSONWebToken',
-        'authenticationJSONWebToken',
-        'credentialsReceiveJSONWebToken',
-        'credentialOfferRequestJSONWebToken',
-        'credentialOfferResponseJSONWebToken'
-      ]
-
-      expect(Object.keys(identityWallet.create)).to.deep.equal(mockProps)
-    })
-
-    it('create.credential should return a correct credential', () => {
-      const credential = identityWallet.create.credential({
-        metadata: claimsMetadata.emailAddress,
-        claim: singleClaimCreationArgs,
-        subject: 'did:jolo:test'
-      })
-      const credentialFromJSON = Credential.fromJSON(singleClaimCredentialJSON)
-
-      expect(credential).to.deep.equal(credentialFromJSON)
-    })
-
-    it('create.credentialRequestJSONWebToken should return a correct credentialRequest JWT', () => {
-      const credRequestJWT = identityWallet.create.credentialRequestJSONWebToken(credentialRequestPayloadJson)
-      const credRequestPayload = credRequestJWT.getPayload()
-
-      expect(credRequestPayload).to.be.an.instanceof(CredentialRequestPayload)
-      expect(credRequestPayload.credentialRequest).to.be.an.instanceof(CredentialRequest)
-    })
-
-    it('create.authenticationJSONWebToken should return a correct authentication JWT', () => {
-      const authJWT = identityWallet.create.authenticationJSONWebToken(jsonAuthPayload)
-      const authPayload = authJWT.getPayload()
-
-      expect(authPayload).to.be.an.instanceof(AuthenticationPayload)
-      expect(authPayload.authentication).to.be.an.instanceof(Authentication)
-    })
-
-    it('create.credentialReceiveJSONWebToken should return a correct credentialsReceive JWT', () => {
-      const credReceiveJWT = identityWallet.create.credentialsReceiveJSONWebToken(jsonCredReceivePayload)
-      const credReceivePayload = credReceiveJWT.getPayload()
-
-      expect(credReceivePayload).to.be.an.instanceof(CredentialsReceivePayload)
-      expect(credReceivePayload.credentialsReceive).to.be.an.instanceof(CredentialsReceive)
-    })
-
-    it('create.credentialOfferRequestJSONWebToken should return a correct credentialOfferRequest JWT', () => {
-      const credOfferReqJWT = identityWallet.create
-        .credentialOfferRequestJSONWebToken(credOfferRequestPayloadCreateArgs)
-      const credOfferRequestPayload = credOfferReqJWT.getPayload()
-
-      expect(credOfferRequestPayload).to.be.an.instanceof(CredentialOfferRequestPayload)
-      expect(credOfferRequestPayload.credentialOffer).to.be.an.instanceof(CredentialOffer)
-    })
-
-    it('create.credentialOfferResponseJSONWebToken should return a correct credentialOfferResponse JWT', () => {
-      const credOfferResJWT = identityWallet.create
-        .credentialOfferResponseJSONWebToken(credOfferResponsePayloadCreateArgs)
-      const credOfferResponsePayload = credOfferResJWT.getPayload()
-
-      expect(credOfferResponsePayload).to.be.an.instanceof(CredentialOfferResponsePayload)
-      expect(credOfferResponsePayload.credentialOffer).to.be.an.instanceof(CredentialOffer)
-    })
-
-    it('create.signedCredential should return a correct signed credential', async () => {
-      const credAttr = { metadata: claimsMetadata.emailAddress, claim: singleClaimCreationArgs, subject: testSubject }
-      const signedCred = await identityWallet.create.signedCredential(credAttr)
-      const mockSignedCred = SignedCredential.fromJSON(testSignedCred)
-
-      expect(signedCred.getIssuer()).to.deep.equal(mockSignedCred.getIssuer())
-      expect(signedCred.getCredentialSection()).to.deep.equal(mockSignedCred.getCredentialSection())
-      expect(signedCred.getType()).to.deep.equal(mockSignedCred.getType())
-    })
-  })
-
-  describe('sign', () => {
-    let signCredential
-    let iWallet
+    const sandbox = sinon.createSandbox()
+    let stubCredCreate
+    let stubFromJWTEncodable
 
     before(() => {
-      signCredential = sandbox.spy(IdentityWallet.prototype, 'signCredential')
-      iWallet = IdentityWallet.create({
-        privateIdentityKey: testPrivateIdentityKey,
-        identity
-      })
+      stubCredCreate = sandbox.stub(SignedCredential, 'create').callsFake(() => stubbedCredential)
+      stubFromJWTEncodable = sandbox.stub(JSONWebToken, 'fromJWTEncodable').callsFake(stubbedFromJWTEncodable)
+    })
+
+    afterEach(() => {
+      sandbox.resetHistory()
     })
 
     after(() => {
       sandbox.restore()
     })
 
-    it('sign.credential should call signCredential with correct params', () => {
-      const credential = iWallet.create.credential({
-        metadata: claimsMetadata.emailAddress,
-        claim: singleClaimCreationArgs,
-        subject: testSubject
-      })
-      iWallet.sign.credential(credential)
+    it('Should expose aggregated creation methods', () => {
+      const categories = ['credential', 'signedCredential', 'interactionTokens']
+      const flowTypes = ['request', 'response']
+      const tokenTypes = ['auth', 'offer', 'share']
 
-      sandbox.assert.calledOnce(signCredential)
-      sandbox.assert.calledWith(signCredential, credential)
+      expect(Object.keys(iw.create)).to.deep.eq(categories)
+      expect(Object.keys(iw.create.interactionTokens)).to.deep.eq(flowTypes)
+      expect(Object.keys(iw.create.interactionTokens.request)).to.deep.eq(tokenTypes)
+      expect(Object.keys(iw.create.interactionTokens.response)).to.deep.eq(tokenTypes)
     })
-  })
 
-  describe('getter and setter for Identity', () => {
-    it('getIdentity should return a correct instance of identity class ', () => {
-      expect(identityWallet.getIdentity()).to.be.instanceof(Identity)
+    /* A bit hacky, but deep eq for functions is tricky. Should work most of the time */
+
+    it('Should attempt to create credential', () => {
+      expect(iw.create.credential.toString()).to.eq(Credential.create.toString())
     })
-  })
 
-  describe('signCredential', () => {
+    it('Should attempt to create signedCredential', async () => {
+      await iw.create.signedCredential(mockNameCredCreationAttrs, encryptionPass)
 
-    it('should return a correct signed credential', async () => {
-      const credential = identityWallet.create.credential({
-        metadata: claimsMetadata.emailAddress,
-        claim: singleClaimCreationArgs,
-        subject: testSubject
-      })
-      const signedCred = await identityWallet.signCredential(credential)
-      const mockSignedCred = SignedCredential.fromJSON(testSignedCred)
+      sandbox.assert.calledOnce(stubCredCreate)
+      sandbox.assert.calledWith(stubCredCreate, mockNameCredCreationAttrs)
+    })
 
-      expect(signedCred.getIssuer()).to.deep.equal(mockSignedCred.getIssuer())
-      expect(signedCred.getCredentialSection()).to.deep.equal(mockSignedCred.getCredentialSection())
-      expect(signedCred.getType()).to.deep.equal(mockSignedCred.getType())
+    /* All interaction tokens follow the same flow. Would still be good to cover all cases in the future. */
+
+    it('Should attempt to create an interaction token', async () => {
+      await iw.create.interactionTokens.request.share(simpleCredRequestJSON, encryptionPass)
+      sandbox.assert.calledOnce(stubFromJWTEncodable)
+      sandbox.assert.calledWith(stubFromJWTEncodable, CredentialRequest.fromJSON(simpleCredRequestJSON))
     })
   })
 })

@@ -1,9 +1,8 @@
-import { SSO } from '../../ts/sso/'
+import { SSO } from '../../ts/sso/sso'
 import * as chai from 'chai'
 const expect = chai.expect
 
 describe('SSO class', () => {
-
   describe('JWTtoQR', () => {
     const jwtString = 'ajfknvjgaknkltrgm;laref,el;fced'
     const sso = new SSO()

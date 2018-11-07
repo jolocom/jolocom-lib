@@ -1,11 +1,7 @@
 import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
-
-export interface IRegistryInstanceCreationArgs {
-  privateIdentityKey: Buffer
-  privateEthereumKey: Buffer
-}
+import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/softwareProvider'
 
 export interface IRegistryStaticCreationArgs {
   ipfsConnector: IIpfsConnector
@@ -13,15 +9,10 @@ export interface IRegistryStaticCreationArgs {
 }
 
 export interface IRegistryCommitArgs {
-  wallet: IdentityWallet,
-  privateEthereumKey: Buffer
+  vaultedKeyProvider: IVaultedKeyProvider
+  keyMetadata: IKeyDerivationArgs
+  identityWallet: IdentityWallet
 }
-
-export interface IVerifiable {
-  validateSignatureWithPublicKey: (pubKey: Buffer) => Promise<boolean>
-  getSigner: () => ISigner
-}
-
 export interface ISigner {
   did: string
   keyId: string

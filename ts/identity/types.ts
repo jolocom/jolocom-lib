@@ -1,7 +1,7 @@
-import { IDidDocumentAttrs } from './didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
+import { DidDocument } from './didDocument/didDocument'
 
 export interface IIdentityCreateArgs {
-  didDocument: IDidDocumentAttrs
-  profile?: SignedCredential
+  didDocument: DidDocument
+  publicProfile?: SignedCredential
 }

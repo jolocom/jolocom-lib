@@ -1,9 +1,17 @@
-export interface ILinkedDataSignature {
-  digest: () => Promise<string>
-  getSigValue: () => Buffer
-  getProofSectionType: () => string
+export interface ILinkedDataSignature extends IDigestable {
+  getCreator: () => string
+  getNonce: () => string
+  getCreationDate: () => Date
+  setCreator: (creator: string) => void
+  setNonce: (nonce: string) => void
+  setSignatureValue: (signatureValue: string) => void
+  setCreationDate: (creation: Date) => void
   toJSON: () => ILinkedDataSignatureAttrs
-  fromJSON: (json: ILinkedDataSignatureAttrs) => ILinkedDataSignature
+}
+
+export interface IDigestable {
+  getSignatureValue: () => Buffer
+  digest: () => Promise<Buffer>
 }
 
 export interface ILinkedDataSignatureAttrs {
@@ -12,9 +20,4 @@ export interface ILinkedDataSignatureAttrs {
   creator: string
   nonce: string
   signatureValue: string
-}
-
-export enum proofTypes {
-  proofSet = 'proofSet',
-  proofChain = 'proofChain'
 }

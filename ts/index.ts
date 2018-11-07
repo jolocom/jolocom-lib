@@ -1,19 +1,18 @@
 import 'reflect-metadata'
-import { parse } from './parse/parser'
-import { Credential } from './credentials/credential/credential'
+import { parse } from './parse/parse'
 import { registries } from './registries'
-import { IdentityManager, KeyTypes } from './identityManager/identityManager'
+import { SoftwareKeyProvider } from './vaultedKeyProvider/softwareProvider'
+import { KeyTypes } from './vaultedKeyProvider/types'
+import { constraintFunctions } from './interactionTokens/credentialRequest'
 
 export const JolocomLib = {
   parse,
-  registry : registries,
-  identityManager : {
-    create: IdentityManager.create
+  registries,
+  keyProvider: SoftwareKeyProvider,
+  util: {
+    constraintFunctions: constraintFunctions
   },
-  unsigned : {
-    createCredential: Credential.create,
-  },
-  KeyTypes
+  KeyTypes,
 }
 
 export { claimsMetadata } from 'cred-types-jolocom-core'
