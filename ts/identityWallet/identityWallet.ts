@@ -114,7 +114,7 @@ export class IdentityWallet {
    * @returns {Object} -  Instance of CredentialOffer class
   */
 
-  private createCredOffer = async (credOffer: ICredentialOfferCreationAttrs, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>) => {
+  private createCredOffer = async (credOffer: ICredentialOfferAttrs, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>) => {
     const offer = CredentialOffer.fromJSON(credOffer)
     const jwt = JSONWebToken.fromJWTEncodable(offer)
     return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
