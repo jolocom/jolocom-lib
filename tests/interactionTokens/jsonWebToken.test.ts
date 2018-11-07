@@ -76,7 +76,7 @@ describe('JSONWebToken', () => {
     jwt.setSignature(signature)
     jwt.setTokenContent(credReq)
     jwt.setTokenIssuer(iss)
-    jwt.setTokenTimeStamps()
+    jwt.setIssueAndExpiryTime()
     jwt.setTokenNonce(nonce)
     jwt.setTokenAudience('did:jolo:testauddid')
     jwt.setTokenType(typ as InteractionType)

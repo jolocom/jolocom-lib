@@ -111,9 +111,14 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     return jwt
   }
 
-  public setTokenTimeStamps() {
+  /*
+   * @description - Populates the token issued and exiry times, expiry defaults to 1 hr
+   * @returns {void}
+  */
+
+  public setIssueAndExpiryTime() {
     this.payload.iat = Date.now()
-    this.payload.exp = Date.now() + 3600000
+    this.payload.exp = this.payload.iat + 3600000
   }
 
   public setTokenNonce(nonce: string) {

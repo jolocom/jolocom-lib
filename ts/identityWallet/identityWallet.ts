@@ -157,7 +157,7 @@ export class IdentityWallet {
   */
 
   private async initializeAndSign<T extends JWTEncodable>(jwt: JSONWebToken<T>, derivationPath: string, pass: string, receivedJWT?: JSONWebToken<T>) {
-    jwt.setTokenTimeStamps()
+    jwt.setIssueAndExpiryTime()
     jwt.setTokenIssuer(this.getKeyId())
     jwt.setTokenType(InteractionType.CredentialRequest)
 
