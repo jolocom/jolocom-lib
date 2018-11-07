@@ -10,7 +10,8 @@ export function getIssuerPublicKey(keyId: string, ddo: DidDocument): Buffer {
   const relevantPubKey = ddo.getPublicKeySections().map((keySection) => {
     if (keySection.getIdentifier() === keyId) { return keySection.getPublicKeyHex() }
   })
-  return Buffer.from(relevantPubKey[0])
+
+  return Buffer.from(relevantPubKey[0], 'hex')
 }
 
 export function handleValidationStatus(status: boolean, key: string) {
@@ -21,7 +22,6 @@ export function handleValidationStatus(status: boolean, key: string) {
       return
   }
 }
-
 
 export enum ErrorKeys {
   exp = 'Token expired',
