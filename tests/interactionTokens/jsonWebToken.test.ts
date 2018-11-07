@@ -12,6 +12,7 @@ import {
   hashedSimpleCredReqJWT,
 } from '../data/interactionTokens/jsonWebToken.data'
 import { InteractionType } from '../../ts/interactionTokens/types'
+import { mockDid } from '../data/didDocument.data'
 chai.use(sinonChai)
 
 describe('JSONWebToken', () => {
@@ -78,7 +79,7 @@ describe('JSONWebToken', () => {
     jwt.setTokenIssuer(iss)
     jwt.setIssueAndExpiryTime()
     jwt.setTokenNonce(nonce)
-    jwt.setTokenAudience('did:jolo:testauddid')
+    jwt.setTokenAudience(mockDid)
     jwt.setTokenType(typ as InteractionType)
 
     expect(jwt.getSignatureValue().toString('hex')).to.eq(signature)
@@ -86,7 +87,7 @@ describe('JSONWebToken', () => {
     expect(jwt.getInteractionToken()).to.deep.eq(credReq)
     expect(jwt.getIssueTime()).to.eq(iat)
     expect(jwt.getExpirationTime()).to.eq(exp)
-    expect(jwt.getAudience()).to.eq('did:jolo:testauddid')
+    expect(jwt.getAudience()).to.eq(mockDid)
     expect(jwt.getTokenNonce()).to.eq(nonce)
   })
 
@@ -108,7 +109,6 @@ describe('JSONWebToken', () => {
   })
 
   it('Should thow error on expired JWT during decode', () => {
-    signedSimpleCredReqJWT.payload.exp = 0
     expect(() => JSONWebToken.decode(expiredEncodedSimpleCredReqJWT)).to.throw('Token expired')
   })
 })

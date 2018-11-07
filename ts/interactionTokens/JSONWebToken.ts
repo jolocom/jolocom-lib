@@ -153,9 +153,8 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
   public static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T> {
     const jwtClass = JSONWebToken.fromJSON(decodeToken(jwt))
-    const validTimePeriod = jwtClass.getExpirationTime() - jwtClass.getIssueTime() > 1
 
-    if (!validTimePeriod) {
+    if (jwtClass.getExpirationTime() < Date.now() + 1) {
       throw new Error('Token expired')
     }
 
