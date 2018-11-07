@@ -11,15 +11,6 @@ export interface ICredentialOfferAttrs {
   }
 }
 
-export interface ICredentialOfferCreationAttrs {
-  challenge: string
-  callbackURL: string
-  instant: boolean
-  requestedInput: {
-    [key: string]: string | null
-  }
-}
-
 export interface ICredentialRequestAttrs {
   callbackURL: string
   credentialRequirements: ICredentialRequest[]

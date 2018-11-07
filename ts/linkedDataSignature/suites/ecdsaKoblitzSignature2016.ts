@@ -11,9 +11,11 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
   public type = 'EcdsaKoblitzSignature2016'
 
   @Expose()
+  @Transform(value => value || '', { toPlainOnly: true })
   private creator: string
 
   @Expose()
+  @Transform(value => value || '', { toPlainOnly: true })
   private nonce: string
 
   /*
@@ -99,7 +101,7 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
     return sha256(Buffer.from(normalized))
   }
 
-  public fromJSON(json: ILinkedDataSignatureAttrs): EcdsaLinkedDataSignature {
+  public static fromJSON(json: ILinkedDataSignatureAttrs): EcdsaLinkedDataSignature {
     return plainToClass(EcdsaLinkedDataSignature, json)
   }
 

@@ -1,5 +1,5 @@
 import { classToPlain, plainToClass, Expose, Exclude } from 'class-transformer'
-import { ICredentialOfferCreationAttrs } from './interactionTokens.types'
+import { ICredentialOfferAttrs } from './interactionTokens.types'
 
 /* Class representing a credential offer. Encodable in JWT */
 
@@ -39,7 +39,7 @@ export class CredentialOffer {
     return classToPlain(this)
   }
 
-  public static fromJSON(json: ICredentialOfferCreationAttrs) {
+  public static fromJSON(json: ICredentialOfferAttrs) {
     return plainToClass(this, json) as CredentialOffer
   }
 }

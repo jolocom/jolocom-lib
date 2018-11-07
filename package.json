@@ -10,7 +10,7 @@
     "prepublish": "yarn clean; tsc -p ./tsconfig.json",
     "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
     "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
-    "test:integration": "./node_modules/.bin/nyc -r lcov -r text ./node_modules/.bin/mocha --opts ./mocha.opts ./tests/integration/index.ts"
+    "test:integration": "mocha --opts ./mocha.opts ./tests/integration/integration.ts"
   },
   "nyc": {
     "include": [
@@ -78,7 +78,7 @@
     "@types/mocha": "^2.2.43",
     "@types/node": "^9.4.0",
     "chai": "^4.1.2",
-    "ganache-cli": "^6.1.6",
+    "ganache-core": "^2.2.1",
     "ipfsd-ctl": "^0.39.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.0.0",
