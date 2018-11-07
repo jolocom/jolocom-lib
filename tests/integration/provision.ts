@@ -18,12 +18,11 @@ const ganacheServer = ganache.server({
 
 const daemonFactory = IPFSFactory.create({ type: 'go' })
 
-
-/*
-  * @description - Helper function to deploy the registry contract on the local eth network
-  * @returns {void} - Would normally return the address of the deployed contract, but we know
-  *   it already since we know the deployer addr, and their account nonce (0)
-*/
+/**
+ * @description - Helper function to deploy the registry contract on the local eth network
+ * @returns {void} - Would normally return the address of the deployed contract, but we know
+ *   it already since we know the deployer addr, and their account nonce (0)
+ */
 
 const deployContract = async () => {
   web3.setProvider(new Web3.providers.HttpProvider(`http://localhost:${PORT}`))
@@ -31,11 +30,11 @@ const deployContract = async () => {
   return registryContract.TestDeployment.deployIdentityContract(web3, deployerAddress)
 }
 
-/*
-  * @description - Helper function to spawn a in process ipfs node
-  * @returns {void} - Once the function is executed, an ipfs endpoint
-  *   available at localhost:5001
-*/
+/**
+ * @description - Helper function to spawn a in process ipfs node
+ * @returns {void} - Once the function is executed, an ipfs endpoint
+ *   available at localhost:5001
+ */
 
 const spawnIpfsNode = async () => {
   return new Promise((resolve, reject) =>
@@ -56,11 +55,11 @@ const spawnIpfsNode = async () => {
   )
 }
 
-/*
-  * @description - Initiates a mock ethereum network using ganache, a discardable ipfs node using ipfsd, and
-  *   deployes the Jolocom identity registry contract.
-  * @returns {void}
-*/
+/**
+ * @description - Initiates a mock ethereum network using ganache, a discardable ipfs node using ipfsd, and
+ *   deployes the Jolocom identity registry contract.
+ * @returns {void}
+ */
 
 export const init = async () =>
   new Promise<string>(async (resolve, reject) => {
