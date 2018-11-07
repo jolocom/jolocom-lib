@@ -5,16 +5,12 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.9
-  code_climate:
 node_js:
   - "8.11.2"
 install: 
   - CC=gcc-4.9 CXX=g++-4.9 yarn install
 before_script:
-  - curl https://dist.ipfs.io/go-ipfs/v0.4.18/go-ipfs_v0.4.18_darwin-amd64.tar.gz > go-ipfs.tar.gz
-  - tar xvfz go-ipfs.tar.gz
-  - cd go-ipfs
-  - sudo bash ./install.sh
+  - npm install -g git://github.com/ipfs/npm-go-ipfs#32acf52
 jobs:
   include:
     - stage: 'Tests'
