@@ -51,34 +51,34 @@ describe('DidDocument', () => {
     const { authentication, proof, publicKey, id, service, created } = didDocumentJSON
 
     it('implements getAuthSections', () => {
-      const jsonForm = referenceDidDocument.getAuthSections().map(auth => auth.toJSON())
+      const jsonForm = referenceDidDocument.authentication.map(auth => auth.toJSON())
       expect(jsonForm).to.deep.eq(authentication)
     }),
       it('implements getPublicKeySections', () => {
-        const jsonForm = referenceDidDocument.getPublicKeySections().map(pub => pub.toJSON())
+        const jsonForm = referenceDidDocument.publicKey.map(pub => pub.toJSON())
         expect(jsonForm).to.deep.eq(publicKey)
       }),
       it('implements getServiceEndpointSections', () => {
-        const jsonForm = referenceDidDocument.getServiceEndpointSections().map(ser => ser.toJSON())
+        const jsonForm = referenceDidDocument.service.map(ser => ser.toJSON())
         expect(jsonForm).to.deep.eq(service)
       }),
       it('implements getContext', () => {
-        expect(referenceDidDocument.getContext()).to.deep.eq(didDocumentJSON['@context'])
+        expect(referenceDidDocument.context).to.deep.eq(didDocumentJSON['@context'])
       }),
       it('implements getDid', () => {
-        expect(referenceDidDocument.getDid()).to.deep.eq(id)
+        expect(referenceDidDocument.did).to.deep.eq(id)
       }),
       it('implements getCreationDate', () => {
-        expect(referenceDidDocument.getCreationDate().toISOString()).to.deep.eq(created)
+        expect(referenceDidDocument.created.toISOString()).to.deep.eq(created)
       }),
       it('implements getProof', () => {
-        expect(referenceDidDocument.getProof().toJSON()).to.deep.eq(proof)
+        expect(referenceDidDocument.proof.toJSON()).to.deep.eq(proof)
       }),
       it('implements getSignatureValue', () => {
-        expect(referenceDidDocument.getSignatureValue()).to.deep.eq(Buffer.from(proof.signatureValue))
+        expect(referenceDidDocument.signatureValue).to.deep.eq(proof.signatureValue)
       }),
       it('implements getSigner', () => {
-        expect(referenceDidDocument.getSigner()).to.deep.eq({
+        expect(referenceDidDocument.signer).to.deep.eq({
           did: mockDid,
           keyId: mockKeyId,
         })

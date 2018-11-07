@@ -59,6 +59,10 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
    * the appropriate interaction token class dynamically based on a key in the parsed json
   */
 
+  get signatureValue() {
+    return this.getSignatureValue().toString('hex')
+  }
+
   @Transform(value => convertPayload(value), { toClassOnly: true })
   private payload: IPayloadSection<T> = {}
   

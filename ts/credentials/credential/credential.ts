@@ -12,39 +12,48 @@ import { ISignedCredCreationArgs } from '../signedCredential/types'
 
 @Exclude()
 export class Credential {
-  @Expose()
-  private '@context': ContextEntry[]
-
-  @Expose()
-  private type: string[]
-
-  @Expose()
-  private claim: IClaimSection
-
-  @Expose()
-  private name: string
+  private '_@context': ContextEntry[]
+  private _id: string
+  private _type: string[]
+  private _claim: IClaimSection
+  private _name: string
 
   /**
-   * @description - Returns the claim section from the credential
+   * The claim section of the credential
    */
-  public getClaim(): IClaimSection {
-    return this.claim
+  @Expose()
+  get claim(): IClaimSection {
+    return this._claim
+  }
+
+  set claim(claim: IClaimSection) {
+    this._claim = claim
   }
 
   /**
    * @description - Returns the credential type
    * @returns {string[]} - credential type, e.g ['Credential', 'ProofOfNameCredential']
    */
-  public getType(): string[] {
-    return this.type
+  @Expose()
+  get type(): string[] {
+    return this._type
+  }
+
+  set type(type: string[]) {
+    this._type = type
   }
 
   /**
    * @description - Returns a presentable credential name if present
    * @returns {string | undefined} - credential name, e.g. 'Email', 'Name'
    */
-  public getName(): string {
-    return this.name
+  @Expose()
+  get name(): string {
+    return this._name
+  }
+
+  set name(name: string) {
+    this._name = name
   }
 
   /**
@@ -52,8 +61,13 @@ export class Credential {
    * @returns {ContextEntry[]} - the '@context' section of the JSON-LD document
    * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
    */
-  public getContext(): ContextEntry[] {
+  @Expose({ name: '@context' })
+  public get context(): ContextEntry[] {
     return this['@context']
+  }
+
+  public set context(context: ContextEntry[]) {
+    this['@context'] = context
   }
 
   /**
@@ -63,7 +77,7 @@ export class Credential {
    * @param subject - the did of the subject
    * @see {@link https://jolocom-lib.readthedocs.io/en/latest/signedCredentials.html | developer documentation}
    * @returns {Credential}
-  */
+   */
 
   public static create<T extends BaseMetadata>({ metadata, claim, subject }: ISignedCredCreationArgs<T>) {
     const credential = new Credential()
@@ -81,7 +95,7 @@ export class Credential {
    * @param json - credential in JSON-LD form
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
    * @returns {Credential}
-  */
+   */
 
   public static fromJSON(json: ICredentialAttrs): Credential {
     return plainToClass(Credential, json)

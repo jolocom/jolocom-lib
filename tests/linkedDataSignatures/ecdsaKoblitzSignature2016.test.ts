@@ -3,9 +3,14 @@ import { expect } from 'chai'
 import * as jsonld from 'jsonld'
 
 import { EcdsaLinkedDataSignature } from '../../ts/linkedDataSignature'
-import { signatureAttributes, normalizedSignatureSection, digestedSignatureSection, incompleteSignatureAttrs } from './ecdsaSignature.data'
+import {
+  signatureAttributes,
+  normalizedSignatureSection,
+  digestedSignatureSection,
+  incompleteSignatureAttrs
+} from './ecdsaSignature.data'
 import { defaultContext } from '../../ts/utils/contexts'
-import { mockKeyId } from '../data/credential/signedCredential.data';
+import { mockKeyId } from '../data/credential/signedCredential.data'
 
 describe('EcdsaKoblitzSignature', () => {
   let signature: EcdsaLinkedDataSignature
@@ -37,11 +42,11 @@ describe('EcdsaKoblitzSignature', () => {
   it('Should implement getters method', () => {
     const { created, creator, nonce, signatureValue, type } = signatureAttributes
 
-    expect(signature.getCreationDate()).to.deep.eq(new Date(created))
-    expect(signature.getCreator()).to.eq(creator)
-    expect(signature.getNonce()).to.eq(nonce)
-    expect(signature.getSignatureValue()).to.deep.eq(Buffer.from(signatureValue, 'hex'))
-    expect(signature.getType()).to.deep.eq(type)
+    expect(signature.created).to.deep.eq(new Date(created))
+    expect(signature.creator).to.eq(creator)
+    expect(signature.nonce).to.eq(nonce)
+    expect(signature.signatureValue).to.deep.eq(signatureValue)
+    expect(signature.type).to.deep.eq(type)
   })
 
   it('Should implement normalize', async () => {
@@ -55,10 +60,10 @@ describe('EcdsaKoblitzSignature', () => {
 
   it('Should implement setters', () => {
     const bareSignature = new EcdsaLinkedDataSignature()
-    bareSignature.setCreationDate(new Date(0))
-    bareSignature.setCreator(mockKeyId)
-    bareSignature.setNonce('1842fb5f567dd532')
-    bareSignature.setSignatureValue('abcdef')
+    bareSignature.created = new Date(0)
+    bareSignature.creator = mockKeyId
+    bareSignature.nonce = '1842fb5f567dd532'
+    bareSignature.signatureValue = 'abcdef'
 
     expect(bareSignature.toJSON()).to.deep.eq(signatureAttributes)
   })

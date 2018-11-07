@@ -9,8 +9,7 @@ import {
   mockPubProfServiceEndpointJSON,
 } from '../data/didDocumentSections.data'
 import {
-  PublicProfileServiceEndpoint,
-  ServiceEndpointsSection,
+  ServiceEndpointsSection, generatePublicProfileServiceSection,
 } from '../../ts/identity/didDocument/sections/serviceEndpointsSection'
 import { mockDid, mockIpfsHash } from '../data/didDocument.data'
 const expect = chai.expect
@@ -48,7 +47,7 @@ describe('DidDocumentSections', () => {
   })
 
   describe('Public profile ServiceEndpoint', () => {
-    const pubProfEndpSection = PublicProfileServiceEndpoint.create(mockDid, mockIpfsHash)
+    const pubProfEndpSection = generatePublicProfileServiceSection(mockDid, mockIpfsHash)
 
     it('Should correctly instantiate from keyId and did', () => {
       expect(pubProfEndpSection.toJSON()).to.deep.eq(mockPubProfServiceEndpointJSON)
@@ -58,10 +57,10 @@ describe('DidDocumentSections', () => {
       const serviceEndpointFromJson = ServiceEndpointsSection.fromJSON(mockPubProfServiceEndpointJSON)
       const { description, serviceEndpoint, id, type } = mockPubProfServiceEndpointJSON
 
-      expect(serviceEndpointFromJson.getDescription()).to.eq(description)
-      expect(serviceEndpointFromJson.getEndpoint()).to.eq(serviceEndpoint)
-      expect(serviceEndpointFromJson.getId()).to.eq(id)
-      expect(serviceEndpointFromJson.getType()).to.eq(type)
+      expect(serviceEndpointFromJson.description).to.eq(description)
+      expect(serviceEndpointFromJson.serviceEndpoint).to.eq(serviceEndpoint)
+      expect(serviceEndpointFromJson.id).to.eq(id)
+      expect(serviceEndpointFromJson.type).to.eq(type)
     })
   })
 })

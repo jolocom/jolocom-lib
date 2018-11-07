@@ -13,20 +13,26 @@ const typeToAuthType = {
 
 @Exclude()
 export class AuthenticationSection {
-  @Expose()
-  private publicKey: string
+  private _publicKey: string
+  private _type: string
 
   @Expose()
-  private type: string
-
-  public getPublicKey(): string {
-    return this.publicKey
+  get publicKey() {
+    return this._publicKey
   }
 
-  public getType(): string {
-    return this.type
+  set publicKey(key: string) {
+    this._publicKey = key
   }
 
+  @Expose()
+  get type() {
+    return this._type
+  }
+
+  set type(type: string) {
+    this._type = type
+  }
   /*
    * @description - Generate a boilerplate Authentication section based on passed public key
    * @param publicKey - A secp256k1 public key that will be listed in the did document
@@ -36,8 +42,8 @@ export class AuthenticationSection {
 
   public static fromEcdsa(publicKeySection: PublicKeySection): AuthenticationSection {
     const authSection = new AuthenticationSection()
-    authSection.publicKey = publicKeySection.getIdentifier()
-    authSection.type = typeToAuthType[publicKeySection.getType()]
+    authSection.publicKey = publicKeySection.id
+    authSection.type = typeToAuthType[publicKeySection.type]
 
     return authSection
   }

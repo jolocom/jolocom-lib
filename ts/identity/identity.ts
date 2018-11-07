@@ -12,7 +12,7 @@ export class Identity {
   private publicProfileCredential?: SignedCredential
 
   public getDid() {
-    return this.didDocument.getDid()
+    return this.didDocument.did
   }
 
   public getDidDocument(): DidDocument {
@@ -20,11 +20,11 @@ export class Identity {
   }
 
   public getServiceEndpointSections() {
-    return this.didDocument.getServiceEndpointSections()
+    return this.didDocument.service
   }
 
   public getPublicKeySection() {
-    return this.didDocument.getPublicKeySections()
+    return this.didDocument.publicKey
   }
 
   public setDidDocument(didDocument: DidDocument) {

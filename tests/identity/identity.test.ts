@@ -34,10 +34,10 @@ describe('Identity', () => {
 
   it('Should implement all getters', () => {
     const identity = Identity.fromDidDocument({ didDocument: mockDidDocument })
-    expect(identity.getDid()).to.eq(mockDidDocument.getDid())
+    expect(identity.getDid()).to.eq(mockDidDocument.did)
     expect(identity.getDidDocument()).to.eq(mockDidDocument)
-    expect(identity.getPublicKeySection()).to.eq(mockDidDocument.getPublicKeySections())
-    expect(identity.getServiceEndpointSections()).to.eq(mockDidDocument.getServiceEndpointSections())
+    expect(identity.getPublicKeySection()).to.eq(mockDidDocument.publicKey)
+    expect(identity.getServiceEndpointSections()).to.eq(mockDidDocument.service)
   })
 
   /*
