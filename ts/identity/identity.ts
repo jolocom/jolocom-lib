@@ -2,9 +2,9 @@ import { DidDocument } from './didDocument/didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { IIdentityCreateArgs } from './types'
 
-/*
- * Class representing an identity, includes a didDocument and public profile
- * in the form of a signed credential.
+/**
+ * @class
+ * Class representing an identity
  */
 
 export class Identity {
@@ -31,11 +31,11 @@ export class Identity {
     this.didDocument = didDocument
   }
 
-  /*
+  /**
    * @description - Instantiates the Identity class based on a did document and public profile
    * @param didDocument - The did document associated with a did
-   * @param [publicProfile] - Verifiable credential containing public claims (e.g. name, website)
-   * @returns {Object} - Instance of the Identity class
+   * @param publicProfile - Verifiable credential containing public claims (e.g. name, website)
+   * @returns {Identity}
   */
 
   public static fromDidDocument({ didDocument, publicProfile }: IIdentityCreateArgs): Identity {

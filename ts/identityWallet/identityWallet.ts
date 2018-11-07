@@ -87,6 +87,10 @@ export class IdentityWallet {
       }
     )
 
+    vCred.claims = {
+
+    }
+
     const signature = await this.vaultedKeyProvider.signDigestable({ derivationPath, encryptionPass: pass }, vCred)
     vCred.setSignatureValue(signature.toString('hex'))
     return vCred

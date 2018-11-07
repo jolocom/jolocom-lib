@@ -10,6 +10,9 @@ import { sha256, publicKeyToDID } from '../../utils/crypto'
 import { ILinkedDataSignature, IDigestable } from '../../linkedDataSignature/types'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 
+/**
+ * @class Represents a did document
+ */
 @Exclude()
 export class DidDocument implements IDigestable {
   @Expose()
@@ -24,7 +27,7 @@ export class DidDocument implements IDigestable {
   @Type(() => ServiceEndpointsSection)
   private service: ServiceEndpointsSection[] = []
 
-  /*
+  /**
    * When toJSON is called, convert date to ISO string format,
    * when fromJSON is called, parse value if exists, else default to now
    */
@@ -80,7 +83,7 @@ export class DidDocument implements IDigestable {
   public getSigner(): ISigner {
     return {
       did: this.getDid(),
-      keyId: this.proof.getCreator(),
+      keyId: this.proof.getCreator()
     }
   }
 
@@ -92,50 +95,50 @@ export class DidDocument implements IDigestable {
     this.proof.setSignatureValue(signature)
   }
 
-  /*
-   * @description - Adds a new Authentication section to the DID Document
-   * @param section - Instance of the AuthenticationSection class
+  /**
+   * @description - Adds a new {@link AuthenticationSection} to the Did Document
+   * @param section - Instantiated and populated {@link AuthenticationSection} instance
    * @returns {void}
-  */
+   */
 
   public addAuthSection(section: AuthenticationSection) {
     this.authentication.push(section)
   }
 
-  /*
-   * @description - Adds a new Public Key section to the DID Document
-   * @param section - Instance of the PublicKeySection class
+  /**
+   * @description - Adds a new {@link PublicKeySection} to the Did Document
+   * @param section - Instantiated and populated {@link PublicKeySection} instance
    * @returns {void}
-  */
+   */
 
   public addPublicKeySection(section: PublicKeySection) {
     this.publicKey.push(section)
   }
 
-  /*
-   * @description - Adds a new service endpoint section to the DID Document
-   * @param section - Instance of the ServiceEndpointSection class
+  /**
+   * @description - Adds a new {@link ServiceEndpointsSection} to the Did Document
+   * @param section - Instantiated and populated {@link ServiceEndpointsSection} instance
    * @returns {void}
-  */
+   */
 
   public addServiceEndpoint(endpoint: ServiceEndpointsSection) {
     this.service = [endpoint]
   }
 
-  /*
-   * @description - Clears the service endpoints section, usefull when removing public profile
+  /**
+   * @description - Clears the service endpoints section, usefull when removing all public profile data
    * @returns {void}
-  */
+   */
 
   public resetServiceEndpoints() {
     this.service = []
   }
 
-  /*
-   * @description - Generates a boilerplate DID Document based on a public key
+  /**
+   * @description - Instantiates a barebones {@link DidDocument} class based on a public key
    * @param publicKey - A secp256k1 public key that will be listed in the did document
-   * @returns {Object} - Instance of the DidDocument class
-  */
+   * @returns {DidDocument}
+   */
 
   public static fromPublicKey(publicKey: Buffer): DidDocument {
     const did = publicKeyToDID(publicKey)
@@ -150,12 +153,11 @@ export class DidDocument implements IDigestable {
     return didDocument
   }
 
-  /*
-   * @description - Populates all fields necessary to compute signaturea, signature
-   *  is computed at a later point due to restricted access to private keys
-   * @param keyId - Public key identifier, e.g. did:jolo:abcdef...ff#keys-1
-   * @returns {void} - Mutates the instance
-  */
+  /**
+   * @description - Sets all fields on the instance necessary to compute the signature
+   * @param keyId - Public key identifier, as defined in the {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}.
+   * @returns {void}
+   */
 
   private async prepareSignature(keyId: string) {
     const inOneYear = new Date()
@@ -167,19 +169,19 @@ export class DidDocument implements IDigestable {
     this.proof.setNonce(SoftwareKeyProvider.getRandom(8).toString('hex'))
   }
 
-  /*
-   * @description - Normalizes the JSON-LD representation of the class instance,
-   *   and computes it's sha256 hash
+  /**
+   * @description - Returns the sha256 hash of the did document, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
    * @returns {Buffer} - sha256 hash of the normalized document
-  */
+   */
 
   public async digest(): Promise<Buffer> {
     const normalized = await this.normalize()
     return sha256(Buffer.from(normalized))
   }
 
-  /*
-   * @description - Converts JSON-LD document to canonical form, see https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm
+  /**
+   * @description - Converts the did document to canonical form
+   * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
    * @returns {Object} - Document in normalized form, quads
   */
 

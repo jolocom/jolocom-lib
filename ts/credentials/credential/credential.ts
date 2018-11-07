@@ -4,9 +4,10 @@ import { BaseMetadata, ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContext } from '../../utils/contexts'
 import { ISignedCredCreationArgs } from '../signedCredential/types'
 
-/*
- * Class representing an unsigned JSON LD credential. Used together with a
- *  Linked Data Signature to form a signed credential
+/**
+ * @class
+ * Class representing an unsigned verifiable credential.
+ * @see {@link https://w3c.github.io/vc-data-model/ | verifiable credential specification}
  */
 
 @Exclude()
@@ -23,29 +24,45 @@ export class Credential {
   @Expose()
   private name: string
 
+  /**
+   * @description - Returns the claim section from the credential
+   */
   public getClaim(): IClaimSection {
     return this.claim
   }
 
+  /**
+   * @description - Returns the credential type
+   * @returns {string[]} - credential type, e.g ['Credential', 'ProofOfNameCredential']
+   */
   public getType(): string[] {
     return this.type
   }
 
+  /**
+   * @description - Returns a presentable credential name if present
+   * @returns {string | undefined} - credential name, e.g. 'Email', 'Name'
+   */
   public getName(): string {
     return this.name
   }
 
+  /**
+   * @description - Returns a presentable credential name if present
+   * @returns {ContextEntry[]} - the '@context' section of the JSON-LD document
+   * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
+   */
   public getContext(): ContextEntry[] {
     return this['@context']
   }
 
-  /*
-   * @description - Instantiates a Credential based on passed configuration
-   * @param metadata - Metadata necessary to create a valid JSON-LD document
-   *   see - https://jolocom-lib.readthedocs.io/en/latest/signedCredentials.html
-   * @param claim - Data to store in claim, e.g. { email: 'test@gmail.com' }
-   * @param subject - Did of the credential subject
-   * @returns {Object} - Instance of Credential class
+  /**
+   * @description - Instantiates a {@link Credential} based on passed options
+   * @param metadata - metadata necessary to create a valid JSON-LD document
+   * @param claim - the claim
+   * @param subject - the did of the subject
+   * @see {@link https://jolocom-lib.readthedocs.io/en/latest/signedCredentials.html | developer documentation}
+   * @returns {Credential}
   */
 
   public static create<T extends BaseMetadata>({ metadata, claim, subject }: ISignedCredCreationArgs<T>) {
@@ -59,9 +76,22 @@ export class Credential {
     return credential
   }
 
+  /**
+   * @description - Instantiates a {@link Credential} from it's JSON form
+   * @param json - credential in JSON-LD form
+   * @see {@link https://w3c.github.io/vc-data-model/ | specification}
+   * @returns {Credential}
+  */
+
   public static fromJSON(json: ICredentialAttrs): Credential {
     return plainToClass(Credential, json)
   }
+
+  /**
+   * @description - Serializes the {@link Credential} as a JSON-LD document
+   * @see {@link https://w3c.github.io/vc-data-model/ | specification}
+   * @returns {ICredentialAttrs} - JSON-LD encoded credential
+   */
 
   public toJSON(): ICredentialAttrs {
     return classToPlain(this) as ICredentialAttrs
