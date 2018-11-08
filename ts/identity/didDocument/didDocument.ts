@@ -141,7 +141,6 @@ export class DidDocument implements IDigestable {
    * @param section - Instantiated and populated {@link AuthenticationSection} instance
    * @returns {void}
    */
-
   public addAuthSection(section: AuthenticationSection) {
     this.authentication.push(section)
   }
@@ -151,7 +150,6 @@ export class DidDocument implements IDigestable {
    * @param section - Instantiated and populated {@link PublicKeySection} instance
    * @returns {void}
    */
-
   public addPublicKeySection(section: PublicKeySection) {
     this.publicKey.push(section)
   }
@@ -161,7 +159,6 @@ export class DidDocument implements IDigestable {
    * @param section - Instantiated and populated {@link ServiceEndpointsSection} instance
    * @returns {void}
    */
-
   public addServiceEndpoint(endpoint: ServiceEndpointsSection) {
     this.service = [endpoint]
   }
@@ -170,7 +167,6 @@ export class DidDocument implements IDigestable {
    * @description - Clears the service endpoints section, usefull when removing all public profile data
    * @returns {void}
    */
-
   public resetServiceEndpoints() {
     this.service = []
   }
@@ -180,7 +176,6 @@ export class DidDocument implements IDigestable {
    * @param publicKey - A secp256k1 public key that will be listed in the did document
    * @returns {DidDocument}
    */
-
   public static fromPublicKey(publicKey: Buffer): DidDocument {
     const did = publicKeyToDID(publicKey)
     const keyId = `${did}#keys-1`
@@ -199,7 +194,6 @@ export class DidDocument implements IDigestable {
    * @param keyId - Public key identifier, as defined in the {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}.
    * @returns {void}
    */
-
   private async prepareSignature(keyId: string) {
     const inOneYear = new Date()
     inOneYear.setFullYear(new Date().getFullYear() + 1)
@@ -214,7 +208,6 @@ export class DidDocument implements IDigestable {
    * @description - Returns the sha256 hash of the did document, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
    * @returns {Buffer} - sha256 hash of the normalized document
    */
-
   public async digest(): Promise<Buffer> {
     const normalized = await this.normalize()
     return sha256(Buffer.from(normalized))
@@ -225,7 +218,6 @@ export class DidDocument implements IDigestable {
    * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
    * @returns {Object} - Document in normalized form, quads
    */
-
   public async normalize(): Promise<string> {
     const json = this.toJSON()
     delete json.proof
