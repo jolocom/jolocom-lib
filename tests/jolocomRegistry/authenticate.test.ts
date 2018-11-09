@@ -18,7 +18,7 @@ describe('Jolocom Registry - authenticate', () => {
   before(async () => {
     sandbox.stub(mockVault, 'getPublicKey').returns(testPublicIdentityKey)
     sandbox.stub(JolocomRegistry.prototype, 'resolve').resolves(Identity.fromDidDocument({ didDocument: mockDidDoc }))
-    sandbox.stub(Identity.prototype, 'getPublicKeySection').returns([
+    sandbox.stub(Identity.prototype, 'publicKeySection').returns([
       {
         getIdentifier: sinon.stub()
       }

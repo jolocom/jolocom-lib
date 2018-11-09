@@ -84,10 +84,10 @@ export class JolocomRegistry {
     const { identityWallet, keyMetadata, vaultedKeyProvider } = commitArgs
 
     const didDocument = identityWallet.getDidDocument()
-    const publicProfile = identityWallet.getIdentity().publicProfile.get()
+    const publicProfile = identityWallet.getIdentity().publicProfile
 
     const remote = await this.resolveSafe(didDocument.did)
-    const remotePubProf = remote && remote.publicProfile.get()
+    const remotePubProf = remote && remote.publicProfile
 
     try {
       if (publicProfile) {
@@ -163,7 +163,7 @@ export class JolocomRegistry {
 
     const publicKeyMetadata = {
       derivationPath: derivationArgs.derivationPath,
-      keyId: identity.getPublicKeySection()[0].id
+      keyId: identity.publicKeySection[0].id
     }
 
     return new IdentityWallet({
