@@ -7,73 +7,57 @@ import { defaultContext } from '../../utils/contexts'
 
 @Exclude()
 export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestable {
-  @Expose()
-  public type = 'EcdsaKoblitzSignature2016'
-
-  @Expose()
-  @Transform(value => value || '', { toPlainOnly: true })
-  private creator: string
-
-  @Expose()
-  @Transform(value => value || '', { toPlainOnly: true })
-  private nonce: string
-
-  /*
-   * In case we are parsing a JSON LD doc with no signature, default to empty string
-   * In case sig is undefined on instance and we run toJSON, default to empty string
-  */
-
-  @Expose()
-  @Transform(value => value || '', { toPlainOnly: true })
-  private signatureValue: string
-
-  /*
-   * When we run toJSON, convert date to iso string as opposed to default format
-  */
+  private _type = 'EcdsaKoblitzSignature2016'
+  private _creator: string = ''
+  private _created: Date = new Date()
+  private _nonce: string = ''
+  private _signatureValue: string = ''
 
   @Expose()
   @Type(() => Date)
   @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
-  private created: Date = new Date()
-
-  public getCreator(): string {
-    return this.creator
+  get created() {
+    return this._created
   }
 
-  public getType(): string {
-    return this.type
+  set created(created: Date) {
+    this._created = created
   }
 
-  public getNonce(): string {
-    return this.nonce
+  @Expose()
+  get type() {
+    return this._type
   }
 
-  /*
-   * Working with buffers is easier when verifying signatures
-  */
-
-  public getSignatureValue(): Buffer {
-    return Buffer.from(this.signatureValue, 'hex')
+  set type(type: string) {
+    this._type = type
   }
 
-  public getCreationDate(): Date {
-    return this.created
+  @Expose()
+  get nonce() {
+    return this._nonce
   }
 
-  public setCreator(creator: string): void {
-    this.creator = creator
+  set nonce(nonce: string) {
+    this._nonce = nonce
   }
 
-  public setNonce(nonce: string): void {
-    this.nonce = nonce
+  @Expose({name: 'signatureValue'})
+  get signature() {
+    return this._signatureValue
   }
 
-  public setSignatureValue(signatureValue: string): void {
-    this.signatureValue = signatureValue
+  set signature(signature: string) {
+    this._signatureValue = signature
   }
 
-  public setCreationDate(creation: Date): void {
-    this.created = creation
+  @Expose()
+  get creator(): string {
+    return this._creator
+  }
+
+  set creator(creator: string) {
+    this._creator = creator
   }
 
   /*

@@ -4,28 +4,36 @@ import { IIpfsConnector, IIpfsConfig } from './types'
 const isNode = require('detect-node')
 
 export class IpfsStorageAgent implements IIpfsConnector {
-  private endpoint: string
-  private fetchImplementation = isNode ? fetchNode : window.fetch
+  private _endpoint: string
+  private _fetchImplementation = isNode ? fetchNode : window.fetch
 
   constructor(config: IIpfsConfig) {
-    this.endpoint = `${config.protocol}://${config.host}:${config.port}`
+    this._endpoint = `${config.protocol}://${config.host}:${config.port}`
   }
 
-  public getEndpoint(): string {
-    return this.endpoint
+  get endpoint() {
+    return this._endpoint
   }
 
-  /*
+  /**
    * @description - Method to swap fetch implementation at runtime, helps with tests too
    * @param newImplementation - Implementation compliant with the fetch api
    * @returns {void}
   */
 
+  set fetchImplementation(newImplementation: typeof window.fetch) {
+    this._fetchImplementation = newImplementation
+  }
+
+  get fetchImplementation(): typeof window.fetch {
+    return this._fetchImplementation
+  }
+
   public changeFetchImplementation(newImplementation: typeof window.fetch) {
     this.fetchImplementation = newImplementation
   }
 
-  /*
+  /**
    * @description - Stores a JSON document on IPFS, using a public gateway
    * @param data - JSON document to store
    * @param pin - Whether the hash should be added to the pinset
@@ -74,7 +82,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
    * @returns {object} - Response object
   */
 
-  private async postRequest(endpoint: string, data: object) {
+  private async postRequest(endpoint: string, data: BodyInit) {
     return this.fetchImplementation(endpoint, {
       method: 'POST',
       body: data

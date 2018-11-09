@@ -1,16 +1,15 @@
-export interface ILinkedDataSignature extends IDigestable {
-  getCreator: () => string
-  getNonce: () => string
-  getCreationDate: () => Date
-  setCreator: (creator: string) => void
-  setNonce: (nonce: string) => void
-  setSignatureValue: (signatureValue: string) => void
-  setCreationDate: (creation: Date) => void
-  toJSON: () => ILinkedDataSignatureAttrs
+export interface ISerializable {
+  toJSON: () => {}
 }
 
+export interface ILinkedDataSignature extends IDigestable, ISerializable {
+  creator: string
+  type: string
+  nonce: string
+  created: Date
+}
 export interface IDigestable {
-  getSignatureValue: () => Buffer
+  signature: string
   digest: () => Promise<Buffer>
 }
 

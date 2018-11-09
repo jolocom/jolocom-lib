@@ -1,20 +1,25 @@
-import { plainToClass, classToPlain, Type, Expose } from 'class-transformer'
+import { plainToClass, classToPlain, Type, Expose, Exclude } from 'class-transformer'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ICredentialsReceiveAttrs } from './interactionTokens.types'
 
-/*
+/**
+ * @class
  * Class representing a credential response. encodable in JWT,
  * currently the same as a credential response without a validation
  * function. Will be extended with support for external verifications.
 */
-@Expose()
+@Exclude()
 export class CredentialsReceive {
-  /* Automatically instantiate SignedCredential class on fromJSON, and serialize on fromJSON */
-  @Type(() => SignedCredential)
-  private signedCredentials: SignedCredential[]
+  private _signedCredentials: SignedCredential[]
 
-  public getSignedCredentials(): SignedCredential[] {
-    return this.signedCredentials
+  @Expose()
+  @Type(() => SignedCredential)
+  get signedCredentials() {
+    return this._signedCredentials
+  }
+
+  set signedCredentials(signedCredentials: SignedCredential[]) {
+    this._signedCredentials = signedCredentials
   }
 
   public toJSON(): ICredentialsReceiveAttrs {

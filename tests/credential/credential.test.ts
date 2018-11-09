@@ -44,10 +44,10 @@ describe('Credential', () => {
   it('Should implement all getter methods', () => {
     const credential = Credential.create<EmailClaimMetadata>(mockEmailCredCreationAttrs)
 
-    expect(credential.getContext()).to.deep.equal([...defaultContext, ...claimsMetadata.emailAddress.context])
-    expect(credential.getClaim()).to.deep.equal(mockEmailCredCreationAttrs.claim)
-    expect(credential.getName()).to.deep.equal(claimsMetadata.emailAddress.name)
-    expect(credential.getType()).to.deep.equal(claimsMetadata.emailAddress.type)
+    expect(credential.context).to.deep.equal([...defaultContext, ...claimsMetadata.emailAddress.context])
+    expect(credential.claim).to.deep.equal(mockEmailCredCreationAttrs.claim)
+    expect(credential.name).to.deep.equal(claimsMetadata.emailAddress.name)
+    expect(credential.type).to.deep.equal(claimsMetadata.emailAddress.type)
   })
 
   it('Should implement static fromJSON method', () => {

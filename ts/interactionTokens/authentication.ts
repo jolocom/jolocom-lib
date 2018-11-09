@@ -1,4 +1,4 @@
-import { plainToClass, classToPlain, Expose } from 'class-transformer'
+import { plainToClass, classToPlain, Expose, Exclude } from 'class-transformer'
 
 /* TODO CLEAN UP */
 export interface IAuthenticationAttrs {
@@ -6,24 +6,32 @@ export interface IAuthenticationAttrs {
   callbackURL: string
 }
 
-/*
- * Class representing a challenge string and callback url for challenge-response
- * authentication did authentication, encodable in JWT
- *
- * Currently unused
+/**
+ * @class
+ * Class containing a challenge string and callbackURL for challenge-response did authentication, encodable in JWT
  */
 
-@Expose()
+ @Exclude()
 export class Authentication {
-  private challenge: string
-  private callbackURL: string
+  private _challenge: string
+  private _callbackURL: string
 
-  public getChallenge(): string {
-    return this.challenge
+  @Expose()
+  get challenge(): string {
+    return this._challenge
   }
 
-  public getCallbackURL(): string {
-    return this.callbackURL
+  set challenge(challenge: string) {
+    this._challenge = challenge
+  }
+
+  @Expose()
+  get callbackURL (): string {
+    return this._callbackURL
+  }
+
+  set callbackURL(callbackURL: string) {
+    this._callbackURL = callbackURL
   }
 
   public toJSON() {

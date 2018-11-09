@@ -9,11 +9,12 @@ describe('Authentication', () => {
 
   it('Should implement static fromJSON', () => {
     auth = Authentication.fromJSON(jsonAuthentication)
+    console.log(auth.toJSON())
     expect(auth.toJSON()).to.deep.eq(jsonAuthentication)
   })
 
   it('Should implement getters method', () => {
-    expect(auth.getCallbackURL()).to.eq(jsonAuthentication.callbackURL)
-    expect(auth.getChallenge()).to.eq(jsonAuthentication.challenge)
+    expect(auth.callbackURL).to.eq(jsonAuthentication.callbackURL)
+    expect(auth.challenge).to.eq(jsonAuthentication.challenge)
   })
 })

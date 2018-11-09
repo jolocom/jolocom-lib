@@ -2,48 +2,61 @@ import 'reflect-metadata'
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { IPublicKeySectionAttrs } from './types'
 
-/*
+/**
  * Class representing a DidDocument Public Key section
  * see: https://w3c-ccg.github.io/did-spec/#public-keys
  */
 
 @Exclude()
 export class PublicKeySection {
-  @Expose()
-  private id: string
+  private _id: string
+  private _type: string
+  private _owner: string
+  private _publicKeyHex: string
 
   @Expose()
-  private type: string
+  get owner(): string {
+    return this._owner
+  }
+
+  set owner(owner: string) {
+    this._owner = owner
+  }
 
   @Expose()
-  private owner: string
+  get id(): string {
+    return this._id
+  }
+
+  set id(id: string) {
+    this._id = id
+  }
 
   @Expose()
-  private publicKeyHex: string
-
-  public getOnwer(): string {
-    return this.owner
+  get type(): string {
+    return this._type
   }
 
-  public getIdentifier(): string {
-    return this.id
+  set type(type: string) {
+    this._type = type
   }
 
-  public getType(): string {
-    return this.type
+  @Expose()
+  get publicKeyHex(): string {
+    return this._publicKeyHex
   }
 
-  public getPublicKeyHex(): string {
-    return this.publicKeyHex
+  set publicKeyHex(keyHex: string) {
+    this._publicKeyHex = keyHex
   }
 
-  /*
+  /**
    * @description - Generates a boilerplate Public Key section based on the passed public key
    * @param publicKey - A secp256k1 public key to be listed in the "publicKey" section of the did document
    * @param id - An identifier for the public key, normally #keys-X
    * @param did - The did listed in the did document, used to compute the full key id
    * @returns {Object} - Instance of the PublicKeySection class
-  */
+   */
 
   public static fromEcdsa(publicKey: Buffer, id: string, did: string): PublicKeySection {
     const publicKeySecion = new PublicKeySection()

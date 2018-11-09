@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { Transform, plainToClass, classToPlain, Type, Expose } from 'class-transformer'
+import { plainToClass, classToPlain, Type, Expose, Exclude, Transform } from 'class-transformer'
 import { canonize } from 'jsonld'
 import { generateRandomID, sha256 } from '../../utils/crypto'
 import { ISignedCredentialAttrs, ISignedCredCreationArgs } from './types'
@@ -25,53 +25,30 @@ interface IIssInfo {
  * Class representing an JSON-LD verifiable credential.
  * @see {@link https://w3c.github.io/vc-data-model/ | verifiable credential specification}
  */
-@Expose()
+@Exclude()
 export class SignedCredential implements IDigestable {
-  private '@context': ContextEntry[]
+  private '_@context': ContextEntry[]
+  private _id: string = generateClaimId(8)
+  private _name: string
+  private _issuer: string
+  private _type: string[]
+  private _claim: IClaimSection = {}
+  private _issued: Date
+  private _expires?: Date
+  private _proof: ILinkedDataSignature = new EcdsaLinkedDataSignature()
 
-  /* If value is not defined when we revive this class from JSON, default to 8 char random id */
-  @Transform((value: string) => value || generateClaimId(8), { toClassOnly: true })
-  private id: string = generateClaimId(8)
-
-  private name: string
-
-  private issuer: string
-
-  private type: string[]
-
-  private claim: IClaimSection
-
-  /*
-   * When toJSON is called, convert date to ISO string format,
-   * when fromJSON is called, parse value if exists, else default to now
+  /**
+   * @description - Returns the credential identifier
+   * @returns {string} - The credential identifier
+   * @see {@link https://w3c.github.io/vc-data-model/#identifiers | specification}
    */
-
-  @Type(() => Date)
-  @Transform((value: Date) => value.toISOString(), { toPlainOnly: true })
-  @Transform((value: string) => (value ? new Date(value) : new Date()), { toClassOnly: true })
-  private issued: Date
-
-  @Type(() => Date)
-  @Transform((value: Date) => value.toISOString(), { toPlainOnly: true })
-  @Transform((value: string) => new Date(value), { toClassOnly: true })
-  private expires?: Date
-
-  /* when fromJSON is called, parse value if exists, else default to new EcdsaLinkedDataSignature */
-
-  @Type(() => EcdsaLinkedDataSignature)
-  @Transform(value => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
-  private proof = new EcdsaLinkedDataSignature()
-
-  public setIssuer(issuer: string) {
-    this.issuer = issuer
+  @Expose({ name: '@context' })
+  get context() {
+    return this['_@context']
   }
 
-  public setIssued(issued: Date) {
-    this.issued = issued
-  }
-
-  public setExpiry(expiry: Date) {
-    this.expires = expiry
+  set context(context: ContextEntry[]) {
+    this['_@context'] = context
   }
 
   /**
@@ -79,44 +56,67 @@ export class SignedCredential implements IDigestable {
    * @returns {string} - The credential identifier
    * @see {@link https://w3c.github.io/vc-data-model/#identifiers | specification}
    */
-  public getId(): string {
-    return this.id
+  @Expose()
+  @Transform(value => value || generateClaimId(8), { toClassOnly: true })
+  get id(): string {
+    return this._id
   }
 
-  /**
-   * @description - Returns the credential issue date
-   * @returns {Date} - Issue date
-   */
-  public getIssued(): Date {
-    return this.issued
-  }
-
-  /**
-   * @description - Returns the credential type
-   * @returns {string[]} - credential type, e.g ['Credential', 'ProofOfNameCredential']
-   */
-  public getType(): string[] {
-    return this.type
+  set id(id: string) {
+    this._id = id
   }
 
   /**
    * @description - Returns the issuer of the signed credential
    * @returns {string} - The did of the issuer
    */
-  public getIssuer(): string {
-    return this.issuer
+  @Expose()
+  get issuer(): string {
+    return this._issuer
+  }
+
+  set issuer(issuer: string) {
+    this._issuer = issuer
+  }
+
+  /**
+   * @description - Returns the credential issue date
+   * @returns {Date} - Issue date
+   */
+  @Expose()
+  @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
+  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+  get issued(): Date {
+    return this._issued
+  }
+
+  set issued(issued: Date) {
+    this._issued = issued
+  }
+
+  /**
+   * @description - Returns the credential type
+   * @returns {string[]} - credential type, e.g ['Credential', 'ProofOfNameCredential']
+   */
+  @Expose()
+  get type(): string[] {
+    return this._type
+  }
+
+  set type(type: string[]) {
+    this._type = type
   }
 
   /**
    * @description - Returns the signature value
    * @returns {string} - The signature encoded as hex
    */
-  public getSignatureValue() {
-    return this.proof.getSignatureValue()
+  get signature() {
+    return this._proof.signature
   }
 
-  public setSignatureValue(signature: string) {
-    this.proof.setSignatureValue(signature)
+  set signature(signature: string) {
+    this._proof.signature = signature
   }
 
   /**
@@ -124,10 +124,10 @@ export class SignedCredential implements IDigestable {
    * @returns {ISigner} - The did of the signer, and the id of the public key
    * @see{@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}
    */
-  public getSigner(): ISigner {
+  get signer(): ISigner {
     return {
       did: this.issuer,
-      keyId: this.proof.getCreator()
+      keyId: this._proof.creator
     }
   }
 
@@ -135,36 +135,55 @@ export class SignedCredential implements IDigestable {
    * @description - Returns the expiry date of the credential
    * @returns {Date} - expiry date
    */
-  public getExpiryDate(): Date {
-    return this.expires
+  @Expose()
+  @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
+  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+  get expires(): Date {
+    return this._expires
+  }
+
+  set expires(expiry: Date) {
+    this._expires = expiry
   }
 
   /**
    * @description - Returns the {@link EcdsaLinkedDataSignature} member of the instance
    * @returns {ILinkedDataSignature} - the proof section of the credential
    */
-  public getProofSection(): ILinkedDataSignature {
-    return this.proof
+  @Expose()
+  @Type(() => EcdsaLinkedDataSignature)
+  @Transform(value => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
+  get proof(): ILinkedDataSignature {
+    return this._proof
+  }
+
+  set proof(proof: ILinkedDataSignature) {
+    this._proof = proof
   }
 
   /**
    * @description - Returns the did of the credential subject
    * @returns {string} - the did of the subject
    */
-  public getSubject(): string {
+  get subject(): string {
     return this.claim.id
   }
 
-  public set claims(claims: IClaimSection) {
-    this.claim = claims
+  set subject(subject: string) {
+    this.claim.id = subject
   }
 
   /**
    * @description - Returns the claim section from the credential
    * @returns {IClaimSection} - the claim section of the credential
    */
-  public get claims(): IClaimSection {
-    return this.claim
+  @Expose()
+  get claim(): IClaimSection {
+    return this._claim
+  }
+
+  set claim(claim: IClaimSection) {
+    this._claim = claim
   }
 
   /**
@@ -172,9 +191,10 @@ export class SignedCredential implements IDigestable {
    * @returns {string | 'Credential'} - credential name, e.g. 'Email', 'Name'
    * @default 'Credential'
    */
-  public getDisplayName(): string {
-    if (this.name) {
-      return this.name
+  @Expose()
+  get name(): string {
+    if (this._name) {
+      return this._name
     }
 
     /* Find first detailed cred type, e.g. ProofOfEmailCredential */
@@ -186,6 +206,10 @@ export class SignedCredential implements IDigestable {
     }
 
     return 'Credential'
+  }
+
+  set name(name: string) {
+    this._name = name
   }
 
   /**
@@ -208,7 +232,7 @@ export class SignedCredential implements IDigestable {
     signedCredential.claim
 
     signedCredential.prepareSignature(issInfo.keyId)
-    signedCredential.setIssuer(issInfo.issuerDid)
+    signedCredential.issuer = issInfo.issuerDid
 
     return signedCredential
   }
@@ -222,12 +246,12 @@ export class SignedCredential implements IDigestable {
     const inOneYear = new Date()
     inOneYear.setFullYear(new Date().getFullYear() + 1)
 
-    this.setIssued(new Date())
-    this.setExpiry(inOneYear)
+    this.issued = new Date()
+    this.expires = inOneYear
 
-    this.proof.setCreator(keyId)
-    this.proof.setSignatureValue('')
-    this.proof.setNonce(SoftwareKeyProvider.getRandom(8).toString('hex'))
+    this.proof.creator = keyId
+    this.proof.signature = ''
+    this.proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
   }
 
   /**

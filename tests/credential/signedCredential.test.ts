@@ -6,7 +6,7 @@ import {
   mockKeyId,
   mockIssuerDid,
   emailVerifiableCredential,
-  emailVerifiableCredentialHash,
+  emailVerifiableCredentialHash
 } from '../data/credential/signedCredential.data'
 import { EmailClaimMetadata } from 'cred-types-jolocom-core/js/types'
 import { Credential } from '../../ts/credentials/credential/credential'
@@ -30,7 +30,7 @@ describe('SignedCredential', () => {
     clock = sinon.useFakeTimers()
     vCred = vCred = await SignedCredential.create<EmailClaimMetadata>(mockEmailCredCreationAttrs, {
       keyId: mockKeyId,
-      issuerDid: mockIssuerDid,
+      issuerDid: mockIssuerDid
     })
   })
 
@@ -45,7 +45,7 @@ describe('SignedCredential', () => {
     })
 
     it('Should correctly assemble signature on create', async () => {
-      expect(vCred.getProofSection().toJSON()).to.deep.eq(emailVerifiableCredential.proof)
+      expect(vCred.proof.toJSON()).to.deep.eq(emailVerifiableCredential.proof)
     })
   })
 
@@ -65,41 +65,21 @@ describe('SignedCredential', () => {
 
   describe('Getters', () => {
     const { id, issued, issuer, expires, claim, proof, type } = emailVerifiableCredential
-    it('Implements getId', () => {
-      expect(vCred.getId()).to.eq(id)
-    })
-    it('Implements getIssued', () => {
-      expect(vCred.getIssued().toISOString()).to.eq(issued)
-    })
-    it('Implements getType', () => {
-      expect(vCred.getType()).to.deep.eq(type)
-    })
-    it('Implements getIssuer', () => {
-      expect(vCred.getIssuer()).to.eq(issuer)
-    })
-    it('Implements getSignatureValue', () => {
-      expect(vCred.getSignatureValue()).to.deep.eq(Buffer.from(proof.signatureValue))
-    })
-    it('Implements getSigner', () => {
-      expect(vCred.getSigner()).to.deep.eq({
+    it('Implements all getters', () => {
+      expect(vCred.id).to.eq(id)
+      expect(vCred.issued.toISOString()).to.eq(issued)
+      expect(vCred.type).to.deep.eq(type)
+      expect(vCred.issuer).to.eq(issuer)
+      expect(vCred.signature).to.deep.eq(proof.signatureValue)
+      expect(vCred.expires.toISOString()).to.deep.eq(expires)
+      expect(vCred.proof.toJSON()).to.deep.eq(proof)
+      expect(vCred.subject).to.eq(claim.id)
+      expect(vCred.claim).to.deep.eq(claim)
+      expect(vCred.name).to.eq('Email address')
+      expect(vCred.signer).to.deep.eq({
         did: issuer,
-        keyId: proof.creator,
+        keyId: proof.creator
       })
-    })
-    it('Implements getExpiryDate', () => {
-      expect(vCred.getExpiryDate().toISOString()).to.deep.eq(expires)
-    })
-    it('Implements getProofSection', () => {
-      expect(vCred.getProofSection().toJSON()).to.deep.eq(proof)
-    })
-    it('Implements getSubject', () => {
-      expect(vCred.getSubject()).to.eq(claim.id)
-    })
-    it('Implements getClaims', () => {
-      expect(vCred.getClaims()).to.deep.eq(claim)
-    })
-    it('Implements getDisplayName', () => {
-      expect(vCred.getDisplayName()).to.eq('Email address')
     })
   })
 })
