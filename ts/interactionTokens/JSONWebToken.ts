@@ -154,7 +154,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
   public static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T> {
     const interactionToken = JSONWebToken.fromJSON(decodeToken(jwt))
-    handleValidationStatus((interactionToken.getExpirationTime() - 1 > Date.now()), 'exp')
+    handleValidationStatus((interactionToken.getExpirationTime() > Date.now()), 'exp')
 
     return interactionToken as JSONWebToken<T>
   }
