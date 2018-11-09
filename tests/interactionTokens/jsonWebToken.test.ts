@@ -9,7 +9,7 @@ import {
   signedSimpleCredReqJWT,
   encodedSimpleCredReqJWT,
   expiredEncodedSimpleCredReqJWT,
-  hashedSimpleCredReqJWT,
+  hashedSimpleCredReqJWT
 } from '../data/interactionTokens/jsonWebToken.data'
 import { InteractionType } from '../../ts/interactionTokens/types'
 import { mockDid } from '../data/didDocument.data'
@@ -37,7 +37,7 @@ describe('JSONWebToken', () => {
 
   /*
    * We don't need to test with all tokenizable objects, it's a simple setter for now
-   * When we fromJWTEncodable, some data, such as issuer, typ and signature is not available, 
+   * When we fromJWTEncodable, some data, such as issuer, typ and signature is not available,
    */
 
   it('Should correctly implement fromJWTEncodable object', () => {
@@ -50,9 +50,8 @@ describe('JSONWebToken', () => {
     const simplified = {
       ...signedSimpleCredReqJWT,
       payload: unsignedPayload,
+      signature: ''
     }
-
-    delete simplified.signature
 
     const jwt = JSONWebToken.fromJWTEncodable(credReq)
 
@@ -64,31 +63,31 @@ describe('JSONWebToken', () => {
   it('Should implement fromJSON', () => {
     const jwt = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
 
-    expect(jwt.getInteractionToken()).to.deep.eq(credReq)
-    expect(jwt.getIssuer()).to.eq(iss)
-    expect(jwt.getIssueTime()).to.eq(0)
-    expect(jwt.getSignatureValue().toString('hex')).to.eq(signature)
+    expect(jwt.interactionToken).to.deep.eq(credReq)
+    expect(jwt.issuer).to.eq(iss)
+    expect(jwt.issued).to.eq(0)
+    expect(jwt.signature).to.eq(signature)
   })
 
   it('Should implement all setters', () => {
     const jwt = new JSONWebToken()
     const nonce = Math.random().toString(36)
-    
-    jwt.setSignature(signature)
-    jwt.setTokenContent(credReq)
-    jwt.setTokenIssuer(iss)
-    jwt.setIssueAndExpiryTime()
-    jwt.setTokenNonce(nonce)
-    jwt.setTokenAudience(mockDid)
-    jwt.setTokenType(typ as InteractionType)
 
-    expect(jwt.getSignatureValue().toString('hex')).to.eq(signature)
-    expect(jwt.getIssuer()).to.eq(iss)
-    expect(jwt.getInteractionToken()).to.deep.eq(credReq)
-    expect(jwt.getIssueTime()).to.eq(iat)
-    expect(jwt.getExpirationTime()).to.eq(exp)
-    expect(jwt.getAudience()).to.eq(mockDid)
-    expect(jwt.getTokenNonce()).to.eq(nonce)
+    jwt.setIssueAndExpiryTime()
+    jwt.signature = signature
+    jwt.interactionToken = credReq
+    jwt.issuer = iss
+    jwt.nonce = nonce
+    jwt.audience = mockDid
+    jwt.interactionType = typ as InteractionType
+
+    expect(jwt.signature).to.eq(signature)
+    expect(jwt.issuer).to.eq(iss)
+    expect(jwt.interactionToken).to.deep.eq(credReq)
+    expect(jwt.issued).to.eq(iat)
+    expect(jwt.expires).to.eq(exp)
+    expect(jwt.audience).to.eq(mockDid)
+    expect(jwt.nonce).to.eq(nonce)
   })
 
   it('Should implement static decode', () => {

@@ -15,7 +15,7 @@ describe('IpfsStorageAgent', () => {
   })
 
   it('should correctly instantiate', () => {
-    expect(storageAgent.getEndpoint()).to.eq(mockBaseUri)
+    expect(storageAgent.endpoint).to.eq(mockBaseUri)
   })
 
   /* We decode the did document from the form data to compare, otherwise we have to rely on form data here */

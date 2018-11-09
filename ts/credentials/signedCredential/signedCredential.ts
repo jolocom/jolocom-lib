@@ -111,12 +111,12 @@ export class SignedCredential implements IDigestable {
    * @description - Returns the signature value
    * @returns {string} - The signature encoded as hex
    */
-  get signatureValue() {
-    return this._proof.signatureValue
+  get signature() {
+    return this._proof.signature
   }
 
-  set signatureValue(signature: string) {
-    this._proof.signatureValue = signature
+  set signature(signature: string) {
+    this._proof.signature = signature
   }
 
   /**
@@ -250,7 +250,7 @@ export class SignedCredential implements IDigestable {
     this.expires = inOneYear
 
     this.proof.creator = keyId
-    this.proof.signatureValue = ''
+    this.proof.signature = ''
     this.proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
   }
 

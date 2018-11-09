@@ -70,7 +70,7 @@ describe('SignedCredential', () => {
       expect(vCred.issued.toISOString()).to.eq(issued)
       expect(vCred.type).to.deep.eq(type)
       expect(vCred.issuer).to.eq(issuer)
-      expect(vCred.signatureValue).to.deep.eq(proof.signatureValue)
+      expect(vCred.signature).to.deep.eq(proof.signatureValue)
       expect(vCred.expires.toISOString()).to.deep.eq(expires)
       expect(vCred.proof.toJSON()).to.deep.eq(proof)
       expect(vCred.subject).to.eq(claim.id)

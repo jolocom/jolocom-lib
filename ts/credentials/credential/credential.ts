@@ -30,6 +30,14 @@ export class Credential {
     this._claim = claim
   }
 
+  get id() {
+    return this._id
+  }
+
+  set id(id: string) {
+    this._id = id
+  }
+
   /**
    * @description - Returns the credential type
    * @returns {string[]} - credential type, e.g ['Credential', 'ProofOfNameCredential']
@@ -63,11 +71,11 @@ export class Credential {
    */
   @Expose({ name: '@context' })
   public get context(): ContextEntry[] {
-    return this['@context']
+    return this['_@context']
   }
 
   public set context(context: ContextEntry[]) {
-    this['@context'] = context
+    this['_@context'] = context
   }
 
   /**
@@ -81,7 +89,7 @@ export class Credential {
 
   public static create<T extends BaseMetadata>({ metadata, claim, subject }: ISignedCredCreationArgs<T>) {
     const credential = new Credential()
-    credential['@context'] = [...defaultContext, ...metadata.context]
+    credential.context = [...defaultContext, ...metadata.context]
     credential.type = metadata.type
     credential.name = metadata.name
     credential.claim = claim

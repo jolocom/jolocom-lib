@@ -42,12 +42,12 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
     this._nonce = nonce
   }
 
-  @Expose()
-  get signatureValue() {
+  @Expose({name: 'signatureValue'})
+  get signature() {
     return this._signatureValue
   }
 
-  set signatureValue(signature: string) {
+  set signature(signature: string) {
     this._signatureValue = signature
   }
 

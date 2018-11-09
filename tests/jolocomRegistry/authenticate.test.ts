@@ -33,6 +33,6 @@ describe('Jolocom Registry - authenticate', () => {
     const iw = await registry.authenticate(mockVault, keyMetadata)
     sandbox.assert.calledWith(mockVault.getPublicKey, keyMetadata)
     sandbox.assert.calledWith(JolocomRegistry.prototype.resolve, mockDid)
-    expect(iw.getDidDocument().toJSON()).to.deep.eq(didDocumentJSON)
+    expect(iw.didDocument.toJSON()).to.deep.eq(didDocumentJSON)
   })
 })

@@ -45,7 +45,7 @@ describe('EcdsaKoblitzSignature', () => {
     expect(signature.created).to.deep.eq(new Date(created))
     expect(signature.creator).to.eq(creator)
     expect(signature.nonce).to.eq(nonce)
-    expect(signature.signatureValue).to.deep.eq(signatureValue)
+    expect(signature.signature).to.deep.eq(signatureValue)
     expect(signature.type).to.deep.eq(type)
   })
 
@@ -63,7 +63,7 @@ describe('EcdsaKoblitzSignature', () => {
     bareSignature.created = new Date(0)
     bareSignature.creator = mockKeyId
     bareSignature.nonce = '1842fb5f567dd532'
-    bareSignature.signatureValue = 'abcdef'
+    bareSignature.signature = 'abcdef'
 
     expect(bareSignature.toJSON()).to.deep.eq(signatureAttributes)
   })

@@ -7,10 +7,9 @@ export interface ILinkedDataSignature extends IDigestable, ISerializable {
   type: string
   nonce: string
   created: Date
-  signatureValue: string
 }
 export interface IDigestable {
-  signatureValue: string
+  signature: string
   digest: () => Promise<Buffer>
 }
 

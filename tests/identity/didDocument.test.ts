@@ -61,7 +61,7 @@ describe('DidDocument', () => {
     expect(referenceDidDocument.did).to.deep.eq(id)
     expect(referenceDidDocument.created.toISOString()).to.deep.eq(created)
     expect(referenceDidDocument.proof.toJSON()).to.deep.eq(proof)
-    expect(referenceDidDocument.signatureValue).to.deep.eq(proof.signatureValue)
+    expect(referenceDidDocument.signature).to.deep.eq(proof.signatureValue)
     expect(referenceDidDocument.signer).to.deep.eq({
       did: mockDid,
       keyId: mockKeyId

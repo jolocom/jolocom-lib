@@ -117,12 +117,12 @@ export class DidDocument implements IDigestable {
     }
   }
 
-  get signatureValue(): string {
-    return this._proof.signatureValue
+  get signature(): string {
+    return this._proof.signature
   }
 
   set signatureValue(signature: string) {
-    this._proof.signatureValue = signature
+    this._proof.signature = signature
   }
 
   @Expose()
@@ -200,7 +200,7 @@ export class DidDocument implements IDigestable {
 
     this._proof = new EcdsaLinkedDataSignature()
     this._proof.creator = keyId
-    this._proof.signatureValue = ''
+    this._proof.signature = ''
     this._proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
   }
 

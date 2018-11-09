@@ -12,7 +12,11 @@ export class Identity {
   private _publicProfileCredential?: SignedCredential
 
   get did() {
-    return this._didDocument.did
+    return this.didDocument.did
+  }
+
+  set did(did: string) {
+    this.didDocument.did = did
   }
 
   get didDocument(): DidDocument {

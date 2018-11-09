@@ -83,8 +83,8 @@ export class JolocomRegistry {
   public async commit(commitArgs: IRegistryCommitArgs) {
     const { identityWallet, keyMetadata, vaultedKeyProvider } = commitArgs
 
-    const didDocument = identityWallet.getDidDocument()
-    const publicProfile = identityWallet.getIdentity().publicProfile
+    const didDocument = identityWallet.didDocument
+    const publicProfile = identityWallet.identity.publicProfile
 
     const remote = await this.resolveSafe(didDocument.did)
     const remotePubProf = remote && remote.publicProfile
