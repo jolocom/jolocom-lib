@@ -29,11 +29,11 @@ export class IdentityWallet {
   private vaultedKeyProvider: IVaultedKeyProvider
 
   public getDid(): string {
-    return this.identity.getDid()
+    return this.identity.did
   }
 
   public getDidDocument(): DidDocument {
-    return this.identity.getDidDocument()
+    return this.identity.didDocument
   }
 
   public getIdentity(): Identity {
