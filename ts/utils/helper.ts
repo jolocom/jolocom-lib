@@ -10,6 +10,10 @@ export function getIssuerPublicKey(keyId: string, ddo: DidDocument): Buffer {
   const relevantKeySection = ddo.getPublicKeySections()
     .find(section => section.getIdentifier() === keyId)
 
+  if (!relevantKeySection) {
+    throw new Error('No relevant key-id found')
+  }
+
   return Buffer.from(relevantKeySection.getPublicKeyHex(), 'hex')
 }
 
