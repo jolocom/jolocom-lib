@@ -10,6 +10,7 @@ import { CredentialResponse } from './credentialResponse'
 import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
 import { CredentialsReceive } from './credentialsReceive'
+import { handleValidationStatus } from '../utils/helper'
 
 /* Local interfaces / types to save on typing later */
 
@@ -153,10 +154,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
   public static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T> {
     const interactionToken = JSONWebToken.fromJSON(decodeToken(jwt))
-
-    if (interactionToken.getExpirationTime() <= Date.now()) {
-      throw new Error('Token expired')
-    }
+    handleValidationStatus((interactionToken.getExpirationTime() > Date.now()), 'exp')
 
     return interactionToken as JSONWebToken<T>
   }
@@ -207,8 +205,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
 const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: InteractionType): T => {
   const payloadParserMap = {
-    [InteractionType.CredentialOfferRequest]: CredentialOffer,
-    [InteractionType.CredentialOfferResponse]: CredentialOffer,
+    [InteractionType.CredentialOffer]: CredentialOffer,
     [InteractionType.CredentialRequest]: CredentialRequest,
     [InteractionType.CredentialResponse]: CredentialResponse,
     [InteractionType.CredentialsReceive]: CredentialsReceive,

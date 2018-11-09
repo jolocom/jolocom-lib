@@ -6,10 +6,10 @@ import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
 import {
-  signedSimpleCredReqJWT,
-  encodedSimpleCredReqJWT,
+  encodedValidCredReqJWT,
   expiredEncodedSimpleCredReqJWT,
-  hashedSimpleCredReqJWT,
+  validSignedCredReqJWT,
+  hashedValidCredReqJWT,
 } from '../data/interactionTokens/jsonWebToken.data'
 import { InteractionType } from '../../ts/interactionTokens/types'
 import { mockDid } from '../data/didDocument.data'
@@ -22,8 +22,8 @@ describe('JSONWebToken', () => {
 
   /* Saves some typing later */
 
-  const { iss, typ, iat, exp } = signedSimpleCredReqJWT.payload
-  const { signature, payload } = signedSimpleCredReqJWT
+  const { iss, typ, iat, exp } = validSignedCredReqJWT.payload
+  const { signature, payload } = validSignedCredReqJWT
 
   before(() => {
     clock = sinon.useFakeTimers()
@@ -46,9 +46,10 @@ describe('JSONWebToken', () => {
     delete unsignedPayload.iss
     delete unsignedPayload.exp
     delete unsignedPayload.iat
+    delete unsignedPayload.jti
 
     const simplified = {
-      ...signedSimpleCredReqJWT,
+      ...validSignedCredReqJWT,
       payload: unsignedPayload,
     }
 
@@ -62,7 +63,7 @@ describe('JSONWebToken', () => {
   /* Tests getters as well */
 
   it('Should implement fromJSON', () => {
-    const jwt = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
+    const jwt = JSONWebToken.fromJSON(validSignedCredReqJWT)
 
     expect(jwt.getInteractionToken()).to.deep.eq(credReq)
     expect(jwt.getIssuer()).to.eq(iss)
@@ -92,20 +93,20 @@ describe('JSONWebToken', () => {
   })
 
   it('Should implement static decode', () => {
-    const referenceJWT = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
-    const decodedJWT = JSONWebToken.decode(encodedSimpleCredReqJWT)
+    const referenceJWT = JSONWebToken.fromJSON(validSignedCredReqJWT)
+    const decodedJWT = JSONWebToken.decode(encodedValidCredReqJWT)
     expect(decodedJWT).to.deep.eq(referenceJWT)
   })
 
   it('Should implement encode', () => {
-    const jwt = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
-    expect(jwt.encode()).to.deep.eq(encodedSimpleCredReqJWT)
+    const jwt = JSONWebToken.fromJSON(validSignedCredReqJWT)
+    expect(jwt.encode()).to.deep.eq(encodedValidCredReqJWT)
   })
 
   it('Should implement digest', async () => {
-    const jwt = JSONWebToken.fromJSON(signedSimpleCredReqJWT)
+    const jwt = JSONWebToken.fromJSON(validSignedCredReqJWT)
     const digest = await jwt.digest()
-    expect(digest.toString('hex')).to.eq(hashedSimpleCredReqJWT)
+    expect(digest.toString('hex')).to.eq(hashedValidCredReqJWT)
   })
 
   it('Should thow error on expired JWT during decode', () => {
