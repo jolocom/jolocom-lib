@@ -174,14 +174,14 @@ export class IdentityWallet {
     return jwt
   }
 
-  public async validateJWT<T extends JWTEncodable>(jwtReceived: JSONWebToken<T>, jwtSend?: JSONWebToken<T>, customRegistry?: JolocomRegistry): Promise<void> {
+  public async validateJWT<T extends JWTEncodable>(receivedJWT: JSONWebToken<T>, sendJWT?: JSONWebToken<T>, customRegistry?: JolocomRegistry): Promise<void> {
     const registry = customRegistry || createJolocomRegistry()
-    const ddo = await registry.resolve(keyIdToDid(jwtReceived.getIssuer()))
-    const pubKey  = getIssuerPublicKey(jwtReceived.getIssuer(), ddo.getDidDocument())
+    const remoteIdentity = await registry.resolve(keyIdToDid(receivedJWT.getIssuer()))
+    const pubKey  = getIssuerPublicKey(receivedJWT.getIssuer(), remoteIdentity.getDidDocument())
  
-    handleValidationStatus(await this.vaultedKeyProvider.verifyDigestable(pubKey, jwtReceived), 'sig')
-    jwtSend && handleValidationStatus(jwtReceived.getAudience() === this.identity.getDid(), 'aud')
-    jwtSend && handleValidationStatus(jwtSend.getTokenNonce() === jwtReceived.getTokenNonce(), 'nonce')
+    handleValidationStatus(await this.vaultedKeyProvider.verifyDigestable(pubKey, receivedJWT), 'sig')
+    sendJWT && handleValidationStatus(receivedJWT.getAudience() === this.identity.getDid(), 'aud')
+    sendJWT && handleValidationStatus(sendJWT.getTokenNonce() === receivedJWT.getTokenNonce(), 'nonce')
   }
 
   /* Gathering creation methods in an easier to use public interface */

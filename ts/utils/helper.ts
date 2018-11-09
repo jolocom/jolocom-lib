@@ -7,25 +7,21 @@ export function keyIdToDid(keyId: string): string {
 }
 
 export function getIssuerPublicKey(keyId: string, ddo: DidDocument): Buffer {
-  const relevantPubKey = ddo.getPublicKeySections().map((keySection) => {
-    if (keySection.getIdentifier() === keyId) { return keySection.getPublicKeyHex() }
-  })
+  const relevantKeySection = ddo.getPublicKeySections()
+    .find(section => section.getIdentifier() === keyId)
 
-  return Buffer.from(relevantPubKey[0], 'hex')
+  return Buffer.from(relevantKeySection.getPublicKeyHex(), 'hex')
 }
 
-export function handleValidationStatus(status: boolean, key: string) {
-  switch (status) {
-    case false:
-      throw new Error(ErrorKeys[key] || 'Unknown Error key') 
-    default:
-      return
+export function handleValidationStatus(success: boolean, key: string) {
+  if(!success) {
+    throw new Error(ErrorKeys[key] || 'Unknown Error key') 
   }
 }
 
-export enum ErrorKeys {
-  exp = 'Token expired',
-  sig = 'Signature on token is invalid',
-  nonce = 'The token nonce deviates from request',
-  aud = 'You are not the intended audience of received token'
+const ErrorKeys = {
+  exp: 'Token expired',
+  sig: 'Signature on token is invalid',
+  nonce: 'The token nonce deviates from request',
+  aud: 'You are not the intended audience of received token'
 }
