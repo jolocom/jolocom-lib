@@ -1,5 +1,5 @@
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
-import { BaseMetadata, claimsMetadata } from 'cred-types-jolocom-core'
+import { claimsMetadata } from 'cred-types-jolocom-core'
 /* Local configuration for ganache server. the contract address is deterministic */
 
 export const testEthereumConfig = {

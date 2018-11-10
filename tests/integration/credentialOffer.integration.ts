@@ -1,11 +1,13 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import { userPass, servicePass } from './integration.data'
+import { userPass, servicePass, emailCredJSON } from './integration.data'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { keyIdToDid } from '../../ts/utils/helper'
 import { credentialOfferCreateAttrs } from '../data/interactionTokens/credentialOffer.data'
 import { CredentialOffer } from '../../ts/interactionTokens/credentialOffer'
 import { userIdentityWallet, serviceIdentityWallet, jolocomRegistry } from './identity.integration'
+import { claimsMetadata } from 'cred-types-jolocom-core'
+import { CredentialsReceive } from '../../ts/interactionTokens/credentialsReceive';
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -13,7 +15,9 @@ const expect = chai.expect
 describe('Integration Test - Token interaction flow Credential Offer', () => {
   let credOfferRequestJWT
   let credOfferRequestEncoded
+  let credOfferResponseJWT
   let credOfferResponseEncoded
+  let credReceiveEncoded
 
   it('Should correctly create a credential offer request token by service', async () => {
     credOfferRequestJWT = await serviceIdentityWallet.create.interactionTokens.request
@@ -35,7 +39,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       expect(true).to.be.false
     }
 
-    const credOfferResponseJWT = await userIdentityWallet.create.interactionTokens.response.offer({
+    credOfferResponseJWT = await userIdentityWallet.create.interactionTokens.response.offer({
         callbackURL: decodedCredOfferRequest.getInteractionToken().getCallbackURL(),
         instant: decodedCredOfferRequest.getInteractionToken().isInstant(),
         requestedInput: {}
@@ -61,5 +65,42 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     }
   })
 
-  // TODO: add credential receive as last step
+  it('Should correctly create a credential receive token by service', async () => {
+    const decodedCredOfferResponse = JSONWebToken.decode<CredentialOffer>(credOfferResponseEncoded)
+    const signedCredForUser = await serviceIdentityWallet.create.signedCredential(
+      {
+        metadata: claimsMetadata.emailAddress,
+        subject: keyIdToDid(decodedCredOfferResponse.getIssuer()),
+        claim: { email: emailCredJSON.claim.email }
+      },
+      servicePass
+    )
+
+    const credReceiveJWT = await serviceIdentityWallet.create.interactionTokens.response.issue(
+      {
+        signedCredentials: [signedCredForUser.toJSON()]
+      },
+      servicePass,
+      decodedCredOfferResponse
+    )
+    credReceiveEncoded = credReceiveJWT.encode()
+
+    expect(credReceiveJWT.getInteractionToken()).to.be.instanceOf(CredentialsReceive)
+    expect(credReceiveJWT.getAudience()).to.eq(keyIdToDid(decodedCredOfferResponse.getIssuer()))
+    expect(credReceiveJWT.getTokenNonce()).to.eq(decodedCredOfferResponse.getTokenNonce())
+  })
+
+  it('Should allow for consumtion of valid credential receive token by user', async () => {
+    const decodedCredReceive = JSONWebToken.decode<CredentialsReceive>(credReceiveEncoded)
+    expect(decodedCredReceive.getInteractionToken()).to.be.instanceOf(CredentialsReceive)
+
+    try {
+      await userIdentityWallet.validateJWT(decodedCredReceive, credOfferResponseJWT, jolocomRegistry)
+    } catch (err) {
+      expect(true).to.be.false
+    }
+    
+    expect(decodedCredReceive.getInteractionToken().getSignedCredentials()[0].getSubject())
+      .to.eq(userIdentityWallet.getDid())
+  })
 })
