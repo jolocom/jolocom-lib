@@ -7,7 +7,7 @@ import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { InteractionType } from '../interactionTokens/types'
 import { CredentialOffer } from '../interactionTokens/credentialOffer'
-import { ICredentialResponseAttrs, ICredentialRequestAttrs, ICredentialOfferAttrs, IAuthenticationAttrs } from '../interactionTokens/interactionTokens.types'
+import { ICredentialResponseAttrs, ICredentialRequestAttrs, ICredentialOfferAttrs, IAuthenticationAttrs, ICredentialsReceiveAttrs } from '../interactionTokens/interactionTokens.types'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
@@ -16,6 +16,7 @@ import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCred
 import { keyIdToDid, getIssuerPublicKey, handleValidationStatus } from '../utils/helper'
 import { generateRandomID } from '../utils/crypto'
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
+import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 
 /*
  * Developer facing class with initialized instance of the key provider as member.
@@ -152,6 +153,21 @@ export class IdentityWallet {
   }
 
   /*
+   * @description - Creates and signs a credential receive (issue of a signed credential)
+   * @param credReceive - Credential receive creation attributes
+   * @param pass - Password to decrypt the vaulted seed
+   * @param receivedJWT - received credential offer response JSONWebToken Class
+   * @returns {Object} -  Instance of credential receive class
+  */
+
+  private createCredReceive = async (credReceive: ICredentialsReceiveAttrs, pass: string, receivedJWT: JSONWebToken<JWTEncodable>) => {
+    const credentialReceieve = CredentialsReceive.fromJSON(credReceive)
+    const jwt = JSONWebToken.fromJWTEncodable(credentialReceieve)
+    jwt.setTokenType(InteractionType.CredentialsReceive)
+    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
+  }
+
+  /*
    * @description - Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
    * @param jwt - JSONWebToken Class
    * @param derivationPath - Derivation Path for identity keys
@@ -206,6 +222,7 @@ export class IdentityWallet {
         auth: this.createAuth,
         offer: this.createCredOffer,
         share: this.createCredResp,
+        issue: this.createCredReceive,
       },
     },
   }

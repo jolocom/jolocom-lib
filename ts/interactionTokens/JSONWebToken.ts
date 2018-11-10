@@ -205,11 +205,11 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
 const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: InteractionType): T => {
   const payloadParserMap = {
-    // [InteractionType.CredentialsReceive]: CredentialsReceive,
+    [InteractionType.CredentialsReceive]: CredentialsReceive,
     [InteractionType.CredentialOffer]: CredentialOffer,
     [InteractionType.CredentialRequest]: CredentialRequest,
     [InteractionType.CredentialResponse]: CredentialResponse,
-    [InteractionType.Authentication]: Authentication 
+    //[InteractionType.Authentication]: Authentication 
   }
 
   const correspondingClass = payloadParserMap[typ]
