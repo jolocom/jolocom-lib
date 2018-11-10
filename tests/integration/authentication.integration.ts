@@ -37,9 +37,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
 
     const authResponseJWT = await userIdentityWallet.create.interactionTokens.response.auth(
       {
-        callbackURL: decodedAuthRequest.getInteractionToken().getCallbackURL(),
-        // TODO: do we still need the challenge?
-        challenge: decodedAuthRequest.getInteractionToken().getChallenge()
+        callbackURL: decodedAuthRequest.getInteractionToken().getCallbackURL()
       },
       userPass,
       decodedAuthRequest
@@ -60,8 +58,5 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     } catch (err) {
       expect(true).to.be.false
     }
-    
-    expect(decodedAuthResponse.getInteractionToken().getChallenge())
-      .to.eq(authRequestJWT.getInteractionToken().getChallenge())
   })
 })

@@ -7,9 +7,8 @@ import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { InteractionType } from '../interactionTokens/types'
 import { CredentialOffer } from '../interactionTokens/credentialOffer'
-import { ICredentialRequestAttrs, ICredentialOfferAttrs } from '../interactionTokens/interactionTokens.types'
-import { Authentication, IAuthenticationAttrs } from '../interactionTokens/authentication'
-import { ICredentialResponseAttrs } from '../interactionTokens/interactionTokens.types'
+import { ICredentialResponseAttrs, ICredentialRequestAttrs, ICredentialOfferAttrs, IAuthenticationAttrs } from '../interactionTokens/interactionTokens.types'
+import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { IVaultedKeyProvider } from '../vaultedKeyProvider/softwareProvider'
@@ -173,6 +172,14 @@ export class IdentityWallet {
 
     return jwt
   }
+
+  /*
+   * @description - Validates interaction tokens for signature - if only received token passed - and for audience (aud) and token nonce (jti) if send token passed also 
+   * @param receivedJWT - recieved JSONWebToken Class
+   * @param sendJWT - optional send JSONWebToken Class which is used to validate the token nonce and the aud field on received token
+   * @param customRegsitry - optional custom registry
+   * @returns void -  Throws error on validation errors
+  */
 
   public async validateJWT<T extends JWTEncodable>(receivedJWT: JSONWebToken<T>, sendJWT?: JSONWebToken<T>, customRegistry?: JolocomRegistry): Promise<void> {
     const registry = customRegistry || createJolocomRegistry()

@@ -1,10 +1,5 @@
 import { plainToClass, classToPlain, Expose } from 'class-transformer'
-
-/* TODO CLEAN UP */
-export interface IAuthenticationAttrs {
-  challenge: string
-  callbackURL: string
-}
+import { IAuthenticationAttrs } from './interactionTokens.types'
 
 /*
  * Class representing a challenge string and callback url for challenge-response
@@ -15,12 +10,7 @@ export interface IAuthenticationAttrs {
 
 @Expose()
 export class Authentication {
-  private challenge: string
   private callbackURL: string
-
-  public getChallenge(): string {
-    return this.challenge
-  }
 
   public getCallbackURL(): string {
     return this.callbackURL

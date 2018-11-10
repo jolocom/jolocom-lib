@@ -6,9 +6,6 @@ import { ICredentialOfferAttrs } from './interactionTokens.types'
 @Exclude()
 export class CredentialOffer {
   @Expose()
-  private challenge: string
-
-  @Expose()
   private callbackURL: string
 
   @Expose()
@@ -17,10 +14,6 @@ export class CredentialOffer {
   @Expose()
   private requestedInput: {
     [key: string]: string | null
-  }
-
-  public getChallenge(): string {
-    return this.challenge
   }
 
   public isInstant(): boolean {

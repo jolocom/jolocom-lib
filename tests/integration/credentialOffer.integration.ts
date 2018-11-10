@@ -37,7 +37,6 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
 
     const credOfferResponseJWT = await userIdentityWallet.create.interactionTokens.response.offer({
         callbackURL: decodedCredOfferRequest.getInteractionToken().getCallbackURL(),
-        challenge: decodedCredOfferRequest.getInteractionToken().getChallenge(),
         instant: decodedCredOfferRequest.getInteractionToken().isInstant(),
         requestedInput: {}
       },
@@ -60,10 +59,6 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     } catch (err) {
       expect(true).to.be.false
     }
-    
-    // TODO: do we still need the challenge on Credential Offer?
-    expect(decodedCredOfferResponse.getInteractionToken().getChallenge())
-      .to.eq(credOfferRequestJWT.getInteractionToken().getChallenge())
   })
 
   // TODO: add credential receive as last step
