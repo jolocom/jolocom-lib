@@ -1,32 +1,16 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
-import { EthResolver } from '../../ts/ethereum/ethereum'
-import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
-import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
-import { testEthereumConfig, testIpfsConfig, userVault, userPass, serviceVault, servicePass } from './integration.data'
+import { userPass, servicePass } from './integration.data'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { keyIdToDid } from '../../ts/utils/helper'
 import { credentialOfferCreateAttrs } from '../data/interactionTokens/credentialOffer.data'
 import { CredentialOffer } from '../../ts/interactionTokens/credentialOffer'
+import { userIdentityWallet, serviceIdentityWallet, jolocomRegistry } from './identity.integration'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
 describe('Integration Test - Token interaction flow Credential Offer', () => {
-  let jolocomRegistry = createJolocomRegistry({
-    ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
-    ethereumConnector: new EthResolver(testEthereumConfig)
-  })
-
-  let userIdentityWallet: IdentityWallet
-  let serviceIdentityWallet: IdentityWallet
-
-  before(async () => {
-    userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
-    serviceIdentityWallet = await jolocomRegistry.create(serviceVault, servicePass)
-  })
-  
   let credOfferRequestJWT
   let credOfferRequestEncoded
   let credOfferResponseEncoded
