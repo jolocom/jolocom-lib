@@ -15,6 +15,16 @@ import { testSeed } from '../data/keys.data'
 chai.use(sinonChai)
 const expect = chai.expect
 
+/* global before and after hook for integration tests */
+
+before(async () => {
+  await integrationHelper.init()
+})
+
+after(() => {
+  process.exit(0)
+})
+
 describe('Integration Test - Create, Resolve, Public Profile', () => {
   let jolocomRegistry = createJolocomRegistry({
     ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
@@ -24,13 +34,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
   let userIdentityWallet: IdentityWallet
   let serviceIdentityWallet: IdentityWallet
 
-  before(async () => {
-    await integrationHelper.init()
-  })
-
-  after(() => {
-    process.exit(0)
-  })
+  
 
   it('should correctly create user and service identities', async () => {
     userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
