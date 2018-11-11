@@ -57,7 +57,7 @@ export class Credential {
 
   /**
    * Get the type of the credential
-   * @returns {string[]} - credential type
+   * @returns {string[]}
    * @example `console.log(credentia.type) //['Credential', 'ProofOf...Credential']`
    */
   @Expose()
@@ -75,7 +75,7 @@ export class Credential {
 
   /**
    * Get a presentable credential name if present
-   * @returns {string | undefined} - credential name, e.g. 'Email', 'Name'
+   * @returns {string | undefined}
    * @example `console.log(credentia.name) // 'Email'`
    */
 
@@ -121,7 +121,8 @@ export class Credential {
    * @param subject - the did of the subject / receiver
    * @see {@link https://jolocom-lib.readthedocs.io/en/latest/signedCredentials.html | developer documentation}
    * @returns {Credential}
-   * @example [[include:credential.creation.md]]
+   * @todo Make this available without having to directly import the {@link Credential} class
+   * @example [[include:credential.create.md]]
    */
 
   public static create<T extends BaseMetadata>({ metadata, claim, subject }: ISignedCredCreationArgs<T>) {
@@ -140,7 +141,7 @@ export class Credential {
    * @param json - credential encoded as JSON-LD
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
    * @returns {Credential}
-   * @example `const credential = Credentia.fromJSON()`
+   * @example `const credential = Credentia.fromJSON({...})`
    */
 
   public static fromJSON(json: ICredentialAttrs): Credential {
@@ -150,7 +151,7 @@ export class Credential {
   /**
    * Serializes the {@link Credential} as a JSON-LD document
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
-   * @returns {ICredentialAttrs} - JSON-LD encoded credential
+   * @returns {ICredentialAttrs}
    * @example `console.log(credential.toJSON()) // Verifiable credential in JSON-LD form`
    */
 
