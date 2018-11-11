@@ -45,7 +45,7 @@ export class JolocomRegistry {
     const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
     const didDocumentSignature = await vaultedKeyProvider.signDigestable(derivationArgs, didDocument)
 
-    didDocument.signatureValue = didDocumentSignature.toString('hex')
+    didDocument.signature = didDocumentSignature.toString('hex')
     const identity = Identity.fromDidDocument({ didDocument })
 
     const identityWallet = new IdentityWallet({

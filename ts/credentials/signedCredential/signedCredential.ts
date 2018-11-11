@@ -320,7 +320,7 @@ export class SignedCredential implements IDigestable {
   }
 
   /**
-   * Returns the sha256 hash of the did document, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
+   * Returns the sha256 hash of the signed credential, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
    * @internal
    */
 
