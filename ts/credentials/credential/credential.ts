@@ -57,9 +57,9 @@ export class Credential {
 
   /**
    * Get the type of the credential
-   * @returns {string[]}
-   * @example `console.log(credentia.type) //['Credential', 'ProofOf...Credential']`
+   * @example `console.log(credential.type) // ['Credential', 'ProofOf...Credential']`
    */
+
   @Expose()
   get type(): string[] {
     return this._type
@@ -67,16 +67,16 @@ export class Credential {
 
   /**
    * Set the type of the credential
-   * @example `credentia.type = ['Credential', 'ProofOf...Credential']`
+   * @example `credential.type = ['Credential', 'ProofOf...Credential']`
    */
+
   set type(type: string[]) {
     this._type = type
   }
 
   /**
    * Get a presentable credential name if present
-   * @returns {string | undefined}
-   * @example `console.log(credentia.name) // 'Email'`
+   * @example `console.log(credential.name) // 'Email'`
    */
 
   @Expose()
@@ -86,7 +86,7 @@ export class Credential {
 
   /**
    * Set a presentable credential name
-   * @example `credentia.name = 'Email'`
+   * @example `credential.name = 'Email'`
    */
 
   set name(name: string) {
@@ -96,7 +96,7 @@ export class Credential {
   /**
    * Get the `@context` section of the JSON-ld document
    * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
-   * @example `console.log(credentia.context) // [{name: 'http://schema.org/name', ...}, {...}]`
+   * @example `console.log(credential.context) // [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
   @Expose({ name: '@context' })
@@ -107,7 +107,7 @@ export class Credential {
   /**
    * Set the `@context` section of the JSON-ld document
    * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
-   * @example `credentia.context = [{name: 'http://schema.org/name', ...}, {...}]`
+   * @example `credential.context = [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
   public set context(context: ContextEntry[]) {
@@ -120,7 +120,6 @@ export class Credential {
    * @param claim - the `claim` section
    * @param subject - the did of the subject / receiver
    * @see {@link https://jolocom-lib.readthedocs.io/en/latest/signedCredentials.html | developer documentation}
-   * @returns {Credential}
    * @todo Make this available without having to directly import the {@link Credential} class
    * @example [[include:credential.create.md]]
    */
@@ -140,8 +139,7 @@ export class Credential {
    * Instantiates a {@link Credential} from it's JSON-LD form
    * @param json - credential encoded as JSON-LD
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
-   * @returns {Credential}
-   * @example `const credential = Credentia.fromJSON({...})`
+   * @example `const credential = Credential.fromJSON({...})`
    */
 
   public static fromJSON(json: ICredentialAttrs): Credential {
@@ -151,7 +149,6 @@ export class Credential {
   /**
    * Serializes the {@link Credential} as a JSON-LD document
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
-   * @returns {ICredentialAttrs}
    * @example `console.log(credential.toJSON()) // Verifiable credential in JSON-LD form`
    */
 
