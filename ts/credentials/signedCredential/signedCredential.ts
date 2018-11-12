@@ -7,7 +7,7 @@ import { ILinkedDataSignature, IDigestable } from '../../linkedDataSignature/typ
 import { ContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
-import { ISigner } from '../../registries/types'
+import { ISigner } from '../../registries/signerType'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 

@@ -13,8 +13,3 @@ export interface IRegistryCommitArgs {
   keyMetadata: IKeyDerivationArgs
   identityWallet: IdentityWallet
 }
-
-export interface ISigner {
-  did: string
-  keyId: string
-}
