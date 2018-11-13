@@ -13,6 +13,6 @@ describe('Authentication', () => {
   })
 
   it('Should implement getters method', () => {
-    expect(auth.getCallbackURL()).to.eq(jsonAuthentication.callbackURL)
+    expect(auth.callbackURL).to.eq(jsonAuthentication.callbackURL)
   })
 })

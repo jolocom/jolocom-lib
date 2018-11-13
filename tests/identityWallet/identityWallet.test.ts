@@ -47,11 +47,11 @@ describe('IdentityWallet', () => {
         vaultedKeyProvider: stubbedKeyProvider,
         publicKeyMetadata: {
           derivationPath: KeyTypes.jolocomIdentityKey,
-          keyId: mockKeyId,
-        },
+          keyId: mockKeyId
+        }
       })
 
-      expect(iw.getDid()).to.eq(mockDid)
+      expect(iw.did).to.eq(mockDid)
     })
   })
 
@@ -110,10 +110,14 @@ describe('IdentityWallet', () => {
 
     it('Should create an interaction token as a response', async () => {
       const decodedToken = JSONWebToken.decode(interactionToken.encode())
-      const interactionResponeToken = await iw.create.interactionTokens.response.share(credentialResponseJSON, encryptionPass, decodedToken)
+      const interactionResponeToken = await iw.create.interactionTokens.response.share(
+        credentialResponseJSON,
+        encryptionPass,
+        decodedToken
+      )
 
-      expect(interactionResponeToken.getTokenNonce()).to.eq(decodedToken.getTokenNonce())
-      expect(interactionResponeToken.getAudience()).to.eq(keyIdToDid(decodedToken.getIssuer()))
+      expect(interactionResponeToken.nonce).to.eq(decodedToken.nonce)
+      expect(interactionResponeToken.audience).to.eq(keyIdToDid(decodedToken.issuer))
     })
   })
 })

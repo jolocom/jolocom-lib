@@ -20,14 +20,14 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
     credRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.share(integrationCredRequestJSON, servicePass)
     credRequestEncoded = credRequestJWT.encode()
 
-    expect(credRequestJWT.getInteractionToken()).to.deep.eq(CredentialRequest.fromJSON(integrationCredRequestJSON))
+    expect(credRequestJWT.interactionToken).to.deep.eq(CredentialRequest.fromJSON(integrationCredRequestJSON))
     expect(credRequestJWT).to.be.instanceOf(JSONWebToken)
-    expect(credRequestJWT.getInteractionToken()).to.be.instanceOf(CredentialRequest)
+    expect(credRequestJWT.interactionToken).to.be.instanceOf(CredentialRequest)
   })
 
   it('Should allow for consumption of valid credential request token by user', async () => {
     const decodedCredRequest = JSONWebToken.decode<CredentialRequest>(credRequestEncoded)
-    expect(decodedCredRequest.getInteractionToken()).to.be.instanceOf(CredentialRequest)
+    expect(decodedCredRequest.interactionToken).to.be.instanceOf(CredentialRequest)
 
     try {
       await userIdentityWallet.validateJWT(decodedCredRequest, null, jolocomRegistry)
@@ -37,12 +37,12 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
 
     const emailSignedCred = await userIdentityWallet.create.signedCredential(emailCredJSON, userPass)
     const emailSecondCred = SignedCredential.fromJSON(emailSignedCred.toJSON())
-    emailSecondCred.setIssuer('did:jolo:bf8095f75ec116362eb31d5e68736be6688f82db616d1dd7df5e9f99047347c3')
-    const filteredCred = decodedCredRequest.getInteractionToken()
+    emailSecondCred.issuer ='did:jolo:bf8095f75ec116362eb31d5e68736be6688f82db616d1dd7df5e9f99047347c3'
+    const filteredCred = decodedCredRequest.interactionToken
       .applyConstraints([emailSignedCred.toJSON(), emailSecondCred.toJSON()])
     
     const credResponseJWT = await userIdentityWallet.create.interactionTokens.response.share({
-        callbackURL: decodedCredRequest.getInteractionToken().getCallbackURL(),
+        callbackURL: decodedCredRequest.interactionToken.callbackURL,
         suppliedCredentials: filteredCred
       },
       userPass,
@@ -50,14 +50,14 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
     )
     credResponseEncoded = credResponseJWT.encode()
 
-    expect(credResponseJWT.getInteractionToken()).to.be.instanceOf(CredentialResponse)
-    expect(credResponseJWT.getTokenNonce()).to.eq(decodedCredRequest.getTokenNonce())
-    expect(credResponseJWT.getAudience()).to.eq(keyIdToDid(decodedCredRequest.getIssuer()))
+    expect(credResponseJWT.interactionToken).to.be.instanceOf(CredentialResponse)
+    expect(credResponseJWT.nonce).to.eq(decodedCredRequest.nonce)
+    expect(credResponseJWT.audience).to.eq(keyIdToDid(decodedCredRequest.issuer))
   })
 
   it('Should allow for consumption of valid credential response token by service', async () => {
     const decodedCredResponse = JSONWebToken.decode<CredentialResponse>(credResponseEncoded)
-    expect(decodedCredResponse.getInteractionToken()).to.be.instanceOf(CredentialResponse)
+    expect(decodedCredResponse.interactionToken).to.be.instanceOf(CredentialResponse)
 
     try {
       await serviceIdentityWallet.validateJWT(decodedCredResponse, credRequestJWT, jolocomRegistry)
@@ -65,7 +65,7 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
       expect(true).to.be.false
     }
     
-    expect(decodedCredResponse.getInteractionToken()
-      .satisfiesRequest(credRequestJWT.getInteractionToken())).to.be.true
+    expect(decodedCredResponse.interactionToken
+      .satisfiesRequest(credRequestJWT.interactionToken)).to.be.true
   })
 })

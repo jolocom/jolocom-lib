@@ -2,69 +2,101 @@ import { DidDocument } from './didDocument/didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { IIdentityCreateArgs } from './types'
 
-/*
- * Class representing an identity, includes a didDocument and public profile
- * in the form of a signed credential.
+/**
+ * @class
+ * Class representing an identity, combines a {@link DidDocument} and a public profile {@link SignedCredential}
  */
 
 export class Identity {
-  private didDocument: DidDocument
-  private publicProfileCredential?: SignedCredential
+  private _didDocument: DidDocument
+  private _publicProfileCredential?: SignedCredential
 
-  public getDid() {
-    return this.didDocument.getDid()
+  /**
+   * Get the identity did
+   * @example `console.log(identity.did) // 'did:jolo:...'`
+   */
+
+  get did() {
+    return this.didDocument.did
   }
 
-  public getDidDocument(): DidDocument {
-    return this.didDocument
+  /**
+   * Set the identity did
+   * @example `identity.did = 'did:jolo:...'`
+   */
+
+  set did(did: string) {
+    this.didDocument.did = did
   }
 
-  public getServiceEndpointSections() {
-    return this.didDocument.getServiceEndpointSections()
+  /**
+   * Get the did document associated with the identity
+   * @example `console.log(identity.didDocument) // DidDocument {...}`
+   */
+
+  get didDocument(): DidDocument {
+    return this._didDocument
   }
 
-  public getPublicKeySection() {
-    return this.didDocument.getPublicKeySections()
+  /**
+   * Set did document associated with the identity
+   * @example `identity.didDocument = DidDocument.fromPublicKey(...)`
+   */
+
+  set didDocument(didDocument: DidDocument) {
+    this._didDocument = didDocument
   }
 
-  public setDidDocument(didDocument: DidDocument) {
-    this.didDocument = didDocument
+  /**
+   * Get the identity service endpoint sections
+   * @example `console.log(identity.serviceEndpointSections) // [ServiceEndpointSection {...}, ...]`
+   */
+
+  get serviceEndpointSections() {
+    return this.didDocument.service
   }
 
-  /*
-   * @description - Instantiates the Identity class based on a did document and public profile
+  /**
+   * Get the identity public key sections
+   * @example `console.log(identity.publicKeySection) // [PublicKeySection {...}, ...]`
+   */
+
+  get publicKeySection() {
+    return this.didDocument.publicKey
+  }
+
+  /**
+   * Get the public profile signed credential associated with the identity
+   * @example `console.log(identity.publicProfile) // SignedCredential {...}`
+   */
+
+  get publicProfile() {
+    return this._publicProfileCredential
+  }
+
+  /**
+   * Get the public profile signed credential associated with the identity
+   * @example `identity.publicProfile = publicProfileSignedCredential`
+   */
+
+  set publicProfile(publicProfile: SignedCredential | undefined) {
+    this._publicProfileCredential = publicProfile
+  }
+
+  /**
+   * Instantiates the {@link Identity} class based on a did document and public profile
    * @param didDocument - The did document associated with a did
-   * @param [publicProfile] - Verifiable credential containing public claims (e.g. name, website)
-   * @returns {Object} - Instance of the Identity class
-  */
+   * @param publicProfile - Verifiable credential containing public claims (e.g. name, website)
+   * @example `const identity = Identity.fromDidDocument({didDocument, publicProfile})`
+   */
 
   public static fromDidDocument({ didDocument, publicProfile }: IIdentityCreateArgs): Identity {
     const identity = new Identity()
-    identity.setDidDocument(didDocument)
+    identity.didDocument = didDocument
     if (publicProfile) {
-      identity.publicProfile.set(publicProfile)
+      identity.publicProfile = publicProfile
     }
 
     return identity
-  }
-
-  /* Aggregates all methods modifying the public profile  */
-
-  public publicProfile = {
-    get: this.getPublicProfile.bind(this),
-    set: this.setPublicProfile.bind(this),
-    delete: this.deletePublicProfile.bind(this),
-  }
-
-  private getPublicProfile() {
-    return this.publicProfileCredential
-  }
-
-  private setPublicProfile(publicProfile: SignedCredential) {
-    this.publicProfileCredential = publicProfile
-  }
-
-  private deletePublicProfile() {
-    this.publicProfileCredential = undefined
   }
 }

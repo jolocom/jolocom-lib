@@ -1,4 +1,4 @@
-import { Transform, plainToClass, classToPlain, Type, Exclude, Expose } from 'class-transformer'
+import { plainToClass, classToPlain, Type, Exclude, Expose, Transform } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
 import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
@@ -10,178 +10,281 @@ import { sha256, publicKeyToDID } from '../../utils/crypto'
 import { ILinkedDataSignature, IDigestable } from '../../linkedDataSignature/types'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 
+/**
+ * Class modelling a Did Document
+ * @see {@link https://w3c-ccg.github.io/did-spec/ | specification}
+ */
+
 @Exclude()
 export class DidDocument implements IDigestable {
-  @Expose()
-  @Type(() => AuthenticationSection)
-  private authentication: AuthenticationSection[] = []
+  private _id: string
+  private _authentication: AuthenticationSection[] = []
+  private _publicKey: PublicKeySection[] = []
+  private _service: ServiceEndpointsSection[] = []
+  private _created: Date = new Date()
+  private _proof: ILinkedDataSignature
+  private '_@context': ContextEntry[] = defaultContextIdentity
 
-  @Expose()
-  @Type(() => PublicKeySection)
-  private publicKey: PublicKeySection[] = []
+  /**
+   * Get the `@context` section of the JSON-ld document
+   * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
+   * @example `console.log(didDocument.context) // [{name: 'http://schema.org/name', ...}, {...}]`
+   */
 
-  @Expose()
-  @Type(() => ServiceEndpointsSection)
-  private service: ServiceEndpointsSection[] = []
+  @Expose({ name: '@context' })
+  get context(): ContextEntry[] {
+    return this['_@context']
+  }
 
-  /*
-   * When toJSON is called, convert date to ISO string format,
-   * when fromJSON is called, parse value if exists, else default to now
+  /**
+   * Set the `@context` section of the JSON-ld document
+   * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
+   * @example `didDocument.context = [{name: 'http://schema.org/name', ...}, {...}]`
+   */
+
+  set context(context: ContextEntry[]) {
+    this['_@context'] = context
+  }
+
+  /**
+   * Get the did associated with the did document
+   * @example `console.log(didDocument.id) //claimId:25453fa543da7`
+   */
+
+  @Expose({ name: 'id' })
+  get did(): string {
+    return this._id
+  }
+
+  /**
+   * Set the did associated with the did document
+   * @example `didDocument.id = 'claimId:25453fa543da7'`
+   */
+
+  set did(did: string) {
+    this._id = did
+  }
+
+  /**
+   * Get the did document authentication sections
+   * @example `console.log(didDocument.authentication) // [AuthenticationSection {...}, ...]`
    */
 
   @Expose()
-  @Type(() => Date)
-  @Transform((value: Date) => value.toISOString(), { toPlainOnly: true })
-  @Transform((value: string) => new Date(value), { toClassOnly: true })
-  private created: Date = new Date()
+  @Type(() => AuthenticationSection)
+  get authentication(): AuthenticationSection[] {
+    return this._authentication
+  }
+
+  /**
+   * Set the did document authentication sections
+   * @example `didDocument.authentication = [AuthenticationSection {...}, ...]`
+   */
+
+  set authentication(authentication: AuthenticationSection[]) {
+    this._authentication = authentication
+  }
+
+  /**
+   * Get the did document public key sections
+   * @example `console.log(didDocument.publicKey) // [PublicKeySection {...}, ...]`
+   */
 
   @Expose()
-  @Type(() => EcdsaLinkedDataSignature)
-  private proof: ILinkedDataSignature
+  @Type(() => PublicKeySection)
+  get publicKey(): PublicKeySection[] {
+    return this._publicKey
+  }
+
+  /**
+   * Set the did document public key sections
+   * @example `didDocument.publicKey = [PublicKeySection {...}, ...]`
+   */
+
+  set publicKey(value: PublicKeySection[]) {
+    this._publicKey = value
+  }
+
+  /**
+   * Get the did document service endpoint sections
+   * @example `console.log(diddocument.service) // [serviceendpointsection {...}, ...]`
+   */
 
   @Expose()
-  private '@context': ContextEntry[] = defaultContextIdentity
+  @Type(() => ServiceEndpointsSection)
+  get service(): ServiceEndpointsSection[] {
+    return this._service
+  }
+
+  /**
+   * Set the did document service endpoint sections
+   * @example `didDocument.service = [ServiceEndpointSection {...}, ...]`
+   */
+
+  set service(service: ServiceEndpointsSection[]) {
+    this._service = service
+  }
+
+  /**
+   * Get the creation date of the did document
+   * @example `console.log(didDocument.issued) // Date 2018-11-11T15:46:09.720Z`
+   */
 
   @Expose()
-  private id: string
-
-  public getDid(): string {
-    return this.id
+  @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
+  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+  get created(): Date {
+    return this._created
   }
 
-  public getAuthSections(): AuthenticationSection[] {
-    return this.authentication
+
+  /**
+   * Set the creation date of the did document
+   * @example `didDocument.created = new Date('2018-11-11T15:46:09.720Z')`
+   */
+
+  set created(value: Date) {
+    this._created = value
   }
 
-  public getPublicKeySections(): PublicKeySection[] {
-    return this.publicKey
-  }
+  /**
+   * Get aggregated metadata related to the signing public key
+   * @see {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}
+   * @example `console.log(didDocument.signer) // { did: 'did:jolo:...', keyId: 'did:jolo:...#keys-1' }`
+   */
 
-  public getServiceEndpointSections(): ServiceEndpointsSection[] {
-    return this.service
-  }
-
-  public getCreationDate(): Date {
-    return this.created
-  }
-
-  public getContext(): ContextEntry[] {
-    return this['@context']
-  }
-
-  public getProof(): ILinkedDataSignature {
-    return this.proof
-  }
-
-  public getSignatureValue(): Buffer {
-    return this.proof.getSignatureValue()
-  }
-
-  public getSigner(): ISigner {
+  get signer(): ISigner {
     return {
-      did: this.getDid(),
-      keyId: this.proof.getCreator(),
+      did: this._id,
+      keyId: this._proof.creator
     }
   }
 
-  public setDid(did: string) {
-    this.id = did
+  /**
+   * Get the hex encoded did document signature
+   * @example `console.log(didDocument.signature) // '2b8504698e...'`
+   */
+
+  get signature(): string {
+    return this._proof.signature
   }
 
-  public setSignatureValue(signature: string) {
-    this.proof.setSignatureValue(signature)
+  /**
+   * Set the hex encoded did document signature
+   * @example `didDocument.signature = '2b8504698e...'`
+   */
+
+  set signature(signature: string) {
+    this._proof.signature = signature
   }
 
-  /*
-   * @description - Adds a new Authentication section to the DID Document
-   * @param section - Instance of the AuthenticationSection class
-   * @returns {void}
-  */
+  /**
+   * Get the {@link EcdsaLinkedDataSignature} member of the did document instance
+   * @example `console.log(didDocument.proof) // EcdsaLinkedDataSignature { ... }`
+   */
+
+  @Expose()
+  @Type(() => EcdsaLinkedDataSignature)
+  @Transform(value => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
+  get proof() : ILinkedDataSignature{
+    return this._proof
+  }
+
+  /**
+   * Set the {@link EcdsaLinkedDataSignature} member of the did document instance
+   * @example `didDocument.proof = new EcdsaLinkedDataSignature()`
+   */
+
+  set proof(proof: ILinkedDataSignature) {
+    this._proof = proof
+  }
+
+  /**
+   * Adds a new {@link AuthenticationSection} to the did document instance
+   * @param section - Configured {@link AuthenticationSection} instance
+   */
 
   public addAuthSection(section: AuthenticationSection) {
     this.authentication.push(section)
   }
 
-  /*
-   * @description - Adds a new Public Key section to the DID Document
-   * @param section - Instance of the PublicKeySection class
-   * @returns {void}
-  */
+  /**
+   * Adds a new {@link PublicKeySection} to the did document instance
+   * @param section - Configured {@link PublicKeySection} instance
+   */
 
   public addPublicKeySection(section: PublicKeySection) {
     this.publicKey.push(section)
   }
 
-  /*
-   * @description - Adds a new service endpoint section to the DID Document
-   * @param section - Instance of the ServiceEndpointSection class
-   * @returns {void}
-  */
+  /**
+   * Adds a new {@link ServiceEndpointsSection} to the did document instance
+   * @param section - Configured {@link ServiceEndpointsSection} instance
+   */
 
   public addServiceEndpoint(endpoint: ServiceEndpointsSection) {
     this.service = [endpoint]
   }
 
-  /*
-   * @description - Clears the service endpoints section, usefull when removing public profile
-   * @returns {void}
-  */
+  /**
+   * Clears all {@link ServiceEndpointSection} members from the instance, usefull when removing all public profile data
+   * @example `didDocument.resetServiceEndpoints()`
+   */
 
   public resetServiceEndpoints() {
     this.service = []
   }
 
-  /*
-   * @description - Generates a boilerplate DID Document based on a public key
+  /**
+   * Instantiates a barebones {@link DidDocument} class based on a public key
    * @param publicKey - A secp256k1 public key that will be listed in the did document
-   * @returns {Object} - Instance of the DidDocument class
-  */
+   * @example `const didDocument = DidDocument.fromPublicKey(Buffer.from('abc...ffe', 'hex'))`
+   */
 
   public static fromPublicKey(publicKey: Buffer): DidDocument {
     const did = publicKeyToDID(publicKey)
     const keyId = `${did}#keys-1`
 
     const didDocument = new DidDocument()
-    didDocument.setDid(did)
+    didDocument.did = did
     didDocument.addPublicKeySection(PublicKeySection.fromEcdsa(publicKey, keyId, did))
-    didDocument.addAuthSection(AuthenticationSection.fromEcdsa(didDocument.getPublicKeySections()[0]))
+    didDocument.addAuthSection(AuthenticationSection.fromEcdsa(didDocument.publicKey[0]))
     didDocument.prepareSignature(keyId)
 
     return didDocument
   }
 
-  /*
-   * @description - Populates all fields necessary to compute signaturea, signature
-   *  is computed at a later point due to restricted access to private keys
-   * @param keyId - Public key identifier, e.g. did:jolo:abcdef...ff#keys-1
-   * @returns {void} - Mutates the instance
-  */
+  /**
+   * Sets all fields on the instance necessary to compute the signature
+   * @param keyId - Public key identifier, as defined in the {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}.
+   * @example `didDocument.prepareSignature('did:jolo:...#keys-1')`
+   */
 
   private async prepareSignature(keyId: string) {
     const inOneYear = new Date()
     inOneYear.setFullYear(new Date().getFullYear() + 1)
 
-    this.proof = new EcdsaLinkedDataSignature()
-    this.proof.setCreator(keyId)
-    this.proof.setSignatureValue('')
-    this.proof.setNonce(SoftwareKeyProvider.getRandom(8).toString('hex'))
+    this._proof = new EcdsaLinkedDataSignature()
+    this._proof.creator = keyId
+    this._proof.signature = ''
+    this._proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
   }
 
-  /*
-   * @description - Normalizes the JSON-LD representation of the class instance,
-   *   and computes it's sha256 hash
-   * @returns {Buffer} - sha256 hash of the normalized document
-  */
+  /**
+   * Returns the sha256 hash of the did document, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
+   * @internal
+   */
 
   public async digest(): Promise<Buffer> {
     const normalized = await this.normalize()
     return sha256(Buffer.from(normalized))
   }
 
-  /*
-   * @description - Converts JSON-LD document to canonical form, see https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm
-   * @returns {Object} - Document in normalized form, quads
-  */
+  /**
+   * Converts the did document to canonical form
+   * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
+   * @internal
+   */
 
   public async normalize(): Promise<string> {
     const json = this.toJSON()
@@ -189,9 +292,18 @@ export class DidDocument implements IDigestable {
     return canonize(json)
   }
 
+  /**
+   * Serializes the {@link DidDocument} as JSON-LD
+   */
+
   public toJSON(): IDidDocumentAttrs {
     return classToPlain(this) as IDidDocumentAttrs
   }
+
+  /**
+   * Instantiates a {@link DidDocument} from it's JSON form
+   * @param json - Verifiable Credential in JSON-LD form
+   */
 
   public static fromJSON(json: IDidDocumentAttrs): DidDocument {
     return plainToClass(DidDocument, json)

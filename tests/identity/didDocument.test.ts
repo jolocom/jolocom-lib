@@ -5,7 +5,7 @@ import * as jsonld from 'jsonld'
 import { testPublicIdentityKey } from '../data/keys.data'
 import { didDocumentJSON, mockDid, mockKeyId, normalizedDidDocument } from '../data/didDocument.data'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
-import { IDidDocumentAttrs } from '../../ts/identity/didDocument/types';
+import { IDidDocumentAttrs } from '../../ts/identity/didDocument/types'
 const expect = chai.expect
 
 describe('DidDocument', () => {
@@ -41,47 +41,30 @@ describe('DidDocument', () => {
   it('Should correctly implement normalize', async () => {
     await referenceDidDocument.digest()
 
-    const excludingProof = {...didDocumentJSON} as IDidDocumentAttrs
+    const excludingProof = { ...didDocumentJSON } as IDidDocumentAttrs
     delete excludingProof.proof
 
     sandbox.assert.calledWith(jsonld.canonize, excludingProof)
   })
 
-  describe('Getters', () => {
+  it('implements getters', () => {
+    /* Makes later comparisons simpler */
     const { authentication, proof, publicKey, id, service, created } = didDocumentJSON
+    const auth = referenceDidDocument.authentication.map(auth => auth.toJSON())
+    const pub = referenceDidDocument.publicKey.map(pub => pub.toJSON())
+    const serv = referenceDidDocument.service.map(ser => ser.toJSON())
 
-    it('implements getAuthSections', () => {
-      const jsonForm = referenceDidDocument.getAuthSections().map(auth => auth.toJSON())
-      expect(jsonForm).to.deep.eq(authentication)
-    }),
-      it('implements getPublicKeySections', () => {
-        const jsonForm = referenceDidDocument.getPublicKeySections().map(pub => pub.toJSON())
-        expect(jsonForm).to.deep.eq(publicKey)
-      }),
-      it('implements getServiceEndpointSections', () => {
-        const jsonForm = referenceDidDocument.getServiceEndpointSections().map(ser => ser.toJSON())
-        expect(jsonForm).to.deep.eq(service)
-      }),
-      it('implements getContext', () => {
-        expect(referenceDidDocument.getContext()).to.deep.eq(didDocumentJSON['@context'])
-      }),
-      it('implements getDid', () => {
-        expect(referenceDidDocument.getDid()).to.deep.eq(id)
-      }),
-      it('implements getCreationDate', () => {
-        expect(referenceDidDocument.getCreationDate().toISOString()).to.deep.eq(created)
-      }),
-      it('implements getProof', () => {
-        expect(referenceDidDocument.getProof().toJSON()).to.deep.eq(proof)
-      }),
-      it('implements getSignatureValue', () => {
-        expect(referenceDidDocument.getSignatureValue()).to.deep.eq(Buffer.from(proof.signatureValue))
-      }),
-      it('implements getSigner', () => {
-        expect(referenceDidDocument.getSigner()).to.deep.eq({
-          did: mockDid,
-          keyId: mockKeyId,
-        })
-      })
+    expect(auth).to.deep.eq(authentication)
+    expect(pub).to.deep.eq(publicKey)
+    expect(serv).to.deep.eq(service)
+    expect(referenceDidDocument.context).to.deep.eq(didDocumentJSON['@context'])
+    expect(referenceDidDocument.did).to.deep.eq(id)
+    expect(referenceDidDocument.created.toISOString()).to.deep.eq(created)
+    expect(referenceDidDocument.proof.toJSON()).to.deep.eq(proof)
+    expect(referenceDidDocument.signature).to.deep.eq(proof.signatureValue)
+    expect(referenceDidDocument.signer).to.deep.eq({
+      did: mockDid,
+      keyId: mockKeyId
+    })
   })
 })

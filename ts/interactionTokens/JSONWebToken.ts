@@ -1,7 +1,7 @@
 import { IJWTHeader } from './types'
 import base64url from 'base64url'
 import { decodeToken } from 'jsontokens'
-import { classToPlain, plainToClass, Expose, Transform } from 'class-transformer'
+import { classToPlain, plainToClass, Expose, Transform, Exclude } from 'class-transformer'
 import { IJSONWebTokenAttrs, InteractionType } from './types'
 import { sha256 } from '../utils/crypto'
 import { IDigestable } from '../linkedDataSignature/types'
@@ -14,7 +14,12 @@ import { handleValidationStatus } from '../utils/helper'
 
 /* Local interfaces / types to save on typing later */
 
-export type JWTEncodable = CredentialResponse | CredentialRequest | Authentication | CredentialOffer | CredentialsReceive
+export type JWTEncodable =
+  | CredentialResponse
+  | CredentialRequest
+  | Authentication
+  | CredentialOffer
+  | CredentialsReceive
 
 interface IJWTEncodable {
   [key: string]: any
@@ -42,119 +47,134 @@ interface TransformArgs {
 
 const convertPayload = <T extends JWTEncodable>(args: TransformArgs) => ({
   ...args,
-  interactionToken: payloadToJWT<T>(args.interactionToken, args.typ),
+  interactionToken: payloadToJWT<T>(args.interactionToken, args.typ)
 })
 
 /* Generic class encoding and decodes various interaction tokens as and from JSON web tokens */
 
-@Expose()
+@Exclude()
 export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
   /* ES256K stands for ec signatures on secp256k1, de facto standard */
-  private header: IJWTHeader = {
+  private _header: IJWTHeader = {
     typ: 'JWT',
-    alg: 'ES256K',
+    alg: 'ES256K'
   }
+  private _signature: string
+  private _payload: IPayloadSection<T> = {}
 
   /*
    * When fromJSON is called, we parse the interaction token section, and instantiate
    * the appropriate interaction token class dynamically based on a key in the parsed json
-  */
+   */
 
+  @Expose()
   @Transform(value => convertPayload(value), { toClassOnly: true })
-  private payload: IPayloadSection<T> = {}
-  
-  /*
-   * In case we are parsing a JWT with no signature, default to empty Buffer
-   * In case sig is undefined on instance and we run toJSON, default to empty string
-  */
+  get payload() {
+    return this._payload
+  }
 
-  @Transform(value => value || '', { toPlainOnly: true })
-  @Transform(value => value || Buffer.from(''), { toClassOnly: true })
-  private signature: string
+  set payload(payload: IPayloadSection<T>) {
+    this._payload = payload
+  }
 
-  public getIssuer(): string {
+  @Expose()
+  @Transform(value => value || '')
+  get signature() {
+    return this._signature
+  }
+
+  set signature(signature) {
+    this._signature = signature
+  }
+
+  get issuer() {
     return this.payload.iss
   }
 
-  public getAudience(): string {
+  set issuer(issuer) {
+    this.payload.iss = issuer
+  }
+
+  get audience() {
     return this.payload.aud
   }
 
-  public getIssueTime(): number {
+  set audience(audience: string) {
+    this.payload.aud = audience
+  }
+
+  get issued() {
     return this.payload.iat
   }
 
-  public getExpirationTime(): number {
+  get expires() {
     return this.payload.exp
   }
 
-  public getTokenNonce(): string {
+  get nonce() {
     return this.payload.jti
   }
 
-  public getInteractionToken() {
+  set nonce(nonce) {
+    this.payload.jti = nonce
+  }
+
+  get interactionToken() {
     return this.payload.interactionToken
   }
 
-  public getSignatureValue(): Buffer {
-    return Buffer.from(this.signature, 'hex')
+  set interactionToken(interactionToken) {
+    this.payload.interactionToken = interactionToken
+  }
+
+  get interactionType() {
+    return this.payload.typ
+  }
+
+  set interactionType(type) {
+    this.payload.typ = type
+  }
+
+  @Expose()
+  get header() {
+    return this._header
+  }
+
+  set header(jwtHeader: IJWTHeader) {
+    this._header = jwtHeader
   }
 
   /*
    * @description - Instantiates the class and stores the passed interaction token as a member
    * @param toEncode - An instance of a class encodable as a JWT, e.g. credential request
    * @returns {Object} - A json web token instance
-  */
+   */
 
   public static fromJWTEncodable<T extends JWTEncodable>(toEncode: T): JSONWebToken<T> {
     const jwt = new JSONWebToken<T>()
-    jwt.setTokenContent(toEncode)
+    jwt.interactionToken = toEncode
     return jwt
   }
 
   /*
    * @description - Populates the token issued and exiry times, expiry defaults to 1 hr
    * @returns {void}
-  */
+   */
 
   public setIssueAndExpiryTime() {
     this.payload.iat = Date.now()
     this.payload.exp = this.payload.iat + 3600000
   }
 
-  public setTokenNonce(nonce: string) {
-    this.payload.jti = nonce
-  }
-
-  public setTokenIssuer(iss: string) {
-    this.payload.iss = iss
-  }
-
-  public setTokenAudience(aud: string) {
-    this.payload.aud = aud
-  }
-
-  public setTokenContent(payload: T) {
-    this.payload.interactionToken = payload
-  }
-
-  public setTokenType(typ: InteractionType) {
-    this.payload.typ = typ
-  }
-
-  public setSignature(signature: string) {
-    this.signature = signature
-  }
-
   /*
    * @description - Decodes a base64 encoded JWT and instantiates this class based on content
    * @param jwt - base64 encoded JWT string
    * @returns {Object} - Instance of JSONWebToken class
-  */
+   */
 
   public static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T> {
     const interactionToken = JSONWebToken.fromJSON(decodeToken(jwt))
-    handleValidationStatus((interactionToken.getExpirationTime() > Date.now()), 'exp')
+    handleValidationStatus((interactionToken.expires > Date.now()), 'exp')
 
     return interactionToken as JSONWebToken<T>
   }
@@ -162,7 +182,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
   /*
    * @description - Encodes the class as a base64 JWT string
    * @returns {string} - base64 encoded JWT
-  */
+   */
 
   public encode(): string {
     if (!this.payload || !this.header || !this.signature) {
@@ -172,14 +192,14 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     return [
       base64url.encode(JSON.stringify(this.header)),
       base64url.encode(JSON.stringify(this.payload)),
-      this.signature,
+      this.signature
     ].join('.')
   }
 
   /*
    * @description - Serializes the class and computes the sha256 hash
    * @returns {Buffer} - sha256 hash of the serialized class
-  */
+   */
 
   public async digest() {
     const { encode } = base64url
@@ -197,11 +217,11 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 }
 
 /*
-  * @description - Instantiates a specific interaction class based on a key in the received JSON
-  * @param payload - Interaction token in JSON form
-  * @param typ - Interaction type
-  * @returns {Object} - Instantiated class based on defined map
-*/
+ * @description - Instantiates a specific interaction class based on a key in the received JSON
+ * @param payload - Interaction token in JSON form
+ * @param typ - Interaction type
+ * @returns {Object} - Instantiated class based on defined map
+ */
 
 const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: InteractionType): T => {
   const payloadParserMap = {
@@ -209,7 +229,7 @@ const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: Inter
     [InteractionType.CredentialOffer]: CredentialOffer,
     [InteractionType.CredentialRequest]: CredentialRequest,
     [InteractionType.CredentialResponse]: CredentialResponse,
-    //[InteractionType.Authentication]: Authentication 
+    // [InteractionType.Authentication]: Authentication 
   }
 
   const correspondingClass = payloadParserMap[typ]

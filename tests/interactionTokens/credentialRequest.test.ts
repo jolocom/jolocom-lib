@@ -22,9 +22,9 @@ describe('CredentialRequest', () => {
 
   it('Should implement getters method', () => {
     const { callbackURL, credentialRequirements } = extendedCredRequestJSON
-    expect(credReq.getCallbackURL()).to.eq(callbackURL)
-    expect(credReq.getRequestedCredentials()).to.deep.eq(credentialRequirements)
-    expect(credReq.getRequestedCredentialTypes()).to.deep.eq([
+    expect(credReq.callbackURL).to.eq(callbackURL)
+    expect(credReq.credentialRequirements).to.deep.eq(credentialRequirements)
+    expect(credReq.requestedCredentialTypes).to.deep.eq([
       credentialRequirements[0].type,
       credentialRequirements[1].type,
     ])

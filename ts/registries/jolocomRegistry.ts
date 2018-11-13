@@ -9,29 +9,26 @@ import { Identity } from '../identity/identity'
 import { IRegistryCommitArgs, IRegistryStaticCreationArgs } from './types'
 import { jolocomIpfsStorageAgent } from '../ipfs/ipfs'
 import { jolocomEthereumResolver } from '../ethereum/ethereum'
-import { PublicProfileServiceEndpoint } from '../identity/didDocument/sections/serviceEndpointsSection'
 import { publicKeyToDID } from '../utils/crypto'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/softwareProvider'
 import { KeyTypes } from '../vaultedKeyProvider/types'
+import { generatePublicProfileServiceSection } from '../identity/didDocument/sections/serviceEndpointsSection'
 
-/*
- * Jolocom specific Registry, which uses IPFS
- * and Ethereum for registering the indentity and the resolution
- * mechanism.
+/**
+ * @class
+ * Jolocom specific Registry. Uses IPFS and Ethereum for anchoring indentities and the resolution mechanism.
  */
 
 export class JolocomRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
 
-  /*
-   * @description - Registers a  new Jolocom identity on Ethereum and IPFS and returns
-   *   an instance of the Identity Wallet class
-   * @param vaultedKeyProvider - Instance of Vaulted Provider class storing password
-   *  encrypted seed. Implementations that interface with secure hardware
-   *  elements can be used too.
+  /**
+   * Registers a  new Jolocom identity on Ethereum and IPFS and returns an instance of the Identity Wallet class
+   * @param vaultedKeyProvider - Instance of Vaulted Provider class storing password encrypted seed.
    * @param decryptionPassword - password used to decrypt seed in vault for key generation
-  */
+   * @example `const identityWallet = await registry.create(vaultedProvider, 'password')`
+   */
 
   public async create(vaultedKeyProvider: IVaultedKeyProvider, decryptionPassword: string): Promise<IdentityWallet> {
     const { jolocomIdentityKey, ethereumKey } = KeyTypes
@@ -45,7 +42,7 @@ export class JolocomRegistry {
     const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
     const didDocumentSignature = await vaultedKeyProvider.signDigestable(derivationArgs, didDocument)
 
-    didDocument.setSignatureValue(didDocumentSignature.toString('hex'))
+    didDocument.signature = didDocumentSignature.toString('hex')
     const identity = Identity.fromDidDocument({ didDocument })
 
     const identityWallet = new IdentityWallet({
@@ -53,7 +50,7 @@ export class JolocomRegistry {
       vaultedKeyProvider,
       publicKeyMetadata: {
         derivationPath: jolocomIdentityKey,
-        keyId: didDocument.getPublicKeySections()[0].getIdentifier()
+        keyId: didDocument.publicKey[0].id
       }
     })
 
@@ -69,30 +66,29 @@ export class JolocomRegistry {
     return identityWallet
   }
 
-  /*
-   * @description - Stores the passed didDocument / public profile on IPFS
-   *   and updates the mapping in the smart contract. Currently requires access
-   *   to the user's private key, which is an antipattern, will be deprecated.
+  /**
+   * Stores the passed didDocument / public profile on IPFS and updates the mapping in the smart contract.
    * @param commitArgs - Data to be commited and vault to get private keys
    * @param commitargs.vaultedKeyProvider - Vaulted key store
    * @param commitargs.keyMetadata - Derivation path and decryption pass
    * @param commitargs.identityWallet - Wallet containing did document and public profile
-   * @return { void }
-  */
+   * @deprecated Will be modified in next major release to not require access to the vault
+   * @example `await registry.commit({ vaultedKeyProvider, keyMetadata, identityWallet })`
+   */
 
   public async commit(commitArgs: IRegistryCommitArgs) {
     const { identityWallet, keyMetadata, vaultedKeyProvider } = commitArgs
 
-    const didDocument = identityWallet.getDidDocument()
-    const publicProfile = identityWallet.getIdentity().publicProfile.get()
+    const didDocument = identityWallet.didDocument
+    const publicProfile = identityWallet.identity.publicProfile
 
-    const remote = await this.resolveSafe(didDocument.getDid())
-    const remotePubProf = remote && remote.publicProfile.get()
+    const remote = await this.resolveSafe(didDocument.did)
+    const remotePubProf = remote && remote.publicProfile
 
     try {
       if (publicProfile) {
         const publicProfileHash = await this.ipfsConnector.storeJSON({ data: publicProfile.toJSON(), pin: true })
-        const publicProfileSection = PublicProfileServiceEndpoint.create(didDocument.getDid(), publicProfileHash)
+        const publicProfileSection = generatePublicProfileServiceSection(didDocument.did, publicProfileHash)
         didDocument.addServiceEndpoint(publicProfileSection)
       }
 
@@ -105,7 +101,7 @@ export class JolocomRegistry {
 
       await this.ethereumConnector.updateDIDRecord({
         ethereumKey: privateEthKey,
-        did: didDocument.getDid(),
+        did: didDocument.did,
         newHash: ipfsHash
       })
     } catch (error) {
@@ -113,11 +109,11 @@ export class JolocomRegistry {
     }
   }
 
-  /*
-   * @description - Resolves a jolocom did and returns an Identity class instance
+  /**
+   * Resolves a jolocom did and returns an {@link Identity} class instance
    * @param did - The jolocom did to resolve
-   * @return { Object } - Instance of Identity class containing did document and public profile
-  */
+   * @example `const serviceIdentity = await registry.resolve('did:jolo:...')`
+   */
 
   public async resolve(did): Promise<Identity> {
     try {
@@ -129,11 +125,10 @@ export class JolocomRegistry {
 
       const didDocument = DidDocument.fromJSON((await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs)
 
-      const publicProfileSection = didDocument
-        .getServiceEndpointSections()
-        .find(endpoint => endpoint.getType() === 'JolocomPublicProfile')
+      const publicProfileSection = didDocument.service.find(endpoint => endpoint.type === 'JolocomPublicProfile')
 
-      const publicProfile = publicProfileSection && (await this.fetchPublicProfile(publicProfileSection.getEndpoint()))
+      const publicProfile =
+        publicProfileSection && (await this.fetchPublicProfile(publicProfileSection.serviceEndpoint))
 
       return Identity.fromDidDocument({
         didDocument,
@@ -144,14 +139,14 @@ export class JolocomRegistry {
     }
   }
 
-  /*
-   * @description - Derives the identity public key, fetches the public
+  /**
+   * Derives the identity public key, fetches the public
    *   profile and did document, and instantiates an identity wallet
    *   with the vault, decryption pass, and and key metadata
    * @param vaultedKeyProvider - Vaulted key store
    * @param derivationArgs - password for the vault and derivation path
-   * @return { Object } - Instance of Identity class containing did document and public profile
-  */
+   * @example `const wallet = registry.authenticate(vault, { derivationPath: '...', encryptionPass: '...'})`
+   */
 
   public async authenticate(
     vaultedKeyProvider: IVaultedKeyProvider,
@@ -163,7 +158,7 @@ export class JolocomRegistry {
 
     const publicKeyMetadata = {
       derivationPath: derivationArgs.derivationPath,
-      keyId: identity.getPublicKeySection()[0].getIdentifier()
+      keyId: identity.publicKeySection[0].id
     }
 
     return new IdentityWallet({
@@ -173,11 +168,12 @@ export class JolocomRegistry {
     })
   }
 
-  /*
-   * @description - Fetches the public profile signed credential form ipfs
-   * @param entry - Service endpoint, e.g. ipfs://Qm....
-   * @return { Object } - Instance of Identity class containing did document and public profile
-  */
+  /**
+   * Fetches the public profile signed credential form ipfs
+   * @param entry - IPFS hash of public profile credential
+   * @example `const pubProf = await registry.fetchPublicProfile('ipfs://Qm...')`
+   * @internal
+   */
 
   public async fetchPublicProfile(entry: string): Promise<SignedCredential> {
     const hash = entry.replace('ipfs://', '')
@@ -186,11 +182,12 @@ export class JolocomRegistry {
     return SignedCredential.fromJSON(publicProfile)
   }
 
-  /*
-   * @description - Proxies to this.resolve, but catches error and returns undefined
+  /**
+   * Proxies to this.resolve, but catches error and returns undefined
    * @param did - The jolocom did to resolve
-   * @return { Object } - Instance of Identity class containing did document and public profile, or undefined
-  */
+   * @example `const serviceIdentity = await registry.resolveSafe('did:jolo:...')`
+   * @internal
+   */
 
   private async resolveSafe(did: string): Promise<Identity> {
     try {
@@ -201,13 +198,12 @@ export class JolocomRegistry {
   }
 }
 
-/*
-   * @description - Returns a instance of the Jolocom registry given connector, defaults to
-   *   Jolocom defined connectors.
-   * @param ipfsConnector - Instance of class implementing the IIpfsConnector interface
-   * @param ethereumConnector - Instance of class implementing the IEthereumConnector interface
-   * @return { Object } - Instantiated registry
-  */
+/**
+ * Returns a instance of the Jolocom registry given connector, defaults to Jolocom defined connectors.
+ * @param ipfsConnector - Instance of class implementing the {@link IIpfsConnector} interface
+ * @param ethereumConnector - Instance of class implementing the {@link IEthereumConnector} interface
+ * @example `const registry = createJolocomRegistry()`
+ */
 
 export const createJolocomRegistry = (
   { ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs = {

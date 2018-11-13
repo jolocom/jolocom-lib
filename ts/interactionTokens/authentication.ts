@@ -1,24 +1,48 @@
-import { plainToClass, classToPlain, Expose } from 'class-transformer'
+import { plainToClass, classToPlain, Expose, Exclude } from 'class-transformer'
 import { IAuthenticationAttrs } from './interactionTokens.types'
 
-/*
- * Class representing a challenge string and callback url for challenge-response
- * authentication did authentication, encodable in JWT
- *
- * Currently unused
+/**
+ * @class
+ * Class containing a challenge string and callbackURL for challenge-response did authentication, 
+ * encodable as a JWT
+ * @ignore
  */
 
-@Expose()
+ @Exclude()
 export class Authentication {
-  private callbackURL: string
+  private _callbackURL: string
 
-  public getCallbackURL(): string {
-    return this.callbackURL
+  /**
+   * Get the callback url encoded in the payload
+   * @example `console.log(authentication.callbackURL) // 'http://example.com/auth'`
+   */
+
+  @Expose()
+  get callbackURL (): string {
+    return this._callbackURL
   }
+
+  /**
+   * Set the callback url encoded in the payload
+   * @example `authentication.callbackURL = 'http://example.com/auth'`
+   */
+
+  set callbackURL(callbackURL: string) {
+    this._callbackURL = callbackURL
+  }
+
+  /**
+   * Serializes the {@link Authentication} request / response as JSON-LD
+   */
 
   public toJSON() {
     return classToPlain(this)
   }
+
+  /**
+   * Instantiates a {@link Authentication} from it's JSON form
+   * @param json - JSON encoded authentication request / response
+   */
 
   public static fromJSON(json: IAuthenticationAttrs): Authentication {
     return plainToClass(this, json)

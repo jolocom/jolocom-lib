@@ -24,14 +24,14 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       .offer(credentialOfferCreateAttrs, servicePass)
     credOfferRequestEncoded = credOfferRequestJWT.encode()
 
-    expect(credOfferRequestJWT.getInteractionToken()).to.deep.eq(CredentialOffer.fromJSON(credentialOfferCreateAttrs))
+    expect(credOfferRequestJWT.interactionToken).to.deep.eq(CredentialOffer.fromJSON(credentialOfferCreateAttrs))
     expect(credOfferRequestJWT).to.be.instanceOf(JSONWebToken)
-    expect(credOfferRequestJWT.getInteractionToken()).to.be.instanceOf(CredentialOffer)
+    expect(credOfferRequestJWT.interactionToken).to.be.instanceOf(CredentialOffer)
   })
 
   it('Should allow for consumption of valid credential request offer token by user', async () => {
     const decodedCredOfferRequest = JSONWebToken.decode<CredentialOffer>(credOfferRequestEncoded)
-    expect(decodedCredOfferRequest.getInteractionToken()).to.be.instanceOf(CredentialOffer)
+    expect(decodedCredOfferRequest.interactionToken).to.be.instanceOf(CredentialOffer)
 
     try {
       await userIdentityWallet.validateJWT(decodedCredOfferRequest, null, jolocomRegistry)
@@ -40,8 +40,8 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     }
 
     credOfferResponseJWT = await userIdentityWallet.create.interactionTokens.response.offer({
-        callbackURL: decodedCredOfferRequest.getInteractionToken().getCallbackURL(),
-        instant: decodedCredOfferRequest.getInteractionToken().isInstant(),
+        callbackURL: decodedCredOfferRequest.interactionToken.callbackURL,
+        instant: decodedCredOfferRequest.interactionToken.instant,
         requestedInput: {}
       },
       userPass,
@@ -49,14 +49,14 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     )
     credOfferResponseEncoded = credOfferResponseJWT.encode()
 
-    expect(credOfferResponseJWT.getInteractionToken()).to.be.instanceOf(CredentialOffer)
-    expect(credOfferResponseJWT.getTokenNonce()).to.eq(decodedCredOfferRequest.getTokenNonce())
-    expect(credOfferResponseJWT.getAudience()).to.eq(keyIdToDid(decodedCredOfferRequest.getIssuer()))
+    expect(credOfferResponseJWT.interactionToken).to.be.instanceOf(CredentialOffer)
+    expect(credOfferResponseJWT.nonce).to.eq(decodedCredOfferRequest.nonce)
+    expect(credOfferResponseJWT.audience).to.eq(keyIdToDid(decodedCredOfferRequest.issuer))
   })
 
   it('Should allow for consumption of valid credential offer response token by service', async () => {
     const decodedCredOfferResponse = JSONWebToken.decode<CredentialOffer>(credOfferResponseEncoded)
-    expect(decodedCredOfferResponse.getInteractionToken()).to.be.instanceOf(CredentialOffer)
+    expect(decodedCredOfferResponse.interactionToken).to.be.instanceOf(CredentialOffer)
 
     try {
       await serviceIdentityWallet.validateJWT(decodedCredOfferResponse, credOfferRequestJWT, jolocomRegistry)
@@ -70,7 +70,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     const signedCredForUser = await serviceIdentityWallet.create.signedCredential(
       {
         metadata: claimsMetadata.emailAddress,
-        subject: keyIdToDid(decodedCredOfferResponse.getIssuer()),
+        subject: keyIdToDid(decodedCredOfferResponse.issuer),
         claim: { email: emailCredJSON.claim.email }
       },
       servicePass
@@ -85,14 +85,14 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     )
     credReceiveEncoded = credReceiveJWT.encode()
 
-    expect(credReceiveJWT.getInteractionToken()).to.be.instanceOf(CredentialsReceive)
-    expect(credReceiveJWT.getAudience()).to.eq(keyIdToDid(decodedCredOfferResponse.getIssuer()))
-    expect(credReceiveJWT.getTokenNonce()).to.eq(decodedCredOfferResponse.getTokenNonce())
+    expect(credReceiveJWT.interactionToken).to.be.instanceOf(CredentialsReceive)
+    expect(credReceiveJWT.audience).to.eq(keyIdToDid(decodedCredOfferResponse.issuer))
+    expect(credReceiveJWT.nonce).to.eq(decodedCredOfferResponse.nonce)
   })
 
   it('Should allow for consumtion of valid credential receive token by user', async () => {
     const decodedCredReceive = JSONWebToken.decode<CredentialsReceive>(credReceiveEncoded)
-    expect(decodedCredReceive.getInteractionToken()).to.be.instanceOf(CredentialsReceive)
+    expect(decodedCredReceive.interactionToken).to.be.instanceOf(CredentialsReceive)
 
     try {
       await userIdentityWallet.validateJWT(decodedCredReceive, credOfferResponseJWT, jolocomRegistry)
@@ -100,7 +100,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       expect(true).to.be.false
     }
     
-    expect(decodedCredReceive.getInteractionToken().getSignedCredentials()[0].getSubject())
-      .to.eq(userIdentityWallet.getDid())
+    expect(decodedCredReceive.interactionToken.signedCredentials[0].subject)
+      .to.eq(userIdentityWallet.did)
   })
 })

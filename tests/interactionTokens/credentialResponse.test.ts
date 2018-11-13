@@ -15,8 +15,8 @@ describe('CredentialResponse', () => {
   })
 
   it('Should implement getters method', () => {
-    expect(credRes.getCallbackURL()).to.eq(credentialResponseJSON.callbackURL)
-    expect(credRes.getSuppliedCredentials()).to.deep.eq(credentialSet.map(SignedCredential.fromJSON))
+    expect(credRes.callbackURL).to.eq(credentialResponseJSON.callbackURL)
+    expect(credRes.suppliedCredentials).to.deep.eq(credentialSet.map(SignedCredential.fromJSON))
   })
 
   it('Should correctly call the satisfiesRequest method on credential request', () => {

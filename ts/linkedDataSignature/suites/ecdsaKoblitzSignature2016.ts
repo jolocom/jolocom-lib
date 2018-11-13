@@ -5,82 +5,122 @@ import { ILinkedDataSignature, ILinkedDataSignatureAttrs, IDigestable } from '..
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
 
+/**
+ * @class A EcdsaKoblitz linked data signature implementation
+ * @implements {ILinkedDataSignature}
+ * @implements {IDigestable}
+ * @internal
+ */
+
 @Exclude()
 export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestable {
-  @Expose()
-  public type = 'EcdsaKoblitzSignature2016'
+  private _type = 'EcdsaKoblitzSignature2016'
+  private _creator: string = ''
+  private _created: Date = new Date()
+  private _nonce: string = ''
+  private _signatureValue: string = ''
 
-  @Expose()
-  @Transform(value => value || '', { toPlainOnly: true })
-  private creator: string
-
-  @Expose()
-  @Transform(value => value || '', { toPlainOnly: true })
-  private nonce: string
-
-  /*
-   * In case we are parsing a JSON LD doc with no signature, default to empty string
-   * In case sig is undefined on instance and we run toJSON, default to empty string
-  */
-
-  @Expose()
-  @Transform(value => value || '', { toPlainOnly: true })
-  private signatureValue: string
-
-  /*
-   * When we run toJSON, convert date to iso string as opposed to default format
-  */
+  /**
+   * Get the creation date of the linked data signature
+   * @example `console.log(proof.created) // Date 2018-11-11T15:46:09.720Z`
+   */
 
   @Expose()
   @Type(() => Date)
   @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
-  private created: Date = new Date()
-
-  public getCreator(): string {
-    return this.creator
+  get created() {
+    return this._created
   }
 
-  public getType(): string {
-    return this.type
+  /**
+   * Set the creation date of the linked data signature
+   * @example `proof.created = Date 2018-11-11T15:46:09.720Z`
+   */
+
+  set created(created: Date) {
+    this._created = created
   }
 
-  public getNonce(): string {
-    return this.nonce
+  /**
+   * Get the type of the linked data signature
+   * @example `console.log(proof.type) // 'EcdsaKoblitzSignature2016'`
+   */
+
+  @Expose()
+  get type() {
+    return this._type
   }
 
-  /*
-   * Working with buffers is easier when verifying signatures
-  */
+  /**
+   * Set the type of the linked data signature
+   * @example `proof.type = 'EcdsaKoblitzSignature2016'`
+   */
 
-  public getSignatureValue(): Buffer {
-    return Buffer.from(this.signatureValue, 'hex')
+  set type(type: string) {
+    this._type = type
   }
 
-  public getCreationDate(): Date {
-    return this.created
+  /**
+   * Get the random signature nonce
+   * @example `console.log(proof.nonce) // 'abc...fe'`
+   */
+
+  @Expose()
+  get nonce() {
+    return this._nonce
   }
 
-  public setCreator(creator: string): void {
-    this.creator = creator
+  /**
+   * Set the random signature nonce
+   * @example `proof.nonce = 'abc...fe'`
+   */
+
+  set nonce(nonce: string) {
+    this._nonce = nonce
   }
 
-  public setNonce(nonce: string): void {
-    this.nonce = nonce
+  /**
+   * Get the hex encoded signature value
+   * @example `console.log(proof.signature) // '2b8504698e...'`
+   */
+
+  @Expose({ name: 'signatureValue' })
+  get signature() {
+    return this._signatureValue
   }
 
-  public setSignatureValue(signatureValue: string): void {
-    this.signatureValue = signatureValue
+  /**
+   * Set the hex encoded signature value
+   * @example `proof.signature = '2b8504698e...'`
+   */
+
+  set signature(signature: string) {
+    this._signatureValue = signature
   }
 
-  public setCreationDate(creation: Date): void {
-    this.created = creation
+  /**
+   * Get the identifier of the public signing key
+   * @example `console.log(proof.creator) // 'did:jolo:...#keys-1`
+   */
+
+  @Expose()
+  get creator(): string {
+    return this._creator
   }
 
-  /*
-   * @description - Converts JSON-LD signature to canonical form
-   *  see https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm
-   * @returns {Object} - Document in normalized form, quads
-  */
+  /**
+   * Set the identifier of the public signing key
+   * @example `proof.creator = 'did:jolo:...#keys-1`
+   */
+
+  set creator(creator: string) {
+    this._creator = creator
+  }
+
+  /**
+   * Converts the lined data signature to canonical form
+   * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
+   */
 
   private async normalize(): Promise<string> {
     const json: ILinkedDataSignatureAttrs = this.toJSON()
@@ -91,19 +131,27 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
     return canonize(json)
   }
 
-  /*
-   * @description - Computes a 256 bit digest that can be signed later
-   * @returns {Buffer} - 32 byte sha256 digest of normalized JSON-LD signature
-  */
+  /**
+   * Returns the sha256 hash of the linked data signature, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
+   */
 
   public async digest(): Promise<Buffer> {
     const normalized = await this.normalize()
     return sha256(Buffer.from(normalized))
   }
 
+  /**
+   * Instantiates a {@link EcdsaLinkedDataSignature} from it's JSON form
+   * @param json - Linked data signature in JSON-LD form
+   */
+
   public static fromJSON(json: ILinkedDataSignatureAttrs): EcdsaLinkedDataSignature {
     return plainToClass(EcdsaLinkedDataSignature, json)
   }
+
+  /**
+   * Serializes the {@link EcdsaLinkedDataSignature} as JSON-LD
+   */
 
   public toJSON(): ILinkedDataSignatureAttrs {
     return classToPlain(this) as ILinkedDataSignatureAttrs

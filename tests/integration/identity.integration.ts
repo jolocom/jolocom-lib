@@ -36,16 +36,16 @@ after(() => {
 
 describe('Integration Test - Create, Resolve, Public Profile', () => {
   it('should correctly create user and service identities', async () => {
-    const remoteUserIdentity = await jolocomRegistry.resolve(userIdentityWallet.getDid())
-    const remoteServiceIdentity = await jolocomRegistry.resolve(serviceIdentityWallet.getDid())
+    const remoteUserIdentity = await jolocomRegistry.resolve(userIdentityWallet.did)
+    const remoteServiceIdentity = await jolocomRegistry.resolve(serviceIdentityWallet.did)
 
-    expect(remoteUserIdentity.getDidDocument()).to.deep.eq(userIdentityWallet.getDidDocument())
-    expect(remoteServiceIdentity.getDidDocument()).to.deep.eq(remoteServiceIdentity.getDidDocument())
+    expect(remoteUserIdentity.didDocument).to.deep.eq(userIdentityWallet.didDocument)
+    expect(remoteServiceIdentity.didDocument).to.deep.eq(remoteServiceIdentity.didDocument)
   })
 
   it('should correctly add and commit public profile', async () => {
     const servicePublicProfile = SignedCredential.fromJSON(publicProfileCredJSON)
-    serviceIdentityWallet.getIdentity().publicProfile.set(servicePublicProfile)
+    serviceIdentityWallet.identity.publicProfile = servicePublicProfile
 
     await jolocomRegistry.commit({
       vaultedKeyProvider: serviceVault,
@@ -56,10 +56,10 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       }
     })
 
-    const remoteServiceIdentity = await jolocomRegistry.resolve(serviceIdentityWallet.getDid())
+    const remoteServiceIdentity = await jolocomRegistry.resolve(serviceIdentityWallet.did)
 
-    expect(remoteServiceIdentity.publicProfile.get()).to.deep.eq(servicePublicProfile)
-    expect(remoteServiceIdentity.getDidDocument()).to.deep.eq(remoteServiceIdentity.getDidDocument())
+    expect(remoteServiceIdentity.publicProfile).to.deep.eq(servicePublicProfile)
+    expect(remoteServiceIdentity.didDocument).to.deep.eq(remoteServiceIdentity.didDocument)
   })
 
   it('should correctly implement authenticate with no public profile', async () => {
@@ -67,8 +67,8 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       derivationPath: KeyTypes.jolocomIdentityKey,
       encryptionPass: userPass
     })
-    expect(wallet.getIdentity().getDidDocument()).to.deep.eq(userIdentityWallet.getIdentity().getDidDocument())
-    expect(wallet.getIdentity().publicProfile.get()).to.deep.eq(userIdentityWallet.getIdentity().publicProfile.get())
+    expect(wallet.identity.didDocument).to.deep.eq(userIdentityWallet.identity.didDocument)
+    expect(wallet.identity.publicProfile).to.deep.eq(userIdentityWallet.identity.publicProfile)
   })
 
   it('should correctly implement authenticate with public profile', async () => {
@@ -77,18 +77,12 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       encryptionPass: servicePass
     })
 
-    const remoteDidDoc = wallet.getDidDocument().toJSON()
-    const localDidDoc = serviceIdentityWallet.getDidDocument().toJSON()
+    const remoteDidDoc = wallet.didDocument.toJSON()
+    const localDidDoc = serviceIdentityWallet.didDocument.toJSON()
 
-    const remotePubProf = wallet
-      .getIdentity()
-      .publicProfile.get()
-      .toJSON()
+    const remotePubProf = wallet.identity.publicProfile.toJSON()
 
-    const localPubProf = serviceIdentityWallet
-      .getIdentity()
-      .publicProfile.get()
-      .toJSON()
+    const localPubProf = serviceIdentityWallet.identity.publicProfile.toJSON()
 
     expect(remoteDidDoc).to.deep.eq(localDidDoc)
     expect(remotePubProf).to.deep.eq(localPubProf)

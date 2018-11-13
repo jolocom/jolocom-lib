@@ -9,7 +9,6 @@ export interface IKeyDerivationArgs {
 }
 
 export interface IVaultedKeyProvider {
-  // getRandom: (nr: number) => Buffer
   getPublicKey: (derivationArgs: IKeyDerivationArgs) => Buffer
   getPrivateKey: (derivationArgs: IKeyDerivationArgs) => Buffer
   sign: (derivationArgs: IKeyDerivationArgs, digest: Buffer) => Buffer
@@ -20,22 +19,21 @@ export interface IVaultedKeyProvider {
 export class SoftwareKeyProvider implements IVaultedKeyProvider {
   private encryptedSeed: Buffer
 
-  /*
-   * @description - initializes the vault with the aes 256 cbc encrypted seed
+  /**
+   * Initializes the vault with the aes 256 cbc encrypted seed
    * @param seed - 32 byte seed for creating bip32 wallet
    * @param encryptionPass - password used to generate encryption cipher
+   * @example `const vault = new SoftwareKeyProvider(Buffer.from('abc...', 'hex'), 'secret')`
   */
 
   constructor(seed: Buffer, encryptionPass: string) {
     this.encryptedSeed = this.encrypt(encryptionPass, seed)
   }
 
-  /*
-   * @description - returns child public key at specified path
-   * @param derivationArgs - Data needed to derive child key
-   * @param derivationArgs.encryptionPass - Password used to create the aes cipher
-   * @param derivationArgs.derivationPath - The bip32 derivation path
-   * @returns {Buffer} - public key at corresponding path
+  /**
+   * Derives and returns child public key at specified path
+   * @param derivationArgs - Password for seed decryption and derivation path
+   * @example `vault.getPublicKey({derivationPath: ..., decryptionPass: ...}) // Buffer <...>`
   */
 
   public getPublicKey(derivationArgs: IKeyDerivationArgs): Buffer {
@@ -44,24 +42,22 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     return fromSeed(seed).derivePath(derivationPath).publicKey
   }
 
-  /*
-   * @TODO - Use csprng implementation
-   * @description - Returns N bytes of random data
+  /**
+   * Returns N bytes of random data
    * @param nrBytes - Number of bytes to verify
-   * @returns {Buffer} - N random bytes
+   * @example `vault.getRandom(32) // Buffer <...>`
   */
 
+  // TODO - Use csprng implementation
   public static getRandom(nr): Buffer {
     return randomBytes(nr)
   }
 
-  /*
-   * @description - computes secp256k1 signature given a 256 bit digest
-   * @param derivationArgs - Data needed to derive child key
-   * @param derivationArgs.encryptionPass - The encryption password
-   * @param derivationArgs.derivationPath - The bip32 derivation path
+  /**
+   * Computes secp256k1 signature given a 256 bit digest
+   * @param derivationArgs - Password for seed decryption and derivation path
    * @param digest - The data to sign, 256 bits
-   * @returns {Buffer} - computed signature
+   * @example `vault.sign({derivationPath: ..., decryptionPass: ...}, Buffer <...>) // Buffer <...>`
   */
 
   public sign(derivationArgs: IKeyDerivationArgs, digest: Buffer): Buffer {
@@ -71,28 +67,23 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     return signingKey.sign(digest)
   }
 
-  /*
-   * @description - verifies secp256k1 signature
+  /**
+   * Verifies secp256k1 signature
    * @param digest - The digest of the data
    * @param signature - The signature to verify
    * @param publicKey - The signer's public key
-   * @returns {Boolean} - signature validity
-   * @
+   * @example `vault.verify(digest, publicKey, signature) // true`
   */
 
   public verify(digest: Buffer, publicKey: Buffer, signature: Buffer): boolean {
     return eccVerify(digest, publicKey, signature)
   }
 
-  /*
-   * Method will be deprecated soon, currently used for signing
-   *  ethereum transactions, where normal secp256k1 signatures
-   *  and the sign method exposed by this class are not enough
-   * @description - returns child public key at specified path
-   * @param derivationArgs - Data needed to derive child key
-   * @param derivationArgs.encryptionPass - Password used to create the aes cipher
-   * @param derivationArgs.derivationPath - The bip32 derivation path
-   * @returns {Buffer} - public key at corresponding path
+  /**
+   * Derives and returns the child private key at specified path
+   * @deprecated Will be removed in next major release, currently used for signing Ethereum transactions
+   * @param derivationArgs - Password for seed decryption and derivation path
+   * @example `vault.getPrivateKey({derivationPath: ..., decryptionPass: ...}) // Buffer <...>`
   */
 
   public getPrivateKey(derivationArgs: IKeyDerivationArgs) {
@@ -103,13 +94,13 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     return fromSeed(seed).derivePath(derivationPath).privateKey
   }
 
-  /*
-   * @description - Digest the passed object, and computes the signature
-   * @param derivationArgs - Data needed to derive child key
-   * @param toSign - Instance of class that implements IDigestable
+  /**
+   * Digests the passed object, and computes the signature
+   * @param derivationArgs - Password for seed decryption and derivation path
+   * @param toSign - Instance of class that implements the {@link IDigestable} interface
    * @param derivationArgs.encryptionPass - The encryption password
    * @param derivationArgs.derivationPath - The bip32 derivation path
-   * @returns {Buffer} - computed signature
+   * @example `await vault.signDigestable(derivationArgs, publicProfileCredential) // Buffer <...>`
   */
 
   public async signDigestable(derivationArgs: IKeyDerivationArgs, toSign: IDigestable): Promise<Buffer> {
@@ -117,24 +108,24 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     return this.sign(derivationArgs, digest)
   }
 
-  /*
-   * @description- Digest the passed object, and validate the signature using a public key
+  /**
+   * Digest the passed object, and validate the signature using a provided public key
    * @param toVerify - Instance of class that implements IDigestable
    * @param publicKey - Public key used to generate the signature
-   * *returns {Promise<boolean>} - the validity of the signature
+   * @example `await vault.verifyDigestable(publicKey, publicProfileSignedCredential) // true`
    */
 
   public async verifyDigestable(publicKey: Buffer, toVerify: IDigestable): Promise<boolean> {
     const digest = await toVerify.digest()
-    const signature = toVerify.getSignatureValue()
+    const signature = Buffer.from(toVerify.signature, 'hex')
     return this.verify(digest, publicKey, signature)
   }
 
-  /*
-   * @description - encrypts data using aes 256 cbc
+  /**
+   * Encrypts data using the aes 256 cbc cipher
    * @param data - The data to encrypt
    * @param password - The encrpyion password
-   * @returns {Buffer} - The encrypted data
+   * @example `this.encrypt('secret', Buffer.from('abc..fe', 'hex'))`
   */
 
   private encrypt(password: string, data: Buffer): Buffer {
@@ -142,11 +133,11 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     return Buffer.concat([cipher.update(data), cipher.final()])
   }
 
-  /*
-   * @description - decripts data using aes 256 cbc
-   * @param data - The data to decrypt
-   * @param password - The encrpyion password
-   * @returns {Buffer} - The decrypted data
+  /**
+   * Dencrypts data using the aes 256 cbc cipher
+   * @param data - The data to dencrypt
+   * @param password - The dencrpyion password
+   * @example `this.dencrypt('secret', encrypted)`
   */
 
   private decrypt(password: string, data: Buffer): Buffer {

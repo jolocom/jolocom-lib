@@ -3,34 +3,60 @@ const fetchNode = require('node-fetch')
 import { IIpfsConnector, IIpfsConfig } from './types'
 const isNode = require('detect-node')
 
+/**
+ * @class
+ * Class abstracting all interactions with ipfs nodes
+ * @internal
+ */
 export class IpfsStorageAgent implements IIpfsConnector {
-  private endpoint: string
-  private fetchImplementation = isNode ? fetchNode : window.fetch
+  private _endpoint: string
+  private _fetchImplementation = isNode ? fetchNode : window.fetch
+
+  /**
+   * Creates an instance of {@link IpfsStorageAgent}
+   * @param config - Remote ipfs gateway address
+   * @example `const ipfsAgent = new IpfsStorageAgent({protocol: 'https', host: 'test.com', port: 443})`
+   */
 
   constructor(config: IIpfsConfig) {
-    this.endpoint = `${config.protocol}://${config.host}:${config.port}`
+    this._endpoint = `${config.protocol}://${config.host}:${config.port}`
   }
 
-  public getEndpoint(): string {
-    return this.endpoint
+  /**
+   * Get the ipfs gateway endpoint
+   * @example `console.log(ipfsAgent.endpoint) // 'https://test.com'`
+   */
+
+  get endpoint() {
+    return this._endpoint
   }
 
-  /*
-   * @description - Method to swap fetch implementation at runtime, helps with tests too
+  /**
+   * Set fetch implementation at runtime, helps with tests
    * @param newImplementation - Implementation compliant with the fetch api
-   * @returns {void}
-  */
+   * @example `ipfsAgent.fetchImplementation = customImplementation`
+   */
 
-  public changeFetchImplementation(newImplementation: typeof window.fetch) {
-    this.fetchImplementation = newImplementation
+  set fetchImplementation(newImplementation: typeof window.fetch) {
+    this._fetchImplementation = newImplementation
   }
 
-  /*
-   * @description - Stores a JSON document on IPFS, using a public gateway
+  /**
+   * Get current fetch implementation
+   * @example `console.log(ipfsAgent.fetchImplementation) // function fetch(...)`
+   */
+
+  get fetchImplementation(): typeof window.fetch {
+    return this._fetchImplementation
+  }
+
+  /**
+   * Stores a JSON document on IPFS, using a public gateway
    * @param data - JSON document to store
    * @param pin - Whether the hash should be added to the pinset
    * @returns {string} - IPFS hash
-  */
+   * @example `await ipfsAgent.storeJSON({data: {test: 'test'}, pin: false})`
+   */
 
   public async storeJSON({ data, pin }: { data: object; pin: boolean }): Promise<string> {
     const endpoint = `${this.endpoint}/api/v0/add?pin=${pin}`
@@ -40,11 +66,11 @@ export class IpfsStorageAgent implements IIpfsConnector {
     return Hash
   }
 
-  /*
-   * @description - Dereferences a JSON document given a IPFS hash
-   * @param hash - IPFS multihash
-   * @returns {object} - JSON encoded data
-  */
+  /**
+   * Dereferences an IPFS hash and parses the result as json
+   * @param hash - IPFS hash
+   * @example `console.log(await ipfsAgent.catJSON('QmZC...')) // {test: 'test'}`
+   */
 
   public async catJSON(hash: string): Promise<object> {
     const endpoint = `${this.endpoint}/api/v0/cat/${hash}`
@@ -52,11 +78,11 @@ export class IpfsStorageAgent implements IIpfsConnector {
     return res.json()
   }
 
-  /*
-   * @description - Removes the specified hash from the pinset
-   * @param hash - IPFS multihash
-   * @returns {void}
-  */
+  /**
+   * Removes the specified hash from the pinset
+   * @param hash - IPFS hash
+   * @example `await ipfsAgent.removePinnedHash('QmZC...')`
+   */
 
   public async removePinnedHash(hash: string): Promise<void> {
     const endpoint = `${this.endpoint}/api/v0/pin/rm?arg=${hash}`
@@ -67,35 +93,32 @@ export class IpfsStorageAgent implements IIpfsConnector {
     }
   }
 
-  /*
-   * @description - Helper method to post data using correct fetch implementation
+  /**
+   * Helper method to post data using correct fetch implementation
    * @param endpoint - HTTP endpoint to post data to
    * @param data - JSON document to post
-   * @returns {object} - Response object
-  */
+   */
 
-  private async postRequest(endpoint: string, data: object) {
+  private async postRequest(endpoint: string, data: BodyInit) {
     return this.fetchImplementation(endpoint, {
       method: 'POST',
       body: data
     })
   }
 
-  /*
-   * @description - Helper method to get data using correct fetch implementation
+  /**
+   * Helper method to get data using correct fetch implementation
    * @param endpoint - HTTP endpoint to get data from
-   * @returns {object} - Response object
-  */
+   */
 
   private async getRequest(endpoint: string) {
     return this.fetchImplementation(endpoint)
   }
 
-  /*
-   * @description - Helper method to serialize JSON so it can be parsed by the go-ipfs implementation
+  /**
+   * Helper method to serialize JSON so it can be parsed by the go-ipfs implementation
    * @param data - JSON document to be serialized
-   * @returns {object} - FormData instance with encoded document
-  */
+   */
 
   private serializeJSON(data: object) {
     if (!data || typeof data !== 'object') {
@@ -118,10 +141,10 @@ export class IpfsStorageAgent implements IIpfsConnector {
   }
 }
 
-/*
-   * @description - Returns a configured instance of the Jolocom ipfs agent 
-   * @return { Object } - Instantiated IPFS agent
-  */
+/**
+ * Returns a configured instance of the Jolocom ipfs agent
+ * @return - Instantiated IPFS agent
+ */
 
 export const jolocomIpfsStorageAgent = new IpfsStorageAgent({
   host: 'ipfs.jolocom.com',

@@ -18,7 +18,7 @@ describe('Jolocom Registry - authenticate', () => {
   before(async () => {
     sandbox.stub(mockVault, 'getPublicKey').returns(testPublicIdentityKey)
     sandbox.stub(JolocomRegistry.prototype, 'resolve').resolves(Identity.fromDidDocument({ didDocument: mockDidDoc }))
-    sandbox.stub(Identity.prototype, 'getPublicKeySection').returns([
+    sandbox.stub(Identity.prototype, 'publicKeySection').returns([
       {
         getIdentifier: sinon.stub()
       }
@@ -33,6 +33,6 @@ describe('Jolocom Registry - authenticate', () => {
     const iw = await registry.authenticate(mockVault, keyMetadata)
     sandbox.assert.calledWith(mockVault.getPublicKey, keyMetadata)
     sandbox.assert.calledWith(JolocomRegistry.prototype.resolve, mockDid)
-    expect(iw.getDidDocument().toJSON()).to.deep.eq(didDocumentJSON)
+    expect(iw.didDocument.toJSON()).to.deep.eq(didDocumentJSON)
   })
 })

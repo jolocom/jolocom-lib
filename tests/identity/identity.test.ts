@@ -22,22 +22,22 @@ describe('Identity', () => {
 
   it('Should correctly instantiate from did document without public profile', () => {
     const identity = Identity.fromDidDocument({ didDocument: mockDidDocument })
-    expect(identity.getDidDocument()).to.deep.eq(mockDidDocument)
-    expect(identity.publicProfile.get()).to.be.undefined
+    expect(identity.didDocument).to.deep.eq(mockDidDocument)
+    expect(identity.publicProfile).to.be.undefined
   })
 
   it('Should correctly instantiate from did document including public profile', () => {
     const identity = Identity.fromDidDocument({ didDocument: mockDidDocument, publicProfile: mockPublicProfile })
-    expect(identity.getDidDocument()).to.deep.eq(mockDidDocument)
-    expect(identity.publicProfile.get()).to.deep.eq(mockPublicProfile)
+    expect(identity.didDocument).to.deep.eq(mockDidDocument)
+    expect(identity.publicProfile).to.deep.eq(mockPublicProfile)
   })
 
   it('Should implement all getters', () => {
     const identity = Identity.fromDidDocument({ didDocument: mockDidDocument })
-    expect(identity.getDid()).to.eq(mockDidDocument.getDid())
-    expect(identity.getDidDocument()).to.eq(mockDidDocument)
-    expect(identity.getPublicKeySection()).to.eq(mockDidDocument.getPublicKeySections())
-    expect(identity.getServiceEndpointSections()).to.eq(mockDidDocument.getServiceEndpointSections())
+    expect(identity.did).to.eq(mockDidDocument.did)
+    expect(identity.didDocument).to.eq(mockDidDocument)
+    expect(identity.publicKeySection).to.eq(mockDidDocument.publicKey)
+    expect(identity.serviceEndpointSections).to.eq(mockDidDocument.service)
   })
 
   /*
@@ -53,32 +53,32 @@ describe('Identity', () => {
     })
 
     it('Should correctly get public profile when present', () => {
-      expect(mockIdentity.publicProfile.get()).to.be.undefined
-      mockIdentity.publicProfile.set(mockPublicProfile)
-      expect(mockIdentity.publicProfile.get()).to.deep.eq(mockPublicProfile)
+      expect(mockIdentity.publicProfile).to.be.undefined
+      mockIdentity.publicProfile = mockPublicProfile
+      expect(mockIdentity.publicProfile).to.deep.eq(mockPublicProfile)
     })
 
     it('Should correctly get public profile when missing', () => {
-      expect(mockIdentity.publicProfile.get()).to.be.undefined
+      expect(mockIdentity.publicProfile).to.be.undefined
     })
 
     it('Should correctly set public profile', () => {
-      expect(mockIdentity.publicProfile.get()).to.be.undefined
-      mockIdentity.publicProfile.set(mockPublicProfile)
-      expect(mockIdentity.publicProfile.get()).to.deep.eq(mockPublicProfile)
+      expect(mockIdentity.publicProfile).to.be.undefined
+      mockIdentity.publicProfile = mockPublicProfile
+      expect(mockIdentity.publicProfile).to.deep.eq(mockPublicProfile)
     })
 
     it('Should correctly delete public profile when present', () => {
-      mockIdentity.publicProfile.set(mockPublicProfile)
-      expect(mockIdentity.publicProfile.get()).to.deep.eq(mockPublicProfile)
-      mockIdentity.publicProfile.delete()
-      expect(mockIdentity.publicProfile.get()).to.be.undefined
+      mockIdentity.publicProfile = mockPublicProfile
+      expect(mockIdentity.publicProfile).to.deep.eq(mockPublicProfile)
+      mockIdentity.publicProfile = undefined
+      expect(mockIdentity.publicProfile).to.be.undefined
     })
 
     it('Should correctly delete public profile when missing', () => {
-      expect(mockIdentity.publicProfile.get()).to.be.undefined
-      mockIdentity.publicProfile.delete()
-      expect(mockIdentity.publicProfile.get()).to.be.undefined
+      expect(mockIdentity.publicProfile).to.be.undefined
+      mockIdentity.publicProfile = undefined
+      expect(mockIdentity.publicProfile).to.be.undefined
     })
   })
 })
