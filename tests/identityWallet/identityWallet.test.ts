@@ -14,7 +14,7 @@ import { credentialResponseJSON } from '../data/interactionTokens/credentialResp
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
-import { signedSimpleCredReqJWT } from '../data/interactionTokens/jsonWebToken.data'
+import { validSignedCredReqJWT } from '../data/interactionTokens/jsonWebToken.data'
 import { keyIdToDid } from '../../ts/utils/helper'
 
 chai.use(sinonChai)
@@ -23,13 +23,14 @@ const expect = chai.expect
 /* Saves some space during stubbing, helper functions */
 
 const stubbedKeyProvider = {
-  signDigestable: sinon.stub().callsFake(attributes => Buffer.from(signedSimpleCredReqJWT.signature, 'hex'))
+  signDigestable: sinon.stub().returns(Buffer.from(validSignedCredReqJWT.signature, 'hex')),
+  verifyDigestable: sinon.stub().returns(true)
 } as IVaultedKeyProvider
 
 const stubbedCredential = {
   setSignatureValue: value => {
-    expect(value).to.eq(signedSimpleCredReqJWT.signature)
-  }
+    expect(value).to.eq(validSignedCredReqJWT.signature)
+  },
 }
 
 describe('IdentityWallet', () => {

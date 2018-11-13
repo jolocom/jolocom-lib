@@ -9,7 +9,6 @@ describe('Authentication', () => {
 
   it('Should implement static fromJSON', () => {
     auth = Authentication.fromJSON(jsonAuthentication)
-    console.log(auth.toJSON())
     expect(auth.toJSON()).to.deep.eq(jsonAuthentication)
   })
 

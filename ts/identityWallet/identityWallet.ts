@@ -13,8 +13,9 @@ import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { IVaultedKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types'
-import { keyIdToDid } from '../utils/helper'
+import { keyIdToDid, getIssuerPublicKey, handleValidationStatus } from '../utils/helper'
 import { generateRandomID } from '../utils/crypto'
+import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
 
 /**
  * @class
@@ -175,6 +176,7 @@ export class IdentityWallet {
   ) => {
     const authenticationReq = Authentication.fromJSON(authArgs)
     const jwt = JSONWebToken.fromJWTEncodable(authenticationReq)
+    jwt.interactionType = InteractionType.Authentication
     return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
   }
 
@@ -192,6 +194,7 @@ export class IdentityWallet {
   ) => {
     const offer = CredentialOffer.fromJSON(credOffer)
     const jwt = JSONWebToken.fromJWTEncodable(offer)
+    jwt.interactionType = InteractionType.CredentialOffer
     return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
   }
 
@@ -204,6 +207,7 @@ export class IdentityWallet {
   private createCredReq = async (credReq: ICredentialRequestAttrs, pass: string) => {
     const credentialRequest = CredentialRequest.fromJSON(credReq)
     const jwt = JSONWebToken.fromJWTEncodable(credentialRequest)
+    jwt.interactionType = InteractionType.CredentialRequest
     return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass)
   }
 
@@ -221,6 +225,7 @@ export class IdentityWallet {
   ) => {
     const credentialResponse = CredentialResponse.fromJSON(credResp)
     const jwt = JSONWebToken.fromJWTEncodable(credentialResponse)
+    jwt.interactionType = InteractionType.CredentialResponse
     return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
   }
 
@@ -240,8 +245,7 @@ export class IdentityWallet {
   ) {
     jwt.setIssueAndExpiryTime()
     jwt.issuer = this.publicKeyMetadata.keyId
-    jwt.interactionType = InteractionType.CredentialRequest
-
+    
     receivedJWT ? (jwt.audience = keyIdToDid(receivedJWT.issuer)) : null
     receivedJWT ? (jwt.nonce = receivedJWT.nonce) : (jwt.nonce = generateRandomID(8))
 
@@ -250,6 +254,18 @@ export class IdentityWallet {
 
     return jwt
   }
+
+  public async validateJWT<T extends JWTEncodable>(receivedJWT: JSONWebToken<T>, sendJWT?: JSONWebToken<T>, customRegistry?: JolocomRegistry): Promise<void> {
+    const registry = customRegistry || createJolocomRegistry()
+    const remoteIdentity = await registry.resolve(keyIdToDid(receivedJWT.issuer))
+    const pubKey  = getIssuerPublicKey(receivedJWT.issuer, remoteIdentity.didDocument)
+ 
+    handleValidationStatus(await this.vaultedKeyProvider.verifyDigestable(pubKey, receivedJWT), 'sig')
+    sendJWT && handleValidationStatus(receivedJWT.audience === this.identity.did, 'aud')
+    sendJWT && handleValidationStatus(sendJWT.nonce === receivedJWT.nonce, 'nonce')
+  }
+
+  /* Gathering creation methods in an easier to use public interface */
 
   public create = {
     credential: Credential.create,
