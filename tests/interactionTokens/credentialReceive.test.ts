@@ -13,6 +13,6 @@ describe('CredentialsReceive', () => {
   })
 
   it('Should implement getters method', () => {
-    expect(credReceive.getSignedCredentials()).to.deep.eq(credentialSet.map(SignedCredential.fromJSON))
+    expect(credReceive.signedCredentials).to.deep.eq(credentialSet.map(SignedCredential.fromJSON))
   })
 })

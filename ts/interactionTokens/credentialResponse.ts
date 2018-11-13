@@ -1,26 +1,37 @@
-import { plainToClass, classToPlain, Expose, Type } from 'class-transformer'
+import { plainToClass, classToPlain, Expose, Type, Exclude } from 'class-transformer'
 import { ICredentialResponseAttrs } from './interactionTokens.types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { CredentialRequest } from './credentialRequest'
 
-/* Class representing a credential response. encodable in jwt */
-@Expose()
+/**
+ * @class
+ * Class representing a credential response. encodable in jwt 
+ */
+@Exclude()
 export class CredentialResponse {
-  private callbackURL: string
+  private _callbackURL: string
+  private _suppliedCredentials: SignedCredential[]
 
-  /* Automatically instantiate SignedCredential class on fromJSON, and serialize on fromJSON */
+  @Expose()
   @Type(() => SignedCredential)
-  private suppliedCredentials: SignedCredential[]
-
-  public getSuppliedCredentials(): SignedCredential[] {
-    return this.suppliedCredentials
+  get suppliedCredentials(): SignedCredential[] {
+    return this._suppliedCredentials
   }
 
-  public getCallbackURL(): string {
-    return this.callbackURL
+  set suppliedCredentials(suppliedCredentials: SignedCredential[]) {
+    this._suppliedCredentials = suppliedCredentials
   }
 
-  /*
+  @Expose()
+  get callbackURL(): string {
+    return this._callbackURL
+  }
+
+  set callbackURL(callbackURL: string) {
+    this._callbackURL = callbackURL
+  }
+
+  /**
    * @description - Evaluates if the current response satisfies the requirements in a request
    * @param cr - Credential request to evaluate against
    * @return{boolean} - Whether the requirements in the request are satisfied

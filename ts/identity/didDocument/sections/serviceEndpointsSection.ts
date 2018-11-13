@@ -2,55 +2,52 @@ import 'reflect-metadata'
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { IServiceEndpointSectionAttrs } from './types'
 
-/*
+/**
  * Class representing a DidDocument Service Endpoint section
  * see: https://w3c-ccg.github.io/did-spec/#service-endpoints
  */
 
 @Exclude()
 export class ServiceEndpointsSection {
-  @Expose()
-  private id: string
+  protected _id: string
+  protected _type: string
+  protected _serviceEndpoint: string
+  protected _description: string
 
   @Expose()
-  private type: string
+  get id(): string {
+    return this._id
+  }
+
+  set id(id: string) {
+    this._id = id
+  }
 
   @Expose()
-  private serviceEndpoint: string
+  get type(): string {
+    return this._type
+  }
+
+  set type(type: string) {
+    this._type = type
+  }
 
   @Expose()
-  private description: string
-
-  public getId(): string {
-    return this.id
+  get serviceEndpoint() {
+    return this._serviceEndpoint
   }
 
-  public getDescription(): string {
-    return this.description
+  set serviceEndpoint(service: string) {
+    this._serviceEndpoint = service
   }
 
-  public getType(): string {
-    return this.type
+  @Expose()
+  get description() {
+    return this._description
   }
 
-  public getEndpoint(): string {
-    return this.serviceEndpoint
-  }
-
-  public setId(id: string) {
-    this.id = id
-  }
-
-  public setDescription(description: string) {
-    this.description = description
-  }
-
-  public setType(type: string) {
-    this.type = type
-  }
-
-  public setEndpoint(endpoint: string) {
-    this.serviceEndpoint = endpoint
+  set description(description: string) {
+    this._description = description
   }
 
   public toJSON(): IServiceEndpointSectionAttrs {
@@ -62,27 +59,24 @@ export class ServiceEndpointsSection {
   }
 }
 
-/*
+/**
  * Class representing a specialized service endpoint entry configuration pointing
  *   to a Jolocom public profile credential.
  * see: https://w3c-ccg.github.io/did-spec/#service-endpoints
  */
 
-export class PublicProfileServiceEndpoint extends ServiceEndpointsSection {
-  /*
-  * @description - Instantiates class based on passed arguments
-  * @param did - The did of the did document owner
-  * @param pubProfIpfsHash - IPFS hash that can be used to dereference
-  *   the public profile credential
-  * @returns {Object} - Populated service endpoint entry instance
-  */
-
-  public static create(did: string, pubProfIpfsHash: string) {
-    const PubProfSec = new PublicProfileServiceEndpoint()
-    PubProfSec.setId(`${did};jolocomPubProfile`)
-    PubProfSec.setEndpoint(`ipfs://${pubProfIpfsHash}`)
-    PubProfSec.setDescription('Verifiable Credential describing entity profile')
-    PubProfSec.setType('JolocomPublicProfile')
-    return PubProfSec
-  }
+/**
+ * @description - Instantiates class based on passed arguments
+ * @param did - The did of the did document owner
+ * @param pubProfIpfsHash - IPFS hash that can be used to dereference
+ *   the public profile credential
+ * @returns {Object} - Populated service endpoint entry instance
+ */
+export const generatePublicProfileServiceSection = (did: string, profileIpfsHash: string): ServiceEndpointsSection => {
+  const PubProfSec = new ServiceEndpointsSection()
+  PubProfSec.id = `${did};jolocomPubProfile`
+  PubProfSec.serviceEndpoint = `ipfs://${profileIpfsHash}`
+  PubProfSec.description = 'Verifiable Credential describing entity profile'
+  PubProfSec.type = 'JolocomPublicProfile'
+  return PubProfSec
 }

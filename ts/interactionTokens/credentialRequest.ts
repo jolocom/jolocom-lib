@@ -1,5 +1,5 @@
 import * as jsonlogic from 'json-logic-js'
-import { plainToClass, classToPlain, Expose } from 'class-transformer'
+import { plainToClass, classToPlain, Expose, Exclude } from 'class-transformer'
 import {
   ICredentialRequestAttrs,
   Comparable,
@@ -12,30 +12,40 @@ import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 /* Class representing a credential request, includes requested types and constraints. Encodable in JWT */
 
-@Expose()
+@Exclude()
 export class CredentialRequest {
-  private callbackURL: string
-  private credentialRequirements: ICredentialRequest[] = []
+  private _callbackURL: string
+  private _credentialRequirements: ICredentialRequest[] = []
 
-  public getCallbackURL(): string {
-    return this.callbackURL
+  @Expose()
+  get credentialRequirements() {
+    return this._credentialRequirements
   }
 
-  public getRequestedCredentials(): ICredentialRequest[] {
-    return this.credentialRequirements
+  set credentialRequirements(requirements) {
+    this._credentialRequirements = requirements
   }
 
-  /*
+  @Expose()
+  get callbackURL(): string {
+    return this._callbackURL
+  }
+
+  set callbackURL(callback: string) {
+    this._callbackURL = callback
+  }
+
+
+  /**
    * @description - Maps over internal data structure and aggregates
    *  all requested credential types
    * @return{Array<string[]>} - Array of types, e.g. [['Credential', 'proofOfEmailCredential']]
    */
-
-  public getRequestedCredentialTypes(): string[][] {
+  get requestedCredentialTypes(): string[][] {
     return this.credentialRequirements.map(credential => credential.type)
   }
 
-  /*
+  /**
    * @description - Filters the passed credentials based on constraints defined on instance
    * @param credentials - Array of verifiable credentials in JSON form
    * @return{Array<string[]>} - Array of verifiable credentials that satisfy the requirements as JSON
@@ -81,24 +91,24 @@ export const constraintFunctions: IExposedConstraintFunctions = {
   smaller: (field: string, value: Comparable) => assembleStatement('<', field, value)
 }
 
-/*
-   * @description - Helper function to assemble a valid json-logic statement
-   * @param operator - Comparison function, i.e. ==, !=, <, >
-   * @param field - Credential field, e.g. 'issued', 'claim.id'
-   * @param value - Value to compare to, currently static
-   * @return{Object} - JSON encoded conditional statement
-   */
+/**
+ * @description - Helper function to assemble a valid json-logic statement
+ * @param operator - Comparison function, i.e. ==, !=, <, >
+ * @param field - Credential field, e.g. 'issued', 'claim.id'
+ * @param value - Value to compare to, currently static
+ * @return{Object} - JSON encoded conditional statement
+ */
 
 const assembleStatement = (operator: Operator, field: string, value: string | Comparable): IConstraint => {
   return { [operator]: [{ var: field }, value] } as IConstraint
 }
 
-/*
-   * @description - Compares two arrays by going through the elements
-   * @param first - First array to compare
-   * @param second - Second array to compare
-   * @return{boolean} - Whether arrays are equal
-   */
+/**
+ * @description - Compares two arrays by going through the elements
+ * @param first - First array to compare
+ * @param second - Second array to compare
+ * @return{boolean} - Whether arrays are equal
+ */
 
 const areCredTypesEqual = (first: string[], second: string[]): boolean => {
   return first.every((el, index) => el === second[index])

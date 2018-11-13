@@ -2,69 +2,61 @@ import { DidDocument } from './didDocument/didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { IIdentityCreateArgs } from './types'
 
-/*
- * Class representing an identity, includes a didDocument and public profile
- * in the form of a signed credential.
+/**
+ * @class
+ * Class representing an identity
  */
 
 export class Identity {
-  private didDocument: DidDocument
-  private publicProfileCredential?: SignedCredential
+  private _didDocument: DidDocument
+  private _publicProfileCredential?: SignedCredential
 
-  public getDid() {
-    return this.didDocument.getDid()
+  get did() {
+    return this.didDocument.did
   }
 
-  public getDidDocument(): DidDocument {
-    return this.didDocument
+  set did(did: string) {
+    this.didDocument.did = did
   }
 
-  public getServiceEndpointSections() {
-    return this.didDocument.getServiceEndpointSections()
+  get didDocument(): DidDocument {
+    return this._didDocument
   }
 
-  public getPublicKeySection() {
-    return this.didDocument.getPublicKeySections()
+  set didDocument(didDocument: DidDocument) {
+    this._didDocument = didDocument
   }
 
-  public setDidDocument(didDocument: DidDocument) {
-    this.didDocument = didDocument
+  get serviceEndpointSections() {
+    return this.didDocument.service
   }
 
-  /*
+  get publicKeySection() {
+    return this.didDocument.publicKey
+  }
+
+  get publicProfile() {
+    return this._publicProfileCredential
+  }
+
+  set publicProfile(publicProfile: SignedCredential | undefined) {
+    this._publicProfileCredential = publicProfile
+  }
+
+  /**
    * @description - Instantiates the Identity class based on a did document and public profile
    * @param didDocument - The did document associated with a did
-   * @param [publicProfile] - Verifiable credential containing public claims (e.g. name, website)
-   * @returns {Object} - Instance of the Identity class
-  */
+   * @param publicProfile - Verifiable credential containing public claims (e.g. name, website)
+   * @returns {Identity}
+   */
 
   public static fromDidDocument({ didDocument, publicProfile }: IIdentityCreateArgs): Identity {
     const identity = new Identity()
-    identity.setDidDocument(didDocument)
+    identity.didDocument = didDocument
     if (publicProfile) {
-      identity.publicProfile.set(publicProfile)
+      identity.publicProfile = publicProfile
     }
 
     return identity
-  }
-
-  /* Aggregates all methods modifying the public profile  */
-
-  public publicProfile = {
-    get: this.getPublicProfile.bind(this),
-    set: this.setPublicProfile.bind(this),
-    delete: this.deletePublicProfile.bind(this),
-  }
-
-  private getPublicProfile() {
-    return this.publicProfileCredential
-  }
-
-  private setPublicProfile(publicProfile: SignedCredential) {
-    this.publicProfileCredential = publicProfile
-  }
-
-  private deletePublicProfile() {
-    this.publicProfileCredential = undefined
   }
 }

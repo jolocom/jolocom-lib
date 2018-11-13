@@ -7,14 +7,14 @@ export function keyIdToDid(keyId: string): string {
 }
 
 export function getIssuerPublicKey(keyId: string, ddo: DidDocument): Buffer {
-  const relevantKeySection = ddo.getPublicKeySections()
-    .find(section => section.getIdentifier() === keyId)
+  const relevantKeySection = ddo.publicKey
+    .find(section => section.id === keyId)
 
   if (!relevantKeySection) {
     throw new Error('No relevant key-id found')
   }
 
-  return Buffer.from(relevantKeySection.getPublicKeyHex(), 'hex')
+  return Buffer.from(relevantKeySection.publicKeyHex, 'hex')
 }
 
 export function handleValidationStatus(success: boolean, key: string) {

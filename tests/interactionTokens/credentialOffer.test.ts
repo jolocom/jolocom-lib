@@ -13,9 +13,9 @@ describe('CredentialOffer', () => {
   })
 
   it('Should implement getters method', () => {
-    expect(credentialOffer.getCallbackURL()).to.eq(credentialOfferCreateAttrs.callbackURL)
-    expect(credentialOffer.getChallenge()).to.eq(credentialOfferCreateAttrs.challenge)
-    expect(credentialOffer.getRequestedInput()).to.deep.eq(credentialOfferCreateAttrs.requestedInput)
-    expect(credentialOffer.isInstant()).to.deep.eq(credentialOfferCreateAttrs.instant)
+    expect(credentialOffer.callbackURL).to.eq(credentialOfferCreateAttrs.callbackURL)
+    expect(credentialOffer.challenge).to.eq(credentialOfferCreateAttrs.challenge)
+    expect(credentialOffer.requestedInput).to.deep.eq(credentialOfferCreateAttrs.requestedInput)
+    expect(credentialOffer.instant).to.deep.eq(credentialOfferCreateAttrs.instant)
   })
 })

@@ -21,11 +21,10 @@ export const validSignature = 'd904b6ca775f555121012ed7ec55be5958703411f5e9af0d9
 export const invalidSignature = 'd904b6ca775f555121012ed7ec55be5958703411f5e9af0d93f17994d5e3bb3b3afdbb49216ffc0b005562d928690e4c94803e9f17ac811480dc0fff46b28613'
 
 export const validSignedCredResJWT = {
-  header: { typ: 'JWT', alg: 'ES256K' },
   payload: {
     interactionToken: {
-      callbackURL: 'https://test.io/auth/abc',
-      suppliedCredentials: credentialSet
+      suppliedCredentials: credentialSet,
+      callbackURL: 'https://test.io/auth/abc'
     },
     typ: 'credentialResponse',
     iat: 0,
@@ -34,7 +33,8 @@ export const validSignedCredResJWT = {
     aud: 'did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777',
     jti: '2a97b35fe74b5'
   },
-  signature: '6b1961c28867eec5b34a794f8606624895b05e838f5d34f2b5af7f5ad63822be0c0dfcf60ca11f83b4b05023b90e176acb3b4d262c3ac4cfd9122b1beccb6def'
+  signature: '8342b50f982c510a16c82cba595a0c69747a9f3c4830c89ce48051f9e64ff5264e17ecc5e8e7eee3a72ac36d25602f473295d7ddec568108a4d0b840461fadc0',
+  header: { typ: 'JWT', alg: 'ES256K' }
 }
 
 export const validNonce = '2a97b35fe74b5'

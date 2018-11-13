@@ -5,34 +5,47 @@ import { ICredentialOfferAttrs } from './interactionTokens.types'
 
 @Exclude()
 export class CredentialOffer {
-  @Expose()
-  private challenge: string
-
-  @Expose()
-  private callbackURL: string
-
-  @Expose()
-  private instant: boolean
-
-  @Expose()
-  private requestedInput: {
+  private _challenge: string
+  private _callbackURL: string
+  private _instant: boolean
+  private _requestedInput: {
     [key: string]: string | null
   }
 
-  public getChallenge(): string {
-    return this.challenge
+  @Expose()
+  get challenge() {
+    return this._challenge
   }
 
-  public isInstant(): boolean {
-    return this.instant
+  set challenge(challenge: string) {
+    this._challenge = challenge
   }
 
-  public getRequestedInput(): { [key: string]: string | undefined } {
-    return this.requestedInput
+  @Expose()
+  get instant(): boolean {
+    return this._instant
   }
 
-  public getCallbackURL(): string {
-    return this.callbackURL
+  set instant(instant: boolean) {
+    this._instant = instant
+  }
+
+  @Expose()
+  get requestedInput(): { [key: string]: string | undefined } {
+    return this._requestedInput
+  }
+
+  set requestedInput(requestedInput) {
+    this._requestedInput = requestedInput
+  }
+
+  @Expose()
+  get callbackURL(): string {
+    return this._callbackURL
+  }
+
+  set callbackURL(callbackURL: string) {
+    this._callbackURL = callbackURL
   }
 
   public toJSON() {

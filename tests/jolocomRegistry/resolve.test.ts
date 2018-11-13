@@ -22,7 +22,7 @@ describe('Jolocom Registry - resolve', () => {
   it('should resolve with no public profile', async () => {
     const identity: Identity = await registry.resolve(mockDid)
     expect(registry.ethereumConnector.resolveDID.getCall(0).args).to.deep.eq([mockDid])
-    expect(identity.publicProfile.get()).to.be.undefined
+    expect(identity.publicProfile).to.be.undefined
   })
 
   it('should throw if resolution fails', async () => {
@@ -43,8 +43,8 @@ describe('Jolocom Registry - resolve', () => {
     registry.fetchPublicProfile = sinon.stub().resolves(SignedCredential.fromJSON(publicProfileCredJSON))
 
     const identity: Identity = await registry.resolve(mockDid)
-    expect(identity.getDidDocument().toJSON()).to.deep.eq(extendedDidDoc)
-    expect(identity.publicProfile.get().toJSON()).to.deep.eq(publicProfileCredJSON)
+    expect(identity.didDocument.toJSON()).to.deep.eq(extendedDidDoc)
+    expect(identity.publicProfile.toJSON()).to.deep.eq(publicProfileCredJSON)
   })
 
   it('should implement fetchPublicProfile', async () => {
