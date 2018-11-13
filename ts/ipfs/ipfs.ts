@@ -1,5 +1,5 @@
 import * as FormDataNode from 'form-data'
-import * as fetchNode from 'node-fetch'
+const fetchNode = require('node-fetch')
 import { IIpfsConnector, IIpfsConfig } from './types'
 const isNode = require('detect-node')
 
