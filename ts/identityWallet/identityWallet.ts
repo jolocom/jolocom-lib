@@ -17,7 +17,8 @@ import { keyIdToDid, getIssuerPublicKey, handleValidationStatus } from '../utils
 import { generateRandomID } from '../utils/crypto'
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
 
-/*
+/**
+ * @class
  * Developer facing class with initialized instance of the key provider as member.
  * Encapsulates functionality related to creating and signing credentials and
  * interaction tokens
@@ -28,48 +29,102 @@ export class IdentityWallet {
   private _publicKeyMetadata: IKeyMetadata
   private _vaultedKeyProvider: IVaultedKeyProvider
 
+  /**
+   * Get the did associated with the identity wallet
+   * @example `console.log(identityWallet.did) // 'did:jolo:...'`
+   */
+
   get did(): string {
     return this.identity.did
   }
+
+  /**
+   * Set the did associated with the identity wallet
+   * @example `identityWallet.did = 'did:jolo:...'`
+   */
 
   set did(did: string) {
     this.identity.did = did
   }
 
+  /**
+   * Get the {@link Identity} associated wtith the identity wallet
+   * @example `console.log(identityWallet.identity) // Identity {...}`
+   */
+
   get identity() {
     return this._identity
   }
+
+  /**
+   * Get the {@link Identity} associated wtith the identity wallet
+   * @example `identityWallet.identity = Identity.fromDidDocument(...)`
+   */
 
   set identity(identity: Identity) {
     this._identity = identity
   }
 
+  /**
+   * Get the {@link DidDocument} associated wtith the identity wallet
+   * @example `console.log(identityWallet.didDocument) // DidDocument {...}`
+   */
+
   get didDocument() {
     return this.identity.didDocument
   }
+
+  /**
+   * Set the {@link DidDocument} associated wtith the identity wallet
+   * @example `identityWallet.didDocument = DidDocument.fromPublicKey(...)`
+   */
+
+  set didDocument(didDocument) {
+    this.identity.didDocument = didDocument
+  }
+
+  /**
+   * Get the metadata about the key pair associated wtith the identity wallet
+   * @example `console.log(identityWallet.publicKeyMetadata) // {derivationPath: '...', keyId: '...'}`
+   */
 
   get publicKeyMetadata(): IKeyMetadata {
     return this._publicKeyMetadata
   }
 
+  /**
+   * Set the metadata about the key pair associated wtith the identity wallet
+   * @example `identityWallet.publicKeyMetadata = {derivationPath: '...', keyId: '...'}`
+   */
+
   set publicKeyMetadata(metadata: IKeyMetadata) {
     this._publicKeyMetadata = metadata
   }
+
+  /**
+   * Get the vaulted key provider instance associated wtith the identity wallet
+   * @example `console.log(identityWallet.vaultedKeyProvider) // SoftwareKeyProvider {...}`
+   */
 
   private get vaultedKeyProvider() {
     return this._vaultedKeyProvider
   }
 
+  /**
+   * Get the vaulted key provider instance associated wtith the identity wallet
+   * @example `identityWallet.vaultedKeyProvider = new SoftwareKeyProvider(...)`
+   */
+
   private set vaultedKeyProvider(keyProvider: IVaultedKeyProvider) {
     this._vaultedKeyProvider = keyProvider
   }
 
-  /*
+  /**
    * @constructor
-   * @param identity - Instance of identity class, contains did document and public profile
+   * @param identity - Instance of {@link Identity} class, containing a {@link DidDocument} 
+   *   and optionally a public profile {@link SignedCredential}
    * @param publicKeyMetadata - Public key id and derivation path
    * @param vaultedKeyProvider - Vaulted key store for generating signatures
-   * @returns {Object} - Instance of class
    */
 
   constructor({ identity, publicKeyMetadata, vaultedKeyProvider }: IIdentityWalletCreateArgs) {
@@ -82,11 +137,10 @@ export class IdentityWallet {
     this.vaultedKeyProvider = vaultedKeyProvider
   }
 
-  /*
-   * @description - Creates and signs a verifiable credential
+  /**
+   * Creates and signs a {@link SignedCredential}
    * @param params - Credential creation attributes, including claim, context, subject
    * @param pass - Password to decrypt the vaulted seed
-   * @returns {Object} -  Instance of SignedCredential class
    */
 
   private createSignedCred = async <T extends BaseMetadata>(params: ISignedCredCreationArgs<T>, pass: string) => {
@@ -108,12 +162,11 @@ export class IdentityWallet {
     return vCred
   }
 
-  /*
-   * @description - Creates and signs an authentication request / response
+  /**
+   * Creates and signs an authentication request / response
    * @param authArgs - Authentication  creation attributes
    * @param pass - Password to decrypt the vaulted seed
    * @param receivedJWT - optional received authentication JSONWebToken Class
-   * @returns {Object} -  Instance of Authentication class
    */
 
   private createAuth = async (
@@ -127,12 +180,11 @@ export class IdentityWallet {
     return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
   }
 
-  /*
-   * @description - Creates and signs a credential offer request / response
+  /**
+   * Creates and signs a credential offer request / response
    * @param credOffer - Credential offer creation attributes
    * @param pass - Password to decrypt the vaulted seed
    * @param receivedJWT - optional received credential offer JSONWebToken Class
-   * @returns {Object} -  Instance of CredentialOffer class
    */
 
   private createCredOffer = async (
@@ -146,11 +198,10 @@ export class IdentityWallet {
     return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
   }
 
-  /*
-   * @description - Creates and signs a crededential request
+  /**
+   * Creates and signs a crededential request
    * @param credReq - Credential request creation attributes
    * @param pass - Password to decrypt the vaulted seed
-   * @returns {Object} -  Instance of CredentialRequest class
    */
 
   private createCredReq = async (credReq: ICredentialRequestAttrs, pass: string) => {
@@ -160,12 +211,11 @@ export class IdentityWallet {
     return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass)
   }
 
-  /*
-   * @description - Creates and signs a credential response
+  /**
+   * Creates and signs a credential response
    * @param credResp - Credential response creation attributes
    * @param pass - Password to decrypt the vaulted seed
    * @param receivedJWT - received credential request JSONWebToken Class
-   * @returns {Object} -  Instance of credential response class
    */
 
   private createCredResp = async (
@@ -179,13 +229,12 @@ export class IdentityWallet {
     return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
   }
 
-  /*
-   * @description - Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
+  /**
+   * Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
    * @param jwt - JSONWebToken Class
    * @param derivationPath - Derivation Path for identity keys
    * @param pass - Password to decrypt the vaulted seed
    * @param receivedJWT - optional received JSONWebToken Class
-   * @returns {Object} -  Instance of JWT class which is initialized and has a signature
    */
 
   private async initializeAndSign<T extends JWTEncodable>(

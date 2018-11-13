@@ -8,7 +8,7 @@ describe('IpfsStorageAgent', () => {
   let storageAgent = new IpfsStorageAgent(mockConfig)
 
   const stubbedFetch = sinon.stub().resolves({ json: sinon.stub().resolves({ Hash: testHash }) })
-  storageAgent.changeFetchImplementation(stubbedFetch)
+  storageAgent.fetchImplementation = stubbedFetch
 
   afterEach(() => {
     stubbedFetch.resetHistory()
@@ -48,14 +48,14 @@ describe('IpfsStorageAgent', () => {
   it('should attempt to remove a pinned hash', async () => {
     const successRespMock = sinon.stub().returns({ ok: true })
 
-    storageAgent.changeFetchImplementation(successRespMock)
+    storageAgent.fetchImplementation = successRespMock
     await storageAgent.removePinnedHash(testHash)
     expect(successRespMock.getCall(0).args).to.deep.eq([mockPinUrl])
   })
 
   it('should throw an error if removing the pinned hash failed', async () => {
     const errorRespMock = sinon.stub().returns({ ok: false, status: 500 })
-    storageAgent.changeFetchImplementation(errorRespMock)
+    storageAgent.fetchImplementation = errorRespMock
     try {
       await storageAgent.removePinnedHash(testHash)
       expect(false).to.be.true
@@ -65,11 +65,10 @@ describe('IpfsStorageAgent', () => {
   })
 })
 
-/*
- * @description - Helper method to decode the payload of form data and compare it to json
+/**
+ * Helper method to decode the payload of form data and compare it to json
  * @param formData - Form data instance containing encoded data
  * @param reference - JSON document to compare to
- * @returns {void}
  */
 
 const compareFormData = (formData, reference) => {

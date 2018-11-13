@@ -11,8 +11,10 @@ import { ILinkedDataSignature, IDigestable } from '../../linkedDataSignature/typ
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 
 /**
- * @class Represents a did document
+ * Class modelling a Did Document
+ * @see {@link https://w3c-ccg.github.io/did-spec/ | specification}
  */
+
 @Exclude()
 export class DidDocument implements IDigestable {
   private _id: string
@@ -24,92 +26,133 @@ export class DidDocument implements IDigestable {
   private '_@context': ContextEntry[] = defaultContextIdentity
 
   /**
-   * @description - Returns a presentable credential name if present
-   * @returns {ContextEntry[]} - the '@context' section of the JSON-LD document
+   * Get the `@context` section of the JSON-ld document
    * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
+   * @example `console.log(didDocument.context) // [{name: 'http://schema.org/name', ...}, {...}]`
    */
+
   @Expose({ name: '@context' })
-  public get context(): ContextEntry[] {
+  get context(): ContextEntry[] {
     return this['_@context']
   }
 
-  public set context(context: ContextEntry[]) {
+  /**
+   * Set the `@context` section of the JSON-ld document
+   * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
+   * @example `didDocument.context = [{name: 'http://schema.org/name', ...}, {...}]`
+   */
+
+  set context(context: ContextEntry[]) {
     this['_@context'] = context
   }
+
+  /**
+   * Get the did associated with the did document
+   * @example `console.log(didDocument.id) //claimId:25453fa543da7`
+   */
 
   @Expose({ name: 'id' })
   get did(): string {
     return this._id
   }
 
+  /**
+   * Set the did associated with the did document
+   * @example `didDocument.id = 'claimId:25453fa543da7'`
+   */
+
   set did(did: string) {
     this._id = did
   }
 
   /**
-   * Getter authentication
-   * @return {AuthenticationSection[] }
+   * Get the did document authentication sections
+   * @example `console.log(didDocument.authentication) // [AuthenticationSection {...}, ...]`
    */
+
   @Expose()
   @Type(() => AuthenticationSection)
   get authentication(): AuthenticationSection[] {
     return this._authentication
   }
 
+  /**
+   * Set the did document authentication sections
+   * @example `didDocument.authentication = [AuthenticationSection {...}, ...]`
+   */
+
   set authentication(authentication: AuthenticationSection[]) {
     this._authentication = authentication
   }
+
   /**
-   * Getter publicKey
-   * @return {PublicKeySection[] }
+   * Get the did document public key sections
+   * @example `console.log(didDocument.publicKey) // [PublicKeySection {...}, ...]`
    */
+
   @Expose()
   @Type(() => PublicKeySection)
-  public get publicKey(): PublicKeySection[] {
+  get publicKey(): PublicKeySection[] {
     return this._publicKey
   }
 
-  public set publicKey(value: PublicKeySection[]) {
+  /**
+   * Set the did document public key sections
+   * @example `didDocument.publicKey = [PublicKeySection {...}, ...]`
+   */
+
+  set publicKey(value: PublicKeySection[]) {
     this._publicKey = value
   }
 
   /**
-   * Getter service
-   * @return {ServiceEndpointsSection[] }
+   * Get the did document service endpoint sections
+   * @example `console.log(diddocument.service) // [serviceendpointsection {...}, ...]`
    */
+
   @Expose()
   @Type(() => ServiceEndpointsSection)
-  public get service(): ServiceEndpointsSection[] {
+  get service(): ServiceEndpointsSection[] {
     return this._service
   }
 
-  public set service(value: ServiceEndpointsSection[]) {
-    this._service = value
+  /**
+   * Set the did document service endpoint sections
+   * @example `didDocument.service = [ServiceEndpointSection {...}, ...]`
+   */
+
+  set service(service: ServiceEndpointsSection[]) {
+    this._service = service
   }
 
   /**
-   * Getter created
-   * @return {Date }
+   * Get the creation date of the did document
+   * @example `console.log(didDocument.issued) // Date 2018-11-11T15:46:09.720Z`
    */
+
   @Expose()
   @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
   @Transform((value: string) => value && new Date(value), { toClassOnly: true })
-  public get created(): Date {
+  get created(): Date {
     return this._created
   }
 
+
   /**
-   * Setter created
-   * @param {Date } value
+   * Set the creation date of the did document
+   * @example `didDocument.created = new Date('2018-11-11T15:46:09.720Z')`
    */
-  public set created(value: Date) {
+
+  set created(value: Date) {
     this._created = value
   }
 
   /**
-   * Setter authentication
-   * @param {AuthenticationSection[] } value
+   * Get aggregated metadata related to the signing public key
+   * @see {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}
+   * @example `console.log(didDocument.signer) // { did: 'did:jolo:...', keyId: 'did:jolo:...#keys-1' }`
    */
+
   get signer(): ISigner {
     return {
       did: this._id,
@@ -117,13 +160,28 @@ export class DidDocument implements IDigestable {
     }
   }
 
+  /**
+   * Get the hex encoded did document signature
+   * @example `console.log(didDocument.signature) // '2b8504698e...'`
+   */
+
   get signature(): string {
     return this._proof.signature
   }
 
-  set signatureValue(signature: string) {
+  /**
+   * Set the hex encoded did document signature
+   * @example `didDocument.signature = '2b8504698e...'`
+   */
+
+  set signature(signature: string) {
     this._proof.signature = signature
   }
+
+  /**
+   * Get the {@link EcdsaLinkedDataSignature} member of the did document instance
+   * @example `console.log(didDocument.proof) // EcdsaLinkedDataSignature { ... }`
+   */
 
   @Expose()
   @Type(() => EcdsaLinkedDataSignature)
@@ -132,50 +190,57 @@ export class DidDocument implements IDigestable {
     return this._proof
   }
 
+  /**
+   * Set the {@link EcdsaLinkedDataSignature} member of the did document instance
+   * @example `didDocument.proof = new EcdsaLinkedDataSignature()`
+   */
+
   set proof(proof: ILinkedDataSignature) {
     this._proof = proof
   }
 
   /**
-   * @description - Adds a new {@link AuthenticationSection} to the Did Document
-   * @param section - Instantiated and populated {@link AuthenticationSection} instance
-   * @returns {void}
+   * Adds a new {@link AuthenticationSection} to the did document instance
+   * @param section - Configured {@link AuthenticationSection} instance
    */
+
   public addAuthSection(section: AuthenticationSection) {
     this.authentication.push(section)
   }
 
   /**
-   * @description - Adds a new {@link PublicKeySection} to the Did Document
-   * @param section - Instantiated and populated {@link PublicKeySection} instance
-   * @returns {void}
+   * Adds a new {@link PublicKeySection} to the did document instance
+   * @param section - Configured {@link PublicKeySection} instance
    */
+
   public addPublicKeySection(section: PublicKeySection) {
     this.publicKey.push(section)
   }
 
   /**
-   * @description - Adds a new {@link ServiceEndpointsSection} to the Did Document
-   * @param section - Instantiated and populated {@link ServiceEndpointsSection} instance
-   * @returns {void}
+   * Adds a new {@link ServiceEndpointsSection} to the did document instance
+   * @param section - Configured {@link ServiceEndpointsSection} instance
    */
+
   public addServiceEndpoint(endpoint: ServiceEndpointsSection) {
     this.service = [endpoint]
   }
 
   /**
-   * @description - Clears the service endpoints section, usefull when removing all public profile data
-   * @returns {void}
+   * Clears all {@link ServiceEndpointSection} members from the instance, usefull when removing all public profile data
+   * @example `didDocument.resetServiceEndpoints()`
    */
+
   public resetServiceEndpoints() {
     this.service = []
   }
 
   /**
-   * @description - Instantiates a barebones {@link DidDocument} class based on a public key
+   * Instantiates a barebones {@link DidDocument} class based on a public key
    * @param publicKey - A secp256k1 public key that will be listed in the did document
-   * @returns {DidDocument}
+   * @example `const didDocument = DidDocument.fromPublicKey(Buffer.from('abc...ffe', 'hex'))`
    */
+
   public static fromPublicKey(publicKey: Buffer): DidDocument {
     const did = publicKeyToDID(publicKey)
     const keyId = `${did}#keys-1`
@@ -190,10 +255,11 @@ export class DidDocument implements IDigestable {
   }
 
   /**
-   * @description - Sets all fields on the instance necessary to compute the signature
+   * Sets all fields on the instance necessary to compute the signature
    * @param keyId - Public key identifier, as defined in the {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}.
-   * @returns {void}
+   * @example `didDocument.prepareSignature('did:jolo:...#keys-1')`
    */
+
   private async prepareSignature(keyId: string) {
     const inOneYear = new Date()
     inOneYear.setFullYear(new Date().getFullYear() + 1)
@@ -205,28 +271,39 @@ export class DidDocument implements IDigestable {
   }
 
   /**
-   * @description - Returns the sha256 hash of the did document, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
-   * @returns {Buffer} - sha256 hash of the normalized document
+   * Returns the sha256 hash of the did document, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
+   * @internal
    */
+
   public async digest(): Promise<Buffer> {
     const normalized = await this.normalize()
     return sha256(Buffer.from(normalized))
   }
 
   /**
-   * @description - Converts the did document to canonical form
+   * Converts the did document to canonical form
    * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
-   * @returns {Object} - Document in normalized form, quads
+   * @internal
    */
+
   public async normalize(): Promise<string> {
     const json = this.toJSON()
     delete json.proof
     return canonize(json)
   }
 
+  /**
+   * Serializes the {@link DidDocument} as JSON-LD
+   */
+
   public toJSON(): IDidDocumentAttrs {
     return classToPlain(this) as IDidDocumentAttrs
   }
+
+  /**
+   * Instantiates a {@link DidDocument} from it's JSON form
+   * @param json - Verifiable Credential in JSON-LD form
+   */
 
   public static fromJSON(json: IDidDocumentAttrs): DidDocument {
     return plainToClass(DidDocument, json)

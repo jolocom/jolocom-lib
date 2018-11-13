@@ -19,72 +19,109 @@ export class Credential {
   private _name: string
 
   /**
-   * The claim section of the credential
+   * Get the identifier of the credential
+   * @example `console.log(credential.id) //claimId:25453fa543da7`
    */
-  @Expose()
-  get claim(): IClaimSection {
-    return this._claim
-  }
-
-  set claim(claim: IClaimSection) {
-    this._claim = claim
-  }
 
   get id() {
     return this._id
   }
+
+  /**
+   * Set the identifier of the credential
+   * @example `credential.id = 'claimId:2543fa543da7'`
+   */
 
   set id(id: string) {
     this._id = id
   }
 
   /**
-   * @description - Returns the credential type
-   * @returns {string[]} - credential type, e.g ['Credential', 'ProofOfNameCredential']
+   * Get the `claim` section of the credential
+   * @example `console.log(credential.claim) // { id: 'did:jolo:abcde', name: 'Example' }`
    */
+
+  @Expose()
+  get claim(): IClaimSection {
+    return this._claim
+  }
+
+  /**
+   * Set the `claim` section of the credential
+   * @example `credential.claim = { id: 'did:jolo:abcde', name: 'Example' }`
+   */
+
+  set claim(claim: IClaimSection) {
+    this._claim = claim
+  }
+
+  /**
+   * Get the type of the credential
+   * @example `console.log(credential.type) // ['Credential', 'ProofOf...Credential']`
+   */
+
   @Expose()
   get type(): string[] {
     return this._type
   }
+
+  /**
+   * Set the type of the credential
+   * @example `credential.type = ['Credential', 'ProofOf...Credential']`
+   */
 
   set type(type: string[]) {
     this._type = type
   }
 
   /**
-   * @description - Returns a presentable credential name if present
-   * @returns {string | undefined} - credential name, e.g. 'Email', 'Name'
+   * Get a presentable credential name if present
+   * @example `console.log(credential.name) // 'Email'`
    */
+
   @Expose()
   get name(): string {
     return this._name
   }
+
+  /**
+   * Set a presentable credential name
+   * @example `credential.name = 'Email'`
+   */
 
   set name(name: string) {
     this._name = name
   }
 
   /**
-   * @description - Returns a presentable credential name if present
-   * @returns {ContextEntry[]} - the '@context' section of the JSON-LD document
+   * Get the `@context` section of the JSON-ld document
    * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
+   * @example `console.log(credential.context) // [{name: 'http://schema.org/name', ...}, {...}]`
    */
+
   @Expose({ name: '@context' })
   public get context(): ContextEntry[] {
     return this['_@context']
   }
+
+  /**
+   * Set the `@context` section of the JSON-ld document
+   * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
+   * @example `credential.context = [{name: 'http://schema.org/name', ...}, {...}]`
+   */
 
   public set context(context: ContextEntry[]) {
     this['_@context'] = context
   }
 
   /**
-   * @description - Instantiates a {@link Credential} based on passed options
+   * Instantiates a {@link Credential} based on passed options
    * @param metadata - metadata necessary to create a valid JSON-LD document
-   * @param claim - the claim
-   * @param subject - the did of the subject
+   * @param claim - the `claim` section
+   * @param subject - the did of the subject / receiver
    * @see {@link https://jolocom-lib.readthedocs.io/en/latest/signedCredentials.html | developer documentation}
-   * @returns {Credential}
+   * @todo Make this available without having to directly import the {@link Credential} class
+   * @example [[include:credential.create.md]]
    */
 
   public static create<T extends BaseMetadata>({ metadata, claim, subject }: ISignedCredCreationArgs<T>) {
@@ -99,10 +136,10 @@ export class Credential {
   }
 
   /**
-   * @description - Instantiates a {@link Credential} from it's JSON form
-   * @param json - credential in JSON-LD form
+   * Instantiates a {@link Credential} from it's JSON-LD form
+   * @param json - credential encoded as JSON-LD
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
-   * @returns {Credential}
+   * @example `const credential = Credential.fromJSON({...})`
    */
 
   public static fromJSON(json: ICredentialAttrs): Credential {
@@ -110,9 +147,9 @@ export class Credential {
   }
 
   /**
-   * @description - Serializes the {@link Credential} as a JSON-LD document
+   * Serializes the {@link Credential} as a JSON-LD document
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
-   * @returns {ICredentialAttrs} - JSON-LD encoded credential
+   * @example `console.log(credential.toJSON()) // Verifiable credential in JSON-LD form`
    */
 
   public toJSON(): ICredentialAttrs {

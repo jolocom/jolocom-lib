@@ -35,7 +35,7 @@ describe('JSONWebToken', () => {
     sandbox.restore()
   })
 
-  /*
+  /**
    * We don't need to test with all tokenizable objects, it's a simple setter for now
    * When we fromJWTEncodable, some data, such as issuer, typ and signature is not available,
    */
