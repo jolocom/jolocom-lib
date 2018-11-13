@@ -77,12 +77,13 @@ describe('IdentityWallet', () => {
     it('Should expose aggregated creation methods', () => {
       const categories = ['credential', 'signedCredential', 'interactionTokens']
       const flowTypes = ['request', 'response']
-      const tokenTypes = ['auth', 'offer', 'share']
+      const tokenTypesRequest = ['auth', 'offer', 'share']
+      const tokenTypesResponse = ['auth', 'offer', 'share', 'issue']
 
       expect(Object.keys(iw.create)).to.deep.eq(categories)
       expect(Object.keys(iw.create.interactionTokens)).to.deep.eq(flowTypes)
-      expect(Object.keys(iw.create.interactionTokens.request)).to.deep.eq(tokenTypes)
-      expect(Object.keys(iw.create.interactionTokens.response)).to.deep.eq(tokenTypes)
+      expect(Object.keys(iw.create.interactionTokens.request)).to.deep.eq(tokenTypesRequest)
+      expect(Object.keys(iw.create.interactionTokens.response)).to.deep.eq(tokenTypesResponse)
     })
 
     /* A bit hacky, but deep eq for functions is tricky. Should work most of the time */

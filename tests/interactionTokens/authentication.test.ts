@@ -14,6 +14,5 @@ describe('Authentication', () => {
 
   it('Should implement getters method', () => {
     expect(auth.callbackURL).to.eq(jsonAuthentication.callbackURL)
-    expect(auth.challenge).to.eq(jsonAuthentication.challenge)
   })
 })

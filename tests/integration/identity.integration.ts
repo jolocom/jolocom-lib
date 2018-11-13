@@ -4,7 +4,7 @@ import * as integrationHelper from './provision'
 import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
 import { EthResolver } from '../../ts/ethereum/ethereum'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
-import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import { createJolocomRegistry, JolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { publicProfileCredJSON } from '../data/identity.data'
@@ -15,28 +15,28 @@ import { testSeed } from '../data/keys.data'
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe('Integration Test - Create, Resolve, Public Profile', () => {
-  let jolocomRegistry = createJolocomRegistry({
+/* global before and after hook for integration tests & shared variables */
+export let jolocomRegistry: JolocomRegistry
+export let userIdentityWallet: IdentityWallet
+export let serviceIdentityWallet: IdentityWallet
+
+before(async () => {
+  await integrationHelper.init()
+  jolocomRegistry = createJolocomRegistry({
     ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
     ethereumConnector: new EthResolver(testEthereumConfig)
   })
+  userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
+  serviceIdentityWallet = await jolocomRegistry.create(serviceVault, servicePass)
+})
 
-  let userIdentityWallet: IdentityWallet
-  let serviceIdentityWallet: IdentityWallet
+after(() => {
+  process.exit(0)
+})
 
-  before(async () => {
-    await integrationHelper.init()
-  })
-
-  after(() => {
-    process.exit(0)
-  })
-
+describe('Integration Test - Create, Resolve, Public Profile', () => {
   it('should correctly create user and service identities', async () => {
-    userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
     const remoteUserIdentity = await jolocomRegistry.resolve(userIdentityWallet.did)
-
-    serviceIdentityWallet = await jolocomRegistry.create(serviceVault, servicePass)
     const remoteServiceIdentity = await jolocomRegistry.resolve(serviceIdentityWallet.did)
 
     expect(remoteUserIdentity.didDocument).to.deep.eq(userIdentityWallet.didDocument)

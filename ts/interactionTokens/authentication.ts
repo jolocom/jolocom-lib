@@ -1,9 +1,5 @@
 import { plainToClass, classToPlain, Expose, Exclude } from 'class-transformer'
-
-export interface IAuthenticationAttrs {
-  challenge: string
-  callbackURL: string
-}
+import { IAuthenticationAttrs } from './interactionTokens.types'
 
 /**
  * @class
@@ -14,27 +10,7 @@ export interface IAuthenticationAttrs {
 
  @Exclude()
 export class Authentication {
-  private _challenge: string
   private _callbackURL: string
-
-  /**
-   * Get the challenge encoded in the payload
-   * @example `console.log(authentication.challenge) // 'abcd'`
-   */
-
-  @Expose()
-  get challenge(): string {
-    return this._challenge
-  }
-
-  /**
-   * Set the challenge encoded in the payload
-   * @example `authentication.challenge = 'abcd'`
-   */
-
-  set challenge(challenge: string) {
-    this._challenge = challenge
-  }
 
   /**
    * Get the callback url encoded in the payload

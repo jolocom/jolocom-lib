@@ -3,7 +3,6 @@ import { ISignedCredentialAttrs } from "../credentials/signedCredential/types"
 /* Creation attributes. Same as JSON form */
 
 export interface ICredentialOfferAttrs {
-  challenge: string
   callbackURL: string
   instant: boolean
   requestedInput: {
@@ -28,6 +27,10 @@ export interface ICredentialsReceiveAttrs {
 export interface ICredentialRequest {
   type: string[]
   constraints: IConstraint[]
+}
+
+export interface IAuthenticationAttrs {
+  callbackURL: string
 }
 
 /* Related to constraint functions */

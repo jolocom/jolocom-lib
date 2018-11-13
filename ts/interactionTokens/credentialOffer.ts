@@ -8,30 +8,10 @@ import { ICredentialOfferAttrs } from './interactionTokens.types'
 
 @Exclude()
 export class CredentialOffer {
-  private _challenge: string
   private _callbackURL: string
   private _instant: boolean
   private _requestedInput: {
     [key: string]: string | null
-  }
-
-  /**
-   * Get the challenge encoded in the payload
-   * @example `console.log(offer.challenge) // 'abcd'`
-   */
-
-  @Expose()
-  get challenge() {
-    return this._challenge
-  }
-
-  /**
-   * Set the challenge encoded in the payload
-   * @example `offer.challenge = 'abcd'`
-   */
-
-  set challenge(challenge: string) {
-    this._challenge = challenge
   }
 
   /**

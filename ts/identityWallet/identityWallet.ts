@@ -6,9 +6,8 @@ import { Identity } from '../identity/identity'
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
 import { CredentialOffer } from '../interactionTokens/credentialOffer'
-import { ICredentialRequestAttrs, ICredentialOfferAttrs } from '../interactionTokens/interactionTokens.types'
-import { Authentication, IAuthenticationAttrs } from '../interactionTokens/authentication'
-import { ICredentialResponseAttrs } from '../interactionTokens/interactionTokens.types'
+import { ICredentialResponseAttrs, ICredentialRequestAttrs, ICredentialOfferAttrs, IAuthenticationAttrs, ICredentialsReceiveAttrs } from '../interactionTokens/interactionTokens.types'
+import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { IVaultedKeyProvider } from '../vaultedKeyProvider/softwareProvider'
@@ -16,6 +15,7 @@ import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCred
 import { keyIdToDid, getIssuerPublicKey, handleValidationStatus } from '../utils/helper'
 import { generateRandomID } from '../utils/crypto'
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
+import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 
 /**
  * @class
@@ -230,6 +230,20 @@ export class IdentityWallet {
   }
 
   /**
+   * Creates and signs a credential receive (issue of a signed credential)
+   * @param credReceive - Credential receive creation attributes
+   * @param pass - Password to decrypt the vaulted seed
+   * @param receivedJWT - received credential offer response JSONWebToken Class
+  */
+
+  private createCredReceive = async (credReceive: ICredentialsReceiveAttrs, pass: string, receivedJWT: JSONWebToken<JWTEncodable>) => {
+    const credentialReceieve = CredentialsReceive.fromJSON(credReceive)
+    const jwt = JSONWebToken.fromJWTEncodable(credentialReceieve)
+    jwt.interactionType = InteractionType.CredentialsReceive
+    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
+  }
+
+  /**
    * Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
    * @param jwt - JSONWebToken Class
    * @param derivationPath - Derivation Path for identity keys
@@ -255,6 +269,13 @@ export class IdentityWallet {
     return jwt
   }
 
+  /**
+   * Validates interaction tokens for signature - if only received token passed - and for audience (aud) and token nonce (jti) if send token passed also 
+   * @param receivedJWT - recieved JSONWebToken Class
+   * @param sendJWT - optional send JSONWebToken Class which is used to validate the token nonce and the aud field on received token
+   * @param customRegsitry - optional custom registry
+  */
+
   public async validateJWT<T extends JWTEncodable>(receivedJWT: JSONWebToken<T>, sendJWT?: JSONWebToken<T>, customRegistry?: JolocomRegistry): Promise<void> {
     const registry = customRegistry || createJolocomRegistry()
     const remoteIdentity = await registry.resolve(keyIdToDid(receivedJWT.issuer))
@@ -279,8 +300,9 @@ export class IdentityWallet {
       response: {
         auth: this.createAuth,
         offer: this.createCredOffer,
-        share: this.createCredResp
-      }
-    }
+        share: this.createCredResp,
+        issue: this.createCredReceive,
+      },
+    },
   }
 }

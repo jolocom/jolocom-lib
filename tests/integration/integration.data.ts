@@ -1,5 +1,5 @@
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
-
+import { claimsMetadata } from 'cred-types-jolocom-core'
 /* Local configuration for ganache server. the contract address is deterministic */
 
 export const testEthereumConfig = {
@@ -33,3 +33,24 @@ export const serviceVault = new SoftwareKeyProvider(serviceSeed, servicePass)
 
 /* The private eth key derived from the service's seed */
 export const serviceEthKey = '0x3b781643bbfdf3964b2c6be0ac1ddf48e874975a88dadc69a719ed3b6bf4f51f'
+
+
+/* Creation attributes for interaction flows */
+
+export const integrationCredRequestJSON = {
+  callbackURL: 'http://test.com',
+  credentialRequirements: [
+    {
+      type: ['Credential', 'ProofOfEmailCredential'],
+      constraints: [{ '==': [{ var: 'issuer' }, 'did:jolo:bf8095f75ec116362eb31d5e68736be6688f82db616d1dd7df5e9f99047347b2'] }],
+    },
+  ],
+}
+
+export const emailCredJSON = {
+  metadata: claimsMetadata.emailAddress,
+  subject: 'did:jolo:bf8095f75ec116362eb31d5e68736be6688f82db616d1dd7df5e9f99047347b2',
+  claim: {
+    email: 'user@test.com',
+  },
+}
