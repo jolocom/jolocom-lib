@@ -60,7 +60,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param digest - The digest of the data
    * @param signature - The signature to verify
    * @param publicKey - The signer's public key
-   * @example `vault.verify(digest, publicKey, signature) // true`
+   * @example `SoftwareKeyProvider.verify(digest, publicKey, signature) // true`
   */
 
   public static verify(digest: Buffer, publicKey: Buffer, signature: Buffer): boolean {
@@ -100,7 +100,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * Digest the passed object, and validate the signature using a provided public key
    * @param toVerify - Instance of class that implements IDigestable
    * @param publicKey - Public key used to generate the signature
-   * @example `await vault.verifyDigestable(publicKey, publicProfileSignedCredential) // true`
+   * @example `await SoftwareKeyProvider.verifyDigestable(publicKey, publicProfileSignedCredential) // true`
    */
 
   public static async verifyDigestable(publicKey: Buffer, toVerify: IDigestable): Promise<boolean> {
