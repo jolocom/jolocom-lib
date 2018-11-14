@@ -2,20 +2,8 @@ import { fromSeed } from 'bip32'
 import { randomBytes, createCipher, createDecipher } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
+import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
 
-export interface IKeyDerivationArgs {
-  encryptionPass: string
-  derivationPath: string
-}
-
-export interface IVaultedKeyProvider {
-  getPublicKey: (derivationArgs: IKeyDerivationArgs) => Buffer
-  getPrivateKey: (derivationArgs: IKeyDerivationArgs) => Buffer
-  sign: (derivationArgs: IKeyDerivationArgs, digest: Buffer) => Buffer
-  verify: (publicKey: Buffer, signature: Buffer, digest: Buffer) => Boolean
-  signDigestable: (derivationArgs: IKeyDerivationArgs, toSign: IDigestable) => Promise<Buffer>
-  verifyDigestable: (publicKey: Buffer, toVerify: IDigestable) => Promise<boolean>
-}
 export class SoftwareKeyProvider implements IVaultedKeyProvider {
   private encryptedSeed: Buffer
 
@@ -75,7 +63,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `vault.verify(digest, publicKey, signature) // true`
   */
 
-  public verify(digest: Buffer, publicKey: Buffer, signature: Buffer): boolean {
+  public static verify(digest: Buffer, publicKey: Buffer, signature: Buffer): boolean {
     return eccVerify(digest, publicKey, signature)
   }
 
@@ -115,10 +103,10 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `await vault.verifyDigestable(publicKey, publicProfileSignedCredential) // true`
    */
 
-  public async verifyDigestable(publicKey: Buffer, toVerify: IDigestable): Promise<boolean> {
+  public static async verifyDigestable(publicKey: Buffer, toVerify: IDigestable): Promise<boolean> {
     const digest = await toVerify.digest()
     const signature = Buffer.from(toVerify.signature, 'hex')
-    return this.verify(digest, publicKey, signature)
+    return SoftwareKeyProvider.verify(digest, publicKey, signature)
   }
 
   /**

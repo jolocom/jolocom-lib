@@ -1,7 +1,7 @@
 import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
-import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/softwareProvider'
+import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/types'
 
 export interface IRegistryStaticCreationArgs {
   ipfsConnector: IIpfsConnector
