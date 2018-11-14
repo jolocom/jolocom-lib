@@ -10,7 +10,8 @@ import { ICredentialResponseAttrs, ICredentialRequestAttrs, ICredentialOfferAttr
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
-import { IVaultedKeyProvider } from '../vaultedKeyProvider/softwareProvider'
+import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
+import { IVaultedKeyProvider } from '../vaultedKeyProvider/types'
 import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types'
 import { keyIdToDid, getIssuerPublicKey, handleValidationStatus } from '../utils/helper'
 import { generateRandomID } from '../utils/crypto'
@@ -281,7 +282,7 @@ export class IdentityWallet {
     const remoteIdentity = await registry.resolve(keyIdToDid(receivedJWT.issuer))
     const pubKey  = getIssuerPublicKey(receivedJWT.issuer, remoteIdentity.didDocument)
  
-    handleValidationStatus(await this.vaultedKeyProvider.verifyDigestable(pubKey, receivedJWT), 'sig')
+    handleValidationStatus(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT), 'sig')
     sendJWT && handleValidationStatus(receivedJWT.audience === this.identity.did, 'aud')
     sendJWT && handleValidationStatus(sendJWT.nonce === receivedJWT.nonce, 'nonce')
   }

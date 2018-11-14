@@ -10,7 +10,7 @@ import { IRegistryCommitArgs, IRegistryStaticCreationArgs } from './types'
 import { jolocomIpfsStorageAgent } from '../ipfs/ipfs'
 import { jolocomEthereumResolver } from '../ethereum/ethereum'
 import { publicKeyToDID } from '../utils/crypto'
-import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/softwareProvider'
+import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/types'
 import { KeyTypes } from '../vaultedKeyProvider/types'
 import { generatePublicProfileServiceSection } from '../identity/didDocument/sections/serviceEndpointsSection'
 

@@ -84,17 +84,17 @@ describe('Software Vaulted Key Provider', () => {
     const pubKey = vault.getPublicKey(keyDerivationArgs)
 
     it('Should correctly validate signature given digest signature, and public key', () => {
-      expect(vault.verify(msgToSign, pubKey, msgSignature)).to.be.true
+      expect(SoftwareKeyProvider.verify(msgToSign, pubKey, msgSignature)).to.be.true
     })
 
     it('Should correctly detect invalid signature', () => {
-      expect(vault.verify(msgToSign, pubKey, incorrectSignature)).to.be.false
+      expect(SoftwareKeyProvider.verify(msgToSign, pubKey, incorrectSignature)).to.be.false
     })
 
     it('Should throw given invalid input', () => {
-      expect(() => vault.verify(invalidMsgToSign, pubKey, msgSignature)).to.throw(Error, 'Expected Hash')
-      expect(() => vault.verify(msgToSign, pubKey, invalidtSignature)).to.throw(Error, 'Expected Signature')
-      expect(() => vault.verify(msgToSign, testIncorrectPublicIdentityKey, msgSignature)).to.throw(
+      expect(() => SoftwareKeyProvider.verify(invalidMsgToSign, pubKey, msgSignature)).to.throw(Error, 'Expected Hash')
+      expect(() => SoftwareKeyProvider.verify(msgToSign, pubKey, invalidtSignature)).to.throw(Error, 'Expected Signature')
+      expect(() => SoftwareKeyProvider.verify(msgToSign, testIncorrectPublicIdentityKey, msgSignature)).to.throw(
         Error,
         'Expected Point'
       )
@@ -148,12 +148,12 @@ describe('Software Vaulted Key Provider', () => {
     const pubKey = vault.getPublicKey(keyDerivationArgs)
 
     it('Should correctly digest passed object and validate the signature', async () => {
-      expect(await vault.verifyDigestable(pubKey, credentialToSign)).to.be.true
+      expect(await SoftwareKeyProvider.verifyDigestable(pubKey, credentialToSign)).to.be.true
     })
 
     it('Should correctly detect incorrect signature', async () => {
       const corruptedCredential = SignedCredential.fromJSON(corruptedSignedCredentialJSON)
-      expect(await vault.verifyDigestable(pubKey, corruptedCredential)).to.be.false
+      expect(await SoftwareKeyProvider.verifyDigestable(pubKey, corruptedCredential)).to.be.false
     })
   })
 })

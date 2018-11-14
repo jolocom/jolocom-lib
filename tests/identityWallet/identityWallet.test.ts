@@ -6,7 +6,7 @@ import { Credential } from '../../ts/credentials/credential/credential'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
 import { didDocumentJSON, mockKeyId, mockDid } from '../data/didDocument.data'
-import { IVaultedKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
+import { IVaultedKeyProvider } from '../../ts/vaultedKeyProvider/types'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { mockNameCredCreationAttrs } from '../data/credential/credential.data'
 import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
@@ -23,8 +23,7 @@ const expect = chai.expect
 /* Saves some space during stubbing, helper functions */
 
 const stubbedKeyProvider = {
-  signDigestable: sinon.stub().returns(Buffer.from(validSignedCredReqJWT.signature, 'hex')),
-  verifyDigestable: sinon.stub().returns(true)
+  signDigestable: sinon.stub().returns(Buffer.from(validSignedCredReqJWT.signature, 'hex'))
 } as IVaultedKeyProvider
 
 const stubbedCredential = {
