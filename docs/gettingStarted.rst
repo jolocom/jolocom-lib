@@ -22,21 +22,20 @@ The first step to start using the Jolocom protocol is to make sure to install th
 How to create a Self-Sovereign Identity
 #########################################
 
-On a higher level, the creation of a self-sovereign identity comprises the following steps:
+In broad strokes, the creation of a self-sovereign identity comprises the following steps:
 
-* Instantiate the Identity Manager class passing a ``Buffer`` containing 32 bytes of entropy
-* Derive 2 key pairs, later used to manage your identity and to finish the registration
-* Create the DID document and anchor it on Ethereum and IPFS
+* Instantiate the ``SoftwareKeyProvider`` class providing a 32 byte random seed ``Buffer``, and a password for encryption
+* Use the ``keyProvider`` to derive two keys, one to control your Jolocom identity, and one to sign Ethereum transactions
+* Transfer a small amount of Ether to your second key to later pay for updating the registry contract
+* Instantiate and use a ``JolocomRegistry`` to anchor the newly created did document on the Ethereum network
 
-We will now look at each step in more detail.
+In the following sections, we will describe the individual steps in greater detail.
 
-**Instantiate the Identity Manager class**
+**Instantiate the Key Provider class**
 
-The Identity Manager class contains methods enabling the derivation of new key pairs from one master key, as defined in `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_.
-
-The master key itself is never used for anything outside of derivation, all further interactions with services and other identities are based on derived keys.
-
-As briefly mentioned before, in order to instantiate the Identity Manager a 32 byte ``seed`` value is required:
+The ``SoftwareKeyProvider`` class abstracts all functionality related to `deriving key pairs <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_. and creating / validating cryptographic signatures.
+The 32 byte seed used to instantiate the key provider is persisted in the instance, encrypted using the provided password. Therefore, for all opperations involving deriving keys, the password needs to be provided as well.
+This is what instantiating a key provider looks like:
 
 .. code-block:: typescript
 
@@ -45,76 +44,67 @@ As briefly mentioned before, in order to instantiate the Identity Manager a 32 b
 
   // Feel free to use a better rng module
   const seed = crypto.randomBytes(32)
-  const identityManager = JolocomLib.identityManager.create(seed)
+  const password = 'correct horse battery staple'
 
-**Derive Child Key pairs**
+  const vaultedKeyProvider = new JolocomLib.SoftwareKeyProvider(seed, password)
 
-The ``identityManager`` instance we have created can now be used to derive further key pairs needed to complete the registration.
-Firstly, we need to derive the key pair that will be used to control your Jolocom Identity.
+.. note:: In the next release, the constructor will be modified to only require the encrypted seed value, to reduce the amount of time the seed is exposed.
+
+**Derive a key to sign the Ethereum transaction**
+
+The ``vaultedKeyProvider`` we have just instantiated can now be used to derive further key pairs needed to complete the registration.
+We need to derive a key for signing the Ethereum transaction anchoring the newly created identity.
 
 .. code-block:: typescript
 
-  const identityKeyDerivationPath = identityManager.getSchema().jolocomIdentityKey // Derivation path - 'm/73'/0'/0'/0'
-  const identityKey = identityManager.deriveChildKey(identityKeyDerivationPath)
+  const publicEthKey = vaultedKeyProvider.getPublicKey({
+    encryptionPass: secret
+    derivationPath: JolocomLib.KeyTypes.ethereumKey // "m/44'/60'/0'/0/0"
+  })
 
-.. seealso:: If any of your derived keys is compromised, you only lose one key. All other derived keys (including the most 
+.. seealso:: If any of your derived keys become compromised, you only lose one key. All other derived keys (including the most 
   important master key) remain secure. Go to `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ 
   if you want to find out more about this derivation scheme. 
   We are currently looking at key recovery solutions in case the master key itself is compromised.
 
-The only argument we need to pass to ``identityManager.deriveChildKey`` is the derivation ``path``, as defined in `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_.
-The Jolocom library ships with a number of predefined paths for generating specific key pairs, which can be accessed as follows:
+The only arguments we need to pass to ``getPublicKey`` is the ``derivationPath``, in the format defined in `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_, and the ``encryptionPass`` that was used to create the encryption cipher.
+The Jolocom library ships with a few predefined paths for generating specific key pairs. The list will expand as new use cases are explored.  You can view the available paths as follows:
 
 .. code-block:: typescript
 
-  const schema = identityManager.getSchema()
+  console.log(JolocomLib.KeyTypes)
 
-  const identityKey = identityManager.deriveChildKey(schema.jolocomIdentityKey)
-  const ethereumKey = identityManager.deriveChildKey(schema.ethereumKey)
+In the next steps, we will transfer a small amount of Ether to the Rinkeby address corresponding to the created key pair.
 
-The return value of the ``deriveChildKey`` function looks as follows:
+**Transferring Ether to the key**
 
-.. code-block:: typescript 
+In order to anchor the identity on the Ethereum network, a transaction needs to be assembled and broadcasted. In order to pay for the execution, a small amount of Ether needs to
+be present on the signing key. There are a few ways to receive Ether on the Rinkeby test network, we also expose a helper function to aid this:
 
-	{ 
-  		wif: string,
-  		privateKey: Buffer,
-  		publicKey: Buffer,
-  		keyType: string,
-  		path: string
-	}
+.. code-block:: typescript
 
-By this point, we have generated two key pairs, one for acting on behalf of the Jolocom Identity, and one for paying for the Ethereum transaction needed to complete the registration.
-The next step shows how to anchor your new identity on Ethereum, by adding a record to the Joloocm registry contract.
+  await JolocomLib.util.fuelKeyWithEther(publicEthKey)
 
-**Anchor the Identity**
+This will send a request to a `fueling service <https://faucet.jolocom.com/balance>`_ Jolocom is currently hosting.
 
-In order to create or resolve Jolocom identities, a new registry instance must be created.
-The registry can help retrieve, create, and modify identity related data persisted on IPFS and indexed on Ethereum.
+**Anchoring the identity**
+
+The only thing left is actually anchoring the identity on Ethereum and storing the newly created did document on IPFS.
+For these purposes, the ``JolocomRegistry`` can be used. It is essentially an implementation of a `did resolver <https://w3c-ccg.github.io/did-spec/#did-resolvers>`_.
+The creation would look as follows:
 
 .. code-block:: typescript
 
   import { JolocomLib } from 'jolocom-lib'
 
-  const registry = Jolocom.registry.jolocom.create()
+  const registry = Jolocom.registries.jolocom.create()
 
-Once the registry has been created, you can proceed with anchoring the identity.
+  await registry.create(vaultedKeyProvider, secret)
 
-.. code-block:: typescript
+IIBehind the scenes, two key pairs are derived from the seed. The first key is used to derive the ``did`` and create a corresponding ``did`` document.
+The second key is used to sign the Ethereum transaction adding the new ``did`` to the registry smart contract.
 
-  // We use the 2 private keys we derived in the previous step
-  const identityWallet = await registry.create({
-    privateIdentityKey: identityKey.privateKey,
-    privateEthereumKey: ethereumKey.privateKey
-  })
-
-.. warning:: You might observe, 2 private keys are needed to create an identity. The first key, ``privateIdentityKey`` is the one that will be used to control your Jolocom identity.
-  The second key, ``privateEthereumKey`` is only used to broadcast the identity creation transaction to the Ethereum network. Due to this, the ``privateEthereumKey``
-  should have enough Rinkeby ether associated with it to pay for the identity creation.
-  In the close future, the ``privateEthereumKey`` will be deprecated in favour of executable signed messages as defined in `EIP-1077 <https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1077.md>`_.
-
-.. seealso:: In case you are looking for a easy way to receive some Rinkeby Ether for testing purposes, all you need to do is send a ``POST`` request with your Ethereum address to the `corresponding endpoint <https://faucet.jolocom.com/request/>`_.
-  Reference implementation can also be found `here <https://github.com/jolocom/smartwallet-app/blob/develop/src/lib/ethereum.ts#L21>`_.
+.. note:: We intend to add support for `executable signed messages <https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1077.md>`_ in the next major release, therefore removing the need to derive two key pairs.
 
 **Use custom connectors for Ethereum and IPFS communication**
 
@@ -168,6 +158,8 @@ What can I do now?
 
 Up to this point, you have successfully created and anchored a digital self-sovereign identity. In the next sections we will look at how you can:
 
-* create a public profile and publish it through your DID document
-* make statements about yourself, and others in the form of verifiable credentials
-* authenticate against services, and share the aforementioned credentials with other identities.
+* create a public profile and make it available through your ``did`` document.
+* issue statements about yourself and others in form of signed `verifiable credentials <https://w3c.github.io/vc-data-model/>`_.
+* authenticate against other identities, share and receive signed verifiable credentials, and create various interaction tokens.
+
+All of these are explored in the later sections.
