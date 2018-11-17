@@ -33,7 +33,7 @@ We will first look at how we can generate the aforementioned request.
 
 .. note:: For further documentation and examples of how to create and send 
   credential requests, check the `api documentation <https://htmlpreview.github.io/?https://raw.githubusercontent.com/jolocom/jolocom-lib/master/api_docs/documentation/classes/credentialrequest.html>`_,
-  the `demo service implementation <https://github.com/jolocom/demo-sso>`_, and the `integration tests <https://github.com/jolocom/jolocom-lib/tree/master/tests/integration>`_.
+  the `demo service implementation <https://github.com/jolocom/demo-sso>`_, the `integration tests <https://github.com/jolocom/jolocom-lib/tree/master/tests/integration>`_, and finally `this collection of examples <https://github.com/Exulansis/Validation-Examples>`_.
 
 The easiest way to make the credential request consumable for the client applications is to encode it
 as a `JSON Web Token <https://jwt.io/introduction/>`_. This allows us to easily validate signatures on individual messages, and prevent some replay attacks.
