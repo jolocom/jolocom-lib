@@ -11,6 +11,10 @@ export interface ILinkedDataSignature extends IDigestable, ISerializable {
 export interface IDigestable {
   signature: string
   digest: () => Promise<Buffer>
+  signer: {
+    did: string,
+    keyId: string
+  }
 }
 
 export interface ILinkedDataSignatureAttrs {

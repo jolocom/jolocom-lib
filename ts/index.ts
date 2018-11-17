@@ -4,15 +4,18 @@ import { registries } from './registries'
 import { SoftwareKeyProvider } from './vaultedKeyProvider/softwareProvider'
 import { KeyTypes } from './vaultedKeyProvider/types'
 import { constraintFunctions } from './interactionTokens/credentialRequest'
-import { fuelKeyWithEther } from './utils/helper'
+import { fuelKeyWithEther, getIssuerPublicKey } from './utils/helper'
+import { validateDigestable } from './utils/validation'
 
 export const JolocomLib = {
   parse,
   registries,
-  keyProvider: SoftwareKeyProvider,
+  KeyProvider: SoftwareKeyProvider,
   util: {
-    constraintFunctions: constraintFunctions,
-    fuelKeyWithEther
+    constraintFunctions,
+    fuelKeyWithEther,
+    getIssuerPublicKey,
+    validateDigestable
   },
   KeyTypes,
 }

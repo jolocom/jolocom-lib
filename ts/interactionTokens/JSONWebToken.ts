@@ -1,7 +1,7 @@
-import { IJWTHeader } from './types'
 import base64url from 'base64url'
 import { decodeToken } from 'jsontokens'
 import { classToPlain, plainToClass, Expose, Transform, Exclude } from 'class-transformer'
+import { IJWTHeader } from './types'
 import { IJSONWebTokenAttrs, InteractionType } from './types'
 import { sha256 } from '../utils/crypto'
 import { IDigestable } from '../linkedDataSignature/types'
@@ -10,7 +10,7 @@ import { CredentialResponse } from './credentialResponse'
 import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
 import { CredentialsReceive } from './credentialsReceive'
-import { handleValidationStatus } from '../utils/helper'
+import { handleValidationStatus, keyIdToDid } from '../utils/helper'
 
 /* Local interfaces / types to save on typing later */
 
@@ -142,6 +142,13 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
   set header(jwtHeader: IJWTHeader) {
     this._header = jwtHeader
+  }
+
+  get signer() {
+    return {
+      did: keyIdToDid(this.issuer),
+      keyId: this.issuer
+    }
   }
 
   /*
