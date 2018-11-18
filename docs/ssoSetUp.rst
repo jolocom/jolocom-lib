@@ -43,11 +43,11 @@ Editing the service configuration file
 If we open the ``config.ts`` - file located in the project root directory, we will notice that there are three options we can configure:
 
 * ``seed`` - A 32 byte ``Buffer`` of random bytes, used for deriving key pairs, as explained
- in the the `Getting Started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html#how-to-create-a-self-sovereign-identity>`_ section.
+  in the the `Getting Started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html#how-to-create-a-self-sovereign-identity>`_ section.
 * ``password`` - The password used to encrypt the ``seed`` on the instance. Must be provided for any operations involving key derivation.
 * ``serviceUrl`` - The url that can be used reach the deployed service, if you are testing locally, the default value should suffice.
 * ``credentialRequirements`` - The types of credentials required by the service. By default the service requires a ``ProofOfNameCredential``,
- with no associated constraints.
+  with no associated constraints.
 
 .. note:: Additional documentation on the ``credentialRequirements`` section will be added soon.
 

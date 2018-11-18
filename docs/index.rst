@@ -8,18 +8,16 @@ The Jolocom Protocol - Own Your Digital Self
 **Our Approach**
 
 
-The Jolocom protocol is a universal, lightweight, open source protocol for decentralized digital identity and access right management.
-
-Any individual, organization, or smart agent ought to be able to use our decentralized protocol to create and share information about their identity in a digital format that can be communicated over a network. 
-
-The protocol is built according to leading industry standards and implements blockchain and other decentralized technologies.
+The Jolocom identity solution aims to be a universal, lightweight, open source protocol for decentralized digital identity and access right management.
+The protocol is built on to leading open source standards standards and relies on distributed / decentralized systems such as Ethereum and IPFS for
+identity registration and resolution.
 
 
 The protcol architecture revolves around three main concepts:
 
 * `Hierarchical Deterministic Key Derivation <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ , which enables pseudonymous, context-specific interactions through the creation of and control over multiple identities.
 
-* `Decentralized Identifiers (DIDs)<https://w3c-ccg.github.io/did-spec/>`_ , which are associated with each identity and used during most interaction flows, such as authentication or data exchange.
+* `Decentralized Identifiers (DIDs) <https://w3c-ccg.github.io/did-spec/>`_ , which are associated with each identity and used during most interaction flows, such as authentication or data exchange.
 
 * `Verifiable Credentials <https://w3c.github.io/vc-data-model/>`_ , which are digitally-signed attestations issued by an identity. The specification can be used to develop a simple way of associating attribute information with identifiers.
 

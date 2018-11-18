@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>IServiceEndpointSectionAttrs | jolocom-lib</title>
+	<title>IRegistry | jolocom-lib</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="iserviceendpointsectionattrs.html">IServiceEndpointSectionAttrs</a>
+					<a href="iregistry.html">IRegistry</a>
 				</li>
 			</ul>
-			<h1>Interface IServiceEndpointSectionAttrs</h1>
+			<h1>Interface IRegistry</h1>
 		</div>
 	</div>
 </header>
@@ -70,8 +70,14 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">IServiceEndpointSectionAttrs</span>
+						<span class="target">IRegistry</span>
 					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel">
+				<h3>Implemented by</h3>
+				<ul class="tsd-hierarchy">
+					<li><a href="../classes/jolocomregistry.html" class="tsd-signature-type">JolocomRegistry</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -81,10 +87,10 @@
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="iserviceendpointsectionattrs.html#description" class="tsd-kind-icon">description</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="iserviceendpointsectionattrs.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="iserviceendpointsectionattrs.html#serviceendpoint" class="tsd-kind-icon">service<wbr>Endpoint</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="iserviceendpointsectionattrs.html#type" class="tsd-kind-icon">type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="iregistry.html#authenticate" class="tsd-kind-icon">authenticate</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="iregistry.html#commit" class="tsd-kind-icon">commit</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="iregistry.html#create" class="tsd-kind-icon">create</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="iregistry.html#resolve" class="tsd-kind-icon">resolve</a></li>
 							</ul>
 						</section>
 					</div>
@@ -93,44 +99,134 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="description" class="tsd-anchor"></a>
-					<h3>description</h3>
-					<div class="tsd-signature tsd-kind-icon">description<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="authenticate" class="tsd-anchor"></a>
+					<h3>authenticate</h3>
+					<div class="tsd-signature tsd-kind-icon">authenticate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/jolocom/jolocom-lib/blob/479a9ca/ts/identity/didDocument/sections/types.ts#L16">identity/didDocument/sections/types.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/jolocom/jolocom-lib/blob/479a9ca/ts/registries/types.ts#L27">registries/types.ts:27</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>vaultedKeyProvider<span class="tsd-signature-symbol">: </span><a href="ivaultedkeyprovider.html" class="tsd-signature-type">IVaultedKeyProvider</a>, derivationArgs<span class="tsd-signature-symbol">: </span><a href="ikeyderivationargs.html" class="tsd-signature-type">IKeyDerivationArgs</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/identitywallet.html" class="tsd-signature-type">IdentityWallet</a><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>vaultedKeyProvider: <a href="ivaultedkeyprovider.html" class="tsd-signature-type">IVaultedKeyProvider</a></h5>
+											</li>
+											<li>
+												<h5>derivationArgs: <a href="ikeyderivationargs.html" class="tsd-signature-type">IKeyDerivationArgs</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/identitywallet.html" class="tsd-signature-type">IdentityWallet</a><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="id" class="tsd-anchor"></a>
-					<h3>id</h3>
-					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="commit" class="tsd-anchor"></a>
+					<h3>commit</h3>
+					<div class="tsd-signature tsd-kind-icon">commit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/jolocom/jolocom-lib/blob/479a9ca/ts/identity/didDocument/sections/types.ts#L13">identity/didDocument/sections/types.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/jolocom/jolocom-lib/blob/479a9ca/ts/registries/types.ts#L25">registries/types.ts:25</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>commitArgs<span class="tsd-signature-symbol">: </span><a href="iregistrycommitargs.html" class="tsd-signature-type">IRegistryCommitArgs</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>commitArgs: <a href="iregistrycommitargs.html" class="tsd-signature-type">IRegistryCommitArgs</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="serviceendpoint" class="tsd-anchor"></a>
-					<h3>service<wbr>Endpoint</h3>
-					<div class="tsd-signature tsd-kind-icon">service<wbr>Endpoint<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="create" class="tsd-anchor"></a>
+					<h3>create</h3>
+					<div class="tsd-signature tsd-kind-icon">create<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/jolocom/jolocom-lib/blob/479a9ca/ts/identity/didDocument/sections/types.ts#L15">identity/didDocument/sections/types.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/jolocom/jolocom-lib/blob/479a9ca/ts/registries/types.ts#L24">registries/types.ts:24</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>vaultedKeyProvider<span class="tsd-signature-symbol">: </span><a href="ivaultedkeyprovider.html" class="tsd-signature-type">IVaultedKeyProvider</a>, decryptionPassword<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/identitywallet.html" class="tsd-signature-type">IdentityWallet</a><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>vaultedKeyProvider: <a href="ivaultedkeyprovider.html" class="tsd-signature-type">IVaultedKeyProvider</a></h5>
+											</li>
+											<li>
+												<h5>decryptionPassword: <span class="tsd-signature-type">string</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/identitywallet.html" class="tsd-signature-type">IdentityWallet</a><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="type" class="tsd-anchor"></a>
-					<h3>type</h3>
-					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="resolve" class="tsd-anchor"></a>
+					<h3>resolve</h3>
+					<div class="tsd-signature tsd-kind-icon">resolve<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/jolocom/jolocom-lib/blob/479a9ca/ts/identity/didDocument/sections/types.ts#L14">identity/didDocument/sections/types.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/jolocom/jolocom-lib/blob/479a9ca/ts/registries/types.ts#L26">registries/types.ts:26</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>did<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/identity.html" class="tsd-signature-type">Identity</a><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>did: <span class="tsd-signature-type">any</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/identity.html" class="tsd-signature-type">Identity</a><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -147,19 +243,19 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-is-external">
-						<a href="iserviceendpointsectionattrs.html" class="tsd-kind-icon">IService<wbr>Endpoint<wbr>Section<wbr>Attrs</a>
+						<a href="iregistry.html" class="tsd-kind-icon">IRegistry</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="iserviceendpointsectionattrs.html#description" class="tsd-kind-icon">description</a>
+								<a href="iregistry.html#authenticate" class="tsd-kind-icon">authenticate</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="iserviceendpointsectionattrs.html#id" class="tsd-kind-icon">id</a>
+								<a href="iregistry.html#commit" class="tsd-kind-icon">commit</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="iserviceendpointsectionattrs.html#serviceendpoint" class="tsd-kind-icon">service<wbr>Endpoint</a>
+								<a href="iregistry.html#create" class="tsd-kind-icon">create</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="iserviceendpointsectionattrs.html#type" class="tsd-kind-icon">type</a>
+								<a href="iregistry.html#resolve" class="tsd-kind-icon">resolve</a>
 							</li>
 						</ul>
 					</li>

@@ -65,9 +65,17 @@
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
 				<h1 id="jolocom-lib">jolocom-lib</h1>
-				<p>Library for interacting with the self-sovereign identity solution provided by Jolocom. </p>
-				<p>Interested in our vision? Take a look at our <a href="http://jolocom.io/wp-content/uploads/2018/07/Jolocom-Technical-WP-_-Self-Sovereign-and-Decentralised-Identity-By-Design-2018-03-09.pdf">whitepaper</a></p>
-				<p>Want to use our library? Please refer to our documentation: <a href="https://jolocom-lib.readthedocs.io/en/latest/">integration guides</a> and <a href="https://jolocom.github.io/jolocom-lib/">code documentation</a>. </p>
+				<p>Library for interacting with the self-sovereign identity solution provided by Jolocom.</p>
+				<p>Interested in our vision? Take a look at our <a href="http://jolocom.io/wp-content/uploads/2018/07/Jolocom-Technical-WP-_-Self-Sovereign-and-Decentralised-Identity-By-Design-2018-03-09.pdf">whitepaper</a> (it is currently outdated, and we are working on updating it).</p>
+				<p>Want to use our library? Please refer to the following resources:</p>
+				<ul>
+					<li><a href="https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html">Library documentation</a></li>
+					<li><a href="http://htmlpreview.github.io/?https://github.com/jolocom/jolocom-lib/blob/master/api_docs/documentation/index.html">Automatically generated api documentation</a></li>
+					<li><a href="https://github.com/jolocom/demo-sso">Demo service implementation</a></li>
+					<li><a href="https://github.com/jolocom/demo-sso-mobile">Demo service application implementation</a></li>
+					<li>Various Useful snippets: <a href="https://github.com/Exulansis/web3_snippets">Here</a>, and <a href="https://github.com/Exulansis/Validation-Examples">here</a></li>
+				</ul>
+				<p>Integration and unit tests located in the <code>./tests</code> folder are a good place to start too.</p>
 				<p><a href="https://gitter.im/jolocom/jolocom-lib"><img src="https://badges.gitter.im/gitterHQ/gitter.png" alt="Gitter chat"></a></p>
 				<h2 id="tslint-for-development">TSLINT for development</h2>
 				<p>We use <code>tslint</code> for static Typescript code analysis.<br><code>tslint [file]</code> running code analysis<br><code>tslint [file] --fix</code> running automatic fix of rule violations (fixes most of the common issues)</p>
@@ -231,6 +239,9 @@
 						<a href="interfaces/ipublickeysectionattrs.html" class="tsd-kind-icon">IPublic<wbr>Key<wbr>Section<wbr>Attrs</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/iregistry.html" class="tsd-kind-icon">IRegistry</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/iregistrycommitargs.html" class="tsd-kind-icon">IRegistry<wbr>Commit<wbr>Args</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
@@ -303,6 +314,9 @@
 						<a href="globals.html#createjolocomregistry" class="tsd-kind-icon">create<wbr>Jolocom<wbr>Registry</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#fuelkeywithether" class="tsd-kind-icon">fuel<wbr>Key<wbr>With<wbr>Ether</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#generatepublicprofileservicesection" class="tsd-kind-icon">generate<wbr>Public<wbr>Profile<wbr>Service<wbr>Section</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
@@ -316,6 +330,12 @@
 					</li>
 					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external tsd-is-not-exported">
 						<a href="globals.html#payloadtojwt" class="tsd-kind-icon">payload<wbr>ToJWT</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external tsd-is-not-exported">
+						<a href="globals.html#publickeytoaddress" class="tsd-kind-icon">public<wbr>Key<wbr>ToAddress</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#validatedigestable" class="tsd-kind-icon">validate<wbr>Digestable</a>
 					</li>
 					<li class=" tsd-kind-object-literal tsd-is-external tsd-is-not-exported">
 						<a href="globals.html#errorkeys" class="tsd-kind-icon">Error<wbr>Keys</a>

@@ -12,7 +12,7 @@ The Jolocom protocol is built using the following core specifications:
 
 * `Hierarchical Deterministic Key Derivation <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ , which enables pseudonymous, context-specific interactions through the creation of and control over multiple identities.
 
-* `Decentralized Identifiers (DIDs)<https://w3c-ccg.github.io/did-spec/>`_ , which are associated with each identity and used during most interaction flows, such as authentication or data exchange.
+* `Decentralized Identifiers (DIDs) <https://w3c-ccg.github.io/did-spec/>`_ , which are associated with each identity and used during most interaction flows, such as authentication or data exchange.
 
 * `Verifiable Credentials <https://w3c.github.io/vc-data-model/>`_ , which are digitally-signed attestations issued by an identity. The specification can be used to develop a simple way of associating attribute information with identifiers.
 
