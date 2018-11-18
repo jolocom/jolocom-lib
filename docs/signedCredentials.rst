@@ -61,8 +61,8 @@ The ``SignedCredential`` class provides a number of methods to easily consume th
     }
   }
 
-.. note:: For more information on what types of credentials are supported by the Jolocom library by default,
-  the purpose behind the ``claimsMetadata``,  the creation of custom credentials, and a deeper dive into the JSON-LD format, please refer to `this document <https://gist.github.com/Exulansis/bec3906fba96a8b63040bad918eec548>`_.
+  All credential types we support by default are made available through the ``cred-types-jolocom-core`` ``npm`` package. 
+  Alternatively, you can check out the `github repository <https://github.com/jolocom/cred-types-jolocom-demo>`_.
 
 It's worth pointing out that in the aforementioned credential, the ``issuer``, ``subject``, and the signature ``creator`` are the same ``did``.
 We refer to this type of credentials as `self signed` or `self issued`.
@@ -140,3 +140,77 @@ If you know the public key of the signing party beforehand, the identity resolut
    */
 
   console.log(await JolocomLib.keyProvider.verifyDigestable(issuerPublicKey, signedCred)) // true
+
+Working with custom credentials
+################################
+
+Users are free to define their custom credential types. Interactions would be quite restricted if only types defined
+by Jolocom could be used. In the following sections we will look into why you would want to define custom credentials,
+and how it can be done.
+
+**Why would I want to define a custom credential type?**
+
+Let's assume you want to use verifiable credentials for managing permissions inside your system. We might have one or more trusted
+identities that issue access credentials to requesters deemed authentic. For these purposes, none of the credential types
+we currently provide suffice.
+
+Or for instance, we can imagine a bar that only allows majors in. At one point, the attendees have to prove that
+they are over 18. They could of course disclose their birth date, but this is undesired as it reveals more information
+than required. An alternative is to adopt a verifiable credential based approach. A trusted entity, such as a government authority
+could issue signed credentials to all citizens that request a verification, stating that they are over a certain age.
+The citizen could later present this credential when entereing the bar.
+
+This allows citizens to prove that they are allowed to enter the bar, in a verifiable way, without disclosing any additional information.
+
+
+**Defining custom metadata**
+
+In all previous steps, when creating credentials, we used ``metadata`` provided by the
+``cred-types-jolocom-core`` package. When creating custom credentials, we have to write
+our own ``metadata`` definitions.
+
+Let's look at the second example use case from the previous section. One of the many possible ``metadata`` definitions would be:
+
+.. code-block:: typescript
+
+  const customMetadata = {
+    context: [{
+      ageOver: 'https://ontology.example.com/v1#ageOver'
+      ProofOfAgeOverCredential: 'https://ontology.example.com/v1#ProofOfAgeOverCredential'
+    }],
+    name: 'Age Over',
+    type: ['Credential', 'ProofOfAgeOverCredential']
+    claimInterface: {
+      ageOver: 0
+    } as { ageOver: number }
+  }
+
+.. note:: For more documentation on defining custom credential ``meatadata``, check out `this document <https://gist.github.com/Exulansis/bec3906fba96a8b63040bad918eec548>`_.
+  Please note that all examples of **creating credentials** and **creating metadata** are currently outdated, we are in the process of updating them.
+  
+The extra typing information - ``as {ageOver: number}`` is only relevant if you use TypeScript. It enables
+for auto completion on the ``claim`` section when creating a ``SignedCredential`` of this type.
+If you develope in JavaScript, remove this part.
+
+**Creating and verifying custom credentials**
+
+The newly created ``metadata`` definition can now be used to create a credential:
+
+.. code-block:: typescript
+
+  const ageOverCredential = verifierIdentityWallet.create.signedCredential({
+    metadata: customMetadata,
+    claim: {
+      ageOver: 18
+    },
+    subject: requesterDid
+  }, servicePassword)
+
+(It's that simple!)
+
+It is worth noting that the custom ``metadata`` definition is only needed for creating
+credentials. Validating custom credentials is still as simple as:
+
+.. code-block:: typescript
+
+  const valid = await JolocomLib.util.validateDigestable(ageOverCredential)
