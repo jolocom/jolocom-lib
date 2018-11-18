@@ -4,7 +4,7 @@ type ClaimType = string | number | boolean | {}
 /**
  * @public
  */
-type ClaimEntry = ClaimType | ClaimInterface
+export type ClaimEntry = ClaimType | ClaimInterface
 
 /**
  * @example
