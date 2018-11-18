@@ -46,7 +46,7 @@ This is what instantiating a key provider looks like:
   const seed = crypto.randomBytes(32)
   const password = 'correct horse battery staple'
 
-  const vaultedKeyProvider = new JolocomLib.SoftwareKeyProvider(seed, password)
+  const vaultedKeyProvider = new JolocomLib.KeyProvider(seed, password)
 
 .. note:: In the next release, the constructor will be modified to require only the encrypted seed value, thereby reducing the amount of time during which the seed is exposed.
 
@@ -95,16 +95,36 @@ The creation would look as follows:
 
 .. code-block:: typescript
 
-  import { JolocomLib } from 'jolocom-lib'
-
-  const registry = Jolocom.registries.jolocom.create()
-
+  const registry = JolocomLib.registries.jolocom.create()
   await registry.create(vaultedKeyProvider, secret)
 
-IIBehind the scenes, two key pairs are derived from the seed. The first key is used to derive the DID and create a corresponding DID document.
+Behind the scenes, two key pairs are derived from the seed. The first key is used to derive the DID and create a corresponding DID document.
 The second key is used to sign the Ethereum transaction, adding the new DID to the registry smart contract.
 
 .. note:: We intend to add support for `executable signed messages <https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1077.md>`_ in the next major release, thereby eliminating the need to derive two key pairs.
+
+Using the identity
+###################
+
+The ``create`` function presented in the previous section eventually returns an instance of the ``IdentityWallet`` class, which can be used
+to authenticate against services, issue credentials, and request data from other identities.
+Later sections will explore the exposed interface in more detail.
+
+In case you have already created your identity, and would like to instantiate an ``IdentityWallet``, you can
+simply run:
+
+.. code-block:: typescript
+
+  /**
+   * You will need to instantiate a Key Provider using the seed used for identity creation
+   * We are currently working on simplifying, and optimising this part of the api
+   */
+
+  const registry = JolocomLib.registries.create()
+  const IdentityWallet = await registry.authenticate(vaultedKeyProvider, {
+    derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
+    decryptionPass: secret
+  })
 
 What can I do now?
 #########################################

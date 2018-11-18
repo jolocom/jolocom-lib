@@ -8,7 +8,7 @@ Create a signed credential
 ##################################
 
 The easiest way to create a signed credential is by using an instance of the ``IdentityWallet`` class. If you have yet not created an identity, check out the `Getting Started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html>`_ section.
-If you have already created an identity, you can obtain an identity wallet by authenticating, as defined in `section 2.2 <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html#authenticating>`_.
+If you have already created an identity, you can obtain an identity wallet by authenticating, as defined in `section 2.2 <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html#using-the-identity>`_.
 
 .. code-block:: typescript
 
@@ -23,7 +23,7 @@ If you have already created an identity, you can obtain an identity wallet by au
 
   ...
 
-Notice the ``JSON`` form of the newly created ``emailAddressSignedCredential``is simply a `JSON-LD W3C Verifiable credential <https://w3c.github.io/vc-data-model/>`_.
+Notice the ``JSON`` form of the newly created ``emailAddressSignedCredential`` is simply a `JSON-LD Verifiable credential <https://w3c.github.io/vc-data-model/>`_.
 The ``SignedCredential`` class provides a number of methods to easily consume the data from the credential.
 
 .. code-block:: typescript
@@ -61,7 +61,7 @@ The ``SignedCredential`` class provides a number of methods to easily consume th
     }
   }
 
-  All credential types the library supports by default are made available through the ``cred-types-jolocom-core`` ``npm`` package. 
+.. note:: All credential types the library supports by default are made available through the ``cred-types-jolocom-core`` ``npm`` package. 
   Alternatively, you can check out the `GitHub repository <https://github.com/jolocom/cred-types-jolocom-demo>`_.
 
 It's worth noting that in the aforementioned credential, the ``issuer``, the ``subject``, and the signature ``creator`` each share the same DID.
@@ -111,20 +111,13 @@ Validating a received credential proceeds as follows:
   const registry = Jolocom.registry.jolocom.create()
 
   // The credential will often be received serialized in its JSON form.
-
-  const registry = JolocomLib.registries.jolocom.create()
   const receivedCredential = JolocomLib.parse.signedCredential(json)
 
-  const issuerIdentity = await registry.resolve(receivedCredential.issuer)
-  const issuerPublicKey = getIssuerPublicKey(receivedCredential.signer.keyId, issuerIdentity.didDocument)
-  console.log(await JolocomLib.keyProvider.verifyDigestable(issuerPublicKey, signedCred)) // true
-
-.. note:: The process for fetching the issuer's public key for signature validation is slightly cumbersome in the current version. Rest assured, we are
-  working on it, and will focus on improving this part of the api for the next release.
+  const valid = await JolocomLib.util.validateDigestable(receivedCredential)
 
 The previous step amounts to resolving the DID document associated with the credential ``issuer`` by using the listed public keys to validate the credential signature.
 
-If you already know the public key corresponding to the signing party, it is not necessary to resolve the DID document as outlined below:
+If you already know the public key corresponding to the signing party, it is not necessary to resolve the DID document:
 
 .. code-block:: typescript
 
