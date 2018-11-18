@@ -7,7 +7,7 @@ Interested in our vision? Take a look at our [whitepaper](http://jolocom.io/wp-c
 Want to use our library? Please refer to the following resources:
 
 - [Library documentation](https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html)
-- [Automatically generated api documentation](http://htmlpreview.github.io/?https://github.com/jolocom/jolocom-lib/blob/master/api_docs/documentation/index.html)
+- [Automatically generated api documentation](https://htmlpreview.github.io/?https://raw.githubusercontent.com/jolocom/jolocom-lib/master/api_docs/documentation/globals.html)
 - [Demo service implementation](https://github.com/jolocom/demo-sso)
 - [Demo service application implementation](https://github.com/jolocom/demo-sso-mobile)
 - Various Useful snippets: [Here](https://github.com/Exulansis/web3_snippets), and [here](https://github.com/Exulansis/Validation-Examples)
