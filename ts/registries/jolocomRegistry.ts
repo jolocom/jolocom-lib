@@ -6,7 +6,7 @@ import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
-import { IRegistryCommitArgs, IRegistryStaticCreationArgs } from './types'
+import { IRegistryCommitArgs, IRegistryStaticCreationArgs, IRegistry } from './types'
 import { jolocomIpfsStorageAgent } from '../ipfs/ipfs'
 import { jolocomEthereumResolver } from '../ethereum/ethereum'
 import { publicKeyToDID } from '../utils/crypto'
@@ -19,7 +19,7 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
  * Jolocom specific Registry. Uses IPFS and Ethereum for anchoring indentities and the resolution mechanism.
  */
 
-export class JolocomRegistry {
+export class JolocomRegistry implements IRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
 

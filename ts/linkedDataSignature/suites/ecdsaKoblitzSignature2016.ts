@@ -4,6 +4,7 @@ import { canonize } from 'jsonld'
 import { ILinkedDataSignature, ILinkedDataSignatureAttrs, IDigestable } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
+import { keyIdToDid } from '../../utils/helper'
 
 /**
  * @class A EcdsaKoblitz linked data signature implementation
@@ -117,6 +118,12 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
     this._creator = creator
   }
 
+  get signer() {
+    return {
+      did: keyIdToDid(this.creator),
+      keyId: this.creator
+    }
+  }
   /**
    * Converts the lined data signature to canonical form
    * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }

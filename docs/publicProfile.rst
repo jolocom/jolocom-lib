@@ -1,20 +1,19 @@
 Public Profile
 ===========================
 
-You can attach a public profile to your identity. It is easily resolvable by all identities you interact with interact with.
-access basic information about you. This is especially relevant for interactions with online services, 
-as the public profile can be used to advertise interaction conditions, as well as various attestations.
+A public profile can be attached to an identity to make it easy for any identity with which you interact to easily resolve your identity. This is especially relevant for interactions with online services,
+as a public profile can be used to advertise interaction conditions, as well as various attestations.
 
-Before you start, initialize the ``IdentityWallet`` class as outlined in the `getting started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html#how-to-create-a-self-sovereign-identity>`_ section. 
+Before you start, be sure to initialize the ``IdentityWallet`` class as outlined in the `Getting Started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html#how-to-create-a-self-sovereign-identity>`_ section.
 
 Adding a public profile
 ########################
 
 
-We currently model public profiles as simeple ``SignedCredential`` instances, containing the following claims -
+We currently model public profiles as simple ``SignedCredential`` instances, each containing the following claims:
 ``about``, ``url``, ``image``, and ``name``.
 
-Before we can publish the credential, we need to create it first, this can be done as follows:
+Before we can publish the credential, we need to first create it:
 
 .. code-block:: typescript
 
@@ -31,12 +30,12 @@ Before we can publish the credential, we need to create it first, this can be do
     subject: identityWallet.did
   }, password)
 
-Now add the created public profile to your identity.
+Add the newly created public profile to your identity:
 
 .. code-block:: typescript
 
   /** 
-  * Typescript accessors  are used to get
+  * Typescript accessors are used to get
   * and set values on the identityWallet instance
   * @see https://www.typescriptlang.org/docs/handbook/classes.html
   */
@@ -46,7 +45,7 @@ Now add the created public profile to your identity.
 
 .. note:: `Typescript accessors <https://www.typescriptlang.org/docs/handbook/classes.html>`_ are used to get and set values on the ``identityWallet`` instance
 
-Up until now, you have been making the changes to your identity locally.
+So far you have been making changes to your identity only locally.
 Now, you can commit the changes to IPFS and Ethereum.
 
 .. code-block:: typescript
@@ -60,7 +59,7 @@ Now, you can commit the changes to IPFS and Ethereum.
     }
   })
 
-In order to update your public profile, simple create a new credential, add it to your ``identityWallet``, and commit the changes.
+In order to update your public profile, simply create a new credential, add it to your ``identityWallet``, and commit the changes.
 
 Removing your public profile
 #############################
@@ -78,12 +77,12 @@ Removing your public profile
     }
   })
 
-Please note that due to the way that IPFS handles the concept of deletion, this delete method simply unpins your public profile from its corresponding pin set, and allows the unpinned data 
-to be garbage collected in a 24 hour cycle. Accordingly, if the data has been pinned by another IPFS gateway, complete removal of stored information on the IPFS network cannot be ensured.
+Please note that due to the way that IPFS handles the concept of deletion, this delete method simply unpins your public profile from its corresponding pin set, and allows the unpinned data
+to be "garbage collected” in a 24-hour cycle. Accordingly, if the data has been pinned by another IPFS gateway, complete removal of stored information on the IPFS network cannot be ensured.
 
 View the public profile
 #########################
-Viewing the public profile associated with an identity, is as simple as this:
+Viewing the public profile associated with an identity is easy:
 
 .. code-block:: typescript
 

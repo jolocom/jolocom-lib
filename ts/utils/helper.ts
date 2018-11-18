@@ -40,7 +40,7 @@ const ErrorKeys = {
  * Helper function to transfer 0.1 Ether to an address given the corresponding public key
  * The Ether is used for anchoring the identity.
  * @param publicKey - public key the Ether should be transferred to
- * @example `await fuelKeyWithEther(Buffer.from('03848...', 'hex'))
+ * @example `await fuelKeyWithEther(Buffer.from('03848...', 'hex'))`
  */
 
 export function fuelKeyWithEther(publicKey: Buffer) {

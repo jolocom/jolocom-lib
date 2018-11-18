@@ -277,7 +277,7 @@ export class IdentityWallet {
    * @param customRegsitry - optional custom registry
   */
 
-  public async validateJWT<T extends JWTEncodable>(receivedJWT: JSONWebToken<T>, sendJWT?: JSONWebToken<T>, customRegistry?: JolocomRegistry): Promise<void> {
+  public async validateJWT<T extends JWTEncodable, A extends JWTEncodable>(receivedJWT: JSONWebToken<T>, sendJWT?: JSONWebToken<A>, customRegistry?: JolocomRegistry): Promise<void> {
     const registry = customRegistry || createJolocomRegistry()
     const remoteIdentity = await registry.resolve(keyIdToDid(receivedJWT.issuer))
     const pubKey  = getIssuerPublicKey(receivedJWT.issuer, remoteIdentity.didDocument)
