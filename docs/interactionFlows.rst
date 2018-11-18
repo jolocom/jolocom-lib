@@ -1,4 +1,4 @@
-Credential Based Communication Flows
+Credential based communication flows
 ======================================
 
 Identities can interact between each other in incredibly complex ways. We currently support a number of quite
@@ -9,7 +9,7 @@ This section is meant to provide a detailed overview of the interaction flows su
 .. note:: The following sections assume you have already created an identity. If you haven't yet, check out the `getting started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html>`_ section.
 
 Request credentials from another identity
-####################################
+##########################################
 
 Many services require the user to provide certain information upon signing up.
 The Jolocom library provides a simple way for services to present their requirements to authenticating users through defining and presenting what we call a credential request.
@@ -55,26 +55,15 @@ On the client side, we can decode and validate the received credential request a
 
 .. code-block:: typescript
 
-  import { JSONWebToken } from "./interactionFlows/JSONWebToken"
-
-  const credentialRequest = JolocomLib.parse.interactionToken.fromJWT(enc)
-
   const credentialRequest = JolocomLib.parse.interactionToken.fromJWT(enc)
   identityWallet.validateJWT(credentialRequest)
 
 .. note:: The ``validateJWT`` method will ensure the credential is not expired, and that it contains a valid signature.
 
-We will look at how to craft the corresponding response in the next section.
-
-Provide credentials to another identity
-#####################################
-
-Once the service has assembled and broadcasted the credential request, the client can parse it and assemble a valid response.
-The following sections will show how this can be done.
 
 **Create a Credential Response**
 
-On the client side, after we have received the encoded credential request, we want to prepare and send a corresponding credential response:
+Once the request has been decoded, we can create the response:
 
 .. code-block:: typescript
 
@@ -152,8 +141,66 @@ Now that we have the decoded credential response, let's ensure that the user pas
     // The credentials can be used
   }
 
+
+Offering credentials to another identity [EXPERIMENTAL]
+########################################################
+
+In some cases, an agent might want to issue another agent a signed credential. We are currently
+developing a siple protocol to facilitate this interaction. As of now, an early version is 
+already supported through the Jolocom Library.
+
+**Crete a Credential Offer**
+
+Firstly, the agent offering the attestation must create a credential offer:
+
+.. code-block:: typescript
+
+  const credentialOffer = await identityWallet.create.interactionTokens.request.offer({
+    callbackURL: 'https://example.com/receive/...',
+    instant: true,
+    requestedInput: {}
+  })
+
+The endpoint denoted by the ``callbackURL`` key will be pinged by the client device with 
+a response to the offer.
+
+The ``instant`` (will be used to signal if the credential will be available right away) and 
+``requestedInput`` (will be used for requesting additional information, e.g. a valid id card to receive
+a driver license credential) are not used as of now, and will be supported once we
+implement verification requests.
+
+**Consume a Credential Offer**
+
+On the client side, we can decode and validate the received credential request as follows:
+
+.. code-block:: typescript
+
+  const credentialOffer = JolocomLib.parse.interactionToken.fromJWT(enc)
+  identityWallet.validateJWT(credentialRequest)
+
+.. note:: The ``validateJWT`` method will ensure the credential is not expired, and that it contains a valid signature.
+
+**Create a Credential Offer Response**
+
+The easiest way to create a response is:
+
+.. code-block:: typescript
+
+  const offerResponse = await identityWallet.create.interactionTokens.response.offer({
+    ....interactionToken.toJSON()
+  }, secret, credentialOffer)
+
+.. note:: The response simply replays all fields in the response. With the introduction of verification requests
+  this will no longer be the case.
+
+**Transferring the credential to the user**
+
+The credential offer response is sent back to the service, which in return generates the credential and
+sends it to the client. There are a few way to accomplish the last step, currently the service simply
+issues a ``CredentialResponse`` JWT containing the credentials. An example implementation can be found `here <https://github.com/jolocom/demo-sso/blob/master/server/routes.ts>`_.
+
 What next?
 ###########
 
-Now that we understand the reasoning behind the credential request and response flows, it's time to test them out in action!
+Now that we understand the reasoning behind the credential request and offer flows, it's time to test them out in action!
 Head to the next section to learn how to set up your own service so it can interact with Jolocom identities.

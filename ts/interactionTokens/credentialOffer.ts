@@ -72,15 +72,15 @@ export class CredentialOffer {
   }
 
   /**
-   * Serializes the {@link Authentication} request / response as JSON-LD
+   * Serializes the {@link CredentialOffer} request / response as JSON-LD
    */
 
-  public toJSON() {
-    return classToPlain(this)
+  public toJSON(): ICredentialOfferAttrs {
+    return classToPlain(this) as ICredentialOfferAttrs
   }
 
   /**
-   * Instantiates a {@link Authentication} from it's JSON form
+   * Instantiates a {@link CredentialOffer} from it's JSON form
    * @param json - JSON encoded authentication request / response
    */
 
