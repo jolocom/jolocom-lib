@@ -8,30 +8,35 @@ The Jolocom Protocol - Own Your Digital Self
 **Our Approach**
 
 
-The Jolocom Protocol is a lightweight protocol which enables self-sovereign identity, which is built 
-with W3C open standards on top of Ethereum and IPFS. The architecture of the protocol revolves around
-three main concepts: 
+The Jolocom protocol is a universal, lightweight, open source protocol for decentralized digital identity and access right management.
 
-* Pairwise pseudonymous multiple personas
-* Decentralized Identifiers (DIDs) and DID Documents
-* Verifiable Credentials
+Any individual, organization, or smart agent ought to be able to use our decentralized protocol to create and share information about their identity in a digital format that can be communicated over a network. 
 
-Identities in the Jolocom system are controlled through asymmetric, public/private key cryptography. 
-This provides identities with signing and transaction capabilities, as well as enabling context-specific interactions 
-through child key pairs, which are derived as Hierarchical Deterministic Keys following the BIP-32 specification.
+The protocol is built according to leading industry standards and implements blockchain and other decentralized technologies.
 
-DIDs are globally unique, persistent identifiers associated with each key pair, which are self-issued and can be 
-automatically resolved to DidDocuments containing more information about the identifier in question. 
-Verifiable Credentials enable cryptographically verifiable statements about identities. As long as the consumer 
-of the credential trusts the issuer of the statement, the Jolocom protocol provides a secure framework for the creation 
-and transaction of trustable statements.
 
-In its most simplistic form, the Jolocom Protocol can be used to:
+The protcol architecture revolves around three main concepts:
 
-* Create a self-sovereign identity for humans/devices/organizations
-* Attach meaningful information to identities in the form of verifiable credentials
-* Easily request and consume verified information about identities
+* `Hierarchical Deterministic Key Derivation <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ , which enables pseudonymous, context-specific interactions through the creation of and control over multiple identities.
 
+* `Decentralized Identifiers (DIDs)<https://w3c-ccg.github.io/did-spec/>`_ , which are associated with each identity and used during most interaction flows, such as authentication or data exchange.
+
+* `Verifiable Credentials <https://w3c.github.io/vc-data-model/>`_ , which are digitally-signed attestations issued by an identity. The specification can be used to develop a simple way of associating attribute information with identifiers.
+
+
+Cryptographic keys and DIDs enable the existence of a self-sovereign identity. Keys and verifiable credentials provide the tools required to create complex data while simultaneously preserving simplicity at the core.
+
+This approach allows us to keep the protocol generic while facilitating an unlimited number of specific use cases with varying levels of complexity.
+
+A further component of the protocol architecture calls for the integration of a public, censorship-resistant, decentralized network for anchoring and resolving user identifiers. For this we currently use IPFS for storage and Ethereum for anchoring and indexing identifiers.
+
+In its most simplistic form, the Jolocom protocol can be used to:
+
+* Create a self-sovereign identity for use by humans, organisations, and smart agents;
+* Attach meaningful information to identities in the form of verifiable credentials;
+* Easily request and consume verified information about identities in an automated fashoin.
+
+We hope it will serve efforts to decentralize the web and digital identity, and enable people, organisations, and smart agents to own and control the data that defines them.
 
 
 .. toctree::

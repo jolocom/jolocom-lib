@@ -1,14 +1,14 @@
 Credentials & Signed Credentials
 ================================
 
-The Jolocom library exposes a number of functions and classess that allow the creation and consumption of signed `verifiable credentials <https://w3c.github.io/vc-data-model/>`_.
-Any agent can ensure a credential is valid by verifying that the associated cryptographic signature is correct and was generated using the expected private key.
+The Jolocom library contains a number of functions and classes that enable the creation and consumption of signed `verifiable credentials <https://w3c.github.io/vc-data-model/>`_.
+Any agent can ensure a given credential is valid by verifying that the associated cryptographic signature is correct and was generated using the expected private key.
 
-Create a Signed Credential
+Create a signed credential
 ##################################
 
-The easiest way to create a signed credential, is by using an instance of the ``IdentityWallet`` class. If you have yet not created an identity, check out the `getting started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html>`_ section.
-If you have already created an identity, you can obtain an identity wallet by authenticating, as defined in section `TODO`.
+The easiest way to create a signed credential is by using an instance of the ``IdentityWallet`` class. If you have yet not created an identity, check out the `Getting Started <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html>`_ section.
+If you have already created an identity, you can obtain an identity wallet by authenticating, as defined in `section 2.2 <https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html#authenticating>`_.
 
 .. code-block:: typescript
 
@@ -18,12 +18,12 @@ If you have already created an identity, you can obtain an identity wallet by au
   const emailAddressSignedCredential = await identityWallet.create.signedCredential({
     metadata: claimsMetadata.emailAddress,
     claim: { email: 'example@example.com' }
-    subject: identityWallet.did // Our own did, referred to as a self issued credential
+    subject: identityWallet.did // Our own DID, referred to as a self-issued credential
   })
 
   ...
 
-If we look at the ``JSON`` form of the newly created ``emailAddressSignedCredential``, we notice it's nothing but a `JSON-LD W3C Verifiable credential <https://w3c.github.io/vc-data-model/>`_.
+Notice the ``JSON`` form of the newly created ``emailAddressSignedCredential``is simply a `JSON-LD W3C Verifiable credential <https://w3c.github.io/vc-data-model/>`_.
 The ``SignedCredential`` class provides a number of methods to easily consume the data from the credential.
 
 .. code-block:: typescript
@@ -61,13 +61,13 @@ The ``SignedCredential`` class provides a number of methods to easily consume th
     }
   }
 
-  All credential types we support by default are made available through the ``cred-types-jolocom-core`` ``npm`` package. 
-  Alternatively, you can check out the `github repository <https://github.com/jolocom/cred-types-jolocom-demo>`_.
+  All credential types the library supports by default are made available through the ``cred-types-jolocom-core`` ``npm`` package. 
+  Alternatively, you can check out the `GitHub repository <https://github.com/jolocom/cred-types-jolocom-demo>`_.
 
-It's worth pointing out that in the aforementioned credential, the ``issuer``, ``subject``, and the signature ``creator`` are the same ``did``.
-We refer to this type of credentials as `self signed` or `self issued`.
+It's worth noting that in the aforementioned credential, the ``issuer``, the ``subject``, and the signature ``creator`` each share the same DID.
+We refer to this type of credential as `self-signed` or `self-issued`.
 
-To issue a credential to another entity, we simply need to specify the corresponding ``subject`` ``did``:
+To issue a credential to another entity, we simply need to specify the DID of the corresponding ``subject``:
 
 .. code-block:: typescript
 
@@ -77,7 +77,7 @@ To issue a credential to another entity, we simply need to specify the correspon
     subject: 'did:jolo:6d6f636b207375626a656374206469646d6f636b207375626a65637420646964'
   })
 
-If we view the newly created credential, we can indeed observe that the ``subject``, denoted by the ``claim.id`` key, is different:
+Taking a look at the newly created credential, we can indeed see that the ``subject``, denoted by the ``claim.id`` key, is different:
 
 .. code-block:: typescript
 
@@ -98,11 +98,11 @@ If we view the newly created credential, we can indeed observe that the ``subjec
       ...
   }
 
-Validate signatures on a Signed Credentials
+Validate a signature on a signed credential
 #############################################
 
-Now that we have created a signed credential, we might want to present it to a service, or another identity as part of an interaction. The receiver needs to be able to ensure the credential is valid and authentic.
-Validating a received credential looks as follows:
+Perhaps you would like to present the newly created signed credential to a service or some other entity with a Jolocom identity as part of an interaction. The (intended) recipient needs to be able to verify that the credential received is valid.
+Validating a received credential proceeds as follows:
 
 .. code-block:: typescript
 
@@ -110,7 +110,7 @@ Validating a received credential looks as follows:
 
   const registry = Jolocom.registry.jolocom.create()
 
-  // Often times, on the credential will be received serialised as JSON.
+  // The credential will often be received serialized in its JSON form.
 
   const registry = JolocomLib.registries.jolocom.create()
   const receivedCredential = JolocomLib.parse.signedCredential(json)
@@ -119,13 +119,12 @@ Validating a received credential looks as follows:
   const issuerPublicKey = getIssuerPublicKey(receivedCredential.signer.keyId, issuerIdentity.didDocument)
   console.log(await JolocomLib.keyProvider.verifyDigestable(issuerPublicKey, signedCred)) // true
 
-.. note:: Currently the process of fetching the issuer's public key for signature validation is slightly cumbersome, we are
+.. note:: The process for fetching the issuer's public key for signature validation is slightly cumbersome in the current version. Rest assured, we are
   working on it, and will focus on improving this part of the api for the next release.
 
-In the previous step, we are essentially resolving the ``did`` document associated with the credential ``issuer``, and use the listed public
-keys to validate the credential signature.
+The previous step amounts to resolving the DID document associated with the credential ``issuer`` by using the listed public keys to validate the credential signature.
 
-If you know the public key of the signing party beforehand, the identity resolution part can of course be skipped:
+If you already know the public key corresponding to the signing party, it is not necessary to resolve the DID document as outlined below:
 
 .. code-block:: typescript
 
@@ -135,8 +134,8 @@ If you know the public key of the signing party beforehand, the identity resolut
   const issuerPublicKey = Buffer.from('030d4792f4165a0a78f7c7d14c42f6f98decfa23d36e8378c30e4291711b31961f', 'hex')
 
   /** 
-   * Please note that this will not fail if the signer has marked the public key as compromised or invalid,
-   * we are simply verifying the signature without checking any external resources
+     * Please note that this will NOT fail if the signer has marked the public key as compromised or invalid;
+     * the signature is simply being verified, without checking against any external resources.
    */
 
   console.log(await JolocomLib.keyProvider.verifyDigestable(issuerPublicKey, signedCred)) // true
@@ -144,32 +143,34 @@ If you know the public key of the signing party beforehand, the identity resolut
 Working with custom credentials
 ################################
 
-Users are free to define their custom credential types. Interactions would be quite restricted if only types defined
-by Jolocom could be used. In the following sections we will look into why you would want to define custom credentials,
-and how it can be done.
+Users are free to define custom credential types. The number of types of interactions would be quite restricted if only types defined
+by Jolocom could be used. The following sections delve into why you might want to define custom credentials,
+and how to do so.
 
 **Why would I want to define a custom credential type?**
 
-Let's assume you want to use verifiable credentials for managing permissions inside your system. We might have one or more trusted
+Let's assume you want to use verifiable credentials for managing permissions inside your system. You might have one or more trusted
 identities that issue access credentials to requesters deemed authentic. For these purposes, none of the credential types
 we currently provide suffice.
 
-Or for instance, we can imagine a bar that only allows majors in. At one point, the attendees have to prove that
-they are over 18. They could of course disclose their birth date, but this is undesired as it reveals more information
-than required. An alternative is to adopt a verifiable credential based approach. A trusted entity, such as a government authority
-could issue signed credentials to all citizens that request a verification, stating that they are over a certain age.
-The citizen could later present this credential when entereing the bar.
+Or consider this scenario: a bar that only allows adults of legal age on the premises. At a certain point, patrons must prove
+they are over 18 years of age in order to order enter the establishment. Patrons could of course disclose their individual dates of birth, 
+but this is not optimal in light of the fact that more information is disclosed than required for the purposes of the interaction.
 
-This allows citizens to prove that they are allowed to enter the bar, in a verifiable way, without disclosing any additional information.
+An alternative is to adopt an approach based on verifiable credentials. A trusted entity, such as a government authority,
+could issue signed credentials to all citizens that request such a verification, i.e. an attestation stating that a citizen is of or over a certain age.
+A citizen could later present such a credential when entering a bar.
+
+This allows citizens to prove that they are allowed to gain entry to the bar, in a verifiable way, without disclosing any additional information.
 
 
 **Defining custom metadata**
 
-In all previous steps, when creating credentials, we used ``metadata`` provided by the
-``cred-types-jolocom-core`` package. When creating custom credentials, we have to write
+So far, when creating credentials, ``metadata`` provided by the
+``cred-types-jolocom-core`` package has been used. When creating custom credentials, we have to write
 our own ``metadata`` definitions.
 
-Let's look at the second example use case from the previous section. One of the many possible ``metadata`` definitions would be:
+Let's take another look at the second example use case from the previous section. One of the many possible ``metadata`` definitions would be:
 
 .. code-block:: typescript
 
@@ -186,11 +187,11 @@ Let's look at the second example use case from the previous section. One of the 
   }
 
 .. note:: For more documentation on defining custom credential ``meatadata``, check out `this document <https://gist.github.com/Exulansis/bec3906fba96a8b63040bad918eec548>`_.
-  Please note that all examples of **creating credentials** and **creating metadata** are currently outdated, we are in the process of updating them.
+  Please note that all examples of **creating credentials** and **creating metadata** are currently outdated (updates already in progress).
   
 The extra typing information - ``as {ageOver: number}`` is only relevant if you use TypeScript. It enables
-for auto completion on the ``claim`` section when creating a ``SignedCredential`` of this type.
-If you develope in JavaScript, remove this part.
+for auto-completion on the ``claim`` section when creating a ``SignedCredential`` of this type.
+If you develope in JavaScript, remove this line.
 
 **Creating and verifying custom credentials**
 
