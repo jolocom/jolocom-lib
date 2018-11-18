@@ -45,4 +45,4 @@ In its most simplistic form, the Jolocom Protocol can be used to:
   publicProfile
   interactionFlows
   ssoSetUp
-  protocolComponents
+  customConnectors

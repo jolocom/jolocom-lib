@@ -106,52 +106,6 @@ The second key is used to sign the Ethereum transaction adding the new ``did`` t
 
 .. note:: We intend to add support for `executable signed messages <https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1077.md>`_ in the next major release, therefore removing the need to derive two key pairs.
 
-**Use custom connectors for Ethereum and IPFS communication**
-
-When it comes down to updating or resolving data persisted on IPFS and Ethereum, the Jolocom Library delegates to two internal components,
-an `IPFS connector <https://github.com/jolocom/jolocom-lib/blob/master/ts/ipfs/types.ts#L7>`_ for interacting with an IPFS node,
-and an `Ethereum connector <https://github.com/jolocom/jolocom-lib/blob/master/ts/ethereum/types.ts#L12>`_, for interacting with the deployed registry smart contract.
-
-You can also supply your custom implementations of both connectors, in case your identities are indexed on a private Ethereum deployment, or you would like to connect to a custom IPFS cluster. A custom implementation might look as follows:
-
-.. code-block:: typescript
-
-  import { JolocomLib } from 'jolocom-lib'
-  import { IIpfsConnector } from './ipfs/types'
-  import { jolocomEthereumResolver } from './ethereum'
-
-  // Our custom implementation needs to correctly implement a library defined interface to be considered valid
-  class CustomIpfsConnector implements IIpfsConnector {
-    constructor(gatewayUrl : string) {
-      this.httpGatewayUrl = gatewayUrl
-    }
-
-    public storeJSON = async ({ data, pin }: { data: object; pin: boolean; }) => {
-      // Perhaps authenticate against an endpoint first
-      const fileHash = await customIpfsAddImplementation(data, pin)
-      return fileHash
-    }
-
-    public catJSON = async (hash: string) => {
-      // Perhaps check in a local cache database first.
-    }
-
-    public removePinnedHash = async (hash: string) => { ... }
-
-    createDagObject = ({ data, pin }: { data: object; pin: boolean; }) => { ... }
-
-    public resolveIpldPath = async (pathToResolve: string) => { ... }
-  }
-
-  const customRegistry = JolocomLib.registry.jolocom.create({
-    ipfsConnector: new CustomIpfsConnector(),
-    ethereumConnector: jolocomEthereumResolver
-  })
-
-
-In this case, we defined a custom class that will handle all communication with IPFS and configured the registry to use it. It might be worth pointing out that we still use the default Ethereum connector. If we wanted to use a custom Ethereum connector, same logic could be followed.
-
-The returned ``identityWallet`` class allows for creating digital signatures, authenticating against services, and creating verifiable credentials. We'll explore some of this functionality in later sections.
 
 What can I do now?
 #########################################
@@ -161,5 +115,6 @@ Up to this point, you have successfully created and anchored a digital self-sove
 * create a public profile and make it available through your ``did`` document.
 * issue statements about yourself and others in form of signed `verifiable credentials <https://w3c.github.io/vc-data-model/>`_.
 * authenticate against other identities, share and receive signed verifiable credentials, and create various interaction tokens.
+* use custom connectors for IPFS and Ethereum communication.
 
 All of these are explored in the later sections.
