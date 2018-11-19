@@ -120,7 +120,7 @@ simply run:
    * We are currently working on simplifying, and optimising this part of the api
    */
 
-  const registry = JolocomLib.registries.create()
+  const registry = JolocomLib.registries.jolocom.create()
   const IdentityWallet = await registry.authenticate(vaultedKeyProvider, {
     derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
     decryptionPass: secret

@@ -108,11 +108,8 @@ Validating a received credential proceeds as follows:
 
   import { JolocomLib } from 'jolocom-lib'
 
-  const registry = Jolocom.registry.jolocom.create()
-
   // The credential will often be received serialized in its JSON form.
   const receivedCredential = JolocomLib.parse.signedCredential(json)
-
   const valid = await JolocomLib.util.validateDigestable(receivedCredential)
 
 The previous step amounts to resolving the DID document associated with the credential ``issuer`` by using the listed public keys to validate the credential signature.

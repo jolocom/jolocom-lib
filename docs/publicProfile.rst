@@ -78,7 +78,7 @@ Removing your public profile
   })
 
 Please note that due to the way that IPFS handles the concept of deletion, this delete method simply unpins your public profile from its corresponding pin set, and allows the unpinned data
-to be "garbage collected” in a 24-hour cycle. Accordingly, if the data has been pinned by another IPFS gateway, complete removal of stored information on the IPFS network cannot be ensured.
+to be removed by the "garbage collection” process. Accordingly, if the data has been pinned by another IPFS gateway, complete removal of stored information on the IPFS network cannot be ensured.
 
 View the public profile
 #########################

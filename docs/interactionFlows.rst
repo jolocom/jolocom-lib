@@ -31,7 +31,7 @@ First, the aforementioned request must be generated:
 .. note:: Documentation on ``constraints`` and how they can be used to create even more specific
   constraints will be added soon.
 
-... note:: For further documentation and examples explaining how to create and send
+.. note:: For further documentation and examples explaining how to create and send
  credential requests, check the `API documentation <https://htmlpreview.github.io/?https://raw.githubusercontent.com/jolocom/jolocom-lib/master/api_docs/documentation/classes/credentialrequest.html>`_,
  the `demo service implementation <https://github.com/jolocom/demo-sso>`_, the `integration tests <https://github.com/jolocom/jolocom-lib/tree/master/tests/integration>`_, and finally `this collection of examples <https://github.com/Exulansis/Validation-Examples>`_.
 
@@ -40,9 +40,11 @@ as a `JSON Web Token <https://jwt.io/introduction/>`_. This allows us to easily 
 
 In order to make the credential request consumable by the `Jolocom SmartWallet <https://github.com/jolocom/smartwallet-app>`_ the ``JSON Web Token`` must further
 be encoded as a QR code that can be scanned by the wallet application. The ``credentialRequest`` can be encoded as follows:
+
 .. code-block:: typescript
 
   // Will be deprecated in future releases in favor of more user-friendly and intuitive ways to encode data
+
   const jwtEncoded = credentialRequest.encode()
   const QREncoded = new SSO().JWTtoQR(jwtEncoded)
 
