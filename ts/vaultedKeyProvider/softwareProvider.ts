@@ -5,7 +5,7 @@ import { IDigestable } from '../linkedDataSignature/types'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
 
 export class SoftwareKeyProvider implements IVaultedKeyProvider {
-  private encryptedSeed: Buffer
+  private readonly encryptedSeed: Buffer
 
   /**
    * Initializes the vault with the aes 256 cbc encrypted seed
