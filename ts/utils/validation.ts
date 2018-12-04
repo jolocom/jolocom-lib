@@ -12,15 +12,21 @@ import { IRegistry } from '../registries/types'
  * @example `await validateDigestable(signedCredential, customRegistry) // true`
  */
 
-export const validateDigestable = async (toValidate: IDigestable, customRegistry?: IRegistry): Promise<boolean> => {
-  const reg = customRegistry || JolocomLib.registries.jolocom.create()
-  const issuerIdentity = await reg.resolve(toValidate.signer.did)
-  try {
-    const issuerPublicKey = getIssuerPublicKey(toValidate.signer.keyId, issuerIdentity.didDocument)
-    return JolocomLib.KeyProvider.verifyDigestable(issuerPublicKey, toValidate)
-  } catch {
-    return false
-  }
+export const validateDigestable = async (
+    toValidate: IDigestable,
+    customRegistry?: IRegistry
+): Promise<boolean> => {
+    const reg = customRegistry || JolocomLib.registries.jolocom.create()
+    const issuerIdentity = await reg.resolve(toValidate.signer.did)
+    try {
+        const issuerPublicKey = getIssuerPublicKey(
+            toValidate.signer.keyId,
+            issuerIdentity.didDocument
+        )
+        return JolocomLib.KeyProvider.verifyDigestable(issuerPublicKey, toValidate)
+    } catch {
+        return false
+    }
 }
 
 /**
@@ -32,6 +38,12 @@ export const validateDigestable = async (toValidate: IDigestable, customRegistry
  * @example `await validateDigestable(signedCredentials, customRegistry) // [true, false...]`
  */
 
-export const validateDigestables = async (toValidate: Array<IDigestable>, customRegistry?: IRegistry): Promise<Array<boolean>> => {
-  return Promise.all(toValidate.map(async digestable => validateDigestable(digestable, customRegistry)))
-}
+export const validateDigestables = async (
+    toValidate: Array<IDigestable>,
+    customRegistry?: IRegistry
+): Promise<Array<boolean>> =>
+    Promise.all(
+        toValidate.map(async digestable =>
+            validateDigestable(digestable, customRegistry)
+        )
+    )
