@@ -63,8 +63,8 @@ We need to derive a key for signing the Ethereum transaction, which anchors the 
   })
 
 .. seealso:: In the event that one of your keys becomes compromised, you only lose that one key. All other derived keys (including the most
-  important master key) remain secure. Go to `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ 
-  if you want to find out more about this derivation scheme. 
+  important master key) remain secure. Go to `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_
+  if you want to find out more about this derivation scheme.
   We are currently looking at key recovery solutions in case the master key itself is compromised.
 
 The only arguments that need to be passed to ``getPublicKey`` are the ``derivationPath``, in the format defined in `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_, and the ``encryptionPass`` that was used to create the encryption cipher.
@@ -123,7 +123,7 @@ simply run:
   const registry = JolocomLib.registries.jolocom.create()
   const IdentityWallet = await registry.authenticate(vaultedKeyProvider, {
     derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
-    decryptionPass: secret
+    encryptionPass: secret
   })
 
 What can I do now?

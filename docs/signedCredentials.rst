@@ -15,11 +15,13 @@ If you have already created an identity, you can obtain an identity wallet by au
   import { JolocomLib } from 'jolocom-lib'
   import { claimsMetadata } from 'cred-types-jolocom-core'
 
+  const password = 'correct horse battery staple'
+
   const emailAddressSignedCredential = await identityWallet.create.signedCredential({
     metadata: claimsMetadata.emailAddress,
     claim: { email: 'example@example.com' }
     subject: identityWallet.did // Our own DID, referred to as a self-issued credential
-  })
+  }, password)
 
   ...
 
@@ -61,7 +63,7 @@ The ``SignedCredential`` class provides a number of methods to easily consume th
     }
   }
 
-.. note:: All credential types the library supports by default are made available through the ``cred-types-jolocom-core`` ``npm`` package. 
+.. note:: All credential types the library supports by default are made available through the ``cred-types-jolocom-core`` ``npm`` package.
   Alternatively, you can check out the `GitHub repository <https://github.com/jolocom/cred-types-jolocom-demo>`_.
 
 It's worth noting that in the aforementioned credential, the ``issuer``, the ``subject``, and the signature ``creator`` each share the same DID.
@@ -75,7 +77,7 @@ To issue a credential to another entity, we simply need to specify the DID of th
     metadata: claimsMetadata.emailAddress,
     claim: { email: 'example@example.com' },
     subject: 'did:jolo:6d6f636b207375626a656374206469646d6f636b207375626a65637420646964'
-  })
+  }, password)
 
 Taking a look at the newly created credential, we can indeed see that the ``subject``, denoted by the ``claim.id`` key, is different:
 
@@ -83,12 +85,12 @@ Taking a look at the newly created credential, we can indeed see that the ``subj
 
   // The credential in JSON form
   // All irrelevant / repeating fields have been ommited.
-  
+
   {
     '@context': [ ... ],
     ...
     issuer: 'did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777',
-    claim: { 
+    claim: {
       email: 'example@example.com',
       id: 'did:jolo:6d6f636b207375626a656374206469646d6f636b207375626a65637420646964'
     },
@@ -123,7 +125,7 @@ If you already know the public key corresponding to the signing party, it is not
   const receivedSignedCredential = JolocomLib.parse.signedCredential.fromJSON(received)
   const issuerPublicKey = Buffer.from('030d4792f4165a0a78f7c7d14c42f6f98decfa23d36e8378c30e4291711b31961f', 'hex')
 
-  /** 
+  /**
      * Please note that this will NOT fail if the signer has marked the public key as compromised or invalid;
      * the signature is simply being verified, without checking against any external resources.
    */
@@ -144,7 +146,7 @@ identities that issue access credentials to requesters deemed authentic. For the
 we currently provide suffice.
 
 Or consider this scenario: a bar that only allows adults of legal age on the premises. At a certain point, patrons must prove
-they are over 18 years of age in order to order enter the establishment. Patrons could of course disclose their individual dates of birth, 
+they are over 18 years of age in order to order enter the establishment. Patrons could of course disclose their individual dates of birth,
 but this is not optimal in light of the fact that more information is disclosed than required for the purposes of the interaction.
 
 An alternative is to adopt an approach based on verifiable credentials. A trusted entity, such as a government authority,
@@ -178,7 +180,7 @@ Let's take another look at the second example use case from the previous section
 
 .. note:: For more documentation on defining custom credential ``meatadata``, check out `this document <https://gist.github.com/Exulansis/bec3906fba96a8b63040bad918eec548>`_.
   Please note that all examples of **creating credentials** and **creating metadata** are currently outdated (updates already in progress).
-  
+
 The extra typing information - ``as {ageOver: number}`` is only relevant if you use TypeScript. It enables
 for auto-completion on the ``claim`` section when creating a ``SignedCredential`` of this type.
 If you develope in JavaScript, remove this line.
