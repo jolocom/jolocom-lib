@@ -133,7 +133,9 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
     const json: ILinkedDataSignatureAttrs = this.toJSON()
 
     json['@context'] = defaultContext
+
     delete json.signatureValue
+    delete json.type
 
     return canonize(json)
   }

@@ -326,7 +326,11 @@ export class SignedCredential implements IDigestable {
 
   public async digest(): Promise<Buffer> {
     const normalized = await this.normalize()
-    return sha256(Buffer.from(normalized))
+    
+    const docSectionDigest = sha256(Buffer.from(normalized))
+    const proofSectionDigest = await this.proof.digest()
+    
+    return sha256(Buffer.concat([proofSectionDigest, docSectionDigest]))
   }
 
   /**
