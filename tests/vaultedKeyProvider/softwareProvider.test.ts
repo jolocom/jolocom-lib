@@ -145,6 +145,7 @@ describe('Software Vaulted Key Provider', () => {
 
   describe('validateDigestable', () => {
     const credentialToSign = SignedCredential.fromJSON(publicProfileCredJSON)
+    console.log(credentialToSign.signature)
     const pubKey = vault.getPublicKey(keyDerivationArgs)
 
     it('Should correctly digest passed object and validate the signature', async () => {

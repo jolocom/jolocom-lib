@@ -15,7 +15,7 @@ export const invalidtSignature = Buffer.from(
   'hex'
 )
 export const invalidMsgToSign = Buffer.from('this is not a hash')
-export const credentialDigest = Buffer.from('967138219ad8311be0e951f11ac517cdec8fbb1603abaec8fa2ca588cdc9a164', 'hex')
+export const credentialDigest = Buffer.from('96c801eca783876e97ce4076ba5c097886ca1d8429f63851be832f7e6d2ea992', 'hex')
 
 /* Swapping the vaild signature value with a valid signature from another message */
 

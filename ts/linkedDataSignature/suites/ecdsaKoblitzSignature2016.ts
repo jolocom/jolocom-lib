@@ -136,6 +136,7 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
 
     delete json.signatureValue
     delete json.type
+    delete json.id
 
     return canonize(json)
   }

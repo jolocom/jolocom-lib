@@ -23,4 +23,5 @@ export interface ILinkedDataSignatureAttrs {
   creator: string
   nonce: string
   signatureValue: string
+  id?: string
 }
