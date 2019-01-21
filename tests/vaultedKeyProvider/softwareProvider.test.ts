@@ -21,8 +21,10 @@ import {
   corruptedSignedCredentialJSON,
 } from '../data/keyProvider.data'
 import { IDigestable } from '../../ts/linkedDataSignature/types'
-import { publicProfileCredJSON } from '../data/identity.data'
+import { publicProfileCredJSON, emailCredential } from '../data/identity.data'
 import { keyDerivationArgs } from '../data/identityWallet.data'
+import { JolocomLib } from '../../ts/index'
+import { claimsMetadata } from 'cred-types-jolocom-core'
 
 chai.use(sinonChai)
 describe('Software Vaulted Key Provider', () => {
@@ -144,9 +146,8 @@ describe('Software Vaulted Key Provider', () => {
   /* Invalid input is covered in vault.signDigestable and vault.verify blocks */
 
   describe('validateDigestable', () => {
-    const credentialToSign = SignedCredential.fromJSON(publicProfileCredJSON)
-    console.log(credentialToSign.signature)
-    const pubKey = vault.getPublicKey(keyDerivationArgs)
+    const credentialToSign = SignedCredential.fromJSON(emailCredential)
+    const pubKey = vault.getPublicKey(keyDerivationArgs);
 
     it('Should correctly digest passed object and validate the signature', async () => {
       expect(await SoftwareKeyProvider.verifyDigestable(pubKey, credentialToSign)).to.be.true
