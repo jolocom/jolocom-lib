@@ -7,6 +7,10 @@ import { constraintFunctions } from './interactionTokens/credentialRequest'
 import { fuelKeyWithEther, getIssuerPublicKey } from './utils/helper'
 import { validateDigestable, validateDigestables } from './utils/validation'
 
+/**
+ * experimental branch - payments interaction flow
+ */
+
 export const JolocomLib = {
   parse,
   registries,
