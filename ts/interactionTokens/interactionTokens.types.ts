@@ -1,4 +1,5 @@
 import { ISignedCredentialAttrs } from "../credentials/signedCredential/types"
+import { ICreateEthTransactionAttrs } from '../ethereum/types'
 
 /* Creation attributes. Same as JSON form */
 
@@ -50,4 +51,10 @@ export interface IExposedConstraintFunctions {
   not: ConstraintFunc
   greater: ComparableConstraintFunc
   smaller: ComparableConstraintFunc
+}
+
+export interface IPaymentRequestAttrs {
+  callbackURL: string,
+  description: string,
+  transactionDetails: ICreateEthTransactionAttrs
 }

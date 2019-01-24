@@ -10,8 +10,8 @@ export class EthereumTransactionConnector {
   private web3: any
 
   constructor(providerUri: string) {
-    const provider = new this.web3.providers.HttpProvider(providerUri)
-    this.web3 = new this.web3(provider)
+    const provider = new Web3.providers.HttpProvider(providerUri)
+    this.web3 = new Web3(provider)
   }
 
   // TODO: type return value
