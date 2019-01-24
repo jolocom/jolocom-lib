@@ -2,7 +2,7 @@ import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { IpfsStorageAgent, jolocomIpfsStorageAgent } from '../../ts/ipfs/ipfs'
-import { EthResolver, jolocomEthereumResolver } from '../../ts/ethereum/ethereum'
+import { EthResolver, jolocomEthereumResolver } from '../../ts/ethereum/didConnector'
 import { JolocomRegistry, createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { testEthereumConfig, testIpfsConfig } from '../data/registry.data'
 
