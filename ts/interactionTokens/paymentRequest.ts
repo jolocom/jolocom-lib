@@ -1,7 +1,7 @@
 import { classToPlain, plainToClass, Expose, Exclude } from 'class-transformer'
 import { IPaymentRequestAttrs } from './interactionTokens.types'
 import { ICreateEthTransactionAttrs } from '../ethereum/types'
- 
+
 /**
  * @class
  * Class representing a payment request for signing. Encodable in JWT
@@ -21,7 +21,7 @@ export class PaymentRequest {
   /**
    * Set the transaction details encoded in the payload
    * This will be used as input to create a transaction on receiver side
-   *@example paymentRequest.transactionDetails = {
+   * @example paymentRequest.transactionDetails = {
       senderAddress: 'address1',
       receiverAddress: 'address2',
       amountInEther: '0.1'

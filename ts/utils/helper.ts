@@ -60,4 +60,5 @@ export function fuelKeyWithEther(publicKey: Buffer) {
  * @internal
  */
 
-const publicKeyToAddress = (publicKey: Buffer): string => addHexPrefix(pubToAddress(publicKey, true).toString('hex'))
+export const publicKeyToAddress = (publicKey: Buffer): string =>
+  addHexPrefix(pubToAddress(publicKey, true).toString('hex'))
