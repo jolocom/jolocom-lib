@@ -3,6 +3,7 @@ import * as sinonChai from 'sinon-chai'
 import * as integrationHelper from './provision'
 import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
 import { EthResolver } from '../../ts/ethereum/didConnector'
+import { EthereumTransactionConnector } from '../../ts/ethereum/transactionConnector'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { createJolocomRegistry, JolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
@@ -19,6 +20,7 @@ const expect = chai.expect
 export let jolocomRegistry: JolocomRegistry
 export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
+export let jolocomEthTransactionConnector:  EthereumTransactionConnector
 
 before(async () => {
   await integrationHelper.init()
@@ -27,6 +29,7 @@ before(async () => {
     ethereumConnector: new EthResolver(testEthereumConfig)
   })
   userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
+  jolocomEthTransactionConnector = new EthereumTransactionConnector(testEthereumConfig.providerUrl)
   serviceIdentityWallet = await jolocomRegistry.create(serviceVault, servicePass)
 })
 
