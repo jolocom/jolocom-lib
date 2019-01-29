@@ -76,7 +76,7 @@ describe('IdentityWallet', () => {
     it('Should expose aggregated creation methods', () => {
       const categories = ['credential', 'signedCredential', 'interactionTokens']
       const flowTypes = ['request', 'response']
-      const tokenTypesRequest = ['auth', 'offer', 'share']
+      const tokenTypesRequest = ['auth', 'offer', 'share', 'payment']
       const tokenTypesResponse = ['auth', 'offer', 'share', 'issue']
 
       expect(Object.keys(iw.create)).to.deep.eq(categories)

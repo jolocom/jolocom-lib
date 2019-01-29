@@ -19,6 +19,6 @@ export interface ICreateEthTransactionAttrs {
   receiverAddress: string,
   amountInEther: string,
   chainId?: number,
-  gasPriceInWei?: number,
+  gasPriceInWei?: string,
   gasLimit?: number
 }
