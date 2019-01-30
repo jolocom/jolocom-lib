@@ -53,6 +53,7 @@ describe('EcdsaKoblitzSignature', () => {
     await signature.digest()
     const withContext = { ...signatureAttributes, '@context': defaultContext }
     delete withContext.signatureValue
+    delete withContext.type
 
     expect(stubbedCanonise.getCall(0).args).to.deep.eq([withContext])
     expect((await signature.digest()).toString('hex')).to.deep.eq(digestedSignatureSection)

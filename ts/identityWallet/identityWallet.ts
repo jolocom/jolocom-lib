@@ -10,6 +10,7 @@ import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { PaymentRequest } from '../interactionTokens/paymentRequest'
+import { PaymentResponse } from '../interactionTokens/paymentResponse'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { IVaultedKeyProvider } from '../vaultedKeyProvider/types'
 import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types'
@@ -23,9 +24,10 @@ import {
   ICredentialOfferAttrs,
   IAuthenticationAttrs,
   ICredentialsReceiveAttrs,
-  IPaymentRequestAttrs
+  IPaymentRequestAttrs,
+  IPaymentResponseAttrs
 } from '../interactionTokens/interactionTokens.types'
-
+import { IKeyDerivationArgs } from '../vaultedKeyProvider/types'
 
 /**
  * @class
@@ -38,6 +40,11 @@ export class IdentityWallet {
   private _identity: Identity
   private _publicKeyMetadata: IKeyMetadata
   private _vaultedKeyProvider: IVaultedKeyProvider
+
+  // TODO: consolidate on next refactor with general key handling
+  public getPublicKey(keyDerivarionArgs: IKeyDerivationArgs): Buffer {
+    return this._vaultedKeyProvider.getPublicKey(keyDerivarionArgs)
+  }
 
   /**
    * Get the did associated with the identity wallet
@@ -260,13 +267,42 @@ export class IdentityWallet {
    * @param pass - Password to decrypt the vaulted seed
   */
 
-  private createPaymentReq = async (paymentReq: IPaymentRequestAttrs, pass: string) => {
+  private createPaymentReq = async (
+    paymentReq: IPaymentRequestAttrs,
+    pass: string
+  ) => {
     const paymentRequest = PaymentRequest.fromJSON(paymentReq)
     const jwt = JSONWebToken.fromJWTEncodable(paymentRequest)
     jwt.interactionType = InteractionType.PaymentRequest
-    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass)
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass
+    )
   }
 
+  /**
+   * Creates and signs a payment response which contains the transaction hash
+   * @param paymentResp - payment response creation args
+   * @param pass - Password to decrypt the vaulted seed
+   * @param receivedJWT - received payment request JSONWebToken Class
+   */
+
+  private createPaymentResp = async (
+    paymentResp: IPaymentResponseAttrs,
+    pass: string,
+    receivedJWT: JSONWebToken<JWTEncodable>
+  ) => {
+    const paymentResponse = PaymentResponse.fromJSON(paymentResp)
+    const jwt = JSONWebToken.fromJWTEncodable(paymentResponse)
+    jwt.interactionType = InteractionType.PaymentResponse
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+      receivedJWT
+    )
+  }
 
   /**
    * Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
@@ -328,6 +364,7 @@ export class IdentityWallet {
         offer: this.createCredOffer,
         share: this.createCredResp,
         issue: this.createCredReceive,
+        payment: this.createPaymentResp
       },
     },
   }

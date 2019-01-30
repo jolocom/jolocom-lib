@@ -9,7 +9,7 @@ const mockSubject = 'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffff
 
 /* Defining fixture for a signedCredential in JSON form */
 
-export const emailVerifiableCredentialHash = '3f374ae2978e56cdcd985dd27f0067ff31929a45350e61cb09985b3c8dd50d0a'
+export const emailVerifiableCredentialHash = 'b516dc3d9d125efe41dd5bc30b94aa2a9bb8b8676f90dbd8d5d9104d18e6a426'
 export const emailVerifiableCredential = {
   '@context': [...defaultContext, ...claimsMetadata.emailAddress.context],
   id: 'claimId:567e6e0c6570a',

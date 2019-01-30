@@ -24,13 +24,13 @@ export class EthereumTransactionConnector {
       gasPriceInWei = this.web3.utils.toWei('10', 'gwei'),
       gasLimit = 21000
     } = args
-
+  
     return new Transaction({
       nonce: await this.web3.eth.getTransactionCount(senderAddress),
-      gasPrice: gasPriceInWei,
+      gasPrice: this.web3.utils.toHex(gasPriceInWei),
       gasLimit,
       to: receiverAddress,
-      value: this.web3.utils.toWei(amountInEther, 'ether'),
+      value: this.web3.utils.toHex(this.web3.utils.toWei(amountInEther, 'ether')),
       chainId
     })
   }
@@ -43,4 +43,6 @@ export class EthereumTransactionConnector {
 
 /* Instantiates a transaction connector using the default configuration */
 
-export const jolocomEthTransactionConnector = new EthereumTransactionConnector('https://rinkeby.infura.io/')
+export const jolocomEthTransactionConnector = new EthereumTransactionConnector(
+  'https://rinkeby.infura.io/'
+)
