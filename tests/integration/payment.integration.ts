@@ -35,27 +35,15 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       })
     )
 
-    /**
-     * Note that the ethereum address from user should be known to service before creating payment request
-     * This can be achieved e.g. by using the credential request beforehand to get the ethereum address
-     */
-
-    const userEthereumAddress = publicKeyToAddress(
-      userIdentityWallet.getPublicKey({
-        encryptionPass: userPass,
-        derivationPath: KeyTypes.ethereumKey
-      })
-    )
-
     const paymentReqCreationArgs = {
       callbackURL: 'https://awesomeservice.com/payment/pending',
       description: 'Payment for monthly subscription to awesome service',
       transactionDetails: {
         receiverAddress: serviceEthereumAddress,
-        senderAddress: userEthereumAddress,
         amountInEther: '0.01'
       }
     }
+
     paymentRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.payment(
       paymentReqCreationArgs,
       servicePass
@@ -95,8 +83,15 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     )
     const { transactionDetails } = decodedPaymentRequest.interactionToken
 
+    const userEthereumAddress = publicKeyToAddress(
+      userIdentityWallet.getPublicKey({
+        encryptionPass: userPass,
+        derivationPath: KeyTypes.ethereumKey
+      })
+    )
+
     const ethTransaction = await jolocomEthTransactionConnector.createTransaction(
-      transactionDetails
+      { ...transactionDetails, senderAddress: userEthereumAddress }
     )
     expect(ethTransaction).to.be.instanceOf(EthereumTx)
 

@@ -59,7 +59,16 @@ export interface IExposedConstraintFunctions {
 export interface IPaymentRequestAttrs {
   callbackURL: string
   description: string
-  transactionDetails: ICreateEthTransactionAttrs
+  transactionDetails: ITransactionDetailsPaymentRequest
+}
+
+export interface ITransactionDetailsPaymentRequest {
+  receiverAddress: string,
+  amountInEther: string,
+  senderAddress?: string,
+  chainId?: number,
+  gasPriceInWei?: string,
+  gasLimit?: number
 }
 
 export interface IPaymentResponseAttrs {

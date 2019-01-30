@@ -1,6 +1,8 @@
 import { classToPlain, plainToClass, Expose, Exclude } from 'class-transformer'
-import { IPaymentRequestAttrs } from './interactionTokens.types'
-import { ICreateEthTransactionAttrs } from '../ethereum/types'
+import {
+  IPaymentRequestAttrs,
+  ITransactionDetailsPaymentRequest
+} from './interactionTokens.types'
 
 /**
  * @class
@@ -10,11 +12,11 @@ import { ICreateEthTransactionAttrs } from '../ethereum/types'
 @Exclude()
 export class PaymentRequest {
   private _callbackURL: string
-  private _transactionDetails: ICreateEthTransactionAttrs
+  private _transactionDetails: ITransactionDetailsPaymentRequest
   private _description: string
 
   @Expose()
-  get transactionDetails(): ICreateEthTransactionAttrs {
+  get transactionDetails(): ITransactionDetailsPaymentRequest {
     return this._transactionDetails
   }
 
@@ -22,13 +24,14 @@ export class PaymentRequest {
    * Set the transaction details encoded in the payload
    * This will be used as input to create a transaction on receiver side
    * @example paymentRequest.transactionDetails = {
-      senderAddress: 'address1',
-      receiverAddress: 'address2',
+      receiverAddress: 'yourAddress',
       amountInEther: '0.1'
     }
    */
 
-  set transactionDetails(transactionDetails: ICreateEthTransactionAttrs) {
+  set transactionDetails(
+    transactionDetails: ITransactionDetailsPaymentRequest
+  ) {
     this._transactionDetails = transactionDetails
   }
 
