@@ -21,13 +21,13 @@ export class EthereumTransactionConnector {
       receiverAddress,
       amountInEther,
       chainId = 4,
-      gasPriceInWei = this.web3.utils.toHex(this.web3.utils.toWei('10', 'gwei')),
+      gasPriceInWei = this.web3.utils.toWei('10', 'gwei'),
       gasLimit = 21000
     } = args
   
     return new Transaction({
       nonce: await this.web3.eth.getTransactionCount(senderAddress),
-      gasPrice: gasPriceInWei,
+      gasPrice: this.web3.utils.toHex(gasPriceInWei),
       gasLimit,
       to: receiverAddress,
       value: this.web3.utils.toHex(this.web3.utils.toWei(amountInEther, 'ether')),
