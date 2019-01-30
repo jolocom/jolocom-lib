@@ -1,6 +1,6 @@
 import * as sinon from 'sinon'
 import { expect } from 'chai'
-import { EthResolver } from '../../ts/ethereum/ethereum'
+import { EthResolver } from '../../ts/ethereum/didConnector'
 import EthereumResolver from 'jolocom-registry-contract'
 import { mockIssuerDid } from '../data/credential/signedCredential.data'
 import { testPrivateEthereumKey } from '../data/keys.data'
