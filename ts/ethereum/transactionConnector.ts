@@ -35,7 +35,8 @@ export class EthereumTransactionConnector {
     })
   }
 
-  public async sendSignedTransaction(serializedTx: Buffer): Promise<string> {
+  // TODO: type return value
+  public async sendSignedTransaction(serializedTx: Buffer): Promise<any> {
     return this.web3.eth
       .sendSignedTransaction(`0x${serializedTx.toString('hex')}`)
   }
