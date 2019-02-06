@@ -39,7 +39,7 @@ describe('CredentialRequest', () => {
 
     it('Should correctly handle undefined or unincluded constraints', () => {
       const simpleCredReq = CredentialRequest.fromJSON(undefinedConstraintsRequestJSON)
-      expect(simpleCredReq.applyConstraints(credentialSet)).to.deep.eq(credentialSet)
+      expect(simpleCredReq.applyConstraints(credentialSet)).to.be.empty
     })
 
     it('Should correctly filter based on issuer', () => {
