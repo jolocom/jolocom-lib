@@ -80,8 +80,11 @@ export class CredentialRequest {
         areCredTypesEqual(section.type, credential.type)
       )
 
-      /* When validating against empty constraints json-logic returns false, we need true */
+      if (!relevantConstraints) {
+        return false
+      }
 
+      /* When validating against empty or undefined constraints json-logic returns false, we need true */
       if (!relevantConstraints.constraints.length) {
         return credential
       }

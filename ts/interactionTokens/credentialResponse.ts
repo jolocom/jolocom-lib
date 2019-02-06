@@ -60,7 +60,7 @@ export class CredentialResponse {
   public satisfiesRequest(cr: CredentialRequest): boolean {
     const credentials = this.suppliedCredentials.map(sCredClass => sCredClass.toJSON())
     const validCredentials = cr.applyConstraints(credentials)
-    return this.suppliedCredentials.length === validCredentials.length
+    return !!this.suppliedCredentials.length && (this.suppliedCredentials.length === validCredentials.length)
   }
 
   /**
