@@ -1,5 +1,5 @@
 import * as sinon from 'sinon'
-import { credentialResponseJSON } from './../data/interactionTokens/credentialResponse.data'
+import { credentialResponseJSON, emptyCredentialResponseJSON } from './../data/interactionTokens/credentialResponse.data'
 import { expect } from 'chai'
 import { CredentialResponse } from '../../ts/interactionTokens/credentialResponse'
 import { credentialSet, simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
@@ -25,5 +25,13 @@ describe('CredentialResponse', () => {
 
     expect(credRes.satisfiesRequest(credentialRequest)).to.be.true
     expect(stub.getCall(0).args[0]).to.deep.eq(credentialSet)
+  })
+
+  it('Should correctly handle an empty credential response', () => {
+    const emptyCredRes = CredentialResponse.fromJSON(emptyCredentialResponseJSON)
+    const credentialRequest = CredentialRequest.fromJSON(simpleCredRequestJSON)
+
+    expect(emptyCredRes.suppliedCredentials.length).to.eq(0)
+    expect(emptyCredRes.satisfiesRequest(credentialRequest)).to.be.false
   })
 })

@@ -30,6 +30,11 @@ export const emptyConstraintsRequestJSON = {
   ],
 }
 
+export const undefinedConstraintsRequestJSON = {
+  ...simpleCredRequestJSON,
+  credentialRequirements: [],
+}
+
 /* Request with two credential requirements, for fromJSON, toJSON, getRequestedTypes tests */
 
 export const extendedCredRequestJSON = {
