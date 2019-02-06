@@ -10,8 +10,7 @@ export class EthereumTransactionConnector {
   private web3: any
 
   constructor(providerUri: string) {
-    const provider = new Web3.providers.HttpProvider(providerUri)
-    this.web3 = new Web3(provider)
+    this.web3 = new Web3(providerUri)
   }
 
   // TODO: type return value
@@ -45,5 +44,5 @@ export class EthereumTransactionConnector {
 /* Instantiates a transaction connector using the default configuration */
 
 export const jolocomEthTransactionConnector = new EthereumTransactionConnector(
-  'https://rinkeby.infura.io/'
+  'wss://rinkeby.infura.io/ws'
 )
