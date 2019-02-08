@@ -6,10 +6,11 @@ import { Identity } from '../identity/identity'
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
 import { CredentialOffer } from '../interactionTokens/credentialOffer'
-import { ICredentialResponseAttrs, ICredentialRequestAttrs, ICredentialOfferAttrs, IAuthenticationAttrs, ICredentialsReceiveAttrs } from '../interactionTokens/interactionTokens.types'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
+import { PaymentRequest } from '../interactionTokens/paymentRequest'
+import { PaymentResponse } from '../interactionTokens/paymentResponse'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { IVaultedKeyProvider } from '../vaultedKeyProvider/types'
 import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types'
@@ -17,6 +18,16 @@ import { keyIdToDid, getIssuerPublicKey, handleValidationStatus } from '../utils
 import { generateRandomID } from '../utils/crypto'
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
+import {
+  ICredentialResponseAttrs,
+  ICredentialRequestAttrs,
+  ICredentialOfferAttrs,
+  IAuthenticationAttrs,
+  ICredentialsReceiveAttrs,
+  IPaymentRequestAttrs,
+  IPaymentResponseAttrs
+} from '../interactionTokens/interactionTokens.types'
+import { IKeyDerivationArgs } from '../vaultedKeyProvider/types'
 
 /**
  * @class
@@ -29,6 +40,11 @@ export class IdentityWallet {
   private _identity: Identity
   private _publicKeyMetadata: IKeyMetadata
   private _vaultedKeyProvider: IVaultedKeyProvider
+
+  // TODO: consolidate on next refactor with general key handling
+  public getPublicKey(keyDerivarionArgs: IKeyDerivationArgs): Buffer {
+    return this._vaultedKeyProvider.getPublicKey(keyDerivarionArgs)
+  }
 
   /**
    * Get the did associated with the identity wallet
@@ -244,6 +260,50 @@ export class IdentityWallet {
     return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
   }
 
+
+   /**
+   * Creates and signs a payment request for ethereum
+   * @param paymentReq - payment request creation args
+   * @param pass - Password to decrypt the vaulted seed
+  */
+
+  private createPaymentReq = async (
+    paymentReq: IPaymentRequestAttrs,
+    pass: string
+  ) => {
+    const paymentRequest = PaymentRequest.fromJSON(paymentReq)
+    const jwt = JSONWebToken.fromJWTEncodable(paymentRequest)
+    jwt.interactionType = InteractionType.PaymentRequest
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass
+    )
+  }
+
+  /**
+   * Creates and signs a payment response which contains the transaction hash
+   * @param paymentResp - payment response creation args
+   * @param pass - Password to decrypt the vaulted seed
+   * @param receivedJWT - received payment request JSONWebToken Class
+   */
+
+  private createPaymentResp = async (
+    paymentResp: IPaymentResponseAttrs,
+    pass: string,
+    receivedJWT: JSONWebToken<JWTEncodable>
+  ) => {
+    const paymentResponse = PaymentResponse.fromJSON(paymentResp)
+    const jwt = JSONWebToken.fromJWTEncodable(paymentResponse)
+    jwt.interactionType = InteractionType.PaymentResponse
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+      receivedJWT
+    )
+  }
+
   /**
    * Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
    * @param jwt - JSONWebToken Class
@@ -296,13 +356,15 @@ export class IdentityWallet {
       request: {
         auth: this.createAuth,
         offer: this.createCredOffer,
-        share: this.createCredReq
+        share: this.createCredReq,
+        payment: this.createPaymentReq
       },
       response: {
         auth: this.createAuth,
         offer: this.createCredOffer,
         share: this.createCredResp,
         issue: this.createCredReceive,
+        payment: this.createPaymentResp
       },
     },
   }

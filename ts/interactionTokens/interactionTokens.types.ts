@@ -1,4 +1,5 @@
-import { ISignedCredentialAttrs } from "../credentials/signedCredential/types"
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
+import { ICreateEthTransactionAttrs } from '../ethereum/types'
 
 /* Creation attributes. Same as JSON form */
 
@@ -43,11 +44,33 @@ export interface IConstraint {
 
 export type Comparable = number | Date
 type ConstraintFunc = (field: string, value: string) => IConstraint
-type ComparableConstraintFunc = (field: string, value: Comparable) => IConstraint
+type ComparableConstraintFunc = (
+  field: string,
+  value: Comparable
+) => IConstraint
 
 export interface IExposedConstraintFunctions {
   is: ConstraintFunc
   not: ConstraintFunc
   greater: ComparableConstraintFunc
   smaller: ComparableConstraintFunc
+}
+
+export interface IPaymentRequestAttrs {
+  callbackURL: string
+  description: string
+  transactionDetails: ITransactionDetailsPaymentRequest
+}
+
+export interface ITransactionDetailsPaymentRequest {
+  receiverAddress: string,
+  amountInEther: string,
+  senderAddress?: string,
+  chainId?: number,
+  gasPriceInWei?: string,
+  gasLimit?: number
+}
+
+export interface IPaymentResponseAttrs {
+  txHash: string
 }

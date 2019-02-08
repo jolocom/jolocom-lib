@@ -1,6 +1,6 @@
 {
   "name": "jolocom-lib",
-  "version": "2.2.9",
+  "version": "2.2.10",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "typings": "js/index.d.ts",
@@ -71,7 +71,8 @@
     "qrcode": "^1.2.0",
     "reflect-metadata": "^0.1.12",
     "sinon-chai": "^3.2.0",
-    "tiny-secp256k1": "^1.0.1"
+    "tiny-secp256k1": "^1.0.1",
+    "web3": "^1.0.0-beta.35"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",
@@ -86,7 +87,6 @@
     "sinon": "^6.0.0",
     "source-map-support": "^0.4.18",
     "ts-node": "^6.1.1",
-    "typescript": "^3.0.1",
-    "web3": "^1.0.0-beta.35"
+    "typescript": "^3.0.1"
   }
 }

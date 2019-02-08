@@ -6,7 +6,7 @@ const IPFSFactory = require('ipfsd-ctl')
 
 const PORT = 8945
 const web3 = new Web3()
-const balance = web3.utils.toWei('1')
+const balance = web3.utils.toWei('100')
 
 const ganacheServer = ganache.server({
   accounts: [

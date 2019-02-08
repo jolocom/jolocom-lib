@@ -13,3 +13,12 @@ export interface IEthereumConnector {
   resolveDID: (did: string) => Promise<string>
   updateDIDRecord: (args: IEthereumResolverUpdateDIDArgs) => Promise<void>
 }
+
+export interface ICreateEthTransactionAttrs {
+  senderAddress: string,
+  receiverAddress: string,
+  amountInEther: string,
+  chainId?: number,
+  gasPriceInWei?: string,
+  gasLimit?: number
+}
