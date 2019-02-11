@@ -3,7 +3,7 @@
 yarn-error.log
 .nyc_output
 coverage
-
+js
 node_modules
 *.map
 .vs
