@@ -3,3 +3,4 @@
 --full-trace
 --bail
 --timeout 40000
+--exit
