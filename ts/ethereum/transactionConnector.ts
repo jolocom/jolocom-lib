@@ -44,5 +44,5 @@ export class EthereumTransactionConnector {
 /* Instantiates a transaction connector using the default configuration */
 
 export const jolocomEthTransactionConnector = new EthereumTransactionConnector(
-  'wss://rinkeby.infura.io/ws'
+  'https://rinkeby.infura.io'
 )
