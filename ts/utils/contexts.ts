@@ -1,6 +1,6 @@
 import { ContextEntry } from 'cred-types-jolocom-core'
 
-/* Expanded default context for did documents, more verbose, but works in offline use cases */
+/* Expanded default context for verifiable credentials, more verbose, but works in offline use cases */
 
 export const defaultContext: ContextEntry[] = [
   {
@@ -27,7 +27,7 @@ export const defaultContext: ContextEntry[] = [
   },
 ]
 
-/* Expanded default context for verifiable credentials, more verbose, but works in offline use cases */
+/* Expanded default context for did documents, more verbose, but works in offline use cases */
 
 export const defaultContextIdentity: ContextEntry[] = [
   {
@@ -62,6 +62,7 @@ export const defaultContextIdentity: ContextEntry[] = [
     proofType: 'sec:proofType',
     proofValue: 'sec:proofValue',
     publicKey: { '@id': 'sec:publicKey', '@type': '@id', '@container': '@set' },
+    publicKeyHex: 'sec:publicKeyHex',
     requiredProof: 'sec:requiredProof',
     revoked: { '@id': 'sec:revoked', '@type': 'xsd:dateTime' },
     signature: 'sec:signature',

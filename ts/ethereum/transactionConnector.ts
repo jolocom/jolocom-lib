@@ -1,16 +1,16 @@
 import * as Transaction from 'ethereumjs-tx'
 import { ICreateEthTransactionAttrs } from './types'
-const Web3 = require('web3')
+import { ethers, utils } from 'ethers'
 
 /**
  * Note that this is an experimental implementation to allow for payments on Ethereum
  */
 
 export class EthereumTransactionConnector {
-  private web3: any
+  private provider: any
 
   constructor(providerUri: string) {
-    this.web3 = new Web3(providerUri)
+    this.provider = new ethers.providers.JsonRpcProvider(providerUri)
   }
 
   // TODO: type return value
@@ -20,29 +20,29 @@ export class EthereumTransactionConnector {
       receiverAddress,
       amountInEther,
       chainId = 4,
-      gasPriceInWei = this.web3.utils.toWei('10', 'gwei'),
+      gasPriceInWei = 10e9, // 10 gwei set as default
       gasLimit = 21000
     } = args
   
     return new Transaction({
-      nonce: await this.web3.eth.getTransactionCount(senderAddress),
-      gasPrice: this.web3.utils.toHex(gasPriceInWei),
+      nonce: await this.provider.getTransactionCount(senderAddress),
+      gasPrice: utils.hexlify(gasPriceInWei),
       gasLimit,
       to: receiverAddress,
-      value: this.web3.utils.toHex(this.web3.utils.toWei(amountInEther, 'ether')),
+      value: utils.hexlify(utils.parseEther(amountInEther)),
       chainId
     })
   }
 
   // TODO: type return value
   public async sendSignedTransaction(serializedTx: Buffer): Promise<any> {
-    return this.web3.eth
-      .sendSignedTransaction(`0x${serializedTx.toString('hex')}`)
+    return this.provider
+      .sendTransaction(`0x${serializedTx.toString('hex')}`)
   }
 }
 
 /* Instantiates a transaction connector using the default configuration */
 
 export const jolocomEthTransactionConnector = new EthereumTransactionConnector(
-  'wss://rinkeby.infura.io/ws'
+  'https://rinkeby.infura.io'
 )
