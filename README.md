@@ -16,6 +16,10 @@ Integration and unit tests located in the ``./tests`` folder are a good place to
 
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/jolocom/jolocom-lib)
 
+## Requirements
+
+Please use ```Node.js 10+``` from version 2.3.0 of the library.
+
 ## TSLINT for development
 
 We use `tslint` for static Typescript code analysis.  
