@@ -7,7 +7,8 @@
   "scripts": {
     "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts",
     "clean": "rm -rf ./js",
-    "prepublish": "yarn clean; tsc -p ./tsconfig.json",
+    "prepublish": "yarn clean; tsc -p .",
+    "build": "tsc -p .",
     "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
     "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
     "test:integration": "mocha --opts ./mocha.opts ./tests/**/*.integration.ts"
@@ -86,7 +87,7 @@
     "sinon": "^7.2.5",
     "source-map-support": "^0.5.10",
     "ts-node": "^8.0.2",
-    "typescript": "^3.0.1",
+    "typescript": "^3.3.3",
     "web3": "1.0.0-beta.35"
   }
 }
