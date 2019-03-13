@@ -7,7 +7,7 @@
   "scripts": {
     "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts",
     "clean": "rm -rf ./js",
-    "prepublish": "yarn clean; tsc -p .",
+    "prepublish": "yarn clean; yarn build",
     "build": "tsc -p .",
     "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
     "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
