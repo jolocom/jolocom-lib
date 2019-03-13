@@ -1,10 +1,9 @@
 {
-    "version": "2.7.1",
     "compilerOptions": {
-        "target": "es5",
         "module": "commonjs",
+        "target": "es2017",
         "removeComments": true,
-        "lib": ["dom","es2017"],
+        "moduleResolution": "node",
         "noLib": false,
         "preserveConstEnums": true,
         "declaration": true,
