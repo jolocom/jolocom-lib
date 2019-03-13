@@ -16,6 +16,10 @@ Integration and unit tests located in the ``./tests`` folder are a good place to
 
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/jolocom/jolocom-lib)
 
+## Requirements
+
+Starting with version `2.3.0`, the Jolocom Library requires `Node.js v10+` to run. Versions prior to `2.3.0` require `Node.js v8`.
+
 ## TSLINT for development
 
 We use `tslint` for static Typescript code analysis.  
