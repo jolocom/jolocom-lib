@@ -17,6 +17,7 @@ import { keyIdToDid, getIssuerPublicKey, handleValidationStatus } from '../utils
 import { generateRandomID } from '../utils/crypto'
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
+import {IContractConnector, IContractHandler} from '../ethereum/types'
 
 /**
  * @class
@@ -29,6 +30,8 @@ export class IdentityWallet {
   private _identity: Identity
   private _publicKeyMetadata: IKeyMetadata
   private _vaultedKeyProvider: IVaultedKeyProvider
+  private _contractHandler: IContractHandler
+  private _contractConnector: IContractConnector
 
   /**
    * Get the did associated with the identity wallet
@@ -122,7 +125,7 @@ export class IdentityWallet {
 
   /**
    * @constructor
-   * @param identity - Instance of {@link Identity} class, containing a {@link DidDocument} 
+   * @param identity - Instance of {@link Identity} class, containing a {@link DidDocument}
    *   and optionally a public profile {@link SignedCredential}
    * @param publicKeyMetadata - Public key id and derivation path
    * @param vaultedKeyProvider - Vaulted key store for generating signatures
@@ -260,7 +263,7 @@ export class IdentityWallet {
   ) {
     jwt.setIssueAndExpiryTime()
     jwt.issuer = this.publicKeyMetadata.keyId
-    
+
     receivedJWT ? (jwt.audience = keyIdToDid(receivedJWT.issuer)) : null
     receivedJWT ? (jwt.nonce = receivedJWT.nonce) : (jwt.nonce = generateRandomID(8))
 
@@ -271,17 +274,17 @@ export class IdentityWallet {
   }
 
   /**
-   * Validates interaction tokens for signature - if only received token passed - and for audience (aud) and token nonce (jti) if send token passed also 
-   * @param receivedJWT - recieved JSONWebToken Class
+   * Validates interaction tokens for signature - if only received token passed - and for audience (aud) and token nonce (jti) if send token passed also
+   * @param receivedJWT - received JSONWebToken Class
    * @param sendJWT - optional send JSONWebToken Class which is used to validate the token nonce and the aud field on received token
-   * @param customRegsitry - optional custom registry
+   * @param customRegistry - optional custom registry
   */
 
   public async validateJWT<T extends JWTEncodable, A extends JWTEncodable>(receivedJWT: JSONWebToken<T>, sendJWT?: JSONWebToken<A>, customRegistry?: JolocomRegistry): Promise<void> {
     const registry = customRegistry || createJolocomRegistry()
     const remoteIdentity = await registry.resolve(keyIdToDid(receivedJWT.issuer))
     const pubKey  = getIssuerPublicKey(receivedJWT.issuer, remoteIdentity.didDocument)
- 
+
     handleValidationStatus(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT), 'sig')
     sendJWT && handleValidationStatus(receivedJWT.audience === this.identity.did, 'aud')
     sendJWT && handleValidationStatus(sendJWT.nonce === receivedJWT.nonce, 'nonce')
@@ -305,5 +308,9 @@ export class IdentityWallet {
         issue: this.createCredReceive,
       },
     },
+    contracts: {
+      assembleTransaction: this._contractHandler.assembleTransaction,
+      broadcastTransaction: this._contractConnector.broadcastTransaction
+    }
   }
 }

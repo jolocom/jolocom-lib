@@ -13,3 +13,16 @@ export interface IEthereumConnector {
   resolveDID: (did: string) => Promise<string>
   updateDIDRecord: (args: IEthereumResolverUpdateDIDArgs) => Promise<void>
 }
+
+export enum SupportedTxTypes {
+  payment = 'payment'
+}
+
+export interface IContractHandler {
+  assembleTransaction: (txType: SupportedTxTypes) => void
+}
+
+export interface IContractConnector {
+  broadcastTransaction: () => {}
+}
+
