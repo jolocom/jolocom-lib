@@ -1,3 +1,6 @@
+import {ITransactionOptions} from '../interactionTokens/interactionTokens.types'
+import {IVaultedKeyProvider} from '../vaultedKeyProvider/types'
+
 export interface IEthereumResolverConfig {
   providerUrl: string
   contractAddress: string
@@ -14,15 +17,16 @@ export interface IEthereumConnector {
   updateDIDRecord: (args: IEthereumResolverUpdateDIDArgs) => Promise<void>
 }
 
-export enum SupportedTxTypes {
-  payment = 'payment'
-}
-
 export interface IContractHandler {
-  assembleTransaction: (txType: SupportedTxTypes) => void
+  assembleTransaction: (request: ITransactionEncodable, from: string, nonce: number, vault: IVaultedKeyProvider, pass: string) => string
 }
 
 export interface IContractConnector {
-  broadcastTransaction: () => {}
+  getAddressNonce: (address: string) => Promise<number>
+  broadcastTransaction: (serializedTransaction: string) => Promise<string>
+}
+
+export interface ITransactionEncodable {
+  transactionOptions: ITransactionOptions
 }
 

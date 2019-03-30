@@ -1,10 +1,14 @@
 import { IIpfsConnector } from '../ipfs/types'
-import { IEthereumConnector } from '../ethereum/types'
+import {IContractConnector, IContractHandler, IEthereumConnector} from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/types'
 import { Identity } from '../identity/identity'
 
 export interface IRegistryStaticCreationArgs {
+  contracts: {
+    implementation: IContractHandler,
+    connection: IContractConnector
+  }
   ipfsConnector: IIpfsConnector
   ethereumConnector: IEthereumConnector
 }

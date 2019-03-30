@@ -20,13 +20,13 @@ import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
-import { IVaultedKeyProvider } from '../vaultedKeyProvider/types'
+import {IVaultedKeyProvider, KeyTypes} from '../vaultedKeyProvider/types'
 import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types'
-import { keyIdToDid, getIssuerPublicKey, handleValidationStatus } from '../utils/helper'
+import {keyIdToDid, getIssuerPublicKey, handleValidationStatus, publicKeyToAddress} from '../utils/helper'
 import { generateRandomID } from '../utils/crypto'
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
-import {IContractConnector, IContractHandler} from '../ethereum/types'
+import {IContractConnector, IContractHandler, ITransactionEncodable} from '../ethereum/types'
 
 /**
  * @class
@@ -143,7 +143,7 @@ export class IdentityWallet {
    */
 
   constructor({ identity, publicKeyMetadata, vaultedKeyProvider, contractConnector, contractHandler }: IIdentityWalletCreateArgs) {
-    if (!identity || !publicKeyMetadata || !vaultedKeyProvider) {
+    if (!identity || !publicKeyMetadata || !vaultedKeyProvider || !contractHandler || !contractConnector) {
       throw new Error('Missing arguments! Expected identity, publicKeyMetadata, and vaulterKeyProvider')
     }
 
@@ -346,7 +346,25 @@ export class IdentityWallet {
     sendJWT && handleValidationStatus(sendJWT.nonce === receivedJWT.nonce, 'nonce')
   }
 
+  private assembleTransaction(request: ITransactionEncodable, nonce: number, pass: string) {
+    const publicKey = this._vaultedKeyProvider.getPublicKey({
+      derivationPath: KeyTypes.ethereumKey,
+      encryptionPass: pass
+    })
+
+    const address = publicKeyToAddress(publicKey)
+    return this._contractHandler.assembleTransaction(request, address, nonce, this._vaultedKeyProvider, pass)
+  }
+
+  private broadcastTransaction(serializedTransaction: string) {
+    return this._contractConnector.broadcastTransaction(serializedTransaction)
+  }
   /* Gathering creation methods in an easier to use public interface */
+
+  public contracts = {
+    assembleTransaction: this.assembleTransaction.bind(this),
+    broadcastTransaction: this.broadcastTransaction.bind(this)
+  }
 
   public create = {
     credential: Credential.create,
@@ -366,9 +384,5 @@ export class IdentityWallet {
         payment: this.createPaymentResp
       },
     },
-    contracts: {
-      assembleTransaction: this._contractHandler.assembleTransaction,
-      broadcastTransaction: this._contractConnector.broadcastTransaction
-    }
   }
 }

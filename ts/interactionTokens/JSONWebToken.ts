@@ -227,19 +227,21 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
   }
 }
 
-/*
+/**
  * @description - Instantiates a specific interaction class based on a key in the received JSON
  * @param payload - Interaction token in JSON form
  * @param typ - Interaction type
  * @returns {Object} - Instantiated class based on defined map
  */
-
+/** @TODO use class transformer's discriminator */
 const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: InteractionType): T => {
   const payloadParserMap = {
     [InteractionType.CredentialsReceive]: CredentialsReceive,
     [InteractionType.CredentialOffer]: CredentialOffer,
     [InteractionType.CredentialRequest]: CredentialRequest,
     [InteractionType.CredentialResponse]: CredentialResponse,
+    [InteractionType.PaymentRequest]: PaymentRequest,
+    [InteractionType.PaymentResponse]: PaymentResponse,
     // [InteractionType.Authentication]: Authentication
   }
 

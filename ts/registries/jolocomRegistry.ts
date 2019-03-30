@@ -13,6 +13,8 @@ import { publicKeyToDID } from '../utils/crypto'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/types'
 import { KeyTypes } from '../vaultedKeyProvider/types'
 import { generatePublicProfileServiceSection } from '../identity/didDocument/sections/serviceEndpointsSection'
+import { jolocomContractHandler} from '../ethereum/contracts'
+import { jolocomContractConnector} from '../ethereum/connection'
 
 /**
  * @class
@@ -34,6 +36,7 @@ export class JolocomRegistry implements IRegistry {
 
   public async create(vaultedKeyProvider: IVaultedKeyProvider, decryptionPassword: string): Promise<IdentityWallet> {
     const { jolocomIdentityKey, ethereumKey } = KeyTypes
+
     const derivationArgs = {
       derivationPath: jolocomIdentityKey,
       encryptionPass: decryptionPassword
@@ -206,20 +209,29 @@ export class JolocomRegistry implements IRegistry {
 
 /**
  * Returns a instance of the Jolocom registry given connector, defaults to Jolocom defined connectors.
+ * @param configuration - Connectors required for smart contract, storage, and anchoring interactions
  * @param ipfsConnector - Instance of class implementing the {@link IIpfsConnector} interface
  * @param ethereumConnector - Instance of class implementing the {@link IEthereumConnector} interface
  * @example `const registry = createJolocomRegistry()`
  */
 
 export const createJolocomRegistry = (
-  { ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs = {
+  configuration: IRegistryStaticCreationArgs = {
     ipfsConnector: jolocomIpfsStorageAgent,
-    ethereumConnector: jolocomEthereumResolver
+    ethereumConnector: jolocomEthereumResolver,
+    contracts: {
+      implementation: jolocomContractHandler,
+      connection: jolocomContractConnector
+    }
   }
 ): JolocomRegistry => {
+  const {ipfsConnector, contracts, ethereumConnector} = configuration
   const jolocomRegistry = new JolocomRegistry()
+
   jolocomRegistry.ipfsConnector = ipfsConnector
   jolocomRegistry.ethereumConnector = ethereumConnector
+  jolocomRegistry.contractHandler = contracts.implementation
+  jolocomRegistry.contractConnector = contracts.connection
 
   return jolocomRegistry
 }

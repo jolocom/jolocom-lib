@@ -5,13 +5,12 @@ import { ISignedCredentialAttrs } from "../credentials/signedCredential/types"
 export interface IPaymentRequestAttrs {
   callbackURL: string
   description: string
-  transactionDetails: ITransactionOptions
+  transactionOptions: ITransactionOptions
 }
 
 export interface ITransactionOptions {
   receiverAddress: string,
-  amountInWei: number,
-  chainId?: number,
+  amountInWei: number
 }
 
 export interface IPaymentResponseAttrs {
