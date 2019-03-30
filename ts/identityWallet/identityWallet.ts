@@ -129,16 +129,20 @@ export class IdentityWallet {
    *   and optionally a public profile {@link SignedCredential}
    * @param publicKeyMetadata - Public key id and derivation path
    * @param vaultedKeyProvider - Vaulted key store for generating signatures
+   * @param contractConnector - Instance of connector to the used smart contract chain
+   * @param contractHandler - Instance of handler to assemble Transactions for the used smart contract chain
    */
 
-  constructor({ identity, publicKeyMetadata, vaultedKeyProvider }: IIdentityWalletCreateArgs) {
+  constructor({ identity, publicKeyMetadata, vaultedKeyProvider, contractConnector, contractHandler }: IIdentityWalletCreateArgs) {
     if (!identity || !publicKeyMetadata || !vaultedKeyProvider) {
-      throw new Error('Missing argunments! Expected identity, publicKeyMetadata, and vaulterKeyProvider')
+      throw new Error('Missing arguments! Expected identity, publicKeyMetadata, and vaulterKeyProvider')
     }
 
     this.identity = identity
     this.publicKeyMetadata = publicKeyMetadata
     this.vaultedKeyProvider = vaultedKeyProvider
+    this._contractConnector = contractConnector
+    this._contractHandler = contractHandler
   }
 
   /**

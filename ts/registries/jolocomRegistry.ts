@@ -1,5 +1,5 @@
 import { IIpfsConnector } from '../ipfs/types'
-import { IEthereumConnector } from '../ethereum/types'
+import {IContractConnector, IContractHandler, IEthereumConnector} from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
@@ -22,6 +22,8 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 export class JolocomRegistry implements IRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
+  public contractHandler: IContractHandler
+  public contractConnector: IContractConnector
 
   /**
    * Registers a  new Jolocom identity on Ethereum and IPFS and returns an instance of the Identity Wallet class
@@ -51,7 +53,9 @@ export class JolocomRegistry implements IRegistry {
       publicKeyMetadata: {
         derivationPath: jolocomIdentityKey,
         keyId: didDocument.publicKey[0].id
-      }
+      },
+      contractHandler: this.contractHandler,
+      contractConnector: this.contractConnector
     })
 
     await this.commit({
@@ -68,10 +72,10 @@ export class JolocomRegistry implements IRegistry {
 
   /**
    * Stores the passed didDocument / public profile on IPFS and updates the mapping in the smart contract.
-   * @param commitArgs - Data to be commited and vault to get private keys
-   * @param commitargs.vaultedKeyProvider - Vaulted key store
-   * @param commitargs.keyMetadata - Derivation path and decryption pass
-   * @param commitargs.identityWallet - Wallet containing did document and public profile
+   * @param commitArgs - Data to be committed and vault to get private keys
+   * @param commitArgs.vaultedKeyProvider - Vaulted key store
+   * @param commitArgs.keyMetadata - Derivation path and decryption pass
+   * @param commitArgs.identityWallet - Wallet containing did document and public profile
    * @deprecated Will be modified in next major release to not require access to the vault
    * @example `await registry.commit({ vaultedKeyProvider, keyMetadata, identityWallet })`
    */
@@ -164,7 +168,9 @@ export class JolocomRegistry implements IRegistry {
     return new IdentityWallet({
       vaultedKeyProvider,
       identity,
-      publicKeyMetadata
+      publicKeyMetadata,
+      contractConnector: this.contractConnector,
+      contractHandler: this.contractHandler
     })
   }
 
