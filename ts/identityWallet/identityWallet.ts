@@ -6,7 +6,16 @@ import { Identity } from '../identity/identity'
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
 import { CredentialOffer } from '../interactionTokens/credentialOffer'
-import { ICredentialResponseAttrs, ICredentialRequestAttrs, ICredentialOfferAttrs, IAuthenticationAttrs, ICredentialsReceiveAttrs } from '../interactionTokens/interactionTokens.types'
+import {PaymentResponse} from '../interactionTokens/paymentResponse'
+import {PaymentRequest} from '../interactionTokens/paymentRequest'
+import {
+  ICredentialResponseAttrs,
+  ICredentialRequestAttrs,
+  ICredentialOfferAttrs,
+  IAuthenticationAttrs,
+  ICredentialsReceiveAttrs,
+  IPaymentResponseAttrs, IPaymentRequestAttrs
+} from '../interactionTokens/interactionTokens.types'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
@@ -252,6 +261,49 @@ export class IdentityWallet {
   }
 
   /**
+   * Creates and signs a payment request for Ethereum
+   * @param paymentReq - payment request creation args
+   * @param pass - Password to decrypt the vaulted seed
+   */
+
+  private createPaymentReq = async (
+    paymentReq: IPaymentRequestAttrs,
+    pass: string
+  ) => {
+    const paymentRequest = PaymentRequest.fromJSON(paymentReq)
+    const jwt = JSONWebToken.fromJWTEncodable(paymentRequest)
+    jwt.interactionType = InteractionType.PaymentRequest
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass
+    )
+  }
+
+  /**
+   * Creates and signs a payment response which contains the transaction hash
+   * @param paymentResp - payment response creation args
+   * @param pass - Password to decrypt the vaulted seed
+   * @param receivedJWT - received payment request JSONWebToken Class
+   */
+
+  private createPaymentResp = async (
+    paymentResp: IPaymentResponseAttrs,
+    pass: string,
+    receivedJWT: JSONWebToken<JWTEncodable>
+  ) => {
+    const paymentResponse = PaymentResponse.fromJSON(paymentResp) as PaymentResponse
+    const jwt = JSONWebToken.fromJWTEncodable(paymentResponse)
+    jwt.interactionType = InteractionType.PaymentResponse
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+      receivedJWT
+    )
+  }
+
+  /**
    * Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
    * @param jwt - JSONWebToken Class
    * @param derivationPath - Derivation Path for identity keys
@@ -303,13 +355,15 @@ export class IdentityWallet {
       request: {
         auth: this.createAuth,
         offer: this.createCredOffer,
-        share: this.createCredReq
+        share: this.createCredReq,
+        payment: this.createPaymentReq
       },
       response: {
         auth: this.createAuth,
         offer: this.createCredOffer,
         share: this.createCredResp,
         issue: this.createCredReceive,
+        payment: this.createPaymentResp
       },
     },
     contracts: {

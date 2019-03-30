@@ -2,6 +2,22 @@ import { ISignedCredentialAttrs } from "../credentials/signedCredential/types"
 
 /* Creation attributes. Same as JSON form */
 
+export interface IPaymentRequestAttrs {
+  callbackURL: string
+  description: string
+  transactionDetails: ITransactionOptions
+}
+
+export interface ITransactionOptions {
+  receiverAddress: string,
+  amountInWei: number,
+  chainId?: number,
+}
+
+export interface IPaymentResponseAttrs {
+  txHash: string
+}
+
 export interface ICredentialOfferAttrs {
   callbackURL: string
   instant: boolean

@@ -11,6 +11,8 @@ import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
 import { CredentialsReceive } from './credentialsReceive'
 import { handleValidationStatus, keyIdToDid } from '../utils/helper'
+import {PaymentResponse} from './paymentResponse'
+import {PaymentRequest} from './paymentRequest'
 
 /* Local interfaces / types to save on typing later */
 
@@ -20,6 +22,8 @@ export type JWTEncodable =
   | Authentication
   | CredentialOffer
   | CredentialsReceive
+  | PaymentRequest
+  | PaymentResponse
 
 interface IJWTEncodable {
   [key: string]: any
@@ -236,7 +240,7 @@ const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: Inter
     [InteractionType.CredentialOffer]: CredentialOffer,
     [InteractionType.CredentialRequest]: CredentialRequest,
     [InteractionType.CredentialResponse]: CredentialResponse,
-    // [InteractionType.Authentication]: Authentication 
+    // [InteractionType.Authentication]: Authentication
   }
 
   const correspondingClass = payloadParserMap[typ]
