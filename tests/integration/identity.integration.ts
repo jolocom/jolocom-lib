@@ -11,6 +11,8 @@ import { publicProfileCredJSON } from '../data/identity.data'
 import { testEthereumConfig, testIpfsConfig, userVault, userPass, serviceVault, servicePass } from './integration.data'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
+import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
+import {jolocomContractHandler} from '../../ts/contracts/contracts'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -24,7 +26,11 @@ before(async () => {
   await integrationHelper.init()
   jolocomRegistry = createJolocomRegistry({
     ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
-    ethereumConnector: new EthResolver(testEthereumConfig)
+    ethereumConnector: new EthResolver(testEthereumConfig),
+    contracts: {
+      connection: jolocomContractsGateway,
+      implementation: jolocomContractHandler
+    }
   })
   userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
   serviceIdentityWallet = await jolocomRegistry.create(serviceVault, servicePass)

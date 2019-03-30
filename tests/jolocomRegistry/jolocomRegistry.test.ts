@@ -5,6 +5,8 @@ import { IpfsStorageAgent, jolocomIpfsStorageAgent } from '../../ts/ipfs/ipfs'
 import { EthResolver, jolocomEthereumResolver } from '../../ts/ethereum/ethereum'
 import { JolocomRegistry, createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { testEthereumConfig, testIpfsConfig } from '../data/registry.data'
+import {jolocomContractHandler} from '../../ts/contracts/contracts'
+import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -20,7 +22,10 @@ describe('JolocomRegistry', () => {
   describe('Jolocom Registry - static create', () => {
     const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
     const ethereumConnector = new EthResolver(testEthereumConfig)
-    jolocomRegistry = createJolocomRegistry({ ipfsConnector, ethereumConnector })
+    jolocomRegistry = createJolocomRegistry({ ipfsConnector, ethereumConnector, contracts: {
+      implementation: jolocomContractHandler,
+      connection: jolocomContractsGateway
+    } })
 
     it('should correctly create an instance of JolocomRegistry if connectors are passed ', () => {
       expect(jolocomRegistry.ipfsConnector).to.deep.equal(ipfsConnector)
