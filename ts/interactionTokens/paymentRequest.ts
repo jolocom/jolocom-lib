@@ -1,6 +1,6 @@
 import { classToPlain, plainToClass, Expose, Exclude } from 'class-transformer'
-import { IPaymentRequestAttrs, ITransactionOptions } from './interactionTokens.types'
-import {ITransactionEncodable} from '../ethereum/types'
+import { IPaymentRequestAttrs } from './interactionTokens.types'
+import {ITransactionEncodable, ITransactionOptions} from '../contracts/types'
 
 /**
  * @class
@@ -13,16 +13,24 @@ export class PaymentRequest implements ITransactionEncodable {
   private _transactionOptions: ITransactionOptions
   private _description: string
 
+  /**
+   * Get the transaction options. In case values for gasLimit and gasLimit were not provided
+   * defaults are used.
+   */
   @Expose()
   get transactionOptions(): ITransactionOptions {
-    return this._transactionOptions
+    return {
+      gasLimit: 21000,
+      gasPrice: 10e9,
+      ...this._transactionOptions
+    }
   }
 
   /**
    * Set the transaction details encoded in the payload
    * This will be used as input to create a transaction on receiver side
    * @example paymentRequest.transactionOptions = {
-      receiverAddress: 'yourAddress',
+      to: 'yourAddress',
       amountInEther: '0.1'
     }
    */

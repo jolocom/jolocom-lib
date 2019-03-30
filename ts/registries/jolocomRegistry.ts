@@ -1,5 +1,5 @@
 import { IIpfsConnector } from '../ipfs/types'
-import {IContractConnector, IContractHandler, IEthereumConnector} from '../ethereum/types'
+import { IEthereumConnector} from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
@@ -13,8 +13,9 @@ import { publicKeyToDID } from '../utils/crypto'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/types'
 import { KeyTypes } from '../vaultedKeyProvider/types'
 import { generatePublicProfileServiceSection } from '../identity/didDocument/sections/serviceEndpointsSection'
-import { jolocomContractHandler} from '../ethereum/contracts'
-import { jolocomContractConnector} from '../ethereum/connection'
+import {jolocomContractHandler} from '../contracts/contracts'
+import {IContracts, IContractsGateway} from '../contracts/types'
+import {jolocomContractsGateway} from '../contracts/contractsGateway'
 
 /**
  * @class
@@ -24,8 +25,8 @@ import { jolocomContractConnector} from '../ethereum/connection'
 export class JolocomRegistry implements IRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
-  public contractHandler: IContractHandler
-  public contractConnector: IContractConnector
+  public contractHandler: IContracts
+  public contractConnector: IContractsGateway
 
   /**
    * Registers a  new Jolocom identity on Ethereum and IPFS and returns an instance of the Identity Wallet class
@@ -210,8 +211,9 @@ export class JolocomRegistry implements IRegistry {
 /**
  * Returns a instance of the Jolocom registry given connector, defaults to Jolocom defined connectors.
  * @param configuration - Connectors required for smart contract, storage, and anchoring interactions
- * @param ipfsConnector - Instance of class implementing the {@link IIpfsConnector} interface
- * @param ethereumConnector - Instance of class implementing the {@link IEthereumConnector} interface
+ * @param configuration.ipfsConnector - Instance of class implementing the {@link IIpfsConnector} interface
+ * @param configuration.ethereumConnector - Instance of class implementing the {@link IEthereumConnector} interface
+ * @param configuration.contracts - Classes for interacting with Smart Contracts, implementing {@link IContractsGateway} and {@link IContracts}
  * @example `const registry = createJolocomRegistry()`
  */
 
@@ -221,7 +223,7 @@ export const createJolocomRegistry = (
     ethereumConnector: jolocomEthereumResolver,
     contracts: {
       implementation: jolocomContractHandler,
-      connection: jolocomContractConnector
+      connection: jolocomContractsGateway
     }
   }
 ): JolocomRegistry => {

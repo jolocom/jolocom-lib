@@ -26,7 +26,7 @@ import {keyIdToDid, getIssuerPublicKey, handleValidationStatus, publicKeyToAddre
 import { generateRandomID } from '../utils/crypto'
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
-import {IContractConnector, IContractHandler, ITransactionEncodable} from '../ethereum/types'
+import {IContracts, IContractsGateway, ITransactionEncodable} from '../contracts/types'
 
 /**
  * @class
@@ -39,8 +39,8 @@ export class IdentityWallet {
   private _identity: Identity
   private _publicKeyMetadata: IKeyMetadata
   private _vaultedKeyProvider: IVaultedKeyProvider
-  private _contractHandler: IContractHandler
-  private _contractConnector: IContractConnector
+  private _contractHandler: IContracts
+  private _contractConnector: IContractsGateway
 
   /**
    * Get the did associated with the identity wallet
@@ -346,24 +346,22 @@ export class IdentityWallet {
     sendJWT && handleValidationStatus(sendJWT.nonce === receivedJWT.nonce, 'nonce')
   }
 
-  private assembleTransaction(request: ITransactionEncodable, nonce: number, pass: string) {
+  private sendTransaction = async (request: ITransactionEncodable, pass: string) => {
     const publicKey = this._vaultedKeyProvider.getPublicKey({
       derivationPath: KeyTypes.ethereumKey,
       encryptionPass: pass
     })
 
     const address = publicKeyToAddress(publicKey)
-    return this._contractHandler.assembleTransaction(request, address, nonce, this._vaultedKeyProvider, pass)
-  }
+    const {nonce} = await this._contractConnector.getAddressInfo(address)
 
-  private broadcastTransaction(serializedTransaction: string) {
-    return this._contractConnector.broadcastTransaction(serializedTransaction)
+    const tx = this._contractHandler.assembleTxFromInteractionToken(request, address, nonce, this.vaultedKeyProvider, pass)
+    return this._contractConnector.broadcastTransaction(tx)
   }
   /* Gathering creation methods in an easier to use public interface */
 
-  public contracts = {
-    assembleTransaction: this.assembleTransaction.bind(this),
-    broadcastTransaction: this.broadcastTransaction.bind(this)
+  public transactions = {
+    sendTransaction: this.sendTransaction.bind(this)
   }
 
   public create = {
