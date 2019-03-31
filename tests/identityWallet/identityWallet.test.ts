@@ -16,8 +16,8 @@ import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { validSignedCredReqJWT } from '../data/interactionTokens/jsonWebToken.data'
 import { keyIdToDid } from '../../ts/utils/helper'
-import {jolocomContractHandler} from '../../ts/contracts/contractsAdapter'
 import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
+import {jolocomContractsAdapter} from '../../ts/contracts/contractsAdapter'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -50,8 +50,8 @@ describe('IdentityWallet', () => {
           derivationPath: KeyTypes.jolocomIdentityKey,
           keyId: mockKeyId
         },
-        contractHandler: jolocomContractHandler,
-        contractConnector: jolocomContractsGateway
+        contractsAdapter: jolocomContractsAdapter,
+        contractsGateway: jolocomContractsGateway
       })
 
       expect(iw.did).to.eq(mockDid)

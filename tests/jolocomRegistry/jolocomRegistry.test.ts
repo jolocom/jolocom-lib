@@ -5,7 +5,7 @@ import { IpfsStorageAgent, jolocomIpfsStorageAgent } from '../../ts/ipfs/ipfs'
 import { EthResolver, jolocomEthereumResolver } from '../../ts/ethereum/ethereum'
 import { JolocomRegistry, createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { testEthereumConfig, testIpfsConfig } from '../data/registry.data'
-import {jolocomContractHandler} from '../../ts/contracts/contractsAdapter'
+import {jolocomContractsAdapter} from '../../ts/contracts/contractsAdapter'
 import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
 
 chai.use(sinonChai)
@@ -23,8 +23,8 @@ describe('JolocomRegistry', () => {
     const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
     const ethereumConnector = new EthResolver(testEthereumConfig)
     jolocomRegistry = createJolocomRegistry({ ipfsConnector, ethereumConnector, contracts: {
-      implementation: jolocomContractHandler,
-      connection: jolocomContractsGateway
+      adapter: jolocomContractsAdapter,
+      gateway: jolocomContractsGateway
     } })
 
     it('should correctly create an instance of JolocomRegistry if connectors are passed ', () => {

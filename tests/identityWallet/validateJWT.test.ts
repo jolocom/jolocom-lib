@@ -18,7 +18,7 @@ import {
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
 import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
-import {jolocomContractHandler} from '../../ts/contracts/contractsAdapter'
+import {jolocomContractsAdapter} from '../../ts/contracts/contractsAdapter'
 import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
 chai.use(sinonChai)
 const expect = chai.expect
@@ -42,8 +42,8 @@ describe('IdentityWallet validate JWT', () => {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: mockKeyId,
       },
-      contractHandler: jolocomContractHandler,
-      contractConnector: jolocomContractsGateway
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
   })
 

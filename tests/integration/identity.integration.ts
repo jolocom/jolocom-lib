@@ -12,7 +12,7 @@ import { testEthereumConfig, testIpfsConfig, userVault, userPass, serviceVault, 
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
 import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
-import {jolocomContractHandler} from '../../ts/contracts/contractsAdapter'
+import {jolocomContractsAdapter} from '../../ts/contracts/contractsAdapter'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -28,8 +28,8 @@ before(async () => {
     ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
     ethereumConnector: new EthResolver(testEthereumConfig),
     contracts: {
-      connection: jolocomContractsGateway,
-      implementation: jolocomContractHandler
+      gateway: jolocomContractsGateway,
+      adapter: jolocomContractsAdapter
     }
   })
   userIdentityWallet = await jolocomRegistry.create(userVault, userPass)

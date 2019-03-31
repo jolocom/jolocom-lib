@@ -14,7 +14,7 @@ import { encryptionPass } from './jolocomRegistry.data'
 import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
 import { publicProfileCredJSON } from '../data/identity.data'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-import {jolocomContractHandler} from '../../ts/contracts/contractsAdapter'
+import {jolocomContractsAdapter} from '../../ts/contracts/contractsAdapter'
 import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
 
 chai.use(sinonChai)
@@ -51,8 +51,8 @@ describe('Jolocom registry - commit', () => {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: didDocumentJSON.publicKey[0].id
       },
-      contractHandler: jolocomContractHandler,
-      contractConnector: jolocomContractsGateway
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
 
     await testRegistry.commit({
@@ -94,8 +94,8 @@ describe('Jolocom registry - commit', () => {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: didDocumentJSON.publicKey[0].id
       },
-      contractHandler: jolocomContractHandler,
-      contractConnector: jolocomContractsGateway
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
 
     await testRegistry.commit({
@@ -136,8 +136,8 @@ describe('Jolocom registry - commit', () => {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: didDocumentJSON.publicKey[0].id
       },
-      contractHandler: jolocomContractHandler,
-      contractConnector: jolocomContractsGateway
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
 
     await testRegistry.commit({
@@ -178,8 +178,8 @@ describe('Jolocom registry - commit', () => {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: didDocumentJSON.publicKey[0].id
       },
-      contractHandler: jolocomContractHandler,
-      contractConnector: jolocomContractsGateway
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
 
     await testRegistry.commit({
@@ -210,8 +210,8 @@ describe('Jolocom registry - commit', () => {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: didDocumentJSON.publicKey[0].id
       },
-      contractHandler: jolocomContractHandler,
-      contractConnector: jolocomContractsGateway
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
 
     testRegistry.ipfsConnector.storeJSON = sinon.stub().throws(new Error('Mock'))
