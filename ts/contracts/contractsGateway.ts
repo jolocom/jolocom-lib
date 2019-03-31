@@ -1,5 +1,5 @@
 import {ethers} from 'ethers'
-import {JsonRpcProvider} from 'ethers/providers'
+import {JsonRpcProvider, Web3Provider} from 'ethers/providers'
 import {IContractsGateway} from './types'
 
 /**
@@ -9,16 +9,20 @@ import {IContractsGateway} from './types'
  */
 
 export class ContractsGateway implements IContractsGateway {
-  private provider: JsonRpcProvider
+  private provider: JsonRpcProvider | Web3Provider
 
 
   /**
    * @constructor
-   * @param providerUrl - JSON RPC endpoint for broadcasting transactions
+   * @param provider - JSON RPC endpoint for broadcasting transactions, or configured web3 provider
    */
 
-  constructor(providerUrl: string) {
-    this.provider = new ethers.providers.JsonRpcProvider(providerUrl)
+  constructor(provider: string | Web3Provider) {
+    if (typeof provider === 'string') {
+      this.provider = new ethers.providers.JsonRpcProvider(provider)
+    } else {
+      this.provider = provider
+    }
   }
 
   /**
@@ -27,6 +31,10 @@ export class ContractsGateway implements IContractsGateway {
    */
 
   public getNetworkInfo() {
+    if (!this.provider.network) {
+      return {}
+    }
+
     return {
       name: this.provider.network.name,
       chainId: this.provider.network.chainId,

@@ -23,7 +23,7 @@ export interface IContractsAdapter {
 }
 
 export interface IContractsGateway {
-  getNetworkInfo: () => ContractsGatewayInfo
+  getNetworkInfo: () => ContractsGatewayInfo | {}
   getAddressInfo: (address: string) => Promise<AddressInfo>
   broadcastTransaction: (serializedTransaction: string) => Promise<string>
 }

@@ -138,7 +138,7 @@ export class IdentityWallet {
    *   and optionally a public profile {@link SignedCredential}
    * @param publicKeyMetadata - Public key id and derivation path
    * @param vaultedKeyProvider - Vaulted key store for generating signatures
-   * @param contractsAdapter - Instance of connector to the used smart contract chain
+   * @param contractsGateway - Instance of connector to the used smart contract chain
    * @param contractsAdapter - Instance of handler to assemble Transactions for the used smart contract chain
    */
 
@@ -361,7 +361,7 @@ export class IdentityWallet {
 
 
   public transactions = {
-    sendTransaction: this.sendTransaction.bind(this)
+    sendTransaction: this.sendTransaction
   }
 
   /* Gathering creation methods in an easier to use public interface */

@@ -11,8 +11,8 @@ import { publicProfileCredJSON } from '../data/identity.data'
 import { testEthereumConfig, testIpfsConfig, userVault, userPass, serviceVault, servicePass } from './integration.data'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
-import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
-import {jolocomContractsAdapter} from '../../ts/contracts/contractsAdapter'
+import {ContractsGateway} from '../../ts/contracts/contractsGateway'
+import {ContractsAdapter} from '../../ts/contracts/contractsAdapter'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -21,17 +21,21 @@ const expect = chai.expect
 export let jolocomRegistry: JolocomRegistry
 export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
+export let testContractsGateway: ContractsGateway
+export let testContractsAdapter: ContractsAdapter
 
 before(async () => {
-  await integrationHelper.init()
+  const { testContractsGateway: gateway, testContractsAdapter: adapter } = await integrationHelper.init()
+
+  testContractsGateway = gateway
+  testContractsAdapter = adapter
+
   jolocomRegistry = createJolocomRegistry({
     ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
     ethereumConnector: new EthResolver(testEthereumConfig),
-    contracts: {
-      gateway: jolocomContractsGateway,
-      adapter: jolocomContractsAdapter
-    }
+    contracts: { gateway, adapter }
   })
+
   userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
   serviceIdentityWallet = await jolocomRegistry.create(serviceVault, servicePass)
 })

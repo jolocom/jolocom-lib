@@ -16,7 +16,7 @@ export class ContractsAdapter implements IContractsAdapter {
    * @param chainId - networkID corresponding to the used chain, as defined by EIP-155
    */
 
-  constructor(chainId: number) {
+  constructor(chainId: number = 0) {
     this.chainId = chainId
   }
 
