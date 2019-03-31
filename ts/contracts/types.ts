@@ -12,7 +12,7 @@ type ContractsGatewayInfo = {
   endpoint: string
 }
 
-export interface IContracts {
+export interface IContractsAdapter {
   assembleTxFromInteractionToken: (
     requestToken: ITransactionEncodable,
     from: string,

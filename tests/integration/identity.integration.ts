@@ -12,7 +12,7 @@ import { testEthereumConfig, testIpfsConfig, userVault, userPass, serviceVault, 
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
 import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
-import {jolocomContractHandler} from '../../ts/contracts/contracts'
+import {jolocomContractHandler} from '../../ts/contracts/contractsAdapter'
 
 chai.use(sinonChai)
 const expect = chai.expect

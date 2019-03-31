@@ -26,7 +26,7 @@ import {keyIdToDid, getIssuerPublicKey, handleValidationStatus, publicKeyToAddre
 import { generateRandomID } from '../utils/crypto'
 import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
-import {IContracts, IContractsGateway, ITransactionEncodable} from '../contracts/types'
+import {IContractsAdapter, IContractsGateway, ITransactionEncodable} from '../contracts/types'
 
 /**
  * @class
@@ -39,7 +39,7 @@ export class IdentityWallet {
   private _identity: Identity
   private _publicKeyMetadata: IKeyMetadata
   private _vaultedKeyProvider: IVaultedKeyProvider
-  private _contractHandler: IContracts
+  private _contractHandler: IContractsAdapter
   private _contractConnector: IContractsGateway
 
   /**
@@ -358,11 +358,13 @@ export class IdentityWallet {
     const tx = this._contractHandler.assembleTxFromInteractionToken(request, address, nonce, this.vaultedKeyProvider, pass)
     return this._contractConnector.broadcastTransaction(tx)
   }
-  /* Gathering creation methods in an easier to use public interface */
+
 
   public transactions = {
     sendTransaction: this.sendTransaction.bind(this)
   }
+
+  /* Gathering creation methods in an easier to use public interface */
 
   public create = {
     credential: Credential.create,

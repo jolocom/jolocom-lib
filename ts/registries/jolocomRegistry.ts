@@ -13,8 +13,8 @@ import { publicKeyToDID } from '../utils/crypto'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/types'
 import { KeyTypes } from '../vaultedKeyProvider/types'
 import { generatePublicProfileServiceSection } from '../identity/didDocument/sections/serviceEndpointsSection'
-import {jolocomContractHandler} from '../contracts/contracts'
-import {IContracts, IContractsGateway} from '../contracts/types'
+import {jolocomContractHandler} from '../contracts/contractsAdapter'
+import {IContractsAdapter, IContractsGateway} from '../contracts/types'
 import {jolocomContractsGateway} from '../contracts/contractsGateway'
 
 /**
@@ -25,7 +25,7 @@ import {jolocomContractsGateway} from '../contracts/contractsGateway'
 export class JolocomRegistry implements IRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
-  public contractHandler: IContracts
+  public contractHandler: IContractsAdapter
   public contractConnector: IContractsGateway
 
   /**
@@ -213,7 +213,7 @@ export class JolocomRegistry implements IRegistry {
  * @param configuration - Connectors required for smart contract, storage, and anchoring interactions
  * @param configuration.ipfsConnector - Instance of class implementing the {@link IIpfsConnector} interface
  * @param configuration.ethereumConnector - Instance of class implementing the {@link IEthereumConnector} interface
- * @param configuration.contracts - Classes for interacting with Smart Contracts, implementing {@link IContractsGateway} and {@link IContracts}
+ * @param configuration.contracts - Classes for interacting with Smart ContractsAdapter, implementing {@link IContractsGateway} and {@link IContractsAdapter}
  * @example `const registry = createJolocomRegistry()`
  */
 

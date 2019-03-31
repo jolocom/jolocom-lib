@@ -1,4 +1,4 @@
-import {IContracts, ITransactionEncodable} from './types'
+import {IContractsAdapter, ITransactionEncodable} from './types'
 import * as Transaction from 'ethereumjs-tx'
 import {IVaultedKeyProvider, KeyTypes} from '../vaultedKeyProvider/types'
 
@@ -8,7 +8,7 @@ import {IVaultedKeyProvider, KeyTypes} from '../vaultedKeyProvider/types'
  * @internal
  */
 
-export class Contracts implements IContracts {
+export class ContractsAdapter implements IContractsAdapter {
   private readonly chainId: number
 
   /**
@@ -54,4 +54,4 @@ export class Contracts implements IContracts {
   }
 }
 
-export const jolocomContractHandler = new Contracts(4)
+export const jolocomContractHandler = new ContractsAdapter(4)

@@ -14,7 +14,7 @@ import { encryptionPass } from './jolocomRegistry.data'
 import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
 import { publicProfileCredJSON } from '../data/identity.data'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-import {jolocomContractHandler} from '../../ts/contracts/contracts'
+import {jolocomContractHandler} from '../../ts/contracts/contractsAdapter'
 import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
 
 chai.use(sinonChai)

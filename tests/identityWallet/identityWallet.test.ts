@@ -16,7 +16,7 @@ import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { validSignedCredReqJWT } from '../data/interactionTokens/jsonWebToken.data'
 import { keyIdToDid } from '../../ts/utils/helper'
-import {jolocomContractHandler} from '../../ts/contracts/contracts'
+import {jolocomContractHandler} from '../../ts/contracts/contractsAdapter'
 import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
 
 chai.use(sinonChai)

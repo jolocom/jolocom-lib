@@ -5,7 +5,7 @@ import { IpfsStorageAgent, jolocomIpfsStorageAgent } from '../../ts/ipfs/ipfs'
 import { EthResolver, jolocomEthereumResolver } from '../../ts/ethereum/ethereum'
 import { JolocomRegistry, createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { testEthereumConfig, testIpfsConfig } from '../data/registry.data'
-import {jolocomContractHandler} from '../../ts/contracts/contracts'
+import {jolocomContractHandler} from '../../ts/contracts/contractsAdapter'
 import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
 
 chai.use(sinonChai)

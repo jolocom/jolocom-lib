@@ -18,7 +18,7 @@ import {
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
 import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
-import {jolocomContractHandler} from '../../ts/contracts/contracts'
+import {jolocomContractHandler} from '../../ts/contracts/contractsAdapter'
 import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
 chai.use(sinonChai)
 const expect = chai.expect
