@@ -3,7 +3,6 @@ import * as sinonChai from 'sinon-chai'
 import {
   userPass,
   servicePass,
-  userVault
 } from './integration.data'
 import {
   userIdentityWallet,
@@ -11,7 +10,6 @@ import {
   jolocomRegistry, testContractsGateway
 } from './identity.integration'
 import { publicKeyToAddress } from '../../ts/utils/helper'
-import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { PaymentRequest } from '../../ts/interactionTokens/paymentRequest'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { PaymentResponse } from '../../ts/interactionTokens/paymentResponse'
@@ -27,12 +25,10 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
   let paymentResponseEncoded
 
   it('Should create a payment request token by service', async () => {
-    // TODO if TO not provided, default to address from Identity Wallet
     const paymentReqCreationArgs: IPaymentRequestAttrs = {
       callbackURL: 'https://awesomeservice.com/payment/pending',
       description: 'Payment for monthly subscription to awesome service',
       transactionOptions: {
-        to: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         value: 0.5e18, // 0.5 Ether in Wei
       }
     }
@@ -46,8 +42,15 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
 
     expect(paymentRequestJWT).to.be.instanceOf(JSONWebToken)
     expect(paymentRequestJWT.interactionToken).to.be.instanceOf(PaymentRequest)
+
     expect(paymentRequestJWT.interactionToken).to.deep.equal(
-      PaymentRequest.fromJSON(paymentReqCreationArgs)
+      PaymentRequest.fromJSON({
+        ...paymentReqCreationArgs,
+        transactionOptions: {
+          ...paymentReqCreationArgs.transactionOptions,
+          to: '0x10ed0857fd6d752f2089a6b0d3fe7f0392e046e0' // Defaulted to service's eth addr.
+        }
+      })
     )
   })
 
@@ -117,18 +120,19 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
   })
 
   it('Should transfer the funds and correctly increment the nonce', async () => {
-    const userAddr = publicKeyToAddress(userVault.getPublicKey({
-      derivationPath: KeyTypes.ethereumKey,
-      encryptionPass: userPass
-    }))
+    const userPubKey = userIdentityWallet.getPublicKeys(userPass).ethereumKey
+    const servicePubKey = serviceIdentityWallet.getPublicKeys(servicePass).ethereumKey
 
-    const receiverInfo = await testContractsGateway.getAddressInfo('0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-    const senderInfo = await testContractsGateway.getAddressInfo(userAddr)
+    const userAddr = publicKeyToAddress(Buffer.from(userPubKey, 'hex'))
+    const serviceAddr = publicKeyToAddress(Buffer.from(servicePubKey, 'hex'))
 
-    expect(senderInfo.nonce).to.equal(2)
-    expect(senderInfo.balance.toString()).to.eq('497601680000000000')
+    const userInfo = await testContractsGateway.getAddressInfo(userAddr)
+    const serviceInfo = await testContractsGateway.getAddressInfo(serviceAddr)
 
-    expect(receiverInfo.nonce).to.equal(0)
-    expect(receiverInfo.balance.toString()).to.eq('500000000000000000')
+    expect(userInfo.nonce).to.equal(2)
+    expect(userInfo.balance.toString()).to.eq('497601680000000000')
+
+    expect(serviceInfo.nonce).to.equal(2)
+    expect(serviceInfo.balance.toString()).to.eq('1496995780000000000')
   })
 })
