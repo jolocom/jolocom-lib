@@ -1,5 +1,5 @@
 import { Identity } from '../identity/identity'
-import { IVaultedKeyProvider } from '../vaultedKeyProvider/types'
+import {IVaultedKeyProvider, KeyTypes} from '../vaultedKeyProvider/types'
 import { IKeyMetadata } from '../credentials/signedCredential/types'
 import {IContractsAdapter, IContractsGateway} from '../contracts/types'
 
@@ -10,3 +10,5 @@ export interface IIdentityWalletCreateArgs {
   contractsAdapter: IContractsAdapter
   contractsGateway: IContractsGateway
 }
+
+export type PublicKeyMap = {[key in keyof typeof KeyTypes]?: string}

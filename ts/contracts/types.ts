@@ -33,8 +33,8 @@ export interface ITransactionEncodable {
 }
 
 export interface ITransactionOptions {
-  to: string,
   value: number,
+  to?: string,
   gasLimit?: number,
   gasPrice?: number
 }

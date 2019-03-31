@@ -1,7 +1,7 @@
 import { BaseMetadata } from 'cred-types-jolocom-core'
 import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { IIdentityWalletCreateArgs } from './types'
+import {IIdentityWalletCreateArgs, PublicKeyMap} from './types'
 import { Identity } from '../identity/identity'
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
@@ -261,23 +261,50 @@ export class IdentityWallet {
   }
 
   /**
+   * Derives all public keys listed in the {@link KeyTypes} enum
+   * @param encryptionPass - password for interfacing with the vaulted key provider
+   * @example `iw.getPublicKeys('secret')` // { jolocomIdentityKey: '0xabc...ff', ethereumKey: '0xabc...ff'}
+   */
+
+  public getPublicKeys = (encryptionPass: string) : PublicKeyMap => {
+    const supportedKeys = Object.entries(KeyTypes)
+
+    return supportedKeys.reduce<PublicKeyMap>((acc, currentEntry) => {
+      const [keyType, derivationPath] = currentEntry
+
+      return {
+        ...acc,
+        [keyType]: this.vaultedKeyProvider.getPublicKey({
+          derivationPath,
+          encryptionPass
+        }).toString('hex')
+      }
+    }, {})
+  }
+
+  /**
    * Creates and signs a payment request for Ethereum
-   * @param paymentReq - payment request creation args
+   * @param paymentReq - payment request creation args, if no receiving address is
+   * specified, will default to the wallet's ethereum key
    * @param pass - Password to decrypt the vaulted seed
    */
 
-  private createPaymentReq = async (
-    paymentReq: IPaymentRequestAttrs,
-    pass: string
-  ) => {
-    const paymentRequest = PaymentRequest.fromJSON(paymentReq)
+  private createPaymentReq = async (paymentReq: IPaymentRequestAttrs, pass: string) => {
+    const transactionOptions = Object.assign({}, paymentReq.transactionOptions)
+
+    if (!transactionOptions.to) {
+      const iwEthKey = this.getPublicKeys(pass).ethereumKey
+      transactionOptions.to = publicKeyToAddress(Buffer.from(iwEthKey, 'hex'))
+    }
+
+    const paymentRequest = PaymentRequest.fromJSON({
+      ...paymentReq,
+      transactionOptions: transactionOptions
+    })
+
     const jwt = JSONWebToken.fromJWTEncodable(paymentRequest)
     jwt.interactionType = InteractionType.PaymentRequest
-    return this.initializeAndSign(
-      jwt,
-      this.publicKeyMetadata.derivationPath,
-      pass
-    )
+    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass)
   }
 
   /**
