@@ -54,4 +54,4 @@ export class ContractsAdapter implements IContractsAdapter {
   }
 }
 
-export const jolocomContractHandler = new ContractsAdapter(4)
+export const jolocomContractsAdapter = new ContractsAdapter(4)

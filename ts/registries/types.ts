@@ -7,8 +7,8 @@ import {IContractsAdapter, IContractsGateway} from '../contracts/types'
 
 export interface IRegistryStaticCreationArgs {
   contracts: {
-    implementation: IContractsAdapter,
-    connection: IContractsGateway
+    adapter: IContractsAdapter,
+    gateway: IContractsGateway
   }
   ipfsConnector: IIpfsConnector
   ethereumConnector: IEthereumConnector

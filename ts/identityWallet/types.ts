@@ -7,6 +7,6 @@ export interface IIdentityWalletCreateArgs {
   vaultedKeyProvider: IVaultedKeyProvider
   identity: Identity
   publicKeyMetadata: IKeyMetadata
-  contractHandler: IContractsAdapter
-  contractConnector: IContractsGateway
+  contractsAdapter: IContractsAdapter
+  contractsGateway: IContractsGateway
 }

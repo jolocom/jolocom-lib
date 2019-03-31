@@ -39,8 +39,8 @@ export class IdentityWallet {
   private _identity: Identity
   private _publicKeyMetadata: IKeyMetadata
   private _vaultedKeyProvider: IVaultedKeyProvider
-  private _contractHandler: IContractsAdapter
-  private _contractConnector: IContractsGateway
+  private _contractsAdapter: IContractsAdapter
+  private _contractsGateway: IContractsGateway
 
   /**
    * Get the did associated with the identity wallet
@@ -138,20 +138,20 @@ export class IdentityWallet {
    *   and optionally a public profile {@link SignedCredential}
    * @param publicKeyMetadata - Public key id and derivation path
    * @param vaultedKeyProvider - Vaulted key store for generating signatures
-   * @param contractConnector - Instance of connector to the used smart contract chain
-   * @param contractHandler - Instance of handler to assemble Transactions for the used smart contract chain
+   * @param contractsAdapter - Instance of connector to the used smart contract chain
+   * @param contractsAdapter - Instance of handler to assemble Transactions for the used smart contract chain
    */
 
-  constructor({ identity, publicKeyMetadata, vaultedKeyProvider, contractConnector, contractHandler }: IIdentityWalletCreateArgs) {
-    if (!identity || !publicKeyMetadata || !vaultedKeyProvider || !contractHandler || !contractConnector) {
+  constructor({ identity, publicKeyMetadata, vaultedKeyProvider, contractsGateway, contractsAdapter }: IIdentityWalletCreateArgs) {
+    if (!identity || !publicKeyMetadata || !vaultedKeyProvider || !contractsAdapter || !contractsGateway) {
       throw new Error('Missing arguments! Expected identity, publicKeyMetadata, and vaulterKeyProvider')
     }
 
     this.identity = identity
     this.publicKeyMetadata = publicKeyMetadata
     this.vaultedKeyProvider = vaultedKeyProvider
-    this._contractConnector = contractConnector
-    this._contractHandler = contractHandler
+    this._contractsGateway = contractsGateway
+    this._contractsAdapter = contractsAdapter
   }
 
   /**
@@ -353,10 +353,10 @@ export class IdentityWallet {
     })
 
     const address = publicKeyToAddress(publicKey)
-    const {nonce} = await this._contractConnector.getAddressInfo(address)
+    const {nonce} = await this._contractsGateway.getAddressInfo(address)
 
-    const tx = this._contractHandler.assembleTxFromInteractionToken(request, address, nonce, this.vaultedKeyProvider, pass)
-    return this._contractConnector.broadcastTransaction(tx)
+    const tx = this._contractsAdapter.assembleTxFromInteractionToken(request, address, nonce, this.vaultedKeyProvider, pass)
+    return this._contractsGateway.broadcastTransaction(tx)
   }
 
 

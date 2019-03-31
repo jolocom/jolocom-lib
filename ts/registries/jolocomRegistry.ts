@@ -13,7 +13,7 @@ import { publicKeyToDID } from '../utils/crypto'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/types'
 import { KeyTypes } from '../vaultedKeyProvider/types'
 import { generatePublicProfileServiceSection } from '../identity/didDocument/sections/serviceEndpointsSection'
-import {jolocomContractHandler} from '../contracts/contractsAdapter'
+import {jolocomContractsAdapter} from '../contracts/contractsAdapter'
 import {IContractsAdapter, IContractsGateway} from '../contracts/types'
 import {jolocomContractsGateway} from '../contracts/contractsGateway'
 
@@ -25,8 +25,8 @@ import {jolocomContractsGateway} from '../contracts/contractsGateway'
 export class JolocomRegistry implements IRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
-  public contractHandler: IContractsAdapter
-  public contractConnector: IContractsGateway
+  public contractsAdapter: IContractsAdapter
+  public contractsGateway: IContractsGateway
 
   /**
    * Registers a  new Jolocom identity on Ethereum and IPFS and returns an instance of the Identity Wallet class
@@ -58,8 +58,8 @@ export class JolocomRegistry implements IRegistry {
         derivationPath: jolocomIdentityKey,
         keyId: didDocument.publicKey[0].id
       },
-      contractHandler: this.contractHandler,
-      contractConnector: this.contractConnector
+      contractsAdapter: this.contractsAdapter,
+      contractsGateway: this.contractsGateway
     })
 
     await this.commit({
@@ -173,8 +173,8 @@ export class JolocomRegistry implements IRegistry {
       vaultedKeyProvider,
       identity,
       publicKeyMetadata,
-      contractConnector: this.contractConnector,
-      contractHandler: this.contractHandler
+      contractsGateway: this.contractsGateway,
+      contractsAdapter: this.contractsAdapter
     })
   }
 
@@ -222,8 +222,8 @@ export const createJolocomRegistry = (
     ipfsConnector: jolocomIpfsStorageAgent,
     ethereumConnector: jolocomEthereumResolver,
     contracts: {
-      implementation: jolocomContractHandler,
-      connection: jolocomContractsGateway
+      adapter: jolocomContractsAdapter,
+      gateway: jolocomContractsGateway
     }
   }
 ): JolocomRegistry => {
@@ -232,8 +232,8 @@ export const createJolocomRegistry = (
 
   jolocomRegistry.ipfsConnector = ipfsConnector
   jolocomRegistry.ethereumConnector = ethereumConnector
-  jolocomRegistry.contractHandler = contracts.implementation
-  jolocomRegistry.contractConnector = contracts.connection
+  jolocomRegistry.contractsAdapter = contracts.adapter
+  jolocomRegistry.contractsGateway = contracts.gateway
 
   return jolocomRegistry
 }
