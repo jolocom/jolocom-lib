@@ -20,8 +20,13 @@ Integration and unit tests located in the ``./tests`` folder are a good place to
 
 Starting with version `2.3.0`, the Jolocom Library requires `Node.js v10+` to run. Versions prior to `2.3.0` require `Node.js v8`.
 
-## TSLINT for development
+## Linting and Formatting
 
-We use `tslint` for static Typescript code analysis.  
-`tslint [file]` running code analysis  
-`tslint [file] --fix` running automatic fix of rule violations (fixes most of the common issues)
+We use [ESLint](https://eslint.org/) for static TypeScript code analysis.  
+We use [Prettier](https://prettier.io/) for auto formatting of our code, but this is configured to run as part of ESLint.  
+To display real-time linting errors, an ESLint plugin must be installed in your IDE or text editor.  
+On VSCode, it is possible to allow ESLint to format upon saving of files, which will run Prettier under the options within this project.  
+
+Additionally, we have included a script in package.json to allow use of ESlint/Prettier from the CLI:
+
+- `yarn format` will auto-fix as many problems as it can in the project in files with the extension `.ts`, and log unfixed errors to the console.
