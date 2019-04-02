@@ -7,5 +7,5 @@ export const credentialResponseJSON = {
 
 export const emptyCredentialResponseJSON = {
   callbackURL: 'https://test.io/auth/abc',
-  suppliedCredentials: []
+  suppliedCredentials: [],
 }

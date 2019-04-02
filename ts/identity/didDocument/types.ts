@@ -1,4 +1,8 @@
-import { IPublicKeySectionAttrs, IAuthenticationSectionAttrs, IServiceEndpointSectionAttrs } from './sections/types'
+import {
+  IPublicKeySectionAttrs,
+  IAuthenticationSectionAttrs,
+  IServiceEndpointSectionAttrs,
+} from './sections/types'
 import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 

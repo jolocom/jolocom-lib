@@ -1,9 +1,11 @@
 import { defaultContextIdentity } from '../../ts/utils/contexts'
 
-export const mockDid = 'did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777'
+export const mockDid =
+  'did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777'
 export const mockIpfsHash = 'QmZCEmfiKZhRPB88cEqmcHzQu6siSmVpieG6HTQse4e4Js'
 export const mockKeyId = `${mockDid}#keys-1`
-export const mockPublicKeyHex = '03848af62bffceb57631780ac0e0726106ee1c23262d6fd7ef906559d68f53a551'
+export const mockPublicKeyHex =
+  '03848af62bffceb57631780ac0e0726106ee1c23262d6fd7ef906559d68f53a551'
 
 /* JSON form to ensure toJSON and fromJSON work as intended */
 

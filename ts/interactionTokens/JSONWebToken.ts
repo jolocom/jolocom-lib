@@ -1,6 +1,12 @@
 import base64url from 'base64url'
 import { decodeToken } from 'jsontokens'
-import { classToPlain, plainToClass, Expose, Transform, Exclude } from 'class-transformer'
+import {
+  classToPlain,
+  plainToClass,
+  Expose,
+  Transform,
+  Exclude,
+} from 'class-transformer'
 import { IJWTHeader } from './types'
 import { IJSONWebTokenAttrs, InteractionType } from './types'
 import { sha256 } from '../utils/crypto'
@@ -47,7 +53,7 @@ interface TransformArgs {
 
 const convertPayload = <T extends JWTEncodable>(args: TransformArgs) => ({
   ...args,
-  interactionToken: payloadToJWT<T>(args.interactionToken, args.typ)
+  interactionToken: payloadToJWT<T>(args.interactionToken, args.typ),
 })
 
 /* Generic class encoding and decodes various interaction tokens as and from JSON web tokens */
@@ -57,7 +63,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
   /* ES256K stands for ec signatures on secp256k1, de facto standard */
   private _header: IJWTHeader = {
     typ: 'JWT',
-    alg: 'ES256K'
+    alg: 'ES256K',
   }
   private _signature: string
   private _payload: IPayloadSection<T> = {}
@@ -147,7 +153,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
   get signer() {
     return {
       did: keyIdToDid(this.issuer),
-      keyId: this.issuer
+      keyId: this.issuer,
     }
   }
 
@@ -157,7 +163,9 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
    * @returns {Object} - A json web token instance
    */
 
-  public static fromJWTEncodable<T extends JWTEncodable>(toEncode: T): JSONWebToken<T> {
+  public static fromJWTEncodable<T extends JWTEncodable>(
+    toEncode: T,
+  ): JSONWebToken<T> {
     const jwt = new JSONWebToken<T>()
     jwt.interactionToken = toEncode
     return jwt
@@ -181,7 +189,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
   public static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T> {
     const interactionToken = JSONWebToken.fromJSON(decodeToken(jwt))
-    handleValidationStatus((interactionToken.expires > Date.now()), 'exp')
+    handleValidationStatus(interactionToken.expires > Date.now(), 'exp')
 
     return interactionToken as JSONWebToken<T>
   }
@@ -193,13 +201,15 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
   public encode(): string {
     if (!this.payload || !this.header || !this.signature) {
-      throw new Error('The JWT is not complete, header / payload / signature are missing')
+      throw new Error(
+        'The JWT is not complete, header / payload / signature are missing',
+      )
     }
 
     return [
       base64url.encode(JSON.stringify(this.header)),
       base64url.encode(JSON.stringify(this.payload)),
-      this.signature
+      this.signature,
     ].join('.')
   }
 
@@ -210,7 +220,10 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
   public async digest() {
     const { encode } = base64url
-    const toSign = [encode(JSON.stringify(this.header)), encode(JSON.stringify(this.payload))].join('.')
+    const toSign = [
+      encode(JSON.stringify(this.header)),
+      encode(JSON.stringify(this.payload)),
+    ].join('.')
     return sha256(Buffer.from(toSign))
   }
 
@@ -218,7 +231,9 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     return classToPlain(this) as IJSONWebTokenAttrs
   }
 
-  public static fromJSON<T extends JWTEncodable>(json: IJSONWebTokenAttrs): JSONWebToken<T> {
+  public static fromJSON<T extends JWTEncodable>(
+    json: IJSONWebTokenAttrs,
+  ): JSONWebToken<T> {
     return plainToClass<JSONWebToken<T>, IJSONWebTokenAttrs>(JSONWebToken, json)
   }
 }
@@ -230,13 +245,16 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
  * @returns {Object} - Instantiated class based on defined map
  */
 
-const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: InteractionType): T => {
+const payloadToJWT = <T extends JWTEncodable>(
+  payload: IJWTEncodable,
+  typ: InteractionType,
+): T => {
   const payloadParserMap = {
     [InteractionType.CredentialsReceive]: CredentialsReceive,
     [InteractionType.CredentialOffer]: CredentialOffer,
     [InteractionType.CredentialRequest]: CredentialRequest,
     [InteractionType.CredentialResponse]: CredentialResponse,
-    // [InteractionType.Authentication]: Authentication 
+    // [InteractionType.Authentication]: Authentication
   }
 
   const correspondingClass = payloadParserMap[typ]
@@ -245,5 +263,8 @@ const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: Inter
     throw new Error('Interaction type not recognized!')
   }
 
-  return plainToClass<typeof correspondingClass, IJWTEncodable>(correspondingClass, payload)
+  return plainToClass<typeof correspondingClass, IJWTEncodable>(
+    correspondingClass,
+    payload,
+  )
 }

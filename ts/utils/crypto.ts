@@ -27,14 +27,13 @@ export function publicKeyToDID(publicKey: Buffer): string {
   return prefix + suffix.toString('hex')
 }
 
-
 /**
  * Generates a "random" sequence of bytes
  * @param nrOfBytes - The size of the output
  * @ignore
  */
 
- /* TODO Revert to previous implementation once compatibility issues are sorted */
+/* TODO Revert to previous implementation once compatibility issues are sorted */
 export function generateRandomID(nrOfBytes: number): string {
   return Math.random()
     .toString(16)

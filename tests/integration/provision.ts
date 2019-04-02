@@ -12,8 +12,8 @@ const ganacheServer = ganache.server({
   accounts: [
     { secretKey: deployerEthKey, balance },
     { secretKey: userEthKey, balance },
-    { secretKey: serviceEthKey, balance }
-  ]
+    { secretKey: serviceEthKey, balance },
+  ],
 })
 
 const daemonFactory = IPFSFactory.create({ type: 'go' })
@@ -27,7 +27,10 @@ const daemonFactory = IPFSFactory.create({ type: 'go' })
 const deployContract = async () => {
   web3.setProvider(new Web3.providers.HttpProvider(`http://localhost:${PORT}`))
   const deployerAddress = (await web3.eth.getAccounts())[0]
-  return registryContract.TestDeployment.deployIdentityContract(web3, deployerAddress)
+  return registryContract.TestDeployment.deployIdentityContract(
+    web3,
+    deployerAddress,
+  )
 }
 
 /**
@@ -42,7 +45,7 @@ const spawnIpfsNode = async () => {
       {
         exec: 'ipfs',
         disposable: true,
-        defaultAddrs: true
+        defaultAddrs: true,
       },
       (spawnErr, ipfsd) => {
         if (spawnErr) {
@@ -50,8 +53,8 @@ const spawnIpfsNode = async () => {
         }
 
         ipfsd.api.id(apiErr => (apiErr ? reject(apiErr) : resolve()))
-      }
-    )
+      },
+    ),
   )
 }
 

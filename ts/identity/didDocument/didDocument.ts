@@ -1,13 +1,27 @@
-import { plainToClass, classToPlain, Type, Exclude, Expose, Transform } from 'class-transformer'
+import {
+  plainToClass,
+  classToPlain,
+  Type,
+  Exclude,
+  Expose,
+  Transform,
+} from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
 import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
-import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections'
+import {
+  AuthenticationSection,
+  PublicKeySection,
+  ServiceEndpointsSection,
+} from './sections'
 import { ISigner } from '../../registries/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
 import { sha256, publicKeyToDID } from '../../utils/crypto'
-import { ILinkedDataSignature, IDigestable } from '../../linkedDataSignature/types'
+import {
+  ILinkedDataSignature,
+  IDigestable,
+} from '../../linkedDataSignature/types'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 
 /**
@@ -131,12 +145,13 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose()
-  @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
+  @Transform((value: Date) => value && value.toISOString(), {
+    toPlainOnly: true,
+  })
   @Transform((value: string) => value && new Date(value), { toClassOnly: true })
   get created(): Date {
     return this._created
   }
-
 
   /**
    * Set the creation date of the did document
@@ -156,7 +171,7 @@ export class DidDocument implements IDigestable {
   get signer(): ISigner {
     return {
       did: this._id,
-      keyId: this._proof.creator
+      keyId: this._proof.creator,
     }
   }
 
@@ -185,8 +200,10 @@ export class DidDocument implements IDigestable {
 
   @Expose()
   @Type(() => EcdsaLinkedDataSignature)
-  @Transform(value => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
-  get proof() : ILinkedDataSignature{
+  @Transform(value => value || new EcdsaLinkedDataSignature(), {
+    toClassOnly: true,
+  })
+  get proof(): ILinkedDataSignature {
     return this._proof
   }
 
@@ -247,8 +264,12 @@ export class DidDocument implements IDigestable {
 
     const didDocument = new DidDocument()
     didDocument.did = did
-    didDocument.addPublicKeySection(PublicKeySection.fromEcdsa(publicKey, keyId, did))
-    didDocument.addAuthSection(AuthenticationSection.fromEcdsa(didDocument.publicKey[0]))
+    didDocument.addPublicKeySection(
+      PublicKeySection.fromEcdsa(publicKey, keyId, did),
+    )
+    didDocument.addAuthSection(
+      AuthenticationSection.fromEcdsa(didDocument.publicKey[0]),
+    )
     didDocument.prepareSignature(keyId)
 
     return didDocument
@@ -277,10 +298,10 @@ export class DidDocument implements IDigestable {
 
   public async digest(): Promise<Buffer> {
     const normalized = await this.normalize()
-    
+
     const docSectionDigest = sha256(Buffer.from(normalized))
     const proofSectionDigest = await this.proof.digest()
-    
+
     return sha256(Buffer.concat([proofSectionDigest, docSectionDigest]))
   }
 

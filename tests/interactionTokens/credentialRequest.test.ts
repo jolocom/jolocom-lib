@@ -1,5 +1,8 @@
 import { expect } from 'chai'
-import { CredentialRequest, constraintFunctions } from '../../ts/interactionTokens/credentialRequest'
+import {
+  CredentialRequest,
+  constraintFunctions,
+} from '../../ts/interactionTokens/credentialRequest'
 import { mockKeyId } from '../data/credential/signedCredential.data'
 import {
   credentialSet,
@@ -33,18 +36,26 @@ describe('CredentialRequest', () => {
 
   describe('ApplyConstraints', () => {
     it('Should correctly filter based empty constraint section', () => {
-      const simpleCredReq = CredentialRequest.fromJSON(emptyConstraintsRequestJSON)
-      expect(simpleCredReq.applyConstraints(credentialSet)).to.deep.eq(credentialSet)
+      const simpleCredReq = CredentialRequest.fromJSON(
+        emptyConstraintsRequestJSON,
+      )
+      expect(simpleCredReq.applyConstraints(credentialSet)).to.deep.eq(
+        credentialSet,
+      )
     })
 
     it('Should correctly handle undefined or unincluded constraints', () => {
-      const simpleCredReq = CredentialRequest.fromJSON(undefinedConstraintsRequestJSON)
+      const simpleCredReq = CredentialRequest.fromJSON(
+        undefinedConstraintsRequestJSON,
+      )
       expect(simpleCredReq.applyConstraints(credentialSet)).to.be.empty
     })
 
     it('Should correctly filter based on issuer', () => {
       const simpleCredReq = CredentialRequest.fromJSON(simpleCredRequestJSON)
-      expect(simpleCredReq.applyConstraints(credentialSet)).to.deep.eq([credentialSet[1]])
+      expect(simpleCredReq.applyConstraints(credentialSet)).to.deep.eq([
+        credentialSet[1],
+      ])
     })
   })
 
@@ -55,10 +66,18 @@ describe('CredentialRequest', () => {
     })
 
     it('Should correctly create constraint functions', () => {
-      expect(constraintFunctions.is('claim.id', mockKeyId)).to.deep.eq(expectedIsOutput)
-      expect(constraintFunctions.not('claim.id', mockKeyId)).to.deep.eq(expectedNotOutput)
-      expect(constraintFunctions.greater('issued', new Date(0))).to.deep.eq(expectedGreaterOutput)
-      expect(constraintFunctions.smaller('issued', new Date(100))).to.deep.eq(expectedSmallerOutput)
+      expect(constraintFunctions.is('claim.id', mockKeyId)).to.deep.eq(
+        expectedIsOutput,
+      )
+      expect(constraintFunctions.not('claim.id', mockKeyId)).to.deep.eq(
+        expectedNotOutput,
+      )
+      expect(constraintFunctions.greater('issued', new Date(0))).to.deep.eq(
+        expectedGreaterOutput,
+      )
+      expect(constraintFunctions.smaller('issued', new Date(100))).to.deep.eq(
+        expectedSmallerOutput,
+      )
     })
   })
 })

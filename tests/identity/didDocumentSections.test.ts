@@ -1,7 +1,10 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as crypto from 'crypto'
-import { PublicKeySection, AuthenticationSection } from '../../ts/identity/didDocument/sections'
+import {
+  PublicKeySection,
+  AuthenticationSection,
+} from '../../ts/identity/didDocument/sections'
 import {
   mockPubKeySectionCreationAttrs,
   mockPubKeySectionJSON,
@@ -9,7 +12,8 @@ import {
   mockPubProfServiceEndpointJSON,
 } from '../data/didDocumentSections.data'
 import {
-  ServiceEndpointsSection, generatePublicProfileServiceSection,
+  ServiceEndpointsSection,
+  generatePublicProfileServiceSection,
 } from '../../ts/identity/didDocument/sections/serviceEndpointsSection'
 import { mockDid, mockIpfsHash } from '../data/didDocument.data'
 const expect = chai.expect
@@ -21,7 +25,9 @@ describe('DidDocumentSections', () => {
 
   before(() => {
     clock = sinon.useFakeTimers()
-    sandbox.stub(crypto, 'randomBytes').returns(Buffer.from('1842fb5f567dd532', 'hex'))
+    sandbox
+      .stub(crypto, 'randomBytes')
+      .returns(Buffer.from('1842fb5f567dd532', 'hex'))
   })
 
   after(() => {
@@ -47,15 +53,27 @@ describe('DidDocumentSections', () => {
   })
 
   describe('Public profile ServiceEndpoint', () => {
-    const pubProfEndpSection = generatePublicProfileServiceSection(mockDid, mockIpfsHash)
+    const pubProfEndpSection = generatePublicProfileServiceSection(
+      mockDid,
+      mockIpfsHash,
+    )
 
     it('Should correctly instantiate from keyId and did', () => {
-      expect(pubProfEndpSection.toJSON()).to.deep.eq(mockPubProfServiceEndpointJSON)
+      expect(pubProfEndpSection.toJSON()).to.deep.eq(
+        mockPubProfServiceEndpointJSON,
+      )
     })
 
     it('Should correctly implement fromJSON', () => {
-      const serviceEndpointFromJson = ServiceEndpointsSection.fromJSON(mockPubProfServiceEndpointJSON)
-      const { description, serviceEndpoint, id, type } = mockPubProfServiceEndpointJSON
+      const serviceEndpointFromJson = ServiceEndpointsSection.fromJSON(
+        mockPubProfServiceEndpointJSON,
+      )
+      const {
+        description,
+        serviceEndpoint,
+        id,
+        type,
+      } = mockPubProfServiceEndpointJSON
 
       expect(serviceEndpointFromJson.description).to.eq(description)
       expect(serviceEndpointFromJson.serviceEndpoint).to.eq(serviceEndpoint)

@@ -16,7 +16,7 @@ export const JolocomLib = {
     fuelKeyWithEther,
     getIssuerPublicKey,
     validateDigestable,
-    validateDigestables
+    validateDigestables,
   },
   KeyTypes,
 }

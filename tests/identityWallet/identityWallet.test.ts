@@ -23,7 +23,9 @@ const expect = chai.expect
 /* Saves some space during stubbing, helper functions */
 
 const stubbedKeyProvider = {
-  signDigestable: sinon.stub().returns(Buffer.from(validSignedCredReqJWT.signature, 'hex'))
+  signDigestable: sinon
+    .stub()
+    .returns(Buffer.from(validSignedCredReqJWT.signature, 'hex')),
 } as IVaultedKeyProvider
 
 const stubbedCredential = {
@@ -46,8 +48,8 @@ describe('IdentityWallet', () => {
         vaultedKeyProvider: stubbedKeyProvider,
         publicKeyMetadata: {
           derivationPath: KeyTypes.jolocomIdentityKey,
-          keyId: mockKeyId
-        }
+          keyId: mockKeyId,
+        },
       })
 
       expect(iw.did).to.eq(mockDid)
@@ -61,7 +63,9 @@ describe('IdentityWallet', () => {
     let interactionToken
 
     before(() => {
-      stubCredCreate = sandbox.stub(SignedCredential, 'create').callsFake(() => stubbedCredential)
+      stubCredCreate = sandbox
+        .stub(SignedCredential, 'create')
+        .callsFake(() => stubbedCredential)
       spyFromJWTEncodable = sandbox.spy(JSONWebToken, 'fromJWTEncodable')
     })
 
@@ -81,18 +85,27 @@ describe('IdentityWallet', () => {
 
       expect(Object.keys(iw.create)).to.deep.eq(categories)
       expect(Object.keys(iw.create.interactionTokens)).to.deep.eq(flowTypes)
-      expect(Object.keys(iw.create.interactionTokens.request)).to.deep.eq(tokenTypesRequest)
-      expect(Object.keys(iw.create.interactionTokens.response)).to.deep.eq(tokenTypesResponse)
+      expect(Object.keys(iw.create.interactionTokens.request)).to.deep.eq(
+        tokenTypesRequest,
+      )
+      expect(Object.keys(iw.create.interactionTokens.response)).to.deep.eq(
+        tokenTypesResponse,
+      )
     })
 
     /* A bit hacky, but deep eq for functions is tricky. Should work most of the time */
 
     it('Should attempt to create credential', () => {
-      expect(iw.create.credential.toString()).to.eq(Credential.create.toString())
+      expect(iw.create.credential.toString()).to.eq(
+        Credential.create.toString(),
+      )
     })
 
     it('Should attempt to create signedCredential', async () => {
-      await iw.create.signedCredential(mockNameCredCreationAttrs, encryptionPass)
+      await iw.create.signedCredential(
+        mockNameCredCreationAttrs,
+        encryptionPass,
+      )
 
       sandbox.assert.calledOnce(stubCredCreate)
       sandbox.assert.calledWith(stubCredCreate, mockNameCredCreationAttrs)
@@ -101,10 +114,16 @@ describe('IdentityWallet', () => {
     /* All interaction tokens follow the same flow. Would still be good to cover all cases in the future. */
 
     it('Should attempt to create an interaction token', async () => {
-      interactionToken = await iw.create.interactionTokens.request.share(simpleCredRequestJSON, encryptionPass)
+      interactionToken = await iw.create.interactionTokens.request.share(
+        simpleCredRequestJSON,
+        encryptionPass,
+      )
 
       sandbox.assert.calledOnce(spyFromJWTEncodable)
-      sandbox.assert.calledWith(spyFromJWTEncodable, CredentialRequest.fromJSON(simpleCredRequestJSON))
+      sandbox.assert.calledWith(
+        spyFromJWTEncodable,
+        CredentialRequest.fromJSON(simpleCredRequestJSON),
+      )
     })
 
     it('Should create an interaction token as a response', async () => {
@@ -112,11 +131,13 @@ describe('IdentityWallet', () => {
       const interactionResponeToken = await iw.create.interactionTokens.response.share(
         credentialResponseJSON,
         encryptionPass,
-        decodedToken
+        decodedToken,
       )
 
       expect(interactionResponeToken.nonce).to.eq(decodedToken.nonce)
-      expect(interactionResponeToken.audience).to.eq(keyIdToDid(decodedToken.issuer))
+      expect(interactionResponeToken.audience).to.eq(
+        keyIdToDid(decodedToken.issuer),
+      )
     })
   })
 })
