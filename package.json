@@ -11,7 +11,8 @@
     "build": "tsc -p .",
     "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
     "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
-    "test:integration": "mocha --opts ./mocha.opts ./tests/**/*.integration.ts"
+    "test:integration": "mocha --opts ./mocha.opts ./tests/**/*.integration.ts",
+    "format": "eslint --fix --ext .ts ."
   },
   "nyc": {
     "include": [
@@ -80,7 +81,12 @@
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
     "@types/node": "^11.9.4",
+    "@typescript-eslint/eslint-plugin": "^1.5.0",
+    "@typescript-eslint/parser": "^1.5.0",
     "chai": "^4.2.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-prettier": "^3.0.1",
     "ganache-core": "^2.4.0",
     "ipfsd-ctl": "^0.42.0",
     "istanbul": "^0.4.5",
