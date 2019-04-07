@@ -231,19 +231,25 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
  */
 
 const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: InteractionType): T => {
-  const payloadParserMap = {
-    [InteractionType.CredentialsReceive]: CredentialsReceive,
-    [InteractionType.CredentialOffer]: CredentialOffer,
-    [InteractionType.CredentialRequest]: CredentialRequest,
-    [InteractionType.CredentialResponse]: CredentialResponse,
-    // [InteractionType.Authentication]: Authentication 
-  }
+  console.log(typ);
 
-  const correspondingClass = payloadParserMap[typ]
-
-  if (!correspondingClass) {
-    throw new Error('Interaction type not recognized!')
-  }
-
-  return plainToClass<typeof correspondingClass, IJWTEncodable>(correspondingClass, payload)
+  return instantiateInteraction(typ,
+                                c => plainToClass<T, IJWTEncodable>(c, payload)
+                               )
 }
+
+const instantiateInteraction = <T extends JWTEncodable>(typ: InteractionType, instantiator: (t) => T ) => {
+  switch (typ) {
+    case InteractionType.CredentialsReceive:
+      return instantiator(CredentialsReceive);
+    case InteractionType.CredentialOffer:
+      return instantiator(CredentialOffer);
+    case InteractionType.CredentialRequest:
+      return instantiator(CredentialRequest);
+    case InteractionType.CredentialResponse:
+      return instantiator(CredentialResponse);
+    case InteractionType.Authentication:
+      return instantiator(Authentication);
+  }
+  throw new Error('Invalid interaction type parameter value');
+};
