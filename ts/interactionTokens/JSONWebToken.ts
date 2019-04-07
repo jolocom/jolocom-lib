@@ -227,7 +227,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
  * @description - Instantiates a specific interaction class based on a key in the received JSON
  * @param payload - Interaction token in JSON form
  * @param typ - Interaction type
- * @returns {Object} - Instantiated class based on defined map
+ * @returns {Object} - Instantiated class based on the payload and the InteractionType typ
  */
 
 const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: InteractionType): T => {
@@ -238,6 +238,12 @@ const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: Inter
                                )
 }
 
+/*
+ * @description - Instantiates a specific interaction class based on a key in the received JSON
+ * @param typ - Interaction type
+ * @param instantiator - A function which takes a type and returns an instance of that type
+ * @returns {Object} - Instantiated class based on interactionType typ
+ */
 const instantiateInteraction = <T extends JWTEncodable>(typ: InteractionType, instantiator: (t) => T ) => {
   switch (typ) {
     case InteractionType.CredentialsReceive:
