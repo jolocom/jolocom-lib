@@ -240,6 +240,7 @@ const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: Inter
 
 /*
  * @description - Instantiates a specific interaction class based on a key in the received JSON
+ * the instantiator cannot be typed right now because 'typeof T' can't be used as a type
  * @param typ - Interaction type
  * @param instantiator - A function which takes a type and returns an instance of that type
  * @returns {Object} - Instantiated class based on interactionType typ
