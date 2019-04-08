@@ -11,8 +11,8 @@ import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
 import { CredentialsReceive } from './credentialsReceive'
 import { handleValidationStatus, keyIdToDid } from '../utils/helper'
-import {PaymentResponse} from './paymentResponse'
-import {PaymentRequest} from './paymentRequest'
+import { PaymentResponse } from './paymentResponse'
+import { PaymentRequest } from './paymentRequest'
 
 /* Local interfaces / types to save on typing later */
 
@@ -248,6 +248,7 @@ const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: Inter
  * @param instantiator - A function which takes a type and returns an instance of that type
  * @returns {Object} - Instantiated class based on interactionType typ
  */
+
 const instantiateInteraction = <T extends JWTEncodable>(typ: InteractionType, instantiator: (t) => T ) => {
   switch (typ) {
     case InteractionType.CredentialsReceive:
@@ -260,6 +261,10 @@ const instantiateInteraction = <T extends JWTEncodable>(typ: InteractionType, in
       return instantiator(CredentialResponse);
     case InteractionType.Authentication:
       return instantiator(Authentication);
+    case InteractionType.PaymentRequest:
+      return instantiator(PaymentRequest)
+    case InteractionType.PaymentResponse:
+      return instantiator(PaymentResponse)
   }
   throw new Error('Invalid interaction type parameter value');
 };
