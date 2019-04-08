@@ -231,25 +231,35 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
  * @description - Instantiates a specific interaction class based on a key in the received JSON
  * @param payload - Interaction token in JSON form
  * @param typ - Interaction type
- * @returns {Object} - Instantiated class based on defined map
+ * @returns {Object} - Instantiated class based on the payload and the InteractionType typ
  */
-/** @TODO use class transformer's discriminator */
+
 const payloadToJWT = <T extends JWTEncodable>(payload: IJWTEncodable, typ: InteractionType): T => {
-  const payloadParserMap = {
-    [InteractionType.CredentialsReceive]: CredentialsReceive,
-    [InteractionType.CredentialOffer]: CredentialOffer,
-    [InteractionType.CredentialRequest]: CredentialRequest,
-    [InteractionType.CredentialResponse]: CredentialResponse,
-    [InteractionType.PaymentRequest]: PaymentRequest,
-    [InteractionType.PaymentResponse]: PaymentResponse,
-    // [InteractionType.Authentication]: Authentication
-  }
-
-  const correspondingClass = payloadParserMap[typ]
-
-  if (!correspondingClass) {
-    throw new Error('Interaction type not recognized!')
-  }
-
-  return plainToClass<typeof correspondingClass, IJWTEncodable>(correspondingClass, payload)
+  return instantiateInteraction(
+    typ,
+    c => plainToClass<T, IJWTEncodable>(c, payload)
+  )
 }
+
+/*
+ * @description - Instantiates a specific interaction class based on a key in the received JSON
+ * the instantiator cannot be typed right now because 'typeof T' can't be used as a type
+ * @param typ - Interaction type
+ * @param instantiator - A function which takes a type and returns an instance of that type
+ * @returns {Object} - Instantiated class based on interactionType typ
+ */
+const instantiateInteraction = <T extends JWTEncodable>(typ: InteractionType, instantiator: (t) => T ) => {
+  switch (typ) {
+    case InteractionType.CredentialsReceive:
+      return instantiator(CredentialsReceive);
+    case InteractionType.CredentialOffer:
+      return instantiator(CredentialOffer);
+    case InteractionType.CredentialRequest:
+      return instantiator(CredentialRequest);
+    case InteractionType.CredentialResponse:
+      return instantiator(CredentialResponse);
+    case InteractionType.Authentication:
+      return instantiator(Authentication);
+  }
+  throw new Error('Invalid interaction type parameter value');
+};
