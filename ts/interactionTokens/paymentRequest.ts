@@ -1,6 +1,6 @@
 import { classToPlain, plainToClass, Expose, Exclude } from 'class-transformer'
 import { IPaymentRequestAttrs } from './interactionTokens.types'
-import {ITransactionEncodable, ITransactionOptions} from '../contracts/types'
+import {ITransactionEncodable, TransactionOptions} from '../contracts/types'
 
 /**
  * @class
@@ -10,7 +10,7 @@ import {ITransactionEncodable, ITransactionOptions} from '../contracts/types'
 @Exclude()
 export class PaymentRequest implements ITransactionEncodable {
   private _callbackURL: string
-  private _transactionOptions: ITransactionOptions
+  private _transactionOptions: TransactionOptions
   private _description: string
 
   /**
@@ -18,12 +18,8 @@ export class PaymentRequest implements ITransactionEncodable {
    * defaults are used.
    */
   @Expose()
-  get transactionOptions(): ITransactionOptions {
-    return {
-      gasLimit: 21000,
-      gasPrice: 10e9,
-      ...this._transactionOptions
-    }
+  get transactionOptions(): TransactionOptions {
+    return this._transactionOptions
   }
 
   /**
@@ -36,7 +32,7 @@ export class PaymentRequest implements ITransactionEncodable {
    */
 
   set transactionOptions(
-    transactionOptions: ITransactionOptions
+    transactionOptions: TransactionOptions
   ) {
     this._transactionOptions = transactionOptions
   }

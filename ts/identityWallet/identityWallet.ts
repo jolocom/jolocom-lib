@@ -1,21 +1,23 @@
 import { BaseMetadata } from 'cred-types-jolocom-core'
 import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import {IIdentityWalletCreateArgs, PublicKeyMap} from './types'
+import {
+  AuthRequestCreationArgs,
+  CredentialOfferRequestCreationArgs,
+  CredentialOfferResponseCreationArgs,
+  CredentialShareRequestCreationArgs,
+  CredentialShareResponseCreationArgs,
+  IIdentityWalletCreateArgs,
+  PaymentRequestCreationArgs,
+  PaymentResponseCreationArgs,
+  PublicKeyMap
+} from './types'
 import { Identity } from '../identity/identity'
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
 import { CredentialOffer } from '../interactionTokens/credentialOffer'
 import {PaymentResponse} from '../interactionTokens/paymentResponse'
 import {PaymentRequest} from '../interactionTokens/paymentRequest'
-import {
-  ICredentialResponseAttrs,
-  ICredentialRequestAttrs,
-  ICredentialOfferAttrs,
-  IAuthenticationAttrs,
-  ICredentialsReceiveAttrs,
-  IPaymentResponseAttrs, IPaymentRequestAttrs
-} from '../interactionTokens/interactionTokens.types'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
@@ -187,7 +189,7 @@ export class IdentityWallet {
    */
 
   private createAuth = async (
-    authArgs: IAuthenticationAttrs,
+    authArgs: AuthRequestCreationArgs,
     pass: string,
     receivedJWT?: JSONWebToken<JWTEncodable>
   ) => {
@@ -205,7 +207,7 @@ export class IdentityWallet {
    */
 
   private createCredOffer = async (
-    credOffer: ICredentialOfferAttrs,
+    credOffer: CredentialOfferRequestCreationArgs,
     pass: string,
     receivedJWT?: JSONWebToken<JWTEncodable>
   ) => {
@@ -221,7 +223,7 @@ export class IdentityWallet {
    * @param pass - Password to decrypt the vaulted seed
    */
 
-  private createCredReq = async (credReq: ICredentialRequestAttrs, pass: string) => {
+  private createCredReq = async (credReq: CredentialShareRequestCreationArgs, pass: string) => {
     const credentialRequest = CredentialRequest.fromJSON(credReq)
     const jwt = JSONWebToken.fromJWTEncodable(credentialRequest)
     jwt.interactionType = InteractionType.CredentialRequest
@@ -236,7 +238,7 @@ export class IdentityWallet {
    */
 
   private createCredResp = async (
-    credResp: ICredentialResponseAttrs,
+    credResp: CredentialShareResponseCreationArgs,
     pass: string,
     receivedJWT: JSONWebToken<JWTEncodable>
   ) => {
@@ -253,7 +255,7 @@ export class IdentityWallet {
    * @param receivedJWT - received credential offer response JSONWebToken Class
   */
 
-  private createCredReceive = async (credReceive: ICredentialsReceiveAttrs, pass: string, receivedJWT: JSONWebToken<JWTEncodable>) => {
+  private createCredReceive = async (credReceive: CredentialOfferResponseCreationArgs, pass: string, receivedJWT: JSONWebToken<JWTEncodable>) => {
     const credentialReceieve = CredentialsReceive.fromJSON(credReceive)
     const jwt = JSONWebToken.fromJWTEncodable(credentialReceieve)
     jwt.interactionType = InteractionType.CredentialsReceive
@@ -289,17 +291,22 @@ export class IdentityWallet {
    * @param pass - Password to decrypt the vaulted seed
    */
 
-  private createPaymentReq = async (paymentReq: IPaymentRequestAttrs, pass: string) => {
-    const transactionOptions = Object.assign({}, paymentReq.transactionOptions)
+  private createPaymentReq = async (paymentReq: PaymentRequestCreationArgs, pass: string) => {
+    const { transactionOptions }  = paymentReq
 
-    if (!transactionOptions.to) {
-      const iwEthKey = this.getPublicKeys(pass).ethereumKey
-      transactionOptions.to = publicKeyToAddress(Buffer.from(iwEthKey, 'hex'))
-    }
-
+    // Assigning default values
     const paymentRequest = PaymentRequest.fromJSON({
       ...paymentReq,
-      transactionOptions: transactionOptions
+      transactionOptions: {
+        gasLimit: 21000,
+        gasPrice: 10e9,
+        to: transactionOptions.to
+          ? transactionOptions.to
+          : publicKeyToAddress(
+            Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex')
+          ),
+        ...transactionOptions
+      }
     })
 
     const jwt = JSONWebToken.fromJWTEncodable(paymentRequest)
@@ -315,7 +322,7 @@ export class IdentityWallet {
    */
 
   private createPaymentResp = async (
-    paymentResp: IPaymentResponseAttrs,
+    paymentResp: PaymentResponseCreationArgs,
     pass: string,
     receivedJWT: JSONWebToken<JWTEncodable>
   ) => {

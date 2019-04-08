@@ -1,12 +1,12 @@
 import { ISignedCredentialAttrs } from "../credentials/signedCredential/types"
-import {ITransactionOptions} from '../contracts/types'
+import {TransactionOptions} from '../contracts/types'
 
 /* Creation attributes. Same as JSON form */
 
 export interface IPaymentRequestAttrs {
   callbackURL: string
   description: string
-  transactionOptions: ITransactionOptions
+  transactionOptions: TransactionOptions
 }
 
 export interface IPaymentResponseAttrs {

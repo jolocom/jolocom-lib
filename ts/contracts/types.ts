@@ -29,13 +29,12 @@ export interface IContractsGateway {
 }
 
 export interface ITransactionEncodable {
-  transactionOptions: ITransactionOptions
+  transactionOptions: TransactionOptions
 }
 
-export interface ITransactionOptions {
+export type TransactionOptions = {
   value: number,
-  to?: string,
-  gasLimit?: number,
-  gasPrice?: number
+  to: string,
+  gasLimit: number,
+  gasPrice: number
 }
-
