@@ -3,12 +3,12 @@ import { IAuthenticationAttrs } from './interactionTokens.types'
 
 /**
  * @class
- * Class containing a challenge string and callbackURL for challenge-response did authentication, 
+ * Class containing a challenge string and callbackURL for challenge-response did authentication,
  * encodable as a JWT
  * @ignore
  */
 
- @Exclude()
+@Exclude()
 export class Authentication {
   private _callbackURL: string
 
@@ -18,7 +18,7 @@ export class Authentication {
    */
 
   @Expose()
-  get callbackURL (): string {
+  get callbackURL(): string {
     return this._callbackURL
   }
 

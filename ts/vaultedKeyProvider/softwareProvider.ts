@@ -12,7 +12,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param seed - 32 byte seed for creating bip32 wallet
    * @param encryptionPass - password used to generate encryption cipher
    * @example `const vault = new SoftwareKeyProvider(Buffer.from('abc...', 'hex'), 'secret')`
-  */
+   */
 
   constructor(seed: Buffer, encryptionPass: string) {
     this.encryptedSeed = this.encrypt(encryptionPass, seed)
@@ -22,7 +22,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * Derives and returns child public key at specified path
    * @param derivationArgs - Password for seed decryption and derivation path
    * @example `vault.getPublicKey({derivationPath: ..., decryptionPass: ...}) // Buffer <...>`
-  */
+   */
 
   public getPublicKey(derivationArgs: IKeyDerivationArgs): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
@@ -34,7 +34,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * Returns N bytes of random data
    * @param nrBytes - Number of bytes to verify
    * @example `vault.getRandom(32) // Buffer <...>`
-  */
+   */
 
   // TODO - Use csprng implementation
   public static getRandom(nr): Buffer {
@@ -46,7 +46,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param derivationArgs - Password for seed decryption and derivation path
    * @param digest - The data to sign, 256 bits
    * @example `vault.sign({derivationPath: ..., decryptionPass: ...}, Buffer <...>) // Buffer <...>`
-  */
+   */
 
   public sign(derivationArgs: IKeyDerivationArgs, digest: Buffer): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
@@ -61,9 +61,13 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param signature - The signature to verify
    * @param publicKey - The signer's public key
    * @example `SoftwareKeyProvider.verify(digest, publicKey, signature) // true`
-  */
+   */
 
-  public static verify(digest: Buffer, publicKey: Buffer, signature: Buffer): boolean {
+  public static verify(
+    digest: Buffer,
+    publicKey: Buffer,
+    signature: Buffer,
+  ): boolean {
     return eccVerify(digest, publicKey, signature)
   }
 
@@ -72,7 +76,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @deprecated Will be removed in next major release, currently used for signing Ethereum transactions
    * @param derivationArgs - Password for seed decryption and derivation path
    * @example `vault.getPrivateKey({derivationPath: ..., decryptionPass: ...}) // Buffer <...>`
-  */
+   */
 
   public getPrivateKey(derivationArgs: IKeyDerivationArgs) {
     const { encryptionPass, derivationPath } = derivationArgs
@@ -89,9 +93,12 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param derivationArgs.encryptionPass - The encryption password
    * @param derivationArgs.derivationPath - The bip32 derivation path
    * @example `await vault.signDigestable(derivationArgs, publicProfileCredential) // Buffer <...>`
-  */
+   */
 
-  public async signDigestable(derivationArgs: IKeyDerivationArgs, toSign: IDigestable): Promise<Buffer> {
+  public async signDigestable(
+    derivationArgs: IKeyDerivationArgs,
+    toSign: IDigestable,
+  ): Promise<Buffer> {
     const digest = await toSign.digest()
     return this.sign(derivationArgs, digest)
   }
@@ -103,7 +110,10 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `await SoftwareKeyProvider.verifyDigestable(publicKey, publicProfileSignedCredential) // true`
    */
 
-  public static async verifyDigestable(publicKey: Buffer, toVerify: IDigestable): Promise<boolean> {
+  public static async verifyDigestable(
+    publicKey: Buffer,
+    toVerify: IDigestable,
+  ): Promise<boolean> {
     const digest = await toVerify.digest()
     const signature = Buffer.from(toVerify.signature, 'hex')
     return SoftwareKeyProvider.verify(digest, publicKey, signature)
@@ -114,7 +124,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param data - The data to encrypt
    * @param password - The encrpyion password
    * @example `this.encrypt('secret', Buffer.from('abc..fe', 'hex'))`
-  */
+   */
 
   private encrypt(password: string, data: Buffer): Buffer {
     const cipher = createCipher('aes-256-cbc', password)
@@ -126,7 +136,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param data - The data to dencrypt
    * @param password - The dencrpyion password
    * @example `this.dencrypt('secret', encrypted)`
-  */
+   */
 
   private decrypt(password: string, data: Buffer): Buffer {
     const decipher = createDecipher('aes-256-cbc', password)

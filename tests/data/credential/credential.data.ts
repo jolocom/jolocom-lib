@@ -35,7 +35,8 @@ const nestedAddressClaimMetadata: INestedAddressClaimInterface = {
 
 /* Defining mock user data to reuse later */
 
-const mockSubject = 'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+const mockSubject =
+  'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 const mockEmail = 'test@jolocom.io'
 const mockName = {
   givenName: 'MockName',
@@ -92,7 +93,8 @@ export const emailCredentialJSON = {
     {
       email: 'schema:email',
       schema: 'http://schema.org/',
-      ProofOfEmailCredential: 'https://identity.jolocom.com/terms/ProofOfEmailCredential',
+      ProofOfEmailCredential:
+        'https://identity.jolocom.com/terms/ProofOfEmailCredential',
     },
   ],
   type: ['Credential', 'ProofOfEmailCredential'],
@@ -107,7 +109,8 @@ export const nameCredentialJSON = {
   '@context': [
     ...defaultContext,
     {
-      ProofOfNameCredential: 'https://identity.jolocom.com/terms/ProofOfNameCredential',
+      ProofOfNameCredential:
+        'https://identity.jolocom.com/terms/ProofOfNameCredential',
       familyName: 'schema:familyName',
       givenName: 'schema:givenName',
       schema: 'http://schema.org/',
@@ -122,7 +125,11 @@ export const nameCredentialJSON = {
 }
 
 export const birthdayCredentialJSON = {
-  '@context': [...defaultContext, 'http://test.com', { test: 'http://test.com/terms' }],
+  '@context': [
+    ...defaultContext,
+    'http://test.com',
+    { test: 'http://test.com/terms' },
+  ],
   type: ['Credential', 'MockCredential'],
   claim: {
     ...mockBirthday,
@@ -132,7 +139,11 @@ export const birthdayCredentialJSON = {
 }
 
 export const addressCredentialJSON = {
-  '@context': [...defaultContext, 'http://test.com', { test: 'http://test.com/terms' }],
+  '@context': [
+    ...defaultContext,
+    'http://test.com',
+    { test: 'http://test.com/terms' },
+  ],
   type: ['Credential', 'ProofOfAddressCredential'],
   claim: {
     ...mockAddress,

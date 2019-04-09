@@ -1,19 +1,17 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import {
-  userPass,
-  servicePass,
-} from './integration.data'
+import { userPass, servicePass } from './integration.data'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  jolocomRegistry, testContractsGateway
+  jolocomRegistry,
+  testContractsGateway,
 } from './identity.integration'
 import { publicKeyToAddress } from '../../ts/utils/helper'
 import { PaymentRequest } from '../../ts/interactionTokens/paymentRequest'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { PaymentResponse } from '../../ts/interactionTokens/paymentResponse'
-import {PaymentRequestCreationArgs} from '../../ts/identityWallet/types'
+import { PaymentRequestCreationArgs } from '../../ts/identityWallet/types'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -30,12 +28,12 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       description: 'Payment for monthly subscription to awesome service',
       transactionOptions: {
         value: 0.5e18, // 0.5 Ether in Wei
-      }
+      },
     }
 
     paymentRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.payment(
       paymentReqCreationArgs,
-      servicePass
+      servicePass,
     )
 
     paymentRequestEncoded = paymentRequestJWT.encode()
@@ -51,25 +49,25 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
           to: '0x10ed0857fd6d752f2089a6b0d3fe7f0392e046e0', // Defaulted to service's eth addr.
           gasLimit: 21e3,
           gasPrice: 10e9,
-        }
-      })
+        },
+      }),
     )
   })
 
   it('Should allow for consumption of valid payment request by user', async () => {
     const decodedPaymentRequest = JSONWebToken.decode<PaymentRequest>(
-      paymentRequestEncoded
+      paymentRequestEncoded,
     )
 
     expect(decodedPaymentRequest.interactionToken).to.be.instanceOf(
-      PaymentRequest
+      PaymentRequest,
     )
 
     try {
       await serviceIdentityWallet.validateJWT(
         decodedPaymentRequest,
         null,
-        jolocomRegistry
+        jolocomRegistry,
       )
     } catch (err) {
       expect(true).to.be.false
@@ -78,12 +76,12 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
 
   it('Should create a payment response by user', async () => {
     const decodedPaymentRequest = JSONWebToken.decode<PaymentRequest>(
-      paymentRequestEncoded
+      paymentRequestEncoded,
     )
 
     const receipt = await userIdentityWallet.transactions.sendTransaction(
       decodedPaymentRequest.interactionToken,
-      userPass
+      userPass,
     )
 
     expect(receipt.length).to.equal(66)
@@ -92,28 +90,30 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     paymentResponseJWT = await userIdentityWallet.create.interactionTokens.response.payment(
       { txHash: receipt },
       userPass,
-      decodedPaymentRequest
+      decodedPaymentRequest,
     )
 
     paymentResponseEncoded = paymentResponseJWT.encode()
 
-    expect(paymentResponseJWT.interactionToken).to.be.instanceOf(PaymentResponse)
+    expect(paymentResponseJWT.interactionToken).to.be.instanceOf(
+      PaymentResponse,
+    )
     expect(paymentResponseJWT.interactionToken.txHash).to.equal(receipt)
   })
 
   it('Should allow for consumption of valid payment response by service', async () => {
     const decodedPaymentResponse = JSONWebToken.decode<PaymentResponse>(
-      paymentResponseEncoded
+      paymentResponseEncoded,
     )
     expect(decodedPaymentResponse.interactionToken).to.be.instanceOf(
-      PaymentResponse
+      PaymentResponse,
     )
 
     try {
       await serviceIdentityWallet.validateJWT(
         decodedPaymentResponse,
         paymentRequestJWT,
-        jolocomRegistry
+        jolocomRegistry,
       )
     } catch (err) {
       console.log('ERROR: ', err)
@@ -123,7 +123,8 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
 
   it('Should transfer the funds and correctly increment the nonce', async () => {
     const userPubKey = userIdentityWallet.getPublicKeys(userPass).ethereumKey
-    const servicePubKey = serviceIdentityWallet.getPublicKeys(servicePass).ethereumKey
+    const servicePubKey = serviceIdentityWallet.getPublicKeys(servicePass)
+      .ethereumKey
 
     const userAddr = publicKeyToAddress(Buffer.from(userPubKey, 'hex'))
     const serviceAddr = publicKeyToAddress(Buffer.from(servicePubKey, 'hex'))

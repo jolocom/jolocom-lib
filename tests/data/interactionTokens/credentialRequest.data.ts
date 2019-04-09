@@ -1,10 +1,20 @@
-import { emailVerifiableCredential, mockIssuerDid, mockKeyId } from '../credential/signedCredential.data'
+import {
+  emailVerifiableCredential,
+  mockIssuerDid,
+  mockKeyId,
+} from '../credential/signedCredential.data'
 
 /* Used to test if matching against issuer works */
 
 const invalidIssuer = 'did:jolo:16661'
-const tweakedEmailVerifiableCredential = { ...emailVerifiableCredential, issuer: invalidIssuer }
-export const credentialSet = [tweakedEmailVerifiableCredential, emailVerifiableCredential]
+const tweakedEmailVerifiableCredential = {
+  ...emailVerifiableCredential,
+  issuer: invalidIssuer,
+}
+export const credentialSet = [
+  tweakedEmailVerifiableCredential,
+  emailVerifiableCredential,
+]
 
 /* Defining JSON fixtures for testing fromJSON, toJSON methods */
 

@@ -1,9 +1,9 @@
 import * as ganache from 'ganache-core'
 import * as registryContract from 'jolocom-registry-contract'
 import { userEthKey, serviceEthKey, deployerEthKey } from './integration.data'
-import {ContractsGateway} from '../../ts/contracts/contractsGateway'
-import {ContractsAdapter} from '../../ts/contracts/contractsAdapter'
-import {ethers} from 'ethers'
+import { ContractsGateway } from '../../ts/contracts/contractsGateway'
+import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import { ethers } from 'ethers'
 const Web3 = require('web3')
 const IPFSFactory = require('ipfsd-ctl')
 
@@ -17,8 +17,8 @@ const ganacheServer = ganache.server({
   accounts: [
     { secretKey: deployerEthKey, balance },
     { secretKey: userEthKey, balance },
-    { secretKey: serviceEthKey, balance }
-  ]
+    { secretKey: serviceEthKey, balance },
+  ],
 })
 
 const daemonFactory = IPFSFactory.create({ type: 'go' })
@@ -31,7 +31,10 @@ const daemonFactory = IPFSFactory.create({ type: 'go' })
 
 const deployContract = async () => {
   const deployerAddress = (await web3.eth.getAccounts())[0]
-  return registryContract.TestDeployment.deployIdentityContract(web3, deployerAddress)
+  return registryContract.TestDeployment.deployIdentityContract(
+    web3,
+    deployerAddress,
+  )
 }
 
 /**
@@ -46,7 +49,7 @@ const spawnIpfsNode = async () => {
       {
         exec: 'ipfs',
         disposable: true,
-        defaultAddrs: true
+        defaultAddrs: true,
       },
       (spawnErr, ipfsd) => {
         if (spawnErr) {
@@ -54,8 +57,8 @@ const spawnIpfsNode = async () => {
         }
 
         ipfsd.api.id(apiErr => (apiErr ? reject(apiErr) : resolve()))
-      }
-    )
+      },
+    ),
   )
 }
 
@@ -65,7 +68,7 @@ const spawnIpfsNode = async () => {
  * @returns {void}
  */
 
-type ContractClassess = {
+interface ContractClassess {
   testContractsGateway: ContractsGateway
   testContractsAdapter: ContractsAdapter
 }
@@ -80,12 +83,14 @@ export const init = async () =>
       await deployContract()
       await spawnIpfsNode()
 
-      const testContractsGateway = new ContractsGateway(new ethers.providers.Web3Provider(web3.currentProvider))
+      const testContractsGateway = new ContractsGateway(
+        new ethers.providers.Web3Provider(web3.currentProvider),
+      )
       const testContractsAdapter = new ContractsAdapter()
 
       return resolve({
         testContractsGateway,
-        testContractsAdapter
+        testContractsAdapter,
       })
     })
   })

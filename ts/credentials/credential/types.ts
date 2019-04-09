@@ -15,7 +15,7 @@ export type ClaimEntry = ClaimType | ClaimInterface
  *  familyName: 'Example'
  * }
  * ```
- * 
+ *
  * @param id - The did of the credential subject
  */
 export interface IClaimSection {

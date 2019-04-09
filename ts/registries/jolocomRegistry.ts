@@ -1,21 +1,28 @@
 import { IIpfsConnector } from '../ipfs/types'
-import { IEthereumConnector} from '../ethereum/types'
+import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
-import { IRegistryCommitArgs, IRegistryStaticCreationArgs, IRegistry } from './types'
+import {
+  IRegistryCommitArgs,
+  IRegistryStaticCreationArgs,
+  IRegistry,
+} from './types'
 import { jolocomIpfsStorageAgent } from '../ipfs/ipfs'
 import { jolocomEthereumResolver } from '../ethereum/ethereum'
 import { publicKeyToDID } from '../utils/crypto'
-import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/types'
+import {
+  IVaultedKeyProvider,
+  IKeyDerivationArgs,
+} from '../vaultedKeyProvider/types'
 import { KeyTypes } from '../vaultedKeyProvider/types'
 import { generatePublicProfileServiceSection } from '../identity/didDocument/sections/serviceEndpointsSection'
-import {jolocomContractsAdapter} from '../contracts/contractsAdapter'
-import {IContractsAdapter, IContractsGateway} from '../contracts/types'
-import {jolocomContractsGateway} from '../contracts/contractsGateway'
+import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
+import { IContractsAdapter, IContractsGateway } from '../contracts/types'
+import { jolocomContractsGateway } from '../contracts/contractsGateway'
 
 /**
  * @class
@@ -35,18 +42,24 @@ export class JolocomRegistry implements IRegistry {
    * @example `const identityWallet = await registry.create(vaultedProvider, 'password')`
    */
 
-  public async create(vaultedKeyProvider: IVaultedKeyProvider, decryptionPassword: string): Promise<IdentityWallet> {
+  public async create(
+    vaultedKeyProvider: IVaultedKeyProvider,
+    decryptionPassword: string,
+  ): Promise<IdentityWallet> {
     const { jolocomIdentityKey, ethereumKey } = KeyTypes
 
     const derivationArgs = {
       derivationPath: jolocomIdentityKey,
-      encryptionPass: decryptionPassword
+      encryptionPass: decryptionPassword,
     }
 
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
 
     const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
-    const didDocumentSignature = await vaultedKeyProvider.signDigestable(derivationArgs, didDocument)
+    const didDocumentSignature = await vaultedKeyProvider.signDigestable(
+      derivationArgs,
+      didDocument,
+    )
 
     didDocument.signature = didDocumentSignature.toString('hex')
     const identity = Identity.fromDidDocument({ didDocument })
@@ -56,10 +69,10 @@ export class JolocomRegistry implements IRegistry {
       vaultedKeyProvider,
       publicKeyMetadata: {
         derivationPath: jolocomIdentityKey,
-        keyId: didDocument.publicKey[0].id
+        keyId: didDocument.publicKey[0].id,
       },
       contractsAdapter: this.contractsAdapter,
-      contractsGateway: this.contractsGateway
+      contractsGateway: this.contractsGateway,
     })
 
     await this.commit({
@@ -67,8 +80,8 @@ export class JolocomRegistry implements IRegistry {
       vaultedKeyProvider,
       keyMetadata: {
         encryptionPass: decryptionPassword,
-        derivationPath: ethereumKey
-      }
+        derivationPath: ethereumKey,
+      },
     })
 
     return identityWallet
@@ -95,8 +108,14 @@ export class JolocomRegistry implements IRegistry {
 
     try {
       if (publicProfile) {
-        const publicProfileHash = await this.ipfsConnector.storeJSON({ data: publicProfile.toJSON(), pin: true })
-        const publicProfileSection = generatePublicProfileServiceSection(didDocument.did, publicProfileHash)
+        const publicProfileHash = await this.ipfsConnector.storeJSON({
+          data: publicProfile.toJSON(),
+          pin: true,
+        })
+        const publicProfileSection = generatePublicProfileServiceSection(
+          didDocument.did,
+          publicProfileHash,
+        )
         didDocument.addServiceEndpoint(publicProfileSection)
       }
 
@@ -104,16 +123,21 @@ export class JolocomRegistry implements IRegistry {
         didDocument.resetServiceEndpoints()
       }
 
-      const ipfsHash = await this.ipfsConnector.storeJSON({ data: didDocument.toJSON(), pin: true })
+      const ipfsHash = await this.ipfsConnector.storeJSON({
+        data: didDocument.toJSON(),
+        pin: true,
+      })
       const privateEthKey = vaultedKeyProvider.getPrivateKey(keyMetadata)
 
       await this.ethereumConnector.updateDIDRecord({
         ethereumKey: privateEthKey,
         did: didDocument.did,
-        newHash: ipfsHash
+        newHash: ipfsHash,
       })
     } catch (error) {
-      throw new Error(`Error occured while persisting identity data: ${error.message}`)
+      throw new Error(
+        `Error occured while persisting identity data: ${error.message}`,
+      )
     }
   }
 
@@ -131,16 +155,21 @@ export class JolocomRegistry implements IRegistry {
         throw new Error('No record for DID found.')
       }
 
-      const didDocument = DidDocument.fromJSON((await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs)
+      const didDocument = DidDocument.fromJSON(
+        (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs,
+      )
 
-      const publicProfileSection = didDocument.service.find(endpoint => endpoint.type === 'JolocomPublicProfile')
+      const publicProfileSection = didDocument.service.find(
+        endpoint => endpoint.type === 'JolocomPublicProfile',
+      )
 
       const publicProfile =
-        publicProfileSection && (await this.fetchPublicProfile(publicProfileSection.serviceEndpoint))
+        publicProfileSection &&
+        (await this.fetchPublicProfile(publicProfileSection.serviceEndpoint))
 
       return Identity.fromDidDocument({
         didDocument,
-        publicProfile
+        publicProfile,
       })
     } catch (error) {
       throw new Error(`Could not retrieve DID Document. ${error.message}`)
@@ -158,7 +187,7 @@ export class JolocomRegistry implements IRegistry {
 
   public async authenticate(
     vaultedKeyProvider: IVaultedKeyProvider,
-    derivationArgs: IKeyDerivationArgs
+    derivationArgs: IKeyDerivationArgs,
   ): Promise<IdentityWallet> {
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
     const did = publicKeyToDID(publicIdentityKey)
@@ -166,7 +195,7 @@ export class JolocomRegistry implements IRegistry {
 
     const publicKeyMetadata = {
       derivationPath: derivationArgs.derivationPath,
-      keyId: identity.publicKeySection[0].id
+      keyId: identity.publicKeySection[0].id,
     }
 
     return new IdentityWallet({
@@ -174,7 +203,7 @@ export class JolocomRegistry implements IRegistry {
       identity,
       publicKeyMetadata,
       contractsGateway: this.contractsGateway,
-      contractsAdapter: this.contractsAdapter
+      contractsAdapter: this.contractsAdapter,
     })
   }
 
@@ -187,7 +216,9 @@ export class JolocomRegistry implements IRegistry {
 
   public async fetchPublicProfile(entry: string): Promise<SignedCredential> {
     const hash = entry.replace('ipfs://', '')
-    const publicProfile = (await this.ipfsConnector.catJSON(hash)) as ISignedCredentialAttrs
+    const publicProfile = (await this.ipfsConnector.catJSON(
+      hash,
+    )) as ISignedCredentialAttrs
 
     return SignedCredential.fromJSON(publicProfile)
   }
@@ -223,11 +254,11 @@ export const createJolocomRegistry = (
     ethereumConnector: jolocomEthereumResolver,
     contracts: {
       adapter: jolocomContractsAdapter,
-      gateway: jolocomContractsGateway
-    }
-  }
+      gateway: jolocomContractsGateway,
+    },
+  },
 ): JolocomRegistry => {
-  const {ipfsConnector, contracts, ethereumConnector} = configuration
+  const { ipfsConnector, contracts, ethereumConnector } = configuration
   const jolocomRegistry = new JolocomRegistry()
 
   jolocomRegistry.ipfsConnector = ipfsConnector

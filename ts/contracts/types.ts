@@ -1,12 +1,12 @@
-import {IVaultedKeyProvider} from '../vaultedKeyProvider/types'
-import {BigNumber} from 'ethers/utils'
+import { IVaultedKeyProvider } from '../vaultedKeyProvider/types'
+import { BigNumber } from 'ethers/utils'
 
-type AddressInfo = {
+interface AddressInfo {
   nonce: number
   balance: BigNumber
 }
 
-type ContractsGatewayInfo = {
+interface ContractsGatewayInfo {
   name: string
   chainId: number
   endpoint: string
@@ -18,7 +18,7 @@ export interface IContractsAdapter {
     from: string,
     nonce: number,
     vault: IVaultedKeyProvider,
-    pass: string
+    pass: string,
   ) => string
 }
 
@@ -32,9 +32,9 @@ export interface ITransactionEncodable {
   transactionOptions: TransactionOptions
 }
 
-export type TransactionOptions = {
-  value: number,
-  to: string,
-  gasLimit: number,
+export interface TransactionOptions {
+  value: number
+  to: string
+  gasLimit: number
   gasPrice: number
 }

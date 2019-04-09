@@ -3,7 +3,7 @@ import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { Identity } from '../../ts/identity/identity'
-import { didDocumentJSON, mockKeyId, } from '../data/didDocument.data'
+import { didDocumentJSON, mockKeyId } from '../data/didDocument.data'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
@@ -13,13 +13,13 @@ import {
   validSignedCredReqJWT,
   validSignedCredResJWT,
   invalidNonce,
-  validNonce
+  validNonce,
 } from '../data/interactionTokens/jsonWebToken.data'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
 import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
-import {jolocomContractsAdapter} from '../../ts/contracts/contractsAdapter'
-import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
+import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
 chai.use(sinonChai)
 const expect = chai.expect
 
@@ -34,7 +34,9 @@ describe('IdentityWallet validate JWT', () => {
 
   before(() => {
     sinon.useFakeTimers()
-    sandbox.stub(JolocomRegistry.prototype, 'resolve').resolves(Identity.fromDidDocument({ didDocument }))
+    sandbox
+      .stub(JolocomRegistry.prototype, 'resolve')
+      .resolves(Identity.fromDidDocument({ didDocument }))
     iw = new IdentityWallet({
       identity,
       vaultedKeyProvider: vault,
@@ -43,7 +45,7 @@ describe('IdentityWallet validate JWT', () => {
         keyId: mockKeyId,
       },
       contractsAdapter: jolocomContractsAdapter,
-      contractsGateway: jolocomContractsGateway
+      contractsGateway: jolocomContractsGateway,
     })
   })
 
@@ -72,7 +74,10 @@ describe('IdentityWallet validate JWT', () => {
   it('Should thow error on invalid nonce', async () => {
     validSignedCredReqJWT.payload.jti = invalidNonce
     try {
-      await iw.validateJWT(JSONWebToken.fromJSON(validSignedCredResJWT), JSONWebToken.fromJSON(validSignedCredReqJWT))
+      await iw.validateJWT(
+        JSONWebToken.fromJSON(validSignedCredResJWT),
+        JSONWebToken.fromJSON(validSignedCredReqJWT),
+      )
     } catch (err) {
       validSignedCredReqJWT.payload.jti = validNonce
       expect(err.message).to.eq('The token nonce deviates from request')

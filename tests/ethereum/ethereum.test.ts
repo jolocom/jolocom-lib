@@ -14,7 +14,7 @@ describe('EthResolver', () => {
 
   let eth = new EthResolver({
     contractAddress: mockAddr,
-    providerUrl: mockEndp
+    providerUrl: mockEndp,
   })
 
   let stubbedResolve
@@ -38,9 +38,13 @@ describe('EthResolver', () => {
     eth.updateDIDRecord({
       ethereumKey: testPrivateEthereumKey,
       did: mockIssuerDid,
-      newHash: testHash
+      newHash: testHash,
     })
 
-    expect(stubbedUpdate.getCall(0).args).to.deep.eq([testPrivateEthereumKey, mockIssuerDid, testHash])
+    expect(stubbedUpdate.getCall(0).args).to.deep.eq([
+      testPrivateEthereumKey,
+      mockIssuerDid,
+      testHash,
+    ])
   })
 })

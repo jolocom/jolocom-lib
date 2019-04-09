@@ -6,7 +6,7 @@ import {
   IExposedConstraintFunctions,
   ICredentialRequest,
   IConstraint,
-  Operator
+  Operator,
 } from './interactionTokens.types'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
@@ -74,10 +74,12 @@ export class CredentialRequest {
    * @example `const validCredentials = credentialRequest.applyConstraints(allCredentials)`
    */
 
-  public applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[] {
+  public applyConstraints(
+    credentials: ISignedCredentialAttrs[],
+  ): ISignedCredentialAttrs[] {
     return credentials.filter(credential => {
       const relevantConstraints = this.credentialRequirements.find(section =>
-        areCredTypesEqual(section.type, credential.type)
+        areCredTypesEqual(section.type, credential.type),
       )
 
       if (!relevantConstraints) {
@@ -122,8 +124,10 @@ export class CredentialRequest {
 export const constraintFunctions: IExposedConstraintFunctions = {
   is: (field: string, value: string) => assembleStatement('==', field, value),
   not: (field: string, value: string) => assembleStatement('!=', field, value),
-  greater: (field: string, value: Comparable) => assembleStatement('>', field, value),
-  smaller: (field: string, value: Comparable) => assembleStatement('<', field, value)
+  greater: (field: string, value: Comparable) =>
+    assembleStatement('>', field, value),
+  smaller: (field: string, value: Comparable) =>
+    assembleStatement('<', field, value),
 }
 
 /**
@@ -134,7 +138,11 @@ export const constraintFunctions: IExposedConstraintFunctions = {
  * @ignore
  */
 
-const assembleStatement = (operator: Operator, field: string, value: string | Comparable): IConstraint => {
+const assembleStatement = (
+  operator: Operator,
+  field: string,
+  value: string | Comparable,
+): IConstraint => {
   return { [operator]: [{ var: field }, value] } as IConstraint
 }
 

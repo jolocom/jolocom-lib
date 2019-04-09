@@ -9,7 +9,10 @@ export interface IVaultedKeyProvider {
   getPublicKey: (derivationArgs: IKeyDerivationArgs) => Buffer
   getPrivateKey: (derivationArgs: IKeyDerivationArgs) => Buffer
   sign: (derivationArgs: IKeyDerivationArgs, digest: Buffer) => Buffer
-  signDigestable: (derivationArgs: IKeyDerivationArgs, toSign: IDigestable) => Promise<Buffer>
+  signDigestable: (
+    derivationArgs: IKeyDerivationArgs,
+    toSign: IDigestable,
+  ) => Promise<Buffer>
 }
 
 export interface IKeyDerivationArgs {

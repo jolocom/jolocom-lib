@@ -1,11 +1,14 @@
 import { Identity } from '../identity/identity'
-import {IVaultedKeyProvider, KeyTypes} from '../vaultedKeyProvider/types'
+import { IVaultedKeyProvider, KeyTypes } from '../vaultedKeyProvider/types'
 import { IKeyMetadata } from '../credentials/signedCredential/types'
-import {IContractsAdapter, IContractsGateway} from '../contracts/types'
+import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import {
   IAuthenticationAttrs,
   ICredentialOfferAttrs,
-  ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs, IPaymentResponseAttrs
+  ICredentialRequestAttrs,
+  ICredentialResponseAttrs,
+  ICredentialsReceiveAttrs,
+  IPaymentResponseAttrs,
 } from '../interactionTokens/interactionTokens.types'
 
 export interface IIdentityWalletCreateArgs {
@@ -16,23 +19,23 @@ export interface IIdentityWalletCreateArgs {
   contractsGateway: IContractsGateway
 }
 
-export type PublicKeyMap = {[key in keyof typeof KeyTypes]?: string}
+export type PublicKeyMap = { [key in keyof typeof KeyTypes]?: string }
 
 export type AuthRequestCreationArgs = IAuthenticationAttrs
-export type CredentialShareRequestCreationArgs =  ICredentialRequestAttrs
-export type CredentialShareResponseCreationArgs =  ICredentialResponseAttrs
+export type CredentialShareRequestCreationArgs = ICredentialRequestAttrs
+export type CredentialShareResponseCreationArgs = ICredentialResponseAttrs
 
 export type CredentialOfferRequestCreationArgs = ICredentialOfferAttrs
 export type CredentialOfferResponseCreationArgs = ICredentialsReceiveAttrs
 
 export type PaymentResponseCreationArgs = IPaymentResponseAttrs
-export type PaymentRequestCreationArgs = {
+export interface PaymentRequestCreationArgs {
   callbackURL: string
   description: string
   transactionOptions: {
-    value: number,
-    to?: string,
-    gasLimit?: number,
+    value: number
+    to?: string
+    gasLimit?: number
     gasPrice?: number
   }
 }
