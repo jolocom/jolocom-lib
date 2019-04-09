@@ -1,13 +1,22 @@
 import * as sinon from 'sinon'
 import { expect } from 'chai'
 import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
-import { testHash, mockConfig, mockBaseUri, mockAddUrl, mockCatUrl, mockPinUrl } from '../data/ipfs.data'
-import { didDocumentJSON } from '../data/didDocument.data';
+import {
+  testHash,
+  mockConfig,
+  mockBaseUri,
+  mockAddUrl,
+  mockCatUrl,
+  mockPinUrl,
+} from '../data/ipfs.data'
+import { didDocumentJSON } from '../data/didDocument.data'
 
 describe('IpfsStorageAgent', () => {
   let storageAgent = new IpfsStorageAgent(mockConfig)
 
-  const stubbedFetch = sinon.stub().resolves({ json: sinon.stub().resolves({ Hash: testHash }) })
+  const stubbedFetch = sinon
+    .stub()
+    .resolves({ json: sinon.stub().resolves({ Hash: testHash }) })
   storageAgent.fetchImplementation = stubbedFetch
 
   afterEach(() => {
@@ -32,7 +41,7 @@ describe('IpfsStorageAgent', () => {
     try {
       await storageAgent.storeJSON({
         data: 5 as Object,
-        pin: false
+        pin: false,
       })
       expect(true).to.be.false
     } catch (err) {

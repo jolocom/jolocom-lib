@@ -8,5 +8,5 @@ export const mockPinUrl = `${mockBaseUri}/api/v0/pin/rm?arg=${testHash}`
 export const mockConfig = {
   host: 'localhost',
   port: 5001,
-  protocol: 'http'
+  protocol: 'http',
 }

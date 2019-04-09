@@ -51,7 +51,6 @@ export class ServiceEndpointsSection {
     this._type = type
   }
 
-
   /**
    * Get the the service endpoint
    */
@@ -101,7 +100,9 @@ export class ServiceEndpointsSection {
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
    */
 
-  public static fromJSON(json: IServiceEndpointSectionAttrs): ServiceEndpointsSection {
+  public static fromJSON(
+    json: IServiceEndpointSectionAttrs,
+  ): ServiceEndpointsSection {
     return plainToClass(ServiceEndpointsSection, json)
   }
 }
@@ -113,7 +114,10 @@ export class ServiceEndpointsSection {
  * @internal
  */
 
-export const generatePublicProfileServiceSection = (did: string, profileIpfsHash: string): ServiceEndpointsSection => {
+export const generatePublicProfileServiceSection = (
+  did: string,
+  profileIpfsHash: string,
+): ServiceEndpointsSection => {
   const PubProfSec = new ServiceEndpointsSection()
   PubProfSec.id = `${did};jolocomPubProfile`
   PubProfSec.serviceEndpoint = `ipfs://${profileIpfsHash}`

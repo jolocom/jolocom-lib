@@ -1,5 +1,8 @@
 import * as sinon from 'sinon'
-import { JolocomRegistry, createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import {
+  JolocomRegistry,
+  createJolocomRegistry,
+} from '../../ts/registries/jolocomRegistry'
 import { Identity } from '../../ts/identity/identity'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testPublicIdentityKey, testSeed } from '../data/keys.data'
@@ -17,11 +20,13 @@ describe('Jolocom Registry - authenticate', () => {
 
   before(async () => {
     sandbox.stub(mockVault, 'getPublicKey').returns(testPublicIdentityKey)
-    sandbox.stub(JolocomRegistry.prototype, 'resolve').resolves(Identity.fromDidDocument({ didDocument: mockDidDoc }))
+    sandbox
+      .stub(JolocomRegistry.prototype, 'resolve')
+      .resolves(Identity.fromDidDocument({ didDocument: mockDidDoc }))
     sandbox.stub(Identity.prototype, 'publicKeySection').returns([
       {
-        getIdentifier: sinon.stub()
-      }
+        getIdentifier: sinon.stub(),
+      },
     ])
   })
 

@@ -58,11 +58,19 @@ export class IpfsStorageAgent implements IIpfsConnector {
    * @example `await ipfsAgent.storeJSON({data: {test: 'test'}, pin: false})`
    */
 
-  public async storeJSON({ data, pin }: { data: object; pin: boolean }): Promise<string> {
+  public async storeJSON({
+    data,
+    pin,
+  }: {
+    data: object
+    pin: boolean
+  }): Promise<string> {
     const endpoint = `${this.endpoint}/api/v0/add?pin=${pin}`
 
     const serializedData = this.serializeJSON(data)
-    const { Hash } = await this.postRequest(endpoint, serializedData).then(res => res.json())
+    const { Hash } = await this.postRequest(endpoint, serializedData).then(
+      res => res.json(),
+    )
     return Hash
   }
 
@@ -89,7 +97,9 @@ export class IpfsStorageAgent implements IIpfsConnector {
     const res = await this.getRequest(endpoint)
 
     if (!res.ok) {
-      throw new Error(`Removing pinned hash ${hash} failed, status code: ${res.status}`)
+      throw new Error(
+        `Removing pinned hash ${hash} failed, status code: ${res.status}`,
+      )
     }
   }
 
@@ -102,7 +112,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
   private async postRequest(endpoint: string, data: BodyInit) {
     return this.fetchImplementation(endpoint, {
       method: 'POST',
-      body: data
+      body: data,
     })
   }
 
@@ -132,7 +142,9 @@ export class IpfsStorageAgent implements IIpfsConnector {
       return formData
     } else {
       const formData = new FormDataNode()
-      const serializedData = Buffer.from(JSON.stringify(data)).toString('binary')
+      const serializedData = Buffer.from(JSON.stringify(data)).toString(
+        'binary',
+      )
       const dataBlob = new Blob([serializedData], {})
 
       formData.append('file', dataBlob)
@@ -149,5 +161,5 @@ export class IpfsStorageAgent implements IIpfsConnector {
 export const jolocomIpfsStorageAgent = new IpfsStorageAgent({
   host: 'ipfs.jolocom.com',
   port: 443,
-  protocol: 'https'
+  protocol: 'https',
 })

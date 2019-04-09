@@ -68,7 +68,6 @@ export class PublicKeySection {
     this._type = type
   }
 
-
   /**
    * Get the public key encoded as hex
    */
@@ -93,7 +92,11 @@ export class PublicKeySection {
    * @param did - The did listed in the did document, used to compute the full key id
    */
 
-  public static fromEcdsa(publicKey: Buffer, id: string, did: string): PublicKeySection {
+  public static fromEcdsa(
+    publicKey: Buffer,
+    id: string,
+    did: string,
+  ): PublicKeySection {
     const publicKeySecion = new PublicKeySection()
     publicKeySecion.owner = did
     publicKeySecion.id = id

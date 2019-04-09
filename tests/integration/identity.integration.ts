@@ -4,13 +4,25 @@ import * as integrationHelper from './provision'
 import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
 import { EthResolver } from '../../ts/ethereum/ethereum'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
-import { createJolocomRegistry, JolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import {
+  createJolocomRegistry,
+  JolocomRegistry,
+} from '../../ts/registries/jolocomRegistry'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { publicProfileCredJSON } from '../data/identity.data'
-import { testEthereumConfig, testIpfsConfig, userVault, userPass, serviceVault, servicePass } from './integration.data'
+import {
+  testEthereumConfig,
+  testIpfsConfig,
+  userVault,
+  userPass,
+  serviceVault,
+  servicePass,
+} from './integration.data'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
+import { ContractsGateway } from '../../ts/contracts/contractsGateway'
+import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -19,15 +31,29 @@ const expect = chai.expect
 export let jolocomRegistry: JolocomRegistry
 export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
+export let testContractsGateway: ContractsGateway
+export let testContractsAdapter: ContractsAdapter
 
 before(async () => {
-  await integrationHelper.init()
+  const {
+    testContractsGateway: gateway,
+    testContractsAdapter: adapter,
+  } = await integrationHelper.init()
+
+  testContractsGateway = gateway
+  testContractsAdapter = adapter
+
   jolocomRegistry = createJolocomRegistry({
     ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
-    ethereumConnector: new EthResolver(testEthereumConfig)
+    ethereumConnector: new EthResolver(testEthereumConfig),
+    contracts: { gateway, adapter },
   })
+
   userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
-  serviceIdentityWallet = await jolocomRegistry.create(serviceVault, servicePass)
+  serviceIdentityWallet = await jolocomRegistry.create(
+    serviceVault,
+    servicePass,
+  )
 })
 
 after(() => {
@@ -36,15 +62,25 @@ after(() => {
 
 describe('Integration Test - Create, Resolve, Public Profile', () => {
   it('should correctly create user and service identities', async () => {
-    const remoteUserIdentity = await jolocomRegistry.resolve(userIdentityWallet.did)
-    const remoteServiceIdentity = await jolocomRegistry.resolve(serviceIdentityWallet.did)
+    const remoteUserIdentity = await jolocomRegistry.resolve(
+      userIdentityWallet.did,
+    )
+    const remoteServiceIdentity = await jolocomRegistry.resolve(
+      serviceIdentityWallet.did,
+    )
 
-    expect(remoteUserIdentity.didDocument).to.deep.eq(userIdentityWallet.didDocument)
-    expect(remoteServiceIdentity.didDocument).to.deep.eq(remoteServiceIdentity.didDocument)
+    expect(remoteUserIdentity.didDocument).to.deep.eq(
+      userIdentityWallet.didDocument,
+    )
+    expect(remoteServiceIdentity.didDocument).to.deep.eq(
+      remoteServiceIdentity.didDocument,
+    )
   })
 
   it('should correctly add and commit public profile', async () => {
-    const servicePublicProfile = SignedCredential.fromJSON(publicProfileCredJSON)
+    const servicePublicProfile = SignedCredential.fromJSON(
+      publicProfileCredJSON,
+    )
     serviceIdentityWallet.identity.publicProfile = servicePublicProfile
 
     await jolocomRegistry.commit({
@@ -52,29 +88,37 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       identityWallet: serviceIdentityWallet,
       keyMetadata: {
         derivationPath: KeyTypes.ethereumKey,
-        encryptionPass: servicePass
-      }
+        encryptionPass: servicePass,
+      },
     })
 
-    const remoteServiceIdentity = await jolocomRegistry.resolve(serviceIdentityWallet.did)
+    const remoteServiceIdentity = await jolocomRegistry.resolve(
+      serviceIdentityWallet.did,
+    )
 
     expect(remoteServiceIdentity.publicProfile).to.deep.eq(servicePublicProfile)
-    expect(remoteServiceIdentity.didDocument).to.deep.eq(remoteServiceIdentity.didDocument)
+    expect(remoteServiceIdentity.didDocument).to.deep.eq(
+      remoteServiceIdentity.didDocument,
+    )
   })
 
   it('should correctly implement authenticate with no public profile', async () => {
     const wallet = await jolocomRegistry.authenticate(userVault, {
       derivationPath: KeyTypes.jolocomIdentityKey,
-      encryptionPass: userPass
+      encryptionPass: userPass,
     })
-    expect(wallet.identity.didDocument).to.deep.eq(userIdentityWallet.identity.didDocument)
-    expect(wallet.identity.publicProfile).to.deep.eq(userIdentityWallet.identity.publicProfile)
+    expect(wallet.identity.didDocument).to.deep.eq(
+      userIdentityWallet.identity.didDocument,
+    )
+    expect(wallet.identity.publicProfile).to.deep.eq(
+      userIdentityWallet.identity.publicProfile,
+    )
   })
 
   it('should correctly implement authenticate with public profile', async () => {
     const wallet = await jolocomRegistry.authenticate(serviceVault, {
       derivationPath: KeyTypes.jolocomIdentityKey,
-      encryptionPass: servicePass
+      encryptionPass: servicePass,
     })
 
     const remoteDidDoc = wallet.didDocument.toJSON()
@@ -94,10 +138,12 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
     try {
       await jolocomRegistry.authenticate(mockVault, {
         derivationPath: KeyTypes.jolocomIdentityKey,
-        encryptionPass: 'pass'
+        encryptionPass: 'pass',
       })
     } catch (err) {
-      expect(err.message).to.eq('Could not retrieve DID Document. No record for DID found.')
+      expect(err.message).to.eq(
+        'Could not retrieve DID Document. No record for DID found.',
+      )
     }
   })
 })

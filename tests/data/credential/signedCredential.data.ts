@@ -3,13 +3,17 @@ import { defaultContext } from '../../../ts/utils/contexts'
 
 /* Defining custom metadata objects for custom credentials */
 
-export const mockKeyId = 'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa#keys-1'
-export const mockIssuerDid = 'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-const mockSubject = 'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+export const mockKeyId =
+  'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa#keys-1'
+export const mockIssuerDid =
+  'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+const mockSubject =
+  'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 /* Defining fixture for a signedCredential in JSON form */
 
-export const emailVerifiableCredentialHash = 'b516dc3d9d125efe41dd5bc30b94aa2a9bb8b8676f90dbd8d5d9104d18e6a426'
+export const emailVerifiableCredentialHash =
+  'b516dc3d9d125efe41dd5bc30b94aa2a9bb8b8676f90dbd8d5d9104d18e6a426'
 export const emailVerifiableCredential = {
   '@context': [...defaultContext, ...claimsMetadata.emailAddress.context],
   id: 'claimId:567e6e0c6570a',

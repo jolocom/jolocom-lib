@@ -1,9 +1,19 @@
 import 'reflect-metadata'
-import { plainToClass, classToPlain, Type, Expose, Exclude, Transform } from 'class-transformer'
+import {
+  plainToClass,
+  classToPlain,
+  Type,
+  Expose,
+  Exclude,
+  Transform,
+} from 'class-transformer'
 import { canonize } from 'jsonld'
 import { generateRandomID, sha256 } from '../../utils/crypto'
 import { ISignedCredentialAttrs, ISignedCredCreationArgs } from './types'
-import { ILinkedDataSignature, IDigestable } from '../../linkedDataSignature/types'
+import {
+  ILinkedDataSignature,
+  IDigestable,
+} from '../../linkedDataSignature/types'
 import { ContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
@@ -105,7 +115,9 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
+  @Transform((value: Date) => value && value.toISOString(), {
+    toPlainOnly: true,
+  })
   @Transform((value: string) => value && new Date(value), { toClassOnly: true })
   get issued(): Date {
     return this._issued
@@ -166,7 +178,7 @@ export class SignedCredential implements IDigestable {
   get signer(): ISigner {
     return {
       did: this.issuer,
-      keyId: this._proof.creator
+      keyId: this._proof.creator,
     }
   }
 
@@ -176,7 +188,9 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
+  @Transform((value: Date) => value && value.toISOString(), {
+    toPlainOnly: true,
+  })
   @Transform((value: string) => value && new Date(value), { toClassOnly: true })
   get expires(): Date {
     return this._expires
@@ -198,7 +212,9 @@ export class SignedCredential implements IDigestable {
 
   @Expose()
   @Type(() => EcdsaLinkedDataSignature)
-  @Transform(value => value || new EcdsaLinkedDataSignature(), { toClassOnly: true })
+  @Transform(value => value || new EcdsaLinkedDataSignature(), {
+    toClassOnly: true,
+  })
   get proof(): ILinkedDataSignature {
     return this._proof
   }
@@ -289,7 +305,10 @@ export class SignedCredential implements IDigestable {
    * @internal
    */
 
-  public static async create<T extends BaseMetadata>(credentialOptions: ISignedCredCreationArgs<T>, issInfo: IIssInfo) {
+  public static async create<T extends BaseMetadata>(
+    credentialOptions: ISignedCredCreationArgs<T>,
+    issInfo: IIssInfo,
+  ) {
     const credential = Credential.create(credentialOptions)
     const json = credential.toJSON() as ISignedCredentialAttrs
     const signedCredential = SignedCredential.fromJSON(json)
@@ -326,10 +345,10 @@ export class SignedCredential implements IDigestable {
 
   public async digest(): Promise<Buffer> {
     const normalized = await this.normalize()
-    
+
     const docSectionDigest = sha256(Buffer.from(normalized))
     const proofSectionDigest = await this.proof.digest()
-    
+
     return sha256(Buffer.concat([proofSectionDigest, docSectionDigest]))
   }
 

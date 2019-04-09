@@ -1,6 +1,17 @@
-import { ISignedCredentialAttrs } from "../credentials/signedCredential/types"
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
+import { TransactionOptions } from '../contracts/types'
 
 /* Creation attributes. Same as JSON form */
+
+export interface IPaymentRequestAttrs {
+  callbackURL: string
+  description: string
+  transactionOptions: TransactionOptions
+}
+
+export interface IPaymentResponseAttrs {
+  txHash: string
+}
 
 export interface ICredentialOfferAttrs {
   callbackURL: string
@@ -43,7 +54,10 @@ export interface IConstraint {
 
 export type Comparable = number | Date
 type ConstraintFunc = (field: string, value: string) => IConstraint
-type ComparableConstraintFunc = (field: string, value: Comparable) => IConstraint
+type ComparableConstraintFunc = (
+  field: string,
+  value: Comparable,
+) => IConstraint
 
 export interface IExposedConstraintFunctions {
   is: ConstraintFunc

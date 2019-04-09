@@ -51,7 +51,7 @@ describe('JSONWebToken', () => {
     const simplified = {
       ...validSignedCredReqJWT,
       payload: unsignedPayload,
-      signature: ''
+      signature: '',
     }
 
     const jwt = JSONWebToken.fromJWTEncodable(credReq)
@@ -109,6 +109,8 @@ describe('JSONWebToken', () => {
   })
 
   it('Should thow error on expired JWT during decode', () => {
-    expect(() => JSONWebToken.decode(expiredEncodedSimpleCredReqJWT)).to.throw('Token expired')
+    expect(() => JSONWebToken.decode(expiredEncodedSimpleCredReqJWT)).to.throw(
+      'Token expired',
+    )
   })
 })

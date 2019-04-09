@@ -90,7 +90,10 @@ export class Identity {
    * @example `const identity = Identity.fromDidDocument({didDocument, publicProfile})`
    */
 
-  public static fromDidDocument({ didDocument, publicProfile }: IIdentityCreateArgs): Identity {
+  public static fromDidDocument({
+    didDocument,
+    publicProfile,
+  }: IIdentityCreateArgs): Identity {
     const identity = new Identity()
     identity.didDocument = didDocument
     if (publicProfile) {

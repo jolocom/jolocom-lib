@@ -1,4 +1,10 @@
-import { plainToClass, classToPlain, Type, Expose, Exclude } from 'class-transformer'
+import {
+  plainToClass,
+  classToPlain,
+  Type,
+  Expose,
+  Exclude,
+} from 'class-transformer'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ICredentialsReceiveAttrs } from './interactionTokens.types'
 
@@ -7,12 +13,11 @@ import { ICredentialsReceiveAttrs } from './interactionTokens.types'
  * Class representing a credential response. encodable in JWT,
  * currently the same as a credential response without a validation
  * function. Will be extended with support for external verifications.
-*/
+ */
 
 @Exclude()
 export class CredentialsReceive {
   private _signedCredentials: SignedCredential[]
-
 
   /**
    * Get all signed credentials encoded in the payload
