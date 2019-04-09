@@ -3,12 +3,10 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.9
 node_js:
   - "10.15.1"
 install: 
-  - CC=gcc-4.9 CXX=g++-4.9 yarn install
+  - yarn install
 before_script:
   - npm install -g git://github.com/ipfs/npm-go-ipfs#32acf52
 jobs:
