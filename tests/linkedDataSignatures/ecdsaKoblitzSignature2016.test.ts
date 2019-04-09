@@ -7,7 +7,7 @@ import {
   signatureAttributes,
   normalizedSignatureSection,
   digestedSignatureSection,
-  incompleteSignatureAttrs
+  incompleteSignatureAttrs,
 } from './ecdsaSignature.data'
 import { defaultContext } from '../../ts/utils/contexts'
 import { mockKeyId } from '../data/credential/signedCredential.data'
@@ -19,7 +19,9 @@ describe('EcdsaKoblitzSignature', () => {
 
   before(() => {
     clock = sinon.useFakeTimers()
-    stubbedCanonise = sinon.stub(jsonld, 'canonize').returns(normalizedSignatureSection)
+    stubbedCanonise = sinon
+      .stub(jsonld, 'canonize')
+      .returns(normalizedSignatureSection)
   })
 
   after(() => {
@@ -40,7 +42,13 @@ describe('EcdsaKoblitzSignature', () => {
   })
 
   it('Should implement getters method', () => {
-    const { created, creator, nonce, signatureValue, type } = signatureAttributes
+    const {
+      created,
+      creator,
+      nonce,
+      signatureValue,
+      type,
+    } = signatureAttributes
 
     expect(signature.created).to.deep.eq(new Date(created))
     expect(signature.creator).to.eq(creator)
@@ -56,7 +64,9 @@ describe('EcdsaKoblitzSignature', () => {
     delete withContext.type
 
     expect(stubbedCanonise.getCall(0).args).to.deep.eq([withContext])
-    expect((await signature.digest()).toString('hex')).to.deep.eq(digestedSignatureSection)
+    expect((await signature.digest()).toString('hex')).to.deep.eq(
+      digestedSignatureSection,
+    )
   })
 
   it('Should implement setters', () => {

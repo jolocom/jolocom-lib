@@ -2,11 +2,17 @@ import * as sinon from 'sinon'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { IpfsStorageAgent, jolocomIpfsStorageAgent } from '../../ts/ipfs/ipfs'
-import { EthResolver, jolocomEthereumResolver } from '../../ts/ethereum/ethereum'
-import { JolocomRegistry, createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import {
+  EthResolver,
+  jolocomEthereumResolver,
+} from '../../ts/ethereum/ethereum'
+import {
+  JolocomRegistry,
+  createJolocomRegistry,
+} from '../../ts/registries/jolocomRegistry'
 import { testEthereumConfig, testIpfsConfig } from '../data/registry.data'
-import {jolocomContractsAdapter} from '../../ts/contracts/contractsAdapter'
-import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
+import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -22,10 +28,14 @@ describe('JolocomRegistry', () => {
   describe('Jolocom Registry - static create', () => {
     const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
     const ethereumConnector = new EthResolver(testEthereumConfig)
-    jolocomRegistry = createJolocomRegistry({ ipfsConnector, ethereumConnector, contracts: {
-      adapter: jolocomContractsAdapter,
-      gateway: jolocomContractsGateway
-    } })
+    jolocomRegistry = createJolocomRegistry({
+      ipfsConnector,
+      ethereumConnector,
+      contracts: {
+        adapter: jolocomContractsAdapter,
+        gateway: jolocomContractsGateway,
+      },
+    })
 
     it('should correctly create an instance of JolocomRegistry if connectors are passed ', () => {
       expect(jolocomRegistry.ipfsConnector).to.deep.equal(ipfsConnector)
@@ -34,8 +44,12 @@ describe('JolocomRegistry', () => {
 
     it('should create an instance of JolocomRegistry with correct config', () => {
       const defaultJolocomRegistry = createJolocomRegistry()
-      expect(defaultJolocomRegistry.ipfsConnector).to.deep.equal(jolocomIpfsStorageAgent)
-      expect(defaultJolocomRegistry.ethereumConnector).to.deep.equal(jolocomEthereumResolver)
+      expect(defaultJolocomRegistry.ipfsConnector).to.deep.equal(
+        jolocomIpfsStorageAgent,
+      )
+      expect(defaultJolocomRegistry.ethereumConnector).to.deep.equal(
+        jolocomEthereumResolver,
+      )
     })
   })
 })

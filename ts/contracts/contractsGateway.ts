@@ -1,6 +1,6 @@
-import {ethers} from 'ethers'
-import {JsonRpcProvider, Web3Provider} from 'ethers/providers'
-import {IContractsGateway} from './types'
+import { ethers } from 'ethers'
+import { JsonRpcProvider, Web3Provider } from 'ethers/providers'
+import { IContractsGateway } from './types'
 
 /**
  * @class
@@ -10,7 +10,6 @@ import {IContractsGateway} from './types'
 
 export class ContractsGateway implements IContractsGateway {
   private provider: JsonRpcProvider | Web3Provider
-
 
   /**
    * @constructor
@@ -38,7 +37,7 @@ export class ContractsGateway implements IContractsGateway {
     return {
       name: this.provider.network.name,
       chainId: this.provider.network.chainId,
-      endpoint: this.provider.connection.url
+      endpoint: this.provider.connection.url,
     }
   }
 
@@ -50,7 +49,7 @@ export class ContractsGateway implements IContractsGateway {
   public async getAddressInfo(address: string) {
     return {
       balance: await this.provider.getBalance(address),
-      nonce: await this.provider.getTransactionCount(address)
+      nonce: await this.provider.getTransactionCount(address),
     }
   }
 
@@ -60,8 +59,10 @@ export class ContractsGateway implements IContractsGateway {
    */
 
   public async broadcastTransaction(serializedTx: string): Promise<string> {
-    return this.provider.sendTransaction(serializedTx).then(({hash}) => hash)
+    return this.provider.sendTransaction(serializedTx).then(({ hash }) => hash)
   }
 }
 
-export const jolocomContractsGateway = new ContractsGateway('https://rinkeby.infura.io/')
+export const jolocomContractsGateway = new ContractsGateway(
+  'https://rinkeby.infura.io/',
+)

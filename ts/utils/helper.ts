@@ -33,7 +33,7 @@ const ErrorKeys = {
   exp: 'Token expired',
   sig: 'Signature on token is invalid',
   nonce: 'The token nonce deviates from request',
-  aud: 'You are not the intended audience of received token'
+  aud: 'You are not the intended audience of received token',
 }
 
 /**
@@ -48,8 +48,8 @@ export function fuelKeyWithEther(publicKey: Buffer) {
     method: 'POST',
     body: JSON.stringify({ address: publicKeyToAddress(publicKey) }),
     headers: {
-      'Content-Type': 'application/json'
-    }
+      'Content-Type': 'application/json',
+    },
   })
 }
 
@@ -60,4 +60,5 @@ export function fuelKeyWithEther(publicKey: Buffer) {
  * @internal
  */
 
-export const publicKeyToAddress = (publicKey: Buffer): string => addHexPrefix(pubToAddress(publicKey, true).toString('hex'))
+export const publicKeyToAddress = (publicKey: Buffer): string =>
+  addHexPrefix(pubToAddress(publicKey, true).toString('hex'))

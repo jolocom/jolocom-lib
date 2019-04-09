@@ -6,7 +6,7 @@ import {
   mockKeyId,
   mockIssuerDid,
   emailVerifiableCredential,
-  emailVerifiableCredentialHash
+  emailVerifiableCredentialHash,
 } from '../data/credential/signedCredential.data'
 import { EmailClaimMetadata } from 'cred-types-jolocom-core/js/types'
 import { Credential } from '../../ts/credentials/credential/credential'
@@ -25,13 +25,18 @@ describe('SignedCredential', () => {
   before(async () => {
     create = sandbox.spy(Credential, 'create')
     sandbox.stub(Math, 'random').returns(0.3378666668190271)
-    sandbox.stub(crypto, 'randomBytes').returns(Buffer.from('1842fb5f567dd532', 'hex'))
+    sandbox
+      .stub(crypto, 'randomBytes')
+      .returns(Buffer.from('1842fb5f567dd532', 'hex'))
 
     clock = sinon.useFakeTimers()
-    vCred = vCred = await SignedCredential.create<EmailClaimMetadata>(mockEmailCredCreationAttrs, {
-      keyId: mockKeyId,
-      issuerDid: mockIssuerDid
-    })
+    vCred = vCred = await SignedCredential.create<EmailClaimMetadata>(
+      mockEmailCredCreationAttrs,
+      {
+        keyId: mockKeyId,
+        issuerDid: mockIssuerDid,
+      },
+    )
   })
 
   after(() => {
@@ -64,7 +69,15 @@ describe('SignedCredential', () => {
   })
 
   describe('Getters', () => {
-    const { id, issued, issuer, expires, claim, proof, type } = emailVerifiableCredential
+    const {
+      id,
+      issued,
+      issuer,
+      expires,
+      claim,
+      proof,
+      type,
+    } = emailVerifiableCredential
     it('Implements all getters', () => {
       expect(vCred.id).to.eq(id)
       expect(vCred.issued.toISOString()).to.eq(issued)
@@ -78,7 +91,7 @@ describe('SignedCredential', () => {
       expect(vCred.name).to.eq('Email address')
       expect(vCred.signer).to.deep.eq({
         did: issuer,
-        keyId: proof.creator
+        keyId: proof.creator,
       })
     })
   })

@@ -1,6 +1,6 @@
-import {IContractsAdapter, ITransactionEncodable} from './types'
+import { IContractsAdapter, ITransactionEncodable } from './types'
 import * as Transaction from 'ethereumjs-tx'
-import {IVaultedKeyProvider, KeyTypes} from '../vaultedKeyProvider/types'
+import { IVaultedKeyProvider, KeyTypes } from '../vaultedKeyProvider/types'
 
 /**
  * @class
@@ -30,7 +30,13 @@ export class ContractsAdapter implements IContractsAdapter {
    * @example `ethGateway.assembleTxFromInteractionToken(paymentReq.interactionToken, '0xaa..ff', 1, vault, 'secret')` // '0xabc...'
    */
 
-  public assembleTxFromInteractionToken({transactionOptions}: ITransactionEncodable, from: string, nonce: number, vault: IVaultedKeyProvider, password: string) {
+  public assembleTxFromInteractionToken(
+    { transactionOptions }: ITransactionEncodable,
+    from: string,
+    nonce: number,
+    vault: IVaultedKeyProvider,
+    password: string,
+  ) {
     const { to, value, gasPrice, gasLimit } = transactionOptions
 
     const tx = new Transaction({
@@ -40,12 +46,12 @@ export class ContractsAdapter implements IContractsAdapter {
       to,
       chainId: this.chainId,
       gasLimit,
-      gasPrice
+      gasPrice,
     })
 
     const privateKey = vault.getPrivateKey({
       derivationPath: KeyTypes.ethereumKey,
-      encryptionPass: password
+      encryptionPass: password,
     })
 
     tx.sign(privateKey)

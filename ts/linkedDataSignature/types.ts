@@ -12,7 +12,7 @@ export interface IDigestable {
   signature: string
   digest: () => Promise<Buffer>
   signer: {
-    did: string,
+    did: string
     keyId: string
   }
 }

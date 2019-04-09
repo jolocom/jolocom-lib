@@ -1,6 +1,6 @@
 import { classToPlain, plainToClass, Expose, Exclude } from 'class-transformer'
 import { IPaymentRequestAttrs } from './interactionTokens.types'
-import {ITransactionEncodable, TransactionOptions} from '../contracts/types'
+import { ITransactionEncodable, TransactionOptions } from '../contracts/types'
 
 /**
  * @class
@@ -31,9 +31,7 @@ export class PaymentRequest implements ITransactionEncodable {
     }
    */
 
-  set transactionOptions(
-    transactionOptions: TransactionOptions
-  ) {
+  set transactionOptions(transactionOptions: TransactionOptions) {
     this._transactionOptions = transactionOptions
   }
 

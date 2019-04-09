@@ -10,25 +10,40 @@ import {
   IIdentityWalletCreateArgs,
   PaymentRequestCreationArgs,
   PaymentResponseCreationArgs,
-  PublicKeyMap
+  PublicKeyMap,
 } from './types'
 import { Identity } from '../identity/identity'
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
 import { CredentialOffer } from '../interactionTokens/credentialOffer'
-import {PaymentResponse} from '../interactionTokens/paymentResponse'
-import {PaymentRequest} from '../interactionTokens/paymentRequest'
+import { PaymentResponse } from '../interactionTokens/paymentResponse'
+import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
-import {IVaultedKeyProvider, KeyTypes} from '../vaultedKeyProvider/types'
-import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types'
-import {keyIdToDid, getIssuerPublicKey, handleValidationStatus, publicKeyToAddress} from '../utils/helper'
+import { IVaultedKeyProvider, KeyTypes } from '../vaultedKeyProvider/types'
+import {
+  IKeyMetadata,
+  ISignedCredCreationArgs,
+} from '../credentials/signedCredential/types'
+import {
+  keyIdToDid,
+  getIssuerPublicKey,
+  handleValidationStatus,
+  publicKeyToAddress,
+} from '../utils/helper'
 import { generateRandomID } from '../utils/crypto'
-import { JolocomRegistry, createJolocomRegistry } from '../registries/jolocomRegistry'
+import {
+  JolocomRegistry,
+  createJolocomRegistry,
+} from '../registries/jolocomRegistry'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
-import {IContractsAdapter, IContractsGateway, ITransactionEncodable} from '../contracts/types'
+import {
+  IContractsAdapter,
+  IContractsGateway,
+  ITransactionEncodable,
+} from '../contracts/types'
 
 /**
  * @class
@@ -144,9 +159,23 @@ export class IdentityWallet {
    * @param contractsAdapter - Instance of handler to assemble Transactions for the used smart contract chain
    */
 
-  constructor({ identity, publicKeyMetadata, vaultedKeyProvider, contractsGateway, contractsAdapter }: IIdentityWalletCreateArgs) {
-    if (!identity || !publicKeyMetadata || !vaultedKeyProvider || !contractsAdapter || !contractsGateway) {
-      throw new Error('Missing arguments! Expected identity, publicKeyMetadata, and vaulterKeyProvider')
+  constructor({
+    identity,
+    publicKeyMetadata,
+    vaultedKeyProvider,
+    contractsGateway,
+    contractsAdapter,
+  }: IIdentityWalletCreateArgs) {
+    if (
+      !identity ||
+      !publicKeyMetadata ||
+      !vaultedKeyProvider ||
+      !contractsAdapter ||
+      !contractsGateway
+    ) {
+      throw new Error(
+        'Missing arguments! Expected identity, publicKeyMetadata, and vaulterKeyProvider',
+      )
     }
 
     this.identity = identity
@@ -162,21 +191,27 @@ export class IdentityWallet {
    * @param pass - Password to decrypt the vaulted seed
    */
 
-  private createSignedCred = async <T extends BaseMetadata>(params: ISignedCredCreationArgs<T>, pass: string) => {
+  private createSignedCred = async <T extends BaseMetadata>(
+    params: ISignedCredCreationArgs<T>,
+    pass: string,
+  ) => {
     const { derivationPath } = this.publicKeyMetadata
 
     const vCred = await SignedCredential.create(
       {
         subject: params.subject || this.did,
-        ...params
+        ...params,
       },
       {
         keyId: this.publicKeyMetadata.keyId,
-        issuerDid: this.did
-      }
+        issuerDid: this.did,
+      },
     )
 
-    const signature = await this.vaultedKeyProvider.signDigestable({ derivationPath, encryptionPass: pass }, vCred)
+    const signature = await this.vaultedKeyProvider.signDigestable(
+      { derivationPath, encryptionPass: pass },
+      vCred,
+    )
     vCred.signature = signature.toString('hex')
     return vCred
   }
@@ -191,12 +226,17 @@ export class IdentityWallet {
   private createAuth = async (
     authArgs: AuthRequestCreationArgs,
     pass: string,
-    receivedJWT?: JSONWebToken<JWTEncodable>
+    receivedJWT?: JSONWebToken<JWTEncodable>,
   ) => {
     const authenticationReq = Authentication.fromJSON(authArgs)
     const jwt = JSONWebToken.fromJWTEncodable(authenticationReq)
     jwt.interactionType = InteractionType.Authentication
-    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+      receivedJWT,
+    )
   }
 
   /**
@@ -209,12 +249,17 @@ export class IdentityWallet {
   private createCredOffer = async (
     credOffer: CredentialOfferRequestCreationArgs,
     pass: string,
-    receivedJWT?: JSONWebToken<JWTEncodable>
+    receivedJWT?: JSONWebToken<JWTEncodable>,
   ) => {
     const offer = CredentialOffer.fromJSON(credOffer)
     const jwt = JSONWebToken.fromJWTEncodable(offer)
     jwt.interactionType = InteractionType.CredentialOffer
-    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+      receivedJWT,
+    )
   }
 
   /**
@@ -223,11 +268,18 @@ export class IdentityWallet {
    * @param pass - Password to decrypt the vaulted seed
    */
 
-  private createCredReq = async (credReq: CredentialShareRequestCreationArgs, pass: string) => {
+  private createCredReq = async (
+    credReq: CredentialShareRequestCreationArgs,
+    pass: string,
+  ) => {
     const credentialRequest = CredentialRequest.fromJSON(credReq)
     const jwt = JSONWebToken.fromJWTEncodable(credentialRequest)
     jwt.interactionType = InteractionType.CredentialRequest
-    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass)
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+    )
   }
 
   /**
@@ -240,12 +292,17 @@ export class IdentityWallet {
   private createCredResp = async (
     credResp: CredentialShareResponseCreationArgs,
     pass: string,
-    receivedJWT: JSONWebToken<JWTEncodable>
+    receivedJWT: JSONWebToken<JWTEncodable>,
   ) => {
     const credentialResponse = CredentialResponse.fromJSON(credResp)
     const jwt = JSONWebToken.fromJWTEncodable(credentialResponse)
     jwt.interactionType = InteractionType.CredentialResponse
-    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+      receivedJWT,
+    )
   }
 
   /**
@@ -253,13 +310,22 @@ export class IdentityWallet {
    * @param credReceive - Credential receive creation attributes
    * @param pass - Password to decrypt the vaulted seed
    * @param receivedJWT - received credential offer response JSONWebToken Class
-  */
+   */
 
-  private createCredReceive = async (credReceive: CredentialOfferResponseCreationArgs, pass: string, receivedJWT: JSONWebToken<JWTEncodable>) => {
+  private createCredReceive = async (
+    credReceive: CredentialOfferResponseCreationArgs,
+    pass: string,
+    receivedJWT: JSONWebToken<JWTEncodable>,
+  ) => {
     const credentialReceieve = CredentialsReceive.fromJSON(credReceive)
     const jwt = JSONWebToken.fromJWTEncodable(credentialReceieve)
     jwt.interactionType = InteractionType.CredentialsReceive
-    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass, receivedJWT)
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+      receivedJWT,
+    )
   }
 
   /**
@@ -268,7 +334,7 @@ export class IdentityWallet {
    * @example `iw.getPublicKeys('secret')` // { jolocomIdentityKey: '0xabc...ff', ethereumKey: '0xabc...ff'}
    */
 
-  public getPublicKeys = (encryptionPass: string) : PublicKeyMap => {
+  public getPublicKeys = (encryptionPass: string): PublicKeyMap => {
     const supportedKeys = Object.entries(KeyTypes)
 
     return supportedKeys.reduce<PublicKeyMap>((acc, currentEntry) => {
@@ -276,10 +342,12 @@ export class IdentityWallet {
 
       return {
         ...acc,
-        [keyType]: this.vaultedKeyProvider.getPublicKey({
-          derivationPath,
-          encryptionPass
-        }).toString('hex')
+        [keyType]: this.vaultedKeyProvider
+          .getPublicKey({
+            derivationPath,
+            encryptionPass,
+          })
+          .toString('hex'),
       }
     }, {})
   }
@@ -291,8 +359,11 @@ export class IdentityWallet {
    * @param pass - Password to decrypt the vaulted seed
    */
 
-  private createPaymentReq = async (paymentReq: PaymentRequestCreationArgs, pass: string) => {
-    const { transactionOptions }  = paymentReq
+  private createPaymentReq = async (
+    paymentReq: PaymentRequestCreationArgs,
+    pass: string,
+  ) => {
+    const { transactionOptions } = paymentReq
 
     // Assigning default values
     const paymentRequest = PaymentRequest.fromJSON({
@@ -303,15 +374,19 @@ export class IdentityWallet {
         to: transactionOptions.to
           ? transactionOptions.to
           : publicKeyToAddress(
-            Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex')
-          ),
-        ...transactionOptions
-      }
+              Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex'),
+            ),
+        ...transactionOptions,
+      },
     })
 
     const jwt = JSONWebToken.fromJWTEncodable(paymentRequest)
     jwt.interactionType = InteractionType.PaymentRequest
-    return this.initializeAndSign(jwt, this.publicKeyMetadata.derivationPath, pass)
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+    )
   }
 
   /**
@@ -324,16 +399,18 @@ export class IdentityWallet {
   private createPaymentResp = async (
     paymentResp: PaymentResponseCreationArgs,
     pass: string,
-    receivedJWT: JSONWebToken<JWTEncodable>
+    receivedJWT: JSONWebToken<JWTEncodable>,
   ) => {
-    const paymentResponse = PaymentResponse.fromJSON(paymentResp) as PaymentResponse
+    const paymentResponse = PaymentResponse.fromJSON(
+      paymentResp,
+    ) as PaymentResponse
     const jwt = JSONWebToken.fromJWTEncodable(paymentResponse)
     jwt.interactionType = InteractionType.PaymentResponse
     return this.initializeAndSign(
       jwt,
       this.publicKeyMetadata.derivationPath,
       pass,
-      receivedJWT
+      receivedJWT,
     )
   }
 
@@ -349,15 +426,20 @@ export class IdentityWallet {
     jwt: JSONWebToken<T>,
     derivationPath: string,
     pass: string,
-    receivedJWT?: JSONWebToken<T>
+    receivedJWT?: JSONWebToken<T>,
   ) {
     jwt.setIssueAndExpiryTime()
     jwt.issuer = this.publicKeyMetadata.keyId
 
     receivedJWT ? (jwt.audience = keyIdToDid(receivedJWT.issuer)) : null
-    receivedJWT ? (jwt.nonce = receivedJWT.nonce) : (jwt.nonce = generateRandomID(8))
+    receivedJWT
+      ? (jwt.nonce = receivedJWT.nonce)
+      : (jwt.nonce = generateRandomID(8))
 
-    const signature = await this.vaultedKeyProvider.signDigestable({ derivationPath, encryptionPass: pass }, jwt)
+    const signature = await this.vaultedKeyProvider.signDigestable(
+      { derivationPath, encryptionPass: pass },
+      jwt,
+    )
     jwt.signature = signature.toString('hex')
 
     return jwt
@@ -368,34 +450,56 @@ export class IdentityWallet {
    * @param receivedJWT - received JSONWebToken Class
    * @param sendJWT - optional send JSONWebToken Class which is used to validate the token nonce and the aud field on received token
    * @param customRegistry - optional custom registry
-  */
+   */
 
-  public async validateJWT<T extends JWTEncodable, A extends JWTEncodable>(receivedJWT: JSONWebToken<T>, sendJWT?: JSONWebToken<A>, customRegistry?: JolocomRegistry): Promise<void> {
+  public async validateJWT<T extends JWTEncodable, A extends JWTEncodable>(
+    receivedJWT: JSONWebToken<T>,
+    sendJWT?: JSONWebToken<A>,
+    customRegistry?: JolocomRegistry,
+  ): Promise<void> {
     const registry = customRegistry || createJolocomRegistry()
-    const remoteIdentity = await registry.resolve(keyIdToDid(receivedJWT.issuer))
-    const pubKey  = getIssuerPublicKey(receivedJWT.issuer, remoteIdentity.didDocument)
+    const remoteIdentity = await registry.resolve(
+      keyIdToDid(receivedJWT.issuer),
+    )
+    const pubKey = getIssuerPublicKey(
+      receivedJWT.issuer,
+      remoteIdentity.didDocument,
+    )
 
-    handleValidationStatus(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT), 'sig')
-    sendJWT && handleValidationStatus(receivedJWT.audience === this.identity.did, 'aud')
-    sendJWT && handleValidationStatus(sendJWT.nonce === receivedJWT.nonce, 'nonce')
+    handleValidationStatus(
+      await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT),
+      'sig',
+    )
+    sendJWT &&
+      handleValidationStatus(receivedJWT.audience === this.identity.did, 'aud')
+    sendJWT &&
+      handleValidationStatus(sendJWT.nonce === receivedJWT.nonce, 'nonce')
   }
 
-  private sendTransaction = async (request: ITransactionEncodable, pass: string) => {
+  private sendTransaction = async (
+    request: ITransactionEncodable,
+    pass: string,
+  ) => {
     const publicKey = this._vaultedKeyProvider.getPublicKey({
       derivationPath: KeyTypes.ethereumKey,
-      encryptionPass: pass
+      encryptionPass: pass,
     })
 
     const address = publicKeyToAddress(publicKey)
-    const {nonce} = await this._contractsGateway.getAddressInfo(address)
+    const { nonce } = await this._contractsGateway.getAddressInfo(address)
 
-    const tx = this._contractsAdapter.assembleTxFromInteractionToken(request, address, nonce, this.vaultedKeyProvider, pass)
+    const tx = this._contractsAdapter.assembleTxFromInteractionToken(
+      request,
+      address,
+      nonce,
+      this.vaultedKeyProvider,
+      pass,
+    )
     return this._contractsGateway.broadcastTransaction(tx)
   }
 
-
   public transactions = {
-    sendTransaction: this.sendTransaction
+    sendTransaction: this.sendTransaction,
   }
 
   /* Gathering creation methods in an easier to use public interface */
@@ -408,14 +512,14 @@ export class IdentityWallet {
         auth: this.createAuth,
         offer: this.createCredOffer,
         share: this.createCredReq,
-        payment: this.createPaymentReq
+        payment: this.createPaymentReq,
       },
       response: {
         auth: this.createAuth,
         offer: this.createCredOffer,
         share: this.createCredResp,
         issue: this.createCredReceive,
-        payment: this.createPaymentResp
+        payment: this.createPaymentResp,
       },
     },
   }

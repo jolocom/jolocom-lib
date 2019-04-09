@@ -124,7 +124,11 @@ export class Credential {
    * @example [[include:credential.create.md]]
    */
 
-  public static create<T extends BaseMetadata>({ metadata, claim, subject }: ISignedCredCreationArgs<T>) {
+  public static create<T extends BaseMetadata>({
+    metadata,
+    claim,
+    subject,
+  }: ISignedCredCreationArgs<T>) {
     const credential = new Credential()
     credential.context = [...defaultContext, ...metadata.context]
     credential.type = metadata.type

@@ -1,7 +1,18 @@
 import 'reflect-metadata'
-import { Type, plainToClass, classToPlain, Exclude, Expose, Transform } from 'class-transformer'
+import {
+  Type,
+  plainToClass,
+  classToPlain,
+  Exclude,
+  Expose,
+  Transform,
+} from 'class-transformer'
 import { canonize } from 'jsonld'
-import { ILinkedDataSignature, ILinkedDataSignatureAttrs, IDigestable } from '../types'
+import {
+  ILinkedDataSignature,
+  ILinkedDataSignatureAttrs,
+  IDigestable,
+} from '../types'
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
 import { keyIdToDid } from '../../utils/helper'
@@ -14,7 +25,8 @@ import { keyIdToDid } from '../../utils/helper'
  */
 
 @Exclude()
-export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestable {
+export class EcdsaLinkedDataSignature
+  implements ILinkedDataSignature, IDigestable {
   private _type = 'EcdsaKoblitzSignature2016'
   private _creator: string = ''
   private _created: Date = new Date()
@@ -28,7 +40,9 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
 
   @Expose()
   @Type(() => Date)
-  @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true })
+  @Transform((value: Date) => value && value.toISOString(), {
+    toPlainOnly: true,
+  })
   get created() {
     return this._created
   }
@@ -121,7 +135,7 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
   get signer() {
     return {
       did: keyIdToDid(this.creator),
-      keyId: this.creator
+      keyId: this.creator,
     }
   }
   /**
@@ -155,7 +169,9 @@ export class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestab
    * @param json - Linked data signature in JSON-LD form
    */
 
-  public static fromJSON(json: ILinkedDataSignatureAttrs): EcdsaLinkedDataSignature {
+  public static fromJSON(
+    json: ILinkedDataSignatureAttrs,
+  ): EcdsaLinkedDataSignature {
     return plainToClass(EcdsaLinkedDataSignature, json)
   }
 

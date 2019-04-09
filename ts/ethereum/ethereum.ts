@@ -1,5 +1,9 @@
 import EthereumResolver from 'jolocom-registry-contract'
-import { IEthereumResolverConfig, IEthereumConnector, IEthereumResolverUpdateDIDArgs } from './types'
+import {
+  IEthereumResolverConfig,
+  IEthereumConnector,
+  IEthereumResolverUpdateDIDArgs,
+} from './types'
 
 /**
  * @class
@@ -16,7 +20,10 @@ export class EthResolver implements IEthereumConnector {
    */
 
   constructor(config: IEthereumResolverConfig) {
-    this.ethResolver = new EthereumResolver(config.contractAddress, config.providerUrl)
+    this.ethResolver = new EthereumResolver(
+      config.contractAddress,
+      config.providerUrl,
+    )
   }
 
   /**
@@ -39,7 +46,11 @@ export class EthResolver implements IEthereumConnector {
    * @example `await resolver.updateDIDRecord({ethereumKey: Buffer.from('...'), did: 'did:jolo:...', 'QmZCEmf...'})`
    */
 
-  public async updateDIDRecord({ ethereumKey, did, newHash }: IEthereumResolverUpdateDIDArgs): Promise<void> {
+  public async updateDIDRecord({
+    ethereumKey,
+    did,
+    newHash,
+  }: IEthereumResolverUpdateDIDArgs): Promise<void> {
     await this.ethResolver.updateDIDRecord(ethereumKey, did, newHash)
   }
 }
@@ -48,5 +59,5 @@ export class EthResolver implements IEthereumConnector {
 
 export const jolocomEthereumResolver = new EthResolver({
   providerUrl: 'https://rinkeby.infura.io/',
-  contractAddress: '0xd4351c3f383d79ba378ed1875275b1e7b960f120'
+  contractAddress: '0xd4351c3f383d79ba378ed1875275b1e7b960f120',
 })

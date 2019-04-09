@@ -27,7 +27,10 @@ describe('Identity', () => {
   })
 
   it('Should correctly instantiate from did document including public profile', () => {
-    const identity = Identity.fromDidDocument({ didDocument: mockDidDocument, publicProfile: mockPublicProfile })
+    const identity = Identity.fromDidDocument({
+      didDocument: mockDidDocument,
+      publicProfile: mockPublicProfile,
+    })
     expect(identity.didDocument).to.deep.eq(mockDidDocument)
     expect(identity.publicProfile).to.deep.eq(mockPublicProfile)
   })

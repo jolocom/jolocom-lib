@@ -12,12 +12,14 @@ import { IJSONWebTokenAttrs } from '../interactionTokens/types'
  * generated correctly.
  */
 
-type ParseMethods = {
+interface ParseMethods {
   interactionToken: {
     fromJWT: <T extends JWTEncodable>(jwt: string) => JSONWebToken<T>
-    fromJSON: <T extends JWTEncodable>(json: IJSONWebTokenAttrs) => JSONWebToken<T>
+    fromJSON: <T extends JWTEncodable>(
+      json: IJSONWebTokenAttrs,
+    ) => JSONWebToken<T>
   }
-  credential: (json: ICredentialAttrs) => Credential,
+  credential: (json: ICredentialAttrs) => Credential
   signedCredential: (json: ISignedCredentialAttrs) => SignedCredential
 }
 

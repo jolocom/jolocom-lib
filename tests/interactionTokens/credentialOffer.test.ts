@@ -13,8 +13,14 @@ describe('CredentialOffer', () => {
   })
 
   it('Should implement getters method', () => {
-    expect(credentialOffer.callbackURL).to.eq(credentialOfferCreateAttrs.callbackURL)
-    expect(credentialOffer.requestedInput).to.deep.eq(credentialOfferCreateAttrs.requestedInput)
-    expect(credentialOffer.instant).to.deep.eq(credentialOfferCreateAttrs.instant)
+    expect(credentialOffer.callbackURL).to.eq(
+      credentialOfferCreateAttrs.callbackURL,
+    )
+    expect(credentialOffer.requestedInput).to.deep.eq(
+      credentialOfferCreateAttrs.requestedInput,
+    )
+    expect(credentialOffer.instant).to.deep.eq(
+      credentialOfferCreateAttrs.instant,
+    )
   })
 })
