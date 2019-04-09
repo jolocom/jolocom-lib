@@ -13,7 +13,6 @@ import { publicKeyToAddress } from '../../ts/utils/helper'
 import { PaymentRequest } from '../../ts/interactionTokens/paymentRequest'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { PaymentResponse } from '../../ts/interactionTokens/paymentResponse'
-import {IPaymentRequestAttrs} from '../../ts/interactionTokens/interactionTokens.types'
 import {PaymentRequestCreationArgs} from '../../ts/identityWallet/types'
 
 chai.use(sinonChai)
