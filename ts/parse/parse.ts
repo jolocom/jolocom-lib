@@ -12,7 +12,7 @@ import { IJSONWebTokenAttrs } from '../interactionTokens/types'
  * generated correctly.
  */
 
-interface ParseMethods {
+export interface ParseMethods {
   interactionToken: {
     fromJWT: <T extends JWTEncodable>(jwt: string) => JSONWebToken<T>
     fromJSON: <T extends JWTEncodable>(
