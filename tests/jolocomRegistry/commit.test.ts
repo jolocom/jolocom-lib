@@ -14,6 +14,8 @@ import { encryptionPass } from './jolocomRegistry.data'
 import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
 import { publicProfileCredJSON } from '../data/identity.data'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import {jolocomContractsAdapter} from '../../ts/contracts/contractsAdapter'
+import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -48,7 +50,9 @@ describe('Jolocom registry - commit', () => {
       publicKeyMetadata: {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: didDocumentJSON.publicKey[0].id
-      }
+      },
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
 
     await testRegistry.commit({
@@ -89,7 +93,9 @@ describe('Jolocom registry - commit', () => {
       publicKeyMetadata: {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: didDocumentJSON.publicKey[0].id
-      }
+      },
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
 
     await testRegistry.commit({
@@ -129,7 +135,9 @@ describe('Jolocom registry - commit', () => {
       publicKeyMetadata: {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: didDocumentJSON.publicKey[0].id
-      }
+      },
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
 
     await testRegistry.commit({
@@ -169,7 +177,9 @@ describe('Jolocom registry - commit', () => {
       publicKeyMetadata: {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: didDocumentJSON.publicKey[0].id
-      }
+      },
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
 
     await testRegistry.commit({
@@ -199,7 +209,9 @@ describe('Jolocom registry - commit', () => {
       publicKeyMetadata: {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: didDocumentJSON.publicKey[0].id
-      }
+      },
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
 
     testRegistry.ipfsConnector.storeJSON = sinon.stub().throws(new Error('Mock'))

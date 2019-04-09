@@ -3,7 +3,7 @@ import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { Identity } from '../../ts/identity/identity'
-import { didDocumentJSON, mockKeyId, mockDid } from '../data/didDocument.data'
+import { didDocumentJSON, mockKeyId, } from '../data/didDocument.data'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
@@ -18,6 +18,8 @@ import {
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
 import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import {jolocomContractsAdapter} from '../../ts/contracts/contractsAdapter'
+import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
 chai.use(sinonChai)
 const expect = chai.expect
 
@@ -27,7 +29,7 @@ describe('IdentityWallet validate JWT', () => {
   const didDocument = DidDocument.fromJSON(didDocumentJSON)
   const identity = Identity.fromDidDocument({ didDocument })
   const vault = new SoftwareKeyProvider(testSeed, encryptionPass)
-  
+
   let iw: IdentityWallet
 
   before(() => {
@@ -39,7 +41,9 @@ describe('IdentityWallet validate JWT', () => {
       publicKeyMetadata: {
         derivationPath: KeyTypes.jolocomIdentityKey,
         keyId: mockKeyId,
-      }
+      },
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway
     })
   })
 

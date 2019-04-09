@@ -1,5 +1,5 @@
 import { IIpfsConnector } from '../ipfs/types'
-import { IEthereumConnector } from '../ethereum/types'
+import { IEthereumConnector} from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
@@ -13,6 +13,9 @@ import { publicKeyToDID } from '../utils/crypto'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/types'
 import { KeyTypes } from '../vaultedKeyProvider/types'
 import { generatePublicProfileServiceSection } from '../identity/didDocument/sections/serviceEndpointsSection'
+import {jolocomContractsAdapter} from '../contracts/contractsAdapter'
+import {IContractsAdapter, IContractsGateway} from '../contracts/types'
+import {jolocomContractsGateway} from '../contracts/contractsGateway'
 
 /**
  * @class
@@ -22,6 +25,8 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 export class JolocomRegistry implements IRegistry {
   public ipfsConnector: IIpfsConnector
   public ethereumConnector: IEthereumConnector
+  public contractsAdapter: IContractsAdapter
+  public contractsGateway: IContractsGateway
 
   /**
    * Registers a  new Jolocom identity on Ethereum and IPFS and returns an instance of the Identity Wallet class
@@ -32,6 +37,7 @@ export class JolocomRegistry implements IRegistry {
 
   public async create(vaultedKeyProvider: IVaultedKeyProvider, decryptionPassword: string): Promise<IdentityWallet> {
     const { jolocomIdentityKey, ethereumKey } = KeyTypes
+
     const derivationArgs = {
       derivationPath: jolocomIdentityKey,
       encryptionPass: decryptionPassword
@@ -51,7 +57,9 @@ export class JolocomRegistry implements IRegistry {
       publicKeyMetadata: {
         derivationPath: jolocomIdentityKey,
         keyId: didDocument.publicKey[0].id
-      }
+      },
+      contractsAdapter: this.contractsAdapter,
+      contractsGateway: this.contractsGateway
     })
 
     await this.commit({
@@ -68,10 +76,10 @@ export class JolocomRegistry implements IRegistry {
 
   /**
    * Stores the passed didDocument / public profile on IPFS and updates the mapping in the smart contract.
-   * @param commitArgs - Data to be commited and vault to get private keys
-   * @param commitargs.vaultedKeyProvider - Vaulted key store
-   * @param commitargs.keyMetadata - Derivation path and decryption pass
-   * @param commitargs.identityWallet - Wallet containing did document and public profile
+   * @param commitArgs - Data to be committed and vault to get private keys
+   * @param commitArgs.vaultedKeyProvider - Vaulted key store
+   * @param commitArgs.keyMetadata - Derivation path and decryption pass
+   * @param commitArgs.identityWallet - Wallet containing did document and public profile
    * @deprecated Will be modified in next major release to not require access to the vault
    * @example `await registry.commit({ vaultedKeyProvider, keyMetadata, identityWallet })`
    */
@@ -164,7 +172,9 @@ export class JolocomRegistry implements IRegistry {
     return new IdentityWallet({
       vaultedKeyProvider,
       identity,
-      publicKeyMetadata
+      publicKeyMetadata,
+      contractsGateway: this.contractsGateway,
+      contractsAdapter: this.contractsAdapter
     })
   }
 
@@ -200,20 +210,30 @@ export class JolocomRegistry implements IRegistry {
 
 /**
  * Returns a instance of the Jolocom registry given connector, defaults to Jolocom defined connectors.
- * @param ipfsConnector - Instance of class implementing the {@link IIpfsConnector} interface
- * @param ethereumConnector - Instance of class implementing the {@link IEthereumConnector} interface
+ * @param configuration - Connectors required for smart contract, storage, and anchoring interactions
+ * @param configuration.ipfsConnector - Instance of class implementing the {@link IIpfsConnector} interface
+ * @param configuration.ethereumConnector - Instance of class implementing the {@link IEthereumConnector} interface
+ * @param configuration.contracts - Classes for interacting with Smart ContractsAdapter, implementing {@link IContractsGateway} and {@link IContractsAdapter}
  * @example `const registry = createJolocomRegistry()`
  */
 
 export const createJolocomRegistry = (
-  { ipfsConnector, ethereumConnector }: IRegistryStaticCreationArgs = {
+  configuration: IRegistryStaticCreationArgs = {
     ipfsConnector: jolocomIpfsStorageAgent,
-    ethereumConnector: jolocomEthereumResolver
+    ethereumConnector: jolocomEthereumResolver,
+    contracts: {
+      adapter: jolocomContractsAdapter,
+      gateway: jolocomContractsGateway
+    }
   }
 ): JolocomRegistry => {
+  const {ipfsConnector, contracts, ethereumConnector} = configuration
   const jolocomRegistry = new JolocomRegistry()
+
   jolocomRegistry.ipfsConnector = ipfsConnector
   jolocomRegistry.ethereumConnector = ethereumConnector
+  jolocomRegistry.contractsAdapter = contracts.adapter
+  jolocomRegistry.contractsGateway = contracts.gateway
 
   return jolocomRegistry
 }

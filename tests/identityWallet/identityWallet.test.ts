@@ -16,6 +16,8 @@ import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { validSignedCredReqJWT } from '../data/interactionTokens/jsonWebToken.data'
 import { keyIdToDid } from '../../ts/utils/helper'
+import {jolocomContractsGateway} from '../../ts/contracts/contractsGateway'
+import {jolocomContractsAdapter} from '../../ts/contracts/contractsAdapter'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -47,7 +49,9 @@ describe('IdentityWallet', () => {
         publicKeyMetadata: {
           derivationPath: KeyTypes.jolocomIdentityKey,
           keyId: mockKeyId
-        }
+        },
+        contractsAdapter: jolocomContractsAdapter,
+        contractsGateway: jolocomContractsGateway
       })
 
       expect(iw.did).to.eq(mockDid)
@@ -76,8 +80,8 @@ describe('IdentityWallet', () => {
     it('Should expose aggregated creation methods', () => {
       const categories = ['credential', 'signedCredential', 'interactionTokens']
       const flowTypes = ['request', 'response']
-      const tokenTypesRequest = ['auth', 'offer', 'share']
-      const tokenTypesResponse = ['auth', 'offer', 'share', 'issue']
+      const tokenTypesRequest = ['auth', 'offer', 'share', 'payment']
+      const tokenTypesResponse = ['auth', 'offer', 'share', 'issue', 'payment']
 
       expect(Object.keys(iw.create)).to.deep.eq(categories)
       expect(Object.keys(iw.create.interactionTokens)).to.deep.eq(flowTypes)

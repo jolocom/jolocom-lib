@@ -1,11 +1,16 @@
 import * as ganache from 'ganache-core'
 import * as registryContract from 'jolocom-registry-contract'
 import { userEthKey, serviceEthKey, deployerEthKey } from './integration.data'
+import {ContractsGateway} from '../../ts/contracts/contractsGateway'
+import {ContractsAdapter} from '../../ts/contracts/contractsAdapter'
+import {ethers} from 'ethers'
 const Web3 = require('web3')
 const IPFSFactory = require('ipfsd-ctl')
 
 const PORT = 8945
 const web3 = new Web3()
+web3.setProvider(new Web3.providers.HttpProvider(`http://localhost:${PORT}`))
+
 const balance = web3.utils.toWei('1')
 
 const ganacheServer = ganache.server({
@@ -25,7 +30,6 @@ const daemonFactory = IPFSFactory.create({ type: 'go' })
  */
 
 const deployContract = async () => {
-  web3.setProvider(new Web3.providers.HttpProvider(`http://localhost:${PORT}`))
   const deployerAddress = (await web3.eth.getAccounts())[0]
   return registryContract.TestDeployment.deployIdentityContract(web3, deployerAddress)
 }
@@ -57,12 +61,17 @@ const spawnIpfsNode = async () => {
 
 /**
  * @description - Initiates a mock ethereum network using ganache, a discardable ipfs node using ipfsd, and
- *   deployes the Jolocom identity registry contract.
+ *   deploys the Jolocom identity registry contract.
  * @returns {void}
  */
 
+type ContractClassess = {
+  testContractsGateway: ContractsGateway
+  testContractsAdapter: ContractsAdapter
+}
+
 export const init = async () =>
-  new Promise<string>(async (resolve, reject) => {
+  new Promise<ContractClassess>(async (resolve, reject) => {
     ganacheServer.listen(PORT, async ganacheErr => {
       if (ganacheErr) {
         return reject(ganacheErr)
@@ -71,6 +80,12 @@ export const init = async () =>
       await deployContract()
       await spawnIpfsNode()
 
-      return resolve()
+      const testContractsGateway = new ContractsGateway(new ethers.providers.Web3Provider(web3.currentProvider))
+      const testContractsAdapter = new ContractsAdapter()
+
+      return resolve({
+        testContractsGateway,
+        testContractsAdapter
+      })
     })
   })
