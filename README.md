@@ -14,7 +14,7 @@ Want to use our library? Please refer to the following resources:
 
 Integration and unit tests located in the ``./tests`` folder are a good place to start too.
 
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/jolocom/jolocom-lib)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/jolocom/SmartWallet)
 
 ## Requirements
 
