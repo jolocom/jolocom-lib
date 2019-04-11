@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 
 interface AddressInfo {
   nonce: number
-  balance: BigNumber
+  balance: number
 }
 
 interface ContractsGatewayInfo {
