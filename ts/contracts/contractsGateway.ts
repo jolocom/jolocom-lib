@@ -47,12 +47,8 @@ export class ContractsGateway implements IContractsGateway {
    */
 
   public async getAddressInfo(address: string) {
-    const balance = await this.provider
-      .getBalance(address)
-      .then(res => res.toString())
-
     return {
-      balance: parseInt(balance),
+      balance: await this.provider.getBalance(address),
       nonce: await this.provider.getTransactionCount(address),
     }
   }

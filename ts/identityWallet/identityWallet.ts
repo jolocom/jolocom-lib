@@ -34,14 +34,16 @@ import {
   publicKeyToAddress,
 } from '../utils/helper'
 import { generateRandomID } from '../utils/crypto'
-import { createJolocomRegistry } from '../registries/jolocomRegistry'
+import {
+  JolocomRegistry,
+  createJolocomRegistry,
+} from '../registries/jolocomRegistry'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 import {
   IContractsAdapter,
   IContractsGateway,
   ITransactionEncodable,
 } from '../contracts/types'
-import { IRegistry } from '../registries/types'
 
 /**
  * @class
@@ -453,7 +455,7 @@ export class IdentityWallet {
   public async validateJWT<T extends JWTEncodable, A extends JWTEncodable>(
     receivedJWT: JSONWebToken<T>,
     sendJWT?: JSONWebToken<A>,
-    customRegistry?: IRegistry,
+    customRegistry?: JolocomRegistry,
   ): Promise<void> {
     const registry = customRegistry || createJolocomRegistry()
     const remoteIdentity = await registry.resolve(
