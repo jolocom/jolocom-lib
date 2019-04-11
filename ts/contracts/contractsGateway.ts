@@ -25,6 +25,22 @@ export class ContractsGateway implements IContractsGateway {
   }
 
   /**
+   * Query the chain for info about an address
+   * @example `ethGateway.getAddressInfo('0xabc...def')` // { nonce: 5, balance: BigNumber { _hex: '0x301...'} }
+   */
+
+  public async getAddressInfo(address: string) {
+    const balance = await this.provider
+      .getBalance(address)
+      .then(res => res.toString())
+
+    return {
+      balance: parseInt(balance),
+      nonce: await this.provider.getTransactionCount(address),
+    }
+  }
+
+  /**
    * Get details about the used network
    * @example `ethGateway.getNetworkInfo()` // {name: 'rinkeby', chainId: 4, endpoint: 'https://rinkeby.infura.io'}
    */
@@ -38,18 +54,6 @@ export class ContractsGateway implements IContractsGateway {
       name: this.provider.network.name,
       chainId: this.provider.network.chainId,
       endpoint: this.provider.connection.url,
-    }
-  }
-
-  /**
-   * Query the chain for info about an address
-   * @example `ethGateway.getAddressInfo('0xabc...def')` // { nonce: 5, balance: BigNumber { _hex: '0x301...'} }
-   */
-
-  public async getAddressInfo(address: string) {
-    return {
-      balance: await this.provider.getBalance(address),
-      nonce: await this.provider.getTransactionCount(address),
     }
   }
 

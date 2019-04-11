@@ -1,8 +1,11 @@
 {
   "name": "jolocom-lib",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
+  "files": [
+    "js/"
+  ],
   "typings": "js/index.d.ts",
   "scripts": {
     "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts",
