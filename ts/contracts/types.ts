@@ -1,15 +1,14 @@
 import { IVaultedKeyProvider } from '../vaultedKeyProvider/types'
-import { BigNumber } from 'ethers/utils'
-
-interface AddressInfo {
-  nonce: number
-  balance: number
-}
 
 interface ContractsGatewayInfo {
   name: string
   chainId: number
   endpoint: string
+}
+
+interface AddressInfo {
+  nonce: number
+  balance: number
 }
 
 export interface IContractsAdapter {
