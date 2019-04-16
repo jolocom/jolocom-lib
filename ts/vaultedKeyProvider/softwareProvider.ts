@@ -3,6 +3,7 @@ import { randomBytes, createCipher, createDecipher } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
+import { entropyToMnemonic } from "bip39"
 
 export class SoftwareKeyProvider implements IVaultedKeyProvider {
   private readonly encryptedSeed: Buffer
@@ -84,6 +85,15 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
     console.warn('METHOD WILL BE DEPRECATED SOON, ANTIPATTERN')
     return fromSeed(seed).derivePath(derivationPath).privateKey
+  }
+
+ /**
+  * Returns the Mnemonic of the stored Seed
+  * @param password - Password for seed decryption
+  */
+  public getMnemonic(password: string): string {
+    const seed = this.decrypt(password, this.encryptedSeed)
+    return entropyToMnemonic(seed)
   }
 
   /**
