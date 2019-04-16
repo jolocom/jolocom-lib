@@ -27,8 +27,8 @@ export type CredentialOfferRequestCreationArgs = ICredentialOfferAttrs
 export type CredentialOfferResponseCreationArgs = ICredentialsReceiveAttrs
 export type PaymentResponseCreationArgs = IPaymentResponseAttrs
 
-export type AuthCreationArgs = {
-  callbackURL: string,
+export interface AuthCreationArgs {
+  callbackURL: string
   description?: string
 }
 

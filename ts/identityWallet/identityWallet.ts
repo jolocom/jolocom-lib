@@ -10,7 +10,7 @@ import {
   IIdentityWalletCreateArgs,
   PaymentRequestCreationArgs,
   PaymentResponseCreationArgs,
-  PublicKeyMap
+  PublicKeyMap,
 } from './types'
 import { Identity } from '../identity/identity'
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
@@ -228,7 +228,7 @@ export class IdentityWallet {
   ) => {
     const authenticationReq = Authentication.fromJSON({
       description: 'Authorization required',
-      ...authArgs
+      ...authArgs,
     })
 
     const jwt = JSONWebToken.fromJWTEncodable(authenticationReq)
