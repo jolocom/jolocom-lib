@@ -40,7 +40,7 @@ Add the newly created public profile to your identity:
   * @see https://www.typescriptlang.org/docs/handbook/classes.html
   */
 
-  identityWallet.publicProfile = publicProfileCred
+  identityWallet.identity.publicProfile = publicProfileCred
 
 
 .. note:: `Typescript accessors <https://www.typescriptlang.org/docs/handbook/classes.html>`_ are used to get and set values on the ``identityWallet`` instance
@@ -55,7 +55,7 @@ Now, you can commit the changes to IPFS and Ethereum.
     vaultedKeyProvider,
     keyMetadata: {
       encryptionPass: secret,
-      derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey
+      derivationPath: JolocomLib.KeyTypes.ethereumKey
     }
   })
 
@@ -73,7 +73,7 @@ Removing your public profile
     vaultedKeyProvider,
     keyMetadata: {
       encryptionPass: secret,
-      derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey
+      derivationPath: JolocomLib.KeyTypes.ethereumKey
     }
   })
 
