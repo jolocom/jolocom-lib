@@ -11,6 +11,7 @@ import { IAuthenticationAttrs } from './interactionTokens.types'
 @Exclude()
 export class Authentication {
   private _callbackURL: string
+  private _description: string
 
   /**
    * Get the callback url encoded in the payload
@@ -29,6 +30,25 @@ export class Authentication {
 
   set callbackURL(callbackURL: string) {
     this._callbackURL = callbackURL
+  }
+
+  /**
+   * Get the description for the required action
+   * @example `console.log(authentication.description) // 'Authorization required'`
+   */
+
+  @Expose()
+  get description(): string {
+    return this._description
+  }
+
+  /**
+   * Set the description for the required action
+   * @example `authentication.description = 'Authorization to start the vehicle'`
+   */
+
+  set description(description: string) {
+    this._description = description
   }
 
   /**

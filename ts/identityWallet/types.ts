@@ -21,14 +21,17 @@ export interface IIdentityWalletCreateArgs {
 
 export type PublicKeyMap = { [key in keyof typeof KeyTypes]?: string }
 
-export type AuthRequestCreationArgs = IAuthenticationAttrs
 export type CredentialShareRequestCreationArgs = ICredentialRequestAttrs
 export type CredentialShareResponseCreationArgs = ICredentialResponseAttrs
-
 export type CredentialOfferRequestCreationArgs = ICredentialOfferAttrs
 export type CredentialOfferResponseCreationArgs = ICredentialsReceiveAttrs
-
 export type PaymentResponseCreationArgs = IPaymentResponseAttrs
+
+export type AuthCreationArgs = {
+  callbackURL: string,
+  description?: string
+}
+
 export interface PaymentRequestCreationArgs {
   callbackURL: string
   description: string

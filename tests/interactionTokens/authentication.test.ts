@@ -6,7 +6,6 @@ describe('Authentication', () => {
   let auth: Authentication
 
   /* Implicitly tests toJSON too */
-
   it('Should implement static fromJSON', () => {
     auth = Authentication.fromJSON(jsonAuthentication)
     expect(auth.toJSON()).to.deep.eq(jsonAuthentication)
@@ -14,5 +13,6 @@ describe('Authentication', () => {
 
   it('Should implement getters method', () => {
     expect(auth.callbackURL).to.eq(jsonAuthentication.callbackURL)
+    expect(auth.description).to.eq(jsonAuthentication.description)
   })
 })
