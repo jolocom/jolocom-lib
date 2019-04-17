@@ -2,7 +2,7 @@ import { BaseMetadata } from 'cred-types-jolocom-core'
 import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import {
-  AuthRequestCreationArgs,
+  AuthCreationArgs,
   CredentialOfferRequestCreationArgs,
   CredentialOfferResponseCreationArgs,
   CredentialShareRequestCreationArgs,
@@ -222,11 +222,15 @@ export class IdentityWallet {
    */
 
   private createAuth = async (
-    authArgs: AuthRequestCreationArgs,
+    authArgs: AuthCreationArgs,
     pass: string,
     receivedJWT?: JSONWebToken<JWTEncodable>,
   ) => {
-    const authenticationReq = Authentication.fromJSON(authArgs)
+    const authenticationReq = Authentication.fromJSON({
+      description: 'Authorize the transaction',
+      ...authArgs,
+    })
+
     const jwt = JSONWebToken.fromJWTEncodable(authenticationReq)
     jwt.interactionType = InteractionType.Authentication
     return this.initializeAndSign(

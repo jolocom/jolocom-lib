@@ -42,6 +42,7 @@ export interface ICredentialRequest {
 
 export interface IAuthenticationAttrs {
   callbackURL: string
+  description: string
 }
 
 /* Related to constraint functions */
