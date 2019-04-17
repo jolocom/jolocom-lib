@@ -88,7 +88,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   }
 
  /**
-  * Returns the Mnemonic of the stored Seed
+  * Returns the mnemonic of the stored seed
   * @param password - Password for seed decryption
   */
   public getMnemonic(password: string): string {

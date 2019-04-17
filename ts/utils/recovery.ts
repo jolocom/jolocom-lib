@@ -8,8 +8,8 @@ import { KeyTypes, IVaultedKeyProvider } from '../vaultedKeyProvider/types'
  * Recovers the identity key pair based on a the mnemonic phrase
  * @param seedPhrase - The recovery phrase of the original seed
  * @param registry - jolocom registry to resolve the identity that should be recovered
- * @param password - The
- * @returns identityWallet and the key provider
+ * @param password - The password for the key provider
+ * @returns The identityWallet and the key provider
  */
 export async function recoverIdentity(
   seedPhrase: string,
