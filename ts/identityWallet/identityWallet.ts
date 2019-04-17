@@ -227,7 +227,7 @@ export class IdentityWallet {
     receivedJWT?: JSONWebToken<JWTEncodable>,
   ) => {
     const authenticationReq = Authentication.fromJSON({
-      description: 'Authorization required',
+      description: 'Authorize the transaction',
       ...authArgs,
     })
 
