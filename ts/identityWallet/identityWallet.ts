@@ -34,14 +34,14 @@ import {
   publicKeyToAddress,
 } from '../utils/helper'
 import { generateRandomID } from '../utils/crypto'
-import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 import { createJolocomRegistry } from '../registries/jolocomRegistry'
-import { IRegistry } from '../registries/types'
+import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 import {
   IContractsAdapter,
   IContractsGateway,
   ITransactionEncodable,
 } from '../contracts/types'
+import { IRegistry } from '../registries/types'
 
 /**
  * @class
@@ -417,6 +417,37 @@ export class IdentityWallet {
   }
 
   /**
+   * Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
+   * @param jwt - JSONWebToken Class
+   * @param derivationPath - Derivation Path for identity keys
+   * @param pass - Password to decrypt the vaulted seed
+   * @param receivedJWT - optional received JSONWebToken Class
+   */
+
+  private async initializeAndSign<T extends JWTEncodable>(
+    jwt: JSONWebToken<T>,
+    derivationPath: string,
+    pass: string,
+    receivedJWT?: JSONWebToken<T>,
+  ) {
+    jwt.setIssueAndExpiryTime()
+    jwt.issuer = this.publicKeyMetadata.keyId
+
+    receivedJWT ? (jwt.audience = keyIdToDid(receivedJWT.issuer)) : null
+    receivedJWT
+      ? (jwt.nonce = receivedJWT.nonce)
+      : (jwt.nonce = generateRandomID(8))
+
+    const signature = await this.vaultedKeyProvider.signDigestable(
+      { derivationPath, encryptionPass: pass },
+      jwt,
+    )
+    jwt.signature = signature.toString('hex')
+
+    return jwt
+  }
+
+  /**
    * Validates interaction tokens for signature - if only received token passed - and for audience (aud) and token nonce (jti) if send token passed also
    * @param receivedJWT - received JSONWebToken Class
    * @param sendJWT - optional send JSONWebToken Class which is used to validate the token nonce and the aud field on received token
@@ -467,37 +498,6 @@ export class IdentityWallet {
       pass,
     )
     return this._contractsGateway.broadcastTransaction(tx)
-  }
-
-  /**
-   * Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
-   * @param jwt - JSONWebToken Class
-   * @param derivationPath - Derivation Path for identity keys
-   * @param pass - Password to decrypt the vaulted seed
-   * @param receivedJWT - optional received JSONWebToken Class
-   */
-
-  private async initializeAndSign<T extends JWTEncodable>(
-    jwt: JSONWebToken<T>,
-    derivationPath: string,
-    pass: string,
-    receivedJWT?: JSONWebToken<T>,
-  ) {
-    jwt.setIssueAndExpiryTime()
-    jwt.issuer = this.publicKeyMetadata.keyId
-
-    receivedJWT ? (jwt.audience = keyIdToDid(receivedJWT.issuer)) : null
-    receivedJWT
-      ? (jwt.nonce = receivedJWT.nonce)
-      : (jwt.nonce = generateRandomID(8))
-
-    const signature = await this.vaultedKeyProvider.signDigestable(
-      { derivationPath, encryptionPass: pass },
-      jwt,
-    )
-    jwt.signature = signature.toString('hex')
-
-    return jwt
   }
 
   public transactions = {
