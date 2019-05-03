@@ -9,6 +9,7 @@ import {
   testPublicIdentityKey,
   testIncorrectPublicIdentityKey,
   testPrivateIdentityKey,
+  testMnemonic,
 } from '../data/keys.data'
 import { expect } from 'chai'
 import {
@@ -196,6 +197,35 @@ describe('Software Vaulted Key Provider', () => {
       expect(
         await SoftwareKeyProvider.verifyDigestable(pubKey, corruptedCredential),
       ).to.be.false
+    })
+  })
+
+  describe('getMnemonic', () => {
+    it('should return the mnemonic phrase', function() {
+      expect(vault.getMnemonic(keyDerivationArgs.encryptionPass)).to.equal(
+        testMnemonic,
+      )
+    })
+  })
+
+  describe('recoverKeyPair', () => {
+    it('should correctly return a VaultedKeyProvider', function() {
+      const vault = SoftwareKeyProvider.recoverKeyPair(
+        testMnemonic,
+        keyDerivationArgs.encryptionPass,
+      )
+      expect(vault.getPrivateKey(keyDerivationArgs)).to.deep.eq(
+        testPrivateIdentityKey,
+      )
+    })
+
+    it('should fail if the mnemonic is wrong', function() {
+      expect(() =>
+        SoftwareKeyProvider.recoverKeyPair(
+          'Wrong Mnemonic',
+          keyDerivationArgs.encryptionPass,
+        ),
+      ).to.throw(Error, 'Invalid Mnemonic.')
     })
   })
 })
