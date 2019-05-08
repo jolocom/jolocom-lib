@@ -9,14 +9,25 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   private readonly encryptedSeed: Buffer
 
   /**
+   * Initializes the vault with an already encrypted aes 256 cbc seed
+   * @param encryptedSeed
+   */
+  public constructor(encryptedSeed: Buffer) {
+    this.encryptedSeed = encryptedSeed
+  }
+
+  /**
    * Initializes the vault with the aes 256 cbc encrypted seed
    * @param seed - 32 byte seed for creating bip32 wallet
    * @param encryptionPass - password used to generate encryption cipher
    * @example `const vault = new SoftwareKeyProvider(Buffer.from('abc...', 'hex'), 'secret')`
    */
-
-  public constructor(seed: Buffer, encryptionPass: string) {
-    this.encryptedSeed = this.encrypt(encryptionPass, seed)
+  public static fromSeed(
+    seed: Buffer,
+    encryptionPass: string,
+  ): SoftwareKeyProvider {
+    const encryptedSeed = SoftwareKeyProvider.encrypt(encryptionPass, seed)
+    return new SoftwareKeyProvider(encryptedSeed)
   }
 
   /**
@@ -34,7 +45,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
       throw new Error('Invalid Mnemonic.')
     }
     const seed = Buffer.from(mnemonicToEntropy(mnemonic), 'hex')
-    return new SoftwareKeyProvider(seed, encryptionPass)
+    return SoftwareKeyProvider.fromSeed(seed, encryptionPass)
   }
 
   /**
@@ -45,7 +56,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   public getPublicKey(derivationArgs: IKeyDerivationArgs): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
-    const seed = this.decrypt(encryptionPass, this.encryptedSeed)
+    const seed = SoftwareKeyProvider.decrypt(encryptionPass, this.encryptedSeed)
     return fromSeed(seed).derivePath(derivationPath).publicKey
   }
 
@@ -69,7 +80,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   public sign(derivationArgs: IKeyDerivationArgs, digest: Buffer): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
-    const seed = this.decrypt(encryptionPass, this.encryptedSeed)
+    const seed = SoftwareKeyProvider.decrypt(encryptionPass, this.encryptedSeed)
     const signingKey = fromSeed(seed).derivePath(derivationPath)
     return signingKey.sign(digest)
   }
@@ -99,7 +110,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   public getPrivateKey(derivationArgs: IKeyDerivationArgs): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
-    const seed = this.decrypt(encryptionPass, this.encryptedSeed)
+    const seed = SoftwareKeyProvider.decrypt(encryptionPass, this.encryptedSeed)
 
     console.warn('METHOD WILL BE DEPRECATED SOON, ANTIPATTERN')
     return fromSeed(seed).derivePath(derivationPath).privateKey
@@ -110,7 +121,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param password - Password for seed decryption
    */
   public getMnemonic(password: string): string {
-    const seed = this.decrypt(password, this.encryptedSeed)
+    const seed = SoftwareKeyProvider.decrypt(password, this.encryptedSeed)
     return entropyToMnemonic(seed)
   }
 
@@ -154,7 +165,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `this.encrypt('secret', Buffer.from('abc..fe', 'hex'))`
    */
 
-  private encrypt(password: string, data: Buffer): Buffer {
+  private static encrypt(password: string, data: Buffer): Buffer {
     const cipher = createCipher('aes-256-cbc', password)
     return Buffer.concat([cipher.update(data), cipher.final()])
   }
@@ -166,7 +177,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `this.dencrypt('secret', encrypted)`
    */
 
-  private decrypt(password: string, data: Buffer): Buffer {
+  private static decrypt(password: string, data: Buffer): Buffer {
     const decipher = createDecipher('aes-256-cbc', password)
     return Buffer.concat([decipher.update(data), decipher.final()])
   }

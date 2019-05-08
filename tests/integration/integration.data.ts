@@ -24,7 +24,7 @@ const userSeed = Buffer.from(
   '901271e3f39bc97987193bfaf986a1590191d83f12d136d3039f6d5a5d837201',
 )
 export const userPass = 'user'
-export const userVault = new SoftwareKeyProvider(userSeed, userPass)
+export const userVault = SoftwareKeyProvider.fromSeed(userSeed, userPass)
 
 /* The private eth key derived from the user's seed */
 export const userEthKey =
@@ -35,7 +35,10 @@ const serviceSeed = Buffer.from(
   'f4a95507498d649fdc444fe5525978f24acd179dce79f2d0330372b2908d892b',
 )
 export const servicePass = 'service'
-export const serviceVault = new SoftwareKeyProvider(serviceSeed, servicePass)
+export const serviceVault = SoftwareKeyProvider.fromSeed(
+  serviceSeed,
+  servicePass,
+)
 
 /* The private eth key derived from the service's seed */
 export const serviceEthKey =

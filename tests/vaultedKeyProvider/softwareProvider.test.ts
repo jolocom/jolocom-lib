@@ -29,14 +29,14 @@ import { claimsMetadata } from 'cred-types-jolocom-core'
 
 chai.use(sinonChai)
 describe('Software Vaulted Key Provider', () => {
-  const vault = new SoftwareKeyProvider(
+  const vault = SoftwareKeyProvider.fromSeed(
     testSeed,
     keyDerivationArgs.encryptionPass,
   )
 
   describe('constructor', () => {
     it('Should fail to instantiate if entropy too short', () => {
-      const faultyVault = new SoftwareKeyProvider(
+      const faultyVault = SoftwareKeyProvider.fromSeed(
         Buffer.from('a'),
         keyDerivationArgs.encryptionPass,
       )
@@ -48,7 +48,7 @@ describe('Software Vaulted Key Provider', () => {
 
     it('Should fail to instantiate if entropy too long', () => {
       const longEntropy = Buffer.concat([testSeed, testSeed, testSeed])
-      const faultyVault = new SoftwareKeyProvider(
+      const faultyVault = SoftwareKeyProvider.fromSeed(
         longEntropy,
         keyDerivationArgs.encryptionPass,
       )

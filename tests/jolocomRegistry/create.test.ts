@@ -21,7 +21,7 @@ describe('Jolocom Registry - create', () => {
   const sandbox = sinon.createSandbox()
 
   let identityWallet: IdentityWallet
-  const mockVault = new SoftwareKeyProvider(testSeed, encryptionPass)
+  const mockVault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
 
   before(async () => {
     sandbox.stub(mockVault, 'getPublicKey').returns(testPublicIdentityKey)
