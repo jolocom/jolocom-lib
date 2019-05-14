@@ -6861,6 +6861,11 @@ secp256k1@^3.0.1, secp256k1@^3.6.1:
     nan "^2.2.1"
     safe-buffer "^5.1.0"
 
+secrets.js-grempe@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/secrets.js-grempe/-/secrets.js-grempe-1.1.0.tgz#bb3b606dd68637ca244681a10fdee6c512049294"
+  integrity sha1-uztgbdaGN8okRoGhD97mxRIEkpQ=
+
 seedrandom@2.4.4:
   version "2.4.4"
   resolved "https://registry.yarnpkg.com/seedrandom/-/seedrandom-2.4.4.tgz#b25ea98632c73e45f58b77cfaa931678df01f9ba"
@@ -6997,6 +7002,11 @@ sha3@^1.2.2:
   integrity sha1-pmxQmN5MJbyIM27ItIF9AFvKe6k=
   dependencies:
     nan "2.10.0"
+
+shamirs-secret-sharing@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/shamirs-secret-sharing/-/shamirs-secret-sharing-1.0.0.tgz#3fdf3d3e8da414e2a2fefe2af55674969915724b"
+  integrity sha512-0ds/e/tMDIy2eJSy56DEI6oOMTKXkHtGVEV92zNXg7OQkClvLPHMeVOtncE+QIMHlAWV7dE7zsTKFc4xgsDOVA==
 
 shebang-command@^1.2.0:
   version "1.2.0"
