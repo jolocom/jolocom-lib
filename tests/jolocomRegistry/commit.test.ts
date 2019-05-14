@@ -26,7 +26,7 @@ const expect = chai.expect
 
 describe('Jolocom registry - commit', () => {
   let sandbox = sinon.createSandbox()
-  const vault = new SoftwareKeyProvider(testSeed, encryptionPass)
+  const vault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
 
   const keyMetadata = {
     derivationPath: KeyTypes.jolocomIdentityKey,

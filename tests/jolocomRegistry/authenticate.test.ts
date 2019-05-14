@@ -15,7 +15,7 @@ describe('Jolocom Registry - authenticate', () => {
   const sandbox = sinon.createSandbox()
 
   const mockDidDoc = DidDocument.fromJSON(didDocumentJSON)
-  const mockVault = new SoftwareKeyProvider(testSeed, encryptionPass)
+  const mockVault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
   const registry = createJolocomRegistry()
 
   before(async () => {
