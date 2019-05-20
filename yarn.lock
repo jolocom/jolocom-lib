@@ -4714,10 +4714,10 @@ jsonify@~0.0.0:
   resolved "https://registry.yarnpkg.com/jsonify/-/jsonify-0.0.0.tgz#2c74b6ee41d93ca51b7b5aaee8f503631d252a73"
   integrity sha1-LHS27kHZPKUbe1qu6PUDYx0lKnM=
 
-jsonld@^1.5.3:
-  version "1.5.3"
-  resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-1.5.3.tgz#5814e8040adc075349057b56b2d5e80de23a25ec"
-  integrity sha512-fbgty6qs1UNmzHePUa+4wqZBbjdQN+XNs7bZ1kbp2e/ILIFTDHIuaUH9xrovTcrTfeBc/qbJ0aYpXvYOSRJZxg==
+jsonld@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-1.6.1.tgz#9db5d2a38ac26a118dbc5fae5dbefc3f22780ce2"
+  integrity sha512-4J5ilGTk+rAvAChbADruqFLcZ52b0aoMLL7xtyCVEmoIbyaPtwO4rOlQ/VczqhcrDvzxHflpDBdVi37LpALpXg==
   dependencies:
     rdf-canonize "^1.0.2"
     request "^2.88.0"

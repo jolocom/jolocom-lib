@@ -10,22 +10,18 @@ export const mockPublicKeyHex =
 /* JSON form to ensure toJSON and fromJSON work as intended */
 
 export const didDocumentJSON = {
-  authentication: [
-    {
-      publicKey: mockKeyId,
-      type: 'Secp256k1SignatureAuthentication2018',
-    },
-  ],
+  authentication: [mockKeyId],
   publicKey: [
     {
       id: mockKeyId,
       type: 'Secp256k1VerificationKey2018',
-      owner: mockDid,
+      controller: mockDid,
       publicKeyHex: mockPublicKeyHex,
     },
   ],
   service: [],
   created: '1970-01-01T00:00:00.000Z',
+  updated: '1970-01-01T00:00:00.000Z',
   proof: {
     type: 'EcdsaKoblitzSignature2016',
     creator: mockKeyId,

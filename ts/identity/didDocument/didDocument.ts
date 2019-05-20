@@ -9,11 +9,7 @@ import {
 import { IDidDocumentAttrs } from './types'
 import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
-import {
-  AuthenticationSection,
-  PublicKeySection,
-  ServiceEndpointsSection,
-} from './sections'
+import { PublicKeySection, ServiceEndpointsSection } from './sections'
 import { ISigner } from '../../registries/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
@@ -32,12 +28,13 @@ import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 @Exclude()
 export class DidDocument implements IDigestable {
   private _id: string
-  private _authentication: AuthenticationSection[] = []
+  private _authentication: string[] = []
   private _publicKey: PublicKeySection[] = []
   private _service: ServiceEndpointsSection[] = []
   private _created: Date = new Date()
+  private _updated: Date = new Date()
   private _proof: ILinkedDataSignature
-  private '_@context': ContextEntry[] = defaultContextIdentity
+  private _context: ContextEntry[] = defaultContextIdentity
 
   /**
    * Get the `@context` section of the JSON-ld document
@@ -46,8 +43,8 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose({ name: '@context' })
-  get context(): ContextEntry[] {
-    return this['_@context']
+  public get context(): ContextEntry[] {
+    return this._context
   }
 
   /**
@@ -56,8 +53,8 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.context = [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
-  set context(context: ContextEntry[]) {
-    this['_@context'] = context
+  public set context(context: ContextEntry[]) {
+    this._context = context
   }
 
   /**
@@ -66,7 +63,7 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose({ name: 'id' })
-  get did(): string {
+  public get did(): string {
     return this._id
   }
 
@@ -75,7 +72,7 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.id = 'claimId:25453fa543da7'`
    */
 
-  set did(did: string) {
+  public set did(did: string) {
     this._id = did
   }
 
@@ -85,8 +82,7 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose()
-  @Type(() => AuthenticationSection)
-  get authentication(): AuthenticationSection[] {
+  public get authentication(): string[] {
     return this._authentication
   }
 
@@ -95,7 +91,7 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.authentication = [AuthenticationSection {...}, ...]`
    */
 
-  set authentication(authentication: AuthenticationSection[]) {
+  public set authentication(authentication: string[]) {
     this._authentication = authentication
   }
 
@@ -106,7 +102,7 @@ export class DidDocument implements IDigestable {
 
   @Expose()
   @Type(() => PublicKeySection)
-  get publicKey(): PublicKeySection[] {
+  public get publicKey(): PublicKeySection[] {
     return this._publicKey
   }
 
@@ -115,7 +111,7 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.publicKey = [PublicKeySection {...}, ...]`
    */
 
-  set publicKey(value: PublicKeySection[]) {
+  public set publicKey(value: PublicKeySection[]) {
     this._publicKey = value
   }
 
@@ -126,7 +122,7 @@ export class DidDocument implements IDigestable {
 
   @Expose()
   @Type(() => ServiceEndpointsSection)
-  get service(): ServiceEndpointsSection[] {
+  public get service(): ServiceEndpointsSection[] {
     return this._service
   }
 
@@ -135,13 +131,13 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.service = [ServiceEndpointSection {...}, ...]`
    */
 
-  set service(service: ServiceEndpointsSection[]) {
+  public set service(service: ServiceEndpointsSection[]) {
     this._service = service
   }
 
   /**
    * Get the creation date of the did document
-   * @example `console.log(didDocument.issued) // Date 2018-11-11T15:46:09.720Z`
+   * @example `console.log(didDocument.created) // Date 2018-11-11T15:46:09.720Z`
    */
 
   @Expose()
@@ -149,7 +145,7 @@ export class DidDocument implements IDigestable {
     toPlainOnly: true,
   })
   @Transform((value: string) => value && new Date(value), { toClassOnly: true })
-  get created(): Date {
+  public get created(): Date {
     return this._created
   }
 
@@ -158,8 +154,31 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.created = new Date('2018-11-11T15:46:09.720Z')`
    */
 
-  set created(value: Date) {
+  public set created(value: Date) {
     this._created = value
+  }
+
+  /**
+   * Get the updated date of the did document
+   * @example `console.log(didDocument.updated) // Date 2018-11-11T15:46:09.720Z`
+   */
+
+  @Expose()
+  @Transform((value: Date) => value && value.toISOString(), {
+    toPlainOnly: true,
+  })
+  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+  public get updated(): Date {
+    return this._updated
+  }
+
+  /**
+   * Set the updated date of the did document
+   * @example `didDocument.updated = new Date('2018-11-11T15:46:09.720Z')`
+   */
+
+  public set updated(value: Date) {
+    this._updated = value
   }
 
   /**
@@ -168,7 +187,7 @@ export class DidDocument implements IDigestable {
    * @example `console.log(didDocument.signer) // { did: 'did:jolo:...', keyId: 'did:jolo:...#keys-1' }`
    */
 
-  get signer(): ISigner {
+  public get signer(): ISigner {
     return {
       did: this._id,
       keyId: this._proof.creator,
@@ -180,7 +199,7 @@ export class DidDocument implements IDigestable {
    * @example `console.log(didDocument.signature) // '2b8504698e...'`
    */
 
-  get signature(): string {
+  public get signature(): string {
     return this._proof.signature
   }
 
@@ -189,7 +208,7 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.signature = '2b8504698e...'`
    */
 
-  set signature(signature: string) {
+  public set signature(signature: string) {
     this._proof.signature = signature
   }
 
@@ -203,7 +222,7 @@ export class DidDocument implements IDigestable {
   @Transform(value => value || new EcdsaLinkedDataSignature(), {
     toClassOnly: true,
   })
-  get proof(): ILinkedDataSignature {
+  public get proof(): ILinkedDataSignature {
     return this._proof
   }
 
@@ -212,17 +231,17 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.proof = new EcdsaLinkedDataSignature()`
    */
 
-  set proof(proof: ILinkedDataSignature) {
+  public set proof(proof: ILinkedDataSignature) {
     this._proof = proof
   }
 
   /**
-   * Adds a new {@link AuthenticationSection} to the did document instance
-   * @param section - Configured {@link AuthenticationSection} instance
+   * Adds a new authentication key id to the did document instance
+   * @param authenticationKeyId - id string of a public key
    */
 
-  public addAuthSection(section: AuthenticationSection) {
-    this.authentication.push(section)
+  public addAuthSection(authenticationKeyId: string) {
+    this.authentication.push(authenticationKeyId)
   }
 
   /**
@@ -236,7 +255,7 @@ export class DidDocument implements IDigestable {
 
   /**
    * Adds a new {@link ServiceEndpointsSection} to the did document instance
-   * @param section - Configured {@link ServiceEndpointsSection} instance
+   * @param endpoint - Configured {@link ServiceEndpointsSection} instance
    */
 
   public addServiceEndpoint(endpoint: ServiceEndpointsSection) {
@@ -267,9 +286,7 @@ export class DidDocument implements IDigestable {
     didDocument.addPublicKeySection(
       PublicKeySection.fromEcdsa(publicKey, keyId, did),
     )
-    didDocument.addAuthSection(
-      AuthenticationSection.fromEcdsa(didDocument.publicKey[0]),
-    )
+    didDocument.addAuthSection(didDocument.publicKey[0].id)
     didDocument.prepareSignature(keyId)
 
     return didDocument
@@ -315,6 +332,14 @@ export class DidDocument implements IDigestable {
     const json = this.toJSON()
     delete json.proof
     return canonize(json)
+  }
+
+  /**
+   * Updates the updated field of the DID Document to the current Date and Time.
+   * Should always be called on DID Document updates.
+   */
+  public hasBeenUpdated(): void {
+    this._updated = new Date()
   }
 
   /**

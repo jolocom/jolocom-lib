@@ -64,7 +64,7 @@ describe('DidDocument', () => {
       service,
       created,
     } = didDocumentJSON
-    const auth = referenceDidDocument.authentication.map(auth => auth.toJSON())
+    const auth = referenceDidDocument.authentication
     const pub = referenceDidDocument.publicKey.map(pub => pub.toJSON())
     const serv = referenceDidDocument.service.map(ser => ser.toJSON())
 

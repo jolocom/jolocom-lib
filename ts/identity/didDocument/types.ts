@@ -9,7 +9,7 @@ import { ContextEntry } from 'cred-types-jolocom-core'
 export interface IDidDocumentAttrs {
   '@context': ContextEntry[]
   id: string
-  authentication: IAuthenticationSectionAttrs[]
+  authentication: string[]
   publicKey: IPublicKeySectionAttrs[]
   service: IServiceEndpointSectionAttrs[]
   created: string
