@@ -15,17 +15,12 @@ export const mockPubKeySectionCreationAttrs = {
 export const mockPubKeySectionJSON = {
   id: mockKeyId,
   type: 'Secp256k1VerificationKey2018',
-  owner: mockDid,
+  controller: mockDid,
   publicKeyHex: mockPublicKeyHex,
 }
 
-export const mockAuthSectionJSON = {
-  publicKey: mockKeyId,
-  type: 'Secp256k1SignatureAuthentication2018',
-}
-
 export const mockPubProfServiceEndpointJSON = {
-  id: `${mockDid};jolocomPubProfile`,
+  id: `${mockDid}#jolocomPubProfile`,
   serviceEndpoint: `ipfs://${mockIpfsHash}`,
   description: 'Verifiable Credential describing entity profile',
   type: 'JolocomPublicProfile',

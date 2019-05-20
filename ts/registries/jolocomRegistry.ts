@@ -123,6 +123,7 @@ export class JolocomRegistry implements IRegistry {
         didDocument.resetServiceEndpoints()
       }
 
+      didDocument.hasBeenUpdated()
       const ipfsHash = await this.ipfsConnector.storeJSON({
         data: didDocument.toJSON(),
         pin: true,

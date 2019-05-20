@@ -6,7 +6,7 @@ import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 
 export class SoftwareKeyProvider implements IVaultedKeyProvider {
-  private readonly encryptedSeed: Buffer
+  public readonly encryptedSeed: Buffer
 
   /**
    * Initializes the vault with an already encrypted aes 256 cbc seed
