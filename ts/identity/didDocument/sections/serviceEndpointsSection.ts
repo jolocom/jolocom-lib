@@ -119,7 +119,7 @@ export const generatePublicProfileServiceSection = (
   profileIpfsHash: string,
 ): ServiceEndpointsSection => {
   const PubProfSec = new ServiceEndpointsSection()
-  PubProfSec.id = `${did};jolocomPubProfile`
+  PubProfSec.id = `${did}#jolocomPubProfile`
   PubProfSec.serviceEndpoint = `ipfs://${profileIpfsHash}`
   PubProfSec.description = 'Verifiable Credential describing entity profile'
   PubProfSec.type = 'JolocomPublicProfile'
