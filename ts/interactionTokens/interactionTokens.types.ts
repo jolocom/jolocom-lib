@@ -1,7 +1,5 @@
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { TransactionOptions } from '../contracts/types'
-
-/* Creation attributes. Same as JSON form */
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 export interface IPaymentRequestAttrs {
   callbackURL: string
@@ -13,12 +11,56 @@ export interface IPaymentResponseAttrs {
   txHash: string
 }
 
-export interface ICredentialOfferAttrs {
+enum CredentialRenderTypes {
+  document = 'document',
+  permission = 'permission',
+  claim = 'claim',
+}
+
+export type CredentialOfferInputRequest = {
+  [key: string]: string | null
+}
+
+export type CredentialOfferRenderInfo = {
+  renderAs?: CredentialRenderTypes
+  background: {
+    color: string // Hex value
+    url: string // URL to base64 encoded background image
+  }
+  logo: {
+    url: string // URL to base64 encoded image
+  }
+  text: {
+    color: string // Hex value
+  }
+}
+
+export type CredentialOfferMetadata = {
+  asynchronous?: boolean
+}
+
+export type CredentialOffer = {
+  type: string
+  requestedInput?: CredentialOfferInputRequest
+  renderInfo?: CredentialOfferRenderInfo
+  metadata?: CredentialOfferMetadata
+}
+
+export type CredentialOfferRequestAttrs = {
   callbackURL: string
-  instant: boolean
-  requestedInput: {
+  offeredCredentials: Array<CredentialOffer>
+}
+
+export type CredentialOfferResponseSelection = {
+  type: string
+  providedInput?: {
     [key: string]: string | null
   }
+}
+
+export type CredentialOfferResponseAttrs = {
+  callbackURL: string
+  selectedCredentials: Array<CredentialOfferResponseSelection>
 }
 
 export interface ICredentialRequestAttrs {

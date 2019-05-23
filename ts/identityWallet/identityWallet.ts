@@ -5,6 +5,7 @@ import {
   AuthCreationArgs,
   CredentialOfferRequestCreationArgs,
   CredentialOfferResponseCreationArgs,
+  CredentialReceiveCreationArgs,
   CredentialShareRequestCreationArgs,
   CredentialShareResponseCreationArgs,
   IIdentityWalletCreateArgs,
@@ -15,7 +16,6 @@ import {
 import { Identity } from '../identity/identity'
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
-import { CredentialOffer } from '../interactionTokens/credentialOffer'
 import { PaymentResponse } from '../interactionTokens/paymentResponse'
 import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
@@ -42,6 +42,8 @@ import {
   ITransactionEncodable,
 } from '../contracts/types'
 import { IRegistry } from '../registries/types'
+import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
+import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
 
 /**
  * @class
@@ -242,20 +244,46 @@ export class IdentityWallet {
   }
 
   /**
-   * Creates and signs a credential offer request / response
+   * Creates and signs a credential offer request
    * @param credOffer - Credential offer creation attributes
+   * @param pass - Password to decrypt the vaulted seed
+   */
+
+  private createCredOfferRequest = async (
+    credOffer: CredentialOfferRequestCreationArgs,
+    pass: string,
+  ) => {
+    const offer = CredentialOfferRequest.fromJSON(credOffer)
+    const jwt = JSONWebToken.fromJWTEncodable(offer)
+    jwt.interactionType = InteractionType.CredentialOfferRequest
+
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+    )
+  }
+
+  /**
+   * Creates and signs a credential offer response
+   * @param credentialOfferResponse - Credential offer response creation arguments
    * @param pass - Password to decrypt the vaulted seed
    * @param receivedJWT - optional received credential offer JSONWebToken Class
    */
 
-  private createCredOffer = async (
-    credOffer: CredentialOfferRequestCreationArgs,
+  private createCredentialOfferResponse = async (
+    credentialOfferResponse: CredentialOfferResponseCreationArgs,
     pass: string,
     receivedJWT?: JSONWebToken<JWTEncodable>,
   ) => {
-    const offer = CredentialOffer.fromJSON(credOffer)
-    const jwt = JSONWebToken.fromJWTEncodable(offer)
-    jwt.interactionType = InteractionType.CredentialOffer
+    const offerResponse = CredentialOfferResponse.fromJSON(
+      credentialOfferResponse,
+    )
+    const jwt = JSONWebToken.fromJWTEncodable<CredentialOfferResponse>(
+      offerResponse,
+    )
+    jwt.interactionType = InteractionType.CredentialOfferResponse
+
     return this.initializeAndSign(
       jwt,
       this.publicKeyMetadata.derivationPath,
@@ -315,7 +343,7 @@ export class IdentityWallet {
    */
 
   private createCredReceive = async (
-    credReceive: CredentialOfferResponseCreationArgs,
+    credReceive: CredentialReceiveCreationArgs,
     pass: string,
     receivedJWT: JSONWebToken<JWTEncodable>,
   ) => {
@@ -512,13 +540,13 @@ export class IdentityWallet {
     interactionTokens: {
       request: {
         auth: this.createAuth,
-        offer: this.createCredOffer,
+        offer: this.createCredOfferRequest,
         share: this.createCredReq,
         payment: this.createPaymentReq,
       },
       response: {
         auth: this.createAuth,
-        offer: this.createCredOffer,
+        offer: this.createCredentialOfferResponse,
         share: this.createCredResp,
         issue: this.createCredReceive,
         payment: this.createPaymentResp,

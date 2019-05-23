@@ -11,7 +11,6 @@ import { IJWTHeader } from './types'
 import { IJSONWebTokenAttrs, InteractionType } from './types'
 import { sha256 } from '../utils/crypto'
 import { IDigestable } from '../linkedDataSignature/types'
-import { CredentialOffer } from './credentialOffer'
 import { CredentialResponse } from './credentialResponse'
 import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
@@ -19,6 +18,8 @@ import { CredentialsReceive } from './credentialsReceive'
 import { handleValidationStatus, keyIdToDid } from '../utils/helper'
 import { PaymentResponse } from './paymentResponse'
 import { PaymentRequest } from './paymentRequest'
+import { CredentialOfferResponse } from './credentialOfferResponse'
+import { CredentialOfferRequest } from './credentialOfferRequest'
 
 /* Local interfaces / types to save on typing later */
 
@@ -26,7 +27,8 @@ export type JWTEncodable =
   | CredentialResponse
   | CredentialRequest
   | Authentication
-  | CredentialOffer
+  | CredentialOfferRequest
+  | CredentialOfferResponse
   | CredentialsReceive
   | PaymentRequest
   | PaymentResponse
@@ -273,8 +275,10 @@ const instantiateInteraction = <T extends JWTEncodable>(
   switch (typ) {
     case InteractionType.CredentialsReceive:
       return instantiator(CredentialsReceive)
-    case InteractionType.CredentialOffer:
-      return instantiator(CredentialOffer)
+    case InteractionType.CredentialOfferRequest:
+      return instantiator(CredentialOfferRequest)
+    case InteractionType.CredentialOfferResponse:
+      return instantiator(CredentialOfferResponse)
     case InteractionType.CredentialRequest:
       return instantiator(CredentialRequest)
     case InteractionType.CredentialResponse:

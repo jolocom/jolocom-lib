@@ -1,14 +1,14 @@
 import { expect } from 'chai'
 import { credentialOfferCreateAttrs } from '../data/interactionTokens/credentialOffer.data'
-import { CredentialOffer } from '../../ts/interactionTokens/credentialOffer'
+import { CredentialOfferRequest } from '../../ts/interactionTokens/credentialOffer'
 
 describe('CredentialOffer', () => {
-  let credentialOffer: CredentialOffer
+  let credentialOffer: CredentialOfferRequest
 
   /* Implicitly tests toJSON too */
 
   it('Should implement static fromJSON', () => {
-    credentialOffer = CredentialOffer.fromJSON(credentialOfferCreateAttrs)
+    credentialOffer = CredentialOfferRequest.fromJSON(credentialOfferCreateAttrs)
     expect(credentialOffer.toJSON()).to.deep.eq(credentialOfferCreateAttrs)
   })
 

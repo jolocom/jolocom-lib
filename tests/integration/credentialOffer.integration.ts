@@ -4,7 +4,7 @@ import { userPass, servicePass, emailCredJSON } from './integration.data'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { keyIdToDid } from '../../ts/utils/helper'
 import { credentialOfferCreateAttrs } from '../data/interactionTokens/credentialOffer.data'
-import { CredentialOffer } from '../../ts/interactionTokens/credentialOffer'
+import { CredentialOfferRequest } from '../../ts/interactionTokens/credentialOffer'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
@@ -31,20 +31,20 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     credOfferRequestEncoded = credOfferRequestJWT.encode()
 
     expect(credOfferRequestJWT.interactionToken).to.deep.eq(
-      CredentialOffer.fromJSON(credentialOfferCreateAttrs),
+      CredentialOfferRequest.fromJSON(credentialOfferCreateAttrs),
     )
     expect(credOfferRequestJWT).to.be.instanceOf(JSONWebToken)
     expect(credOfferRequestJWT.interactionToken).to.be.instanceOf(
-      CredentialOffer,
+      CredentialOfferRequest,
     )
   })
 
   it('Should allow for consumption of valid credential request offer token by user', async () => {
-    const decodedCredOfferRequest = JSONWebToken.decode<CredentialOffer>(
+    const decodedCredOfferRequest = JSONWebToken.decode<CredentialOfferRequest>(
       credOfferRequestEncoded,
     )
     expect(decodedCredOfferRequest.interactionToken).to.be.instanceOf(
-      CredentialOffer,
+      CredentialOfferRequest,
     )
 
     try {
@@ -69,7 +69,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     credOfferResponseEncoded = credOfferResponseJWT.encode()
 
     expect(credOfferResponseJWT.interactionToken).to.be.instanceOf(
-      CredentialOffer,
+      CredentialOfferRequest,
     )
     expect(credOfferResponseJWT.nonce).to.eq(decodedCredOfferRequest.nonce)
     expect(credOfferResponseJWT.audience).to.eq(
@@ -78,11 +78,11 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
   })
 
   it('Should allow for consumption of valid credential offer response token by service', async () => {
-    const decodedCredOfferResponse = JSONWebToken.decode<CredentialOffer>(
+    const decodedCredOfferResponse = JSONWebToken.decode<CredentialOfferRequest>(
       credOfferResponseEncoded,
     )
     expect(decodedCredOfferResponse.interactionToken).to.be.instanceOf(
-      CredentialOffer,
+      CredentialOfferRequest,
     )
 
     try {
@@ -97,7 +97,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
   })
 
   it('Should correctly create a credential receive token by service', async () => {
-    const decodedCredOfferResponse = JSONWebToken.decode<CredentialOffer>(
+    const decodedCredOfferResponse = JSONWebToken.decode<CredentialOfferRequest>(
       credOfferResponseEncoded,
     )
     const signedCredForUser = await serviceIdentityWallet.create.signedCredential(
