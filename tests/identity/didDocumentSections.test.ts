@@ -4,7 +4,7 @@ import * as crypto from 'crypto'
 import { PublicKeySection } from '../../ts/identity/didDocument/sections'
 import {
   mockPubKeySectionCreationAttrs,
-  mockPubKeySectionJSON,
+  mockPublicKey,
   mockPubProfServiceEndpointJSON,
 } from '../data/didDocumentSections.data'
 import {
@@ -35,7 +35,7 @@ describe('DidDocumentSections', () => {
     it('Should correctly instantiate from secp256k1 public key', () => {
       const { publicKey, keyId, did } = mockPubKeySectionCreationAttrs
       const section = PublicKeySection.fromEcdsa(publicKey, keyId, did)
-      expect(section.toJSON()).to.deep.eq(mockPubKeySectionJSON)
+      expect(section.toJSON()).to.deep.eq(mockPublicKey)
     })
   })
 

@@ -26,6 +26,7 @@ const expect = chai.expect
 
 describe('Jolocom registry - commit', () => {
   let sandbox = sinon.createSandbox()
+  let clock
   const vault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
 
   const keyMetadata = {
@@ -35,11 +36,14 @@ describe('Jolocom registry - commit', () => {
 
   const didDocument = DidDocument.fromJSON(didDocumentJSON)
 
-  afterEach(() => {
-    sandbox.restore()
+  before(() => {
+    clock = sinon.useFakeTimers()
   })
 
-  before(() => {})
+  afterEach(() => {
+    sandbox.restore()
+    clock.restore()
+  })
 
   it('should commit without public profile', async () => {
     const testRegistry: any = createJolocomRegistry()
@@ -196,11 +200,9 @@ describe('Jolocom registry - commit', () => {
   it('should commit with removed public profile', async () => {
     const testRegistry: any = createJolocomRegistry()
 
-    const extendedDidDocumentJSON = {
-      ...didDocumentJSON,
-      service: [mockPubProfServiceEndpointJSON],
-    }
-    const extendedDidDocument = DidDocument.fromJSON(extendedDidDocumentJSON)
+    delete didDocumentJSON.service
+
+    const extendedDidDocument = DidDocument.fromJSON(didDocumentJSON)
     const publicProfile = SignedCredential.fromJSON(publicProfileCredJSON)
 
     const localIdentity = Identity.fromDidDocument({
