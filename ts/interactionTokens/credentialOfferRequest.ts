@@ -98,7 +98,7 @@ export class CredentialOfferRequest {
    * @example `console.log(offer.getOfferedTypes()) // ['IdCardCredential', ...]
    */
 
-  get getOfferedTypes() {
+  get offeredTypes() {
     return this.offeredCredentials.map(({ type }) => type)
   }
 
