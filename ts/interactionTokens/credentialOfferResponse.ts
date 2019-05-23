@@ -3,6 +3,7 @@ import {
   CredentialOfferResponseAttrs,
   CredentialOfferResponseSelection,
 } from './interactionTokens.types'
+import { CredentialOfferRequest } from './credentialOfferRequest'
 
 /**
  * @class
@@ -52,6 +53,27 @@ export class CredentialOfferResponse {
     selectedCredentials: CredentialOfferResponseSelection[],
   ) {
     this._selectedCredentials = selectedCredentials
+  }
+
+  /**
+   * Evaluates if the credential offer response validates against the offer request
+   * @dev Currently only evaluates if the correct credential types have been provided
+   * validation of requestInputs is currently out of scope
+   * @param credentialOfferRequest - {@link CredentialOfferRequest} to evaluate against
+   * @example `credentialOfferResponse.satisfiesRequest(credentialOfferRequest) // true`
+   */
+
+  public satisfiesRequest({ offeredTypes }: CredentialOfferRequest): boolean {
+    if (offeredTypes.length !== this.selectedCredentials.length) {
+      return false
+    }
+
+    const selectedTypes = this.selectedCredentials.map(
+      selected => selected.type,
+    )
+    return selectedTypes.every(requestedType =>
+      offeredTypes.includes(requestedType),
+    )
   }
 
   /**
