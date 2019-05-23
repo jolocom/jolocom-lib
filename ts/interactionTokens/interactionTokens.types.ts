@@ -17,50 +17,50 @@ enum CredentialRenderTypes {
   claim = 'claim',
 }
 
-export type CredentialOfferInputRequest = {
+export interface CredentialOfferInputRequest {
   [key: string]: string | null
 }
 
-export type CredentialOfferRenderInfo = {
+export interface CredentialOfferRenderInfo {
   renderAs?: CredentialRenderTypes
-  background: {
-    color: string // Hex value
-    url: string // URL to base64 encoded background image
+  background?: {
+    color?: string // Hex value
+    url?: string // URL to base64 encoded background image
   }
-  logo: {
+  logo?: {
     url: string // URL to base64 encoded image
   }
-  text: {
+  text?: {
     color: string // Hex value
   }
 }
 
-export type CredentialOfferMetadata = {
+export interface CredentialOfferMetadata {
   asynchronous?: boolean
 }
 
-export type CredentialOffer = {
+export interface CredentialOffer {
   type: string
   requestedInput?: CredentialOfferInputRequest
   renderInfo?: CredentialOfferRenderInfo
   metadata?: CredentialOfferMetadata
 }
 
-export type CredentialOfferRequestAttrs = {
+export interface CredentialOfferRequestAttrs {
   callbackURL: string
-  offeredCredentials: Array<CredentialOffer>
+  offeredCredentials: CredentialOffer[]
 }
 
-export type CredentialOfferResponseSelection = {
+export interface CredentialOfferResponseSelection {
   type: string
   providedInput?: {
     [key: string]: string | null
   }
 }
 
-export type CredentialOfferResponseAttrs = {
+export interface CredentialOfferResponseAttrs {
   callbackURL: string
-  selectedCredentials: Array<CredentialOfferResponseSelection>
+  selectedCredentials: CredentialOfferResponseSelection[]
 }
 
 export interface ICredentialRequestAttrs {

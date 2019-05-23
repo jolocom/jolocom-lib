@@ -8,7 +8,9 @@ describe('CredentialOffer', () => {
   /* Implicitly tests toJSON too */
 
   it('Should implement static fromJSON', () => {
-    credentialOffer = CredentialOfferRequest.fromJSON(credentialOfferCreateAttrs)
+    credentialOffer = CredentialOfferRequest.fromJSON(
+      credentialOfferCreateAttrs,
+    )
     expect(credentialOffer.toJSON()).to.deep.eq(credentialOfferCreateAttrs)
   })
 

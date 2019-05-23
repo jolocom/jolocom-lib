@@ -48,7 +48,7 @@ describe('CredentialRequest', () => {
       const simpleCredReq = CredentialRequest.fromJSON(
         undefinedConstraintsRequestJSON,
       )
-      expect(simpleCredReq.applyConstraints(credentialSet)).to.be.empty
+      return expect(simpleCredReq.applyConstraints(credentialSet)).to.be.empty
     })
 
     it('Should correctly filter based on issuer', () => {

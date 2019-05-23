@@ -12,7 +12,7 @@ import {
 @Exclude()
 export class CredentialOfferResponse {
   private _callbackURL: string
-  private _selectedCredentials: Array<CredentialOfferResponseSelection>
+  private _selectedCredentials: CredentialOfferResponseSelection[]
 
   /**
    * Get the callback url encoded in the payload
@@ -39,8 +39,19 @@ export class CredentialOfferResponse {
    */
 
   @Expose()
-  get selectedCredentials(): Array<CredentialOfferResponseSelection> {
+  get selectedCredentials(): CredentialOfferResponseSelection[] {
     return this._selectedCredentials
+  }
+
+  /**
+   * Set an array of {@link CredentialOfferResponse} to be included in the interaction token
+   * @example `offerResponse.offeredCredentials = [{type: 'IdCardCredential', ...}, {...}]`
+   */
+
+  set selectedCredentials(
+    selectedCredentials: CredentialOfferResponseSelection[],
+  ) {
+    this._selectedCredentials = selectedCredentials
   }
 
   /**

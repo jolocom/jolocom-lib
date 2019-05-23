@@ -15,7 +15,7 @@ import {
 @Exclude()
 export class CredentialOfferRequest {
   private _callbackURL: string
-  private _offeredCredentials: Array<CredentialOffer>
+  private _offeredCredentials: CredentialOffer[]
 
   /**
    * Get the callback url encoded in the payload
@@ -42,8 +42,17 @@ export class CredentialOfferRequest {
    */
 
   @Expose()
-  get offeredCredentials(): Array<CredentialOffer> {
+  get offeredCredentials(): CredentialOffer[] {
     return this._offeredCredentials
+  }
+
+  /**
+   * Set the array of {@link CredentialOffer} encoded in this interaction token
+   * @example `offer.offeredCredentials = [{type: 'IdCardCredential', ...}, {...}]`
+   */
+
+  set offeredCredentials(offeredCredentials: CredentialOffer[]) {
+    this._offeredCredentials = offeredCredentials
   }
 
   /**
