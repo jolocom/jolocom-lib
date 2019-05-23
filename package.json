@@ -8,7 +8,7 @@
   ],
   "typings": "js/index.d.ts",
   "scripts": {
-    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts",
+    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts --exit",
     "clean": "rm -rf ./js",
     "prepublish": "yarn clean; yarn build",
     "build": "tsc -p .",
