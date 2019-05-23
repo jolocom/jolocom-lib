@@ -4,11 +4,6 @@ export interface IPublicKeySectionAttrs {
   publicKeyHex: string
 }
 
-export interface IAuthenticationSectionAttrs {
-  publicKey: string
-  type: string
-}
-
 export interface IServiceEndpointSectionAttrs {
   id: string
   type: string

@@ -102,6 +102,12 @@ export const defaultContextIdentity: ContextEntry[] = [
     requiredProof: 'sec:requiredProof',
     revoked: { '@id': 'sec:revoked', '@type': 'xsd:dateTime' },
     seeAlso: { '@id': 'rdfs:seeAlso', '@type': '@id' },
+    service: {
+      '@id': 'sec:service-endpoints',
+      '@type': '@id',
+      '@container': '@set',
+    },
+    serviceEndpoint: 'sec:dfn-service-endpoints',
     signature: 'sec:signature',
     signatureAlgorithm: 'sec:signatureAlgorithm',
     signatureValue: 'sec:signatureValue',

@@ -9,12 +9,17 @@ import {
   normalizedDidDocument,
 } from '../data/didDocument.data'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
+import {
+  mockPublicKey2,
+  mockPubProfServiceEndpointJSON,
+} from '../data/didDocumentSections.data'
+import { ServiceEndpointsSection } from '../../ts/identity/didDocument/sections'
 const expect = chai.expect
 
 describe('DidDocument', () => {
   const sandbox = sinon.createSandbox()
 
-  let referenceDidDocument = DidDocument.fromPublicKey(testPublicIdentityKey)
+  let referenceDidDocument
   let clock
 
   before(() => {
@@ -24,8 +29,14 @@ describe('DidDocument', () => {
       .returns(Buffer.from('1842fb5f567dd532', 'hex'))
   })
 
-  beforeEach(() => {
-    referenceDidDocument = DidDocument.fromPublicKey(testPublicIdentityKey)
+  beforeEach(async () => {
+    referenceDidDocument = await DidDocument.fromPublicKey(
+      testPublicIdentityKey,
+    )
+    referenceDidDocument.addAuthKey(mockPublicKey2)
+    referenceDidDocument.addServiceEndpoint(
+      ServiceEndpointsSection.fromJSON(mockPubProfServiceEndpointJSON),
+    )
   })
 
   after(() => {
