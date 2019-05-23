@@ -1,8 +1,9 @@
-import { CredentialOfferRequestCreationArgs } from '../../../ts/identityWallet/types'
+import {CredentialOfferRequestCreationArgs, CredentialOfferResponseCreationArgs} from '../../../ts/identityWallet/types'
 import { claimsMetadata } from 'cred-types-jolocom-core'
 
-export const credentialOfferCreateAttrs: CredentialOfferRequestCreationArgs = {
-  callbackURL: 'https://test.de/external-cred',
+const callbackURL = 'https://test.de/external-cred'
+export const credentialOfferRequestCreationArgs: CredentialOfferRequestCreationArgs = {
+  callbackURL,
   offeredCredentials: [
     {
       type: claimsMetadata.emailAddress.type[1],
@@ -16,4 +17,10 @@ export const credentialOfferCreateAttrs: CredentialOfferRequestCreationArgs = {
       },
     },
   ],
+}
+export const credentialOfferResponseCreationArgs: CredentialOfferResponseCreationArgs = {
+  callbackURL,
+  selectedCredentials: [{
+    type: claimsMetadata.emailAddress.type[1],
+  }]
 }

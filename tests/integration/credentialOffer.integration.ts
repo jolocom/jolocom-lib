@@ -3,7 +3,7 @@ import * as sinonChai from 'sinon-chai'
 import { userPass, servicePass, emailCredJSON } from './integration.data'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { keyIdToDid } from '../../ts/utils/helper'
-import { credentialOfferCreateAttrs } from '../data/interactionTokens/credentialOffer.data'
+import { credentialOfferRequestCreationArgs } from '../data/interactionTokens/credentialOffer.data'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
@@ -26,13 +26,13 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
 
   it('Should correctly create a credential offer request token by service', async () => {
     credOfferRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.offer(
-      credentialOfferCreateAttrs,
+      credentialOfferRequestCreationArgs,
       servicePass,
     )
     credOfferRequestEncoded = credOfferRequestJWT.encode()
 
     expect(credOfferRequestJWT.interactionToken).to.deep.eq(
-      CredentialOfferRequest.fromJSON(credentialOfferCreateAttrs),
+      CredentialOfferRequest.fromJSON(credentialOfferRequestCreationArgs),
     )
     expect(credOfferRequestJWT).to.be.instanceOf(JSONWebToken)
     expect(credOfferRequestJWT.interactionToken).to.be.instanceOf(
