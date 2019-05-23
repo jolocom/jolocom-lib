@@ -28,7 +28,7 @@ import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 @Exclude()
 export class DidDocument implements IDigestable {
   private _id: string
-  private _authentication: string[] = []
+  private _authentication: Array<string | PublicKeySection> = []
   private _publicKey: PublicKeySection[] = []
   private _service: ServiceEndpointsSection[] = []
   private _created: Date = new Date()
@@ -82,7 +82,7 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose()
-  public get authentication(): string[] {
+  public get authentication(): Array<string | PublicKeySection> {
     return this._authentication
   }
 
@@ -91,7 +91,7 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.authentication = [AuthenticationSection {...}, ...]`
    */
 
-  public set authentication(authentication: string[]) {
+  public set authentication(authentication: Array<string | PublicKeySection>) {
     this._authentication = authentication
   }
 
@@ -240,8 +240,17 @@ export class DidDocument implements IDigestable {
    * @param authenticationKeyId - id string of a public key
    */
 
-  public addAuthSection(authenticationKeyId: string) {
+  public addAuthKeyId(authenticationKeyId: string): void {
     this.authentication.push(authenticationKeyId)
+  }
+
+  /**
+   * Adds a new authentication key object to the did document instance
+   * @param authenticationKey - public key that should be used for authentication
+   */
+
+  public addAuthKey(authenticationKey: PublicKeySection): void {
+    this.authentication.push(authenticationKey)
   }
 
   /**
@@ -249,7 +258,7 @@ export class DidDocument implements IDigestable {
    * @param section - Configured {@link PublicKeySection} instance
    */
 
-  public addPublicKeySection(section: PublicKeySection) {
+  public addPublicKeySection(section: PublicKeySection): void {
     this.publicKey.push(section)
   }
 
@@ -277,7 +286,7 @@ export class DidDocument implements IDigestable {
    * @example `const didDocument = DidDocument.fromPublicKey(Buffer.from('abc...ffe', 'hex'))`
    */
 
-  public static fromPublicKey(publicKey: Buffer): DidDocument {
+  public static async fromPublicKey(publicKey: Buffer): Promise<DidDocument> {
     const did = publicKeyToDID(publicKey)
     const keyId = `${did}#keys-1`
 
@@ -286,8 +295,8 @@ export class DidDocument implements IDigestable {
     didDocument.addPublicKeySection(
       PublicKeySection.fromEcdsa(publicKey, keyId, did),
     )
-    didDocument.addAuthSection(didDocument.publicKey[0].id)
-    didDocument.prepareSignature(keyId)
+    didDocument.addAuthKeyId(didDocument.publicKey[0].id)
+    await didDocument.prepareSignature(keyId)
 
     return didDocument
   }
