@@ -200,7 +200,7 @@ describe('Jolocom registry - commit', () => {
   it('should commit with removed public profile', async () => {
     const testRegistry: any = createJolocomRegistry()
 
-    delete didDocumentJSON.service
+    didDocumentJSON.service = []
 
     const extendedDidDocument = DidDocument.fromJSON(didDocumentJSON)
     const publicProfile = SignedCredential.fromJSON(publicProfileCredJSON)
