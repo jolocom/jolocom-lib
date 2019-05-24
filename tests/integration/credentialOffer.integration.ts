@@ -3,7 +3,10 @@ import * as sinonChai from 'sinon-chai'
 import { userPass, servicePass, emailCredJSON } from './integration.data'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { keyIdToDid } from '../../ts/utils/helper'
-import { credentialOfferRequestCreationArgs } from '../data/interactionTokens/credentialOffer.data'
+import {
+  credentialOfferRequestCreationArgs,
+  credentialOfferResponseCreationArgs
+} from '../data/interactionTokens/credentialOffer.data'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
@@ -60,14 +63,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     }
 
     credOfferResponseJWT = await userIdentityWallet.create.interactionTokens.response.offer(
-      {
-        callbackURL: decodedCredOfferRequest.interactionToken.callbackURL,
-        selectedCredentials: [
-          {
-            type: 'ProofOfEmailCredential',
-          },
-        ],
-      },
+      credentialOfferResponseCreationArgs,
       userPass,
       decodedCredOfferRequest,
     )
