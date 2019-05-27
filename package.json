@@ -13,6 +13,7 @@
     "prepublish": "yarn clean; yarn build",
     "build": "tsc -p .",
     "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
+    "test:debug": "mocha --opts ./mocha.opts --inspect -w ./tests/**/*.test.ts",
     "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
     "test:integration": "mocha --opts ./mocha.opts ./tests/**/*.integration.ts",
     "format": "eslint --fix --ext .ts ."
