@@ -10,3 +10,10 @@ export interface IServiceEndpointSectionAttrs {
   serviceEndpoint: string
   description: string
 }
+
+export interface IAuthenticationSectionAttrs_v0 {
+  publicKey: string
+  type: string
+}
+
+export type IAuthenticationSectionAttrs = IPublicKeySectionAttrs | string

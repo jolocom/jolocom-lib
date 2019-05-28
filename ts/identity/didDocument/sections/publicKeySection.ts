@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
+import { classToPlain, plainToClass, Exclude, Expose, Transform } from 'class-transformer'
 import { IPublicKeySectionAttrs } from './types'
 
 /**
@@ -22,6 +22,7 @@ export class PublicKeySection {
    */
 
   @Expose()
+  @Transform((val, obj) => obj.owner, { toClassOnly: true, until: 0.13 })
   public get controller(): string {
     return this._controller
   }

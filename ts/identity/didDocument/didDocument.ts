@@ -5,11 +5,12 @@ import {
   Exclude,
   Expose,
   Transform,
+  ClassTransformOptions
 } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
 import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
-import { PublicKeySection, ServiceEndpointsSection } from './sections'
+import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections'
 import { ISigner } from '../../registries/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
@@ -25,16 +26,32 @@ import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
  * @see {@link https://w3c-ccg.github.io/did-spec/ | specification}
  */
 
+const LATEST_SPEC_VERSION = 0.13
+
 @Exclude()
 export class DidDocument implements IDigestable {
   private _id: string
-  private _authentication: Array<string | PublicKeySection> = []
+  private _specVersion: number = LATEST_SPEC_VERSION
+  private _authentication: AuthenticationSection[] = []
   private _publicKey: PublicKeySection[] = []
   private _service: ServiceEndpointsSection[] = []
   private _created: Date = new Date()
   private _updated: Date = new Date()
   private _proof: ILinkedDataSignature
   private _context: ContextEntry[] = defaultContextIdentity
+
+  /**
+   * The DID spec version
+   * This is non-standard; an extension by jolocom
+   */
+  @Expose({ since: 0.13 })
+  public get specVersion() {
+    return this._specVersion
+  }
+
+  public set specVersion(specVersion: number) {
+    this._specVersion = specVersion
+  }
 
   /**
    * Get the `@context` section of the JSON-ld document
@@ -81,8 +98,12 @@ export class DidDocument implements IDigestable {
    * @example `console.log(didDocument.authentication) // [AuthenticationSection {...}, ...]`
    */
 
-  @Expose()
-  public get authentication(): Array<string | PublicKeySection> {
+  @Expose({ name: 'authentication' })
+  @Transform(
+    auths => auths.map(a => a.publicKey),
+    { toClassOnly: true, until: 0.13 }
+  )
+  public get authentication(): AuthenticationSection[] {
     return this._authentication
   }
 
@@ -91,7 +112,7 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.authentication = [AuthenticationSection {...}, ...]`
    */
 
-  public set authentication(authentication: Array<string | PublicKeySection>) {
+  public set authentication(authentication: AuthenticationSection[]) {
     this._authentication = authentication
   }
 
@@ -163,7 +184,7 @@ export class DidDocument implements IDigestable {
    * @example `console.log(didDocument.updated) // Date 2018-11-11T15:46:09.720Z`
    */
 
-  @Expose()
+  @Expose({ since: 0.13 })
   @Transform((value: Date) => value && value.toISOString(), {
     toPlainOnly: true,
   })
@@ -365,6 +386,11 @@ export class DidDocument implements IDigestable {
    */
 
   public static fromJSON(json: IDidDocumentAttrs): DidDocument {
-    return plainToClass(DidDocument, json)
+    const options: ClassTransformOptions | undefined =
+      json.id.startsWith('did:jolo')
+      ?  { version: json.specVersion || 0 }
+      : undefined
+
+    return plainToClass(DidDocument, json, options)
   }
 }
