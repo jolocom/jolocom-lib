@@ -3,6 +3,7 @@ import * as sinon from 'sinon'
 import * as crypto from 'crypto'
 import { testPublicIdentityKey } from '../data/keys.data'
 import {
+  didDocumentJSON_v0,
   didDocumentJSON,
   mockDid,
   mockKeyId,
@@ -13,7 +14,7 @@ import {
   mockPublicKey2,
   mockPubProfServiceEndpointJSON,
 } from '../data/didDocumentSections.data'
-import { ServiceEndpointsSection } from '../../ts/identity/didDocument/sections'
+import { ServiceEndpointsSection, PublicKeySection } from '../../ts/identity/didDocument/sections'
 const expect = chai.expect
 
 describe('DidDocument', () => {
@@ -42,6 +43,32 @@ describe('DidDocument', () => {
   after(() => {
     sandbox.restore()
     clock.restore()
+  })
+
+  it('Should not try to migrate if DID is not "did:jolo:*"', () => {
+    const didDocJSON = {
+      "@context": "https://w3id.org/did/v1",
+      "id": "did:uknow:d34db33f",
+      "publicKey": [{
+        "id": "did:uknow:d34db33f#cooked",
+        "type": "Secp256k1VerificationKey2018",
+        "owner": "did:uknow:d34db33f",
+        "publicKeyHex": "b9c5714089478a327f09197987f16f9e5d936e8a"
+      }],
+      "authentication": [{
+        "type": "Secp256k1SignatureAuthentication2018",
+        "publicKey": "did:uknow:d34db33f#cooked",
+      }],
+      service: [],
+      created: ''
+    }
+    expect(() => DidDocument.fromJSON(didDocJSON)).to.not.throw()
+  })
+
+  it('Should correctly implement fromJSON for version 0', () => {
+    const didDocFromJSON_v0 = DidDocument.fromJSON(didDocumentJSON_v0)
+    didDocFromJSON_v0.addAuthKey(mockPublicKey2 as PublicKeySection)
+    expect(referenceDidDocument).to.deep.eq(didDocFromJSON_v0)
   })
 
   it('Should correctly implement fromJSON', () => {
