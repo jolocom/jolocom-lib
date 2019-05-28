@@ -55,11 +55,17 @@ export class DidDocument implements IDigestable {
 
   /**
    * Get the `@context` section of the JSON-ld document
+   * NOTE: the context from jolocom identities is automatically replaced with
+   * the latest from the library when deserializing from JSON
    * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
    * @example `console.log(didDocument.context) // [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
   @Expose({ name: '@context' })
+  @Transform((val, obj) => {
+    if (obj.id.startsWith('did:jolo')) return defaultContextIdentity
+    else return val
+  }, { toClassOnly: true })
   public get context(): ContextEntry[] {
     return this._context
   }
