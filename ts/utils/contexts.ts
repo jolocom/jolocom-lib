@@ -42,6 +42,7 @@ export const defaultContextIdentity: ContextEntry[] = [
     didv: 'https://w3id.org/did#',
     xsd: 'http://www.w3.org/2001/XMLSchema#',
 
+    specVersion: 'schema:version',
     AuthenticationSuite: 'sec:AuthenticationSuite',
     CryptographicKey: 'sec:Key',
     EquihashProof2017: 'sec:EquihashProof2017',
