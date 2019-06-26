@@ -281,7 +281,7 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.prepareSignature('did:jolo:...#keys-1')`
    */
 
-  private async prepareSignature(keyId: string) {
+  private prepareSignature(keyId: string) {
     const inOneYear = new Date()
     inOneYear.setFullYear(new Date().getFullYear() + 1)
 

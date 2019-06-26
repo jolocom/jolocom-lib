@@ -11,7 +11,7 @@ export interface IPaymentResponseAttrs {
   txHash: string
 }
 
-enum CredentialRenderTypes {
+export enum CredentialRenderTypes {
   document = 'document',
   permission = 'permission',
   claim = 'claim',
