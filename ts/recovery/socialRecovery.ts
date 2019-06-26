@@ -1,20 +1,25 @@
 import * as secrets from 'secrets.js-grempe'
-import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
-import { createJolocomRegistry } from '../registries/jolocomRegistry'
 
 export class SocialRecovery {
   public static createHorcruxes(
+    did: string,
     secret: string,
     amount: number,
     threshold: number,
   ): string[] {
-    const vkp = new SoftwareKeyProvider(Buffer.from(secret), 'password')
-    const registry = createJolocomRegistry()
-
-    return secrets.share(secret, amount, threshold)
+    const hexString = secrets.str2hex(`${did}:${secret}`)
+    return secrets.share(hexString, amount, threshold)
   }
 
-  public static combineHorcurxes(horcruxes: string[]): string {
-    return secrets.combine(horcruxes)
+  public static combineHorcurxes(
+    horcruxes: string[],
+  ): { did: string; secret: string } {
+    const result = secrets.hex2str(secrets.combine(horcruxes))
+    if (result.indexOf(':') == -1)
+      throw new Error('Invalid shards or not enough shards')
+    return {
+      did: result.split(':')[0],
+      secret: result.split(':')[1],
+    }
   }
 }
