@@ -147,28 +147,84 @@ Offering credentials to another identity [EXPERIMENTAL]
 ########################################################
 
 In some cases, an agent might want to issue another agent a signed credential. We are currently
-developing a siple protocol to facilitate this interaction. As of now, an early version is 
+developing a simple protocol to facilitate this interaction. As of now, an early version is 
 already supported through the Jolocom Library.
 
-**Crete a Credential Offer**
+**Create a Credential Offer**
 
-Firstly, the agent offering the attestation must create a credential offer:
+A Credential offer manifest functions as a menu of credentials which can be issued by the agent who created it.
+It's basic units are individual Credential offers which contain metadata about the credentials offered, for example:
+
+.. code-block:: typescript
+
+   const emailOffer: CredentialOffer = {
+     type: 'email'
+   }
+   const phoneNumberOffer: CredentialOffer = {
+     type: 'phoneNumber'
+   }
+
+Next, the agent offering the attestation must create a credential offer:
 
 .. code-block:: typescript
 
   const credentialOffer = await identityWallet.create.interactionTokens.request.offer({
     callbackURL: 'https://example.com/receive/...',
-    instant: true,
-    requestedInput: {}
+    offeredCredentials: [emailOffer, phoneNumberOffer]
   })
 
 The endpoint denoted by the ``callbackURL`` key will be pinged by the client device with 
 a response to the offer.
 
-The ``instant`` (will be used to signal if the credential will be available right away) and 
+The CredentialOffer objects may also contain additional information in the form of ``requestedInput``,
+``renderInfo`` and ``metadata`` (which currently supports only a boolean ``asynchronous`` key).
+
+The ``metadata.asynchronous`` (will be used to signal if the credential will be available right away) and 
 ``requestedInput`` (will be used for requesting additional information, e.g. a valid id card to receive
 a driver license credential) are not used as of now, and will be supported once we
 implement verification requests.
+
+The ``renderInfo`` is used to describe how a credential should be rendered and is currently supported
+by the Jolocom Smartwallet. It allows for a variety of graphical descriptors in it's format:
+
+.. code-block:: typescript
+  enum CredentialRenderTypes {
+    document = 'document',
+    permission = 'permission',
+    claim = 'claim',
+  }
+  export interface CredentialOfferRenderInfo {
+    renderAs?: CredentialRenderTypes
+    background?: {
+      color?: string // Hex value
+      url?: string // URL to base64 encoded background image
+    }
+    logo?: {
+      url: string // URL to base64 encoded image
+    }
+    text?: {
+      color: string // Hex value
+    }
+  }
+
+As an example, we could define a display format for our email credential offer with:
+
+.. code-block:: typescript
+  const emailOffer: CredentialOffer = {
+    type: 'email',
+    renderInfo: {
+      renderAs: 'document',
+      background: {
+        url: 'https://url.for.your/image.png'
+      }
+      logo: {
+        url: 'https://logo.url/for/email'
+      }
+      text: {
+        color: 'blue'
+      }
+    }
+  }
 
 **Consume a Credential Offer**
 
@@ -183,12 +239,20 @@ On the client side, we can decode and validate the received credential request a
 
 **Create a Credential Offer Response**
 
-The easiest way to create a response is:
+To create a response for a credential offer, the callbackURL and the selected credentials must be used:
 
 .. code-block:: typescript
 
   const offerResponse = await identityWallet.create.interactionTokens.response.offer({
-    ....interactionToken.toJSON()
+    callbackURL: credentialOffer.callbackURL,
+    selectedCredentials: [
+      {
+        type: 'email'
+      },
+      {
+        type: 'phoneNumber'
+      }
+    ]
   }, secret, credentialOffer)
 
 .. note:: The response simply replays all fields in the response. With the introduction of verification requests
