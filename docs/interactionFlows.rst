@@ -157,11 +157,11 @@ It's basic units are individual Credential offers which contain metadata about t
 
 .. code-block:: typescript
 
-   const emailOffer: CredentialOffer = {
-     type: 'email'
+   const idCardOffer: CredentialOffer = {
+     type: 'idCard'
    }
-   const phoneNumberOffer: CredentialOffer = {
-     type: 'phoneNumber'
+   const otherCredentialOffer: CredentialOffer = {
+     type: 'otherCredential'
    }
 
 Next, the agent offering the attestation must create a credential offer:
@@ -170,7 +170,7 @@ Next, the agent offering the attestation must create a credential offer:
 
   const credentialOffer = await identityWallet.create.interactionTokens.request.offer({
     callbackURL: 'https://example.com/receive/...',
-    offeredCredentials: [emailOffer, phoneNumberOffer]
+    offeredCredentials: [idCardOffer, otherCredentialOffer]
   })
 
 The endpoint denoted by the ``callbackURL`` key will be pinged by the client device with 
@@ -207,22 +207,27 @@ by the Jolocom Smartwallet. It allows for a variety of graphical descriptors in 
     }
   }
 
-As an example, we could define a display format for our email credential offer with:
+As an example, we could define a display format for our id card credential offer with:
 
 .. code-block:: typescript
-  const emailOffer: CredentialOffer = {
-    type: 'email',
+  const idCardOffer: CredentialOffer = {
+    type: 'idCard',
     renderInfo: {
-      renderAs: 'document',
-      background: {
-        url: 'https://url.for.your/image.png'
-      }
+      renderAs: CredentialRenderTypes.document,
       logo: {
-        url: 'https://logo.url/for/email'
-      }
+        url: 'https://miro.medium.com/fit/c/240/240/1*jbb5WdcAvaY1uVdCjX1XVg.png'
+      },
+      background: {
+        url: 'https://i.imgur.com/0Mrldei.png',
+      },
       text: {
-        color: 'blue'
+        color: '#05050d'
       }
+    }
+    metadata: {
+      asynchronous: false
+    },
+    requestedInput: {}
     }
   }
 
@@ -247,10 +252,10 @@ To create a response for a credential offer, the callbackURL and the selected cr
     callbackURL: credentialOffer.callbackURL,
     selectedCredentials: [
       {
-        type: 'email'
+        type: 'idCard'
       },
       {
-        type: 'phoneNumber'
+        type: 'otherCredential'
       }
     ]
   }, secret, credentialOffer)
