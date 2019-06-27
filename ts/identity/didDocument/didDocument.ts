@@ -275,6 +275,31 @@ export class DidDocument implements IDigestable {
     return didDocument
   }
 
+  public static fromDidRegistry(
+    didString: string,
+    publicKey: string,
+    recoveryKey: string,
+    servicesHash: string,
+  ): DidDocument {
+    const didDocument = new DidDocument()
+    const did = 'did:jolo:' + didString
+    didDocument.did = did
+    didDocument.addPublicKeySection(
+      PublicKeySection.fromEcdsa(
+        Buffer.from(publicKey, 'hex'),
+        `${did}#keys-1`,
+        did,
+      ),
+    )
+    didDocument.addAuthSection(
+      AuthenticationSection.fromEcdsa(didDocument.publicKey[0]),
+    )
+
+    // TODO add authorization section
+    // TODO parse service section
+    return didDocument
+  }
+
   /**
    * Sets all fields on the instance necessary to compute the signature
    * @param keyId - Public key identifier, as defined in the {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}.
