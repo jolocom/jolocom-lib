@@ -7,19 +7,20 @@ export class SocialRecovery {
     amount: number,
     threshold: number,
   ): string[] {
-    const hexString = secrets.str2hex(`${did}:${secret}`)
+    const hexString = `${did}${secret}`
     return secrets.share(hexString, amount, threshold)
   }
 
   public static combineHorcurxes(
     horcruxes: string[],
   ): { did: string; secret: string } {
-    const result = secrets.hex2str(secrets.combine(horcruxes))
-    if (result.indexOf(':') == -1)
-      throw new Error('Invalid shards or not enough shards')
+    const result = secrets.combine(horcruxes)
+
     return {
-      did: result.split(':')[0],
-      secret: result.split(':')[1],
+      // did: result.split(hexColon)[0],
+      // secret: result.split(hexColon)[1],
+      did: result.slice(0, 64),
+      secret: result.slice(64),
     }
   }
 }
