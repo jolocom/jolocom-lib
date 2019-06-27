@@ -15,7 +15,8 @@
     "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
     "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
     "test:integration": "mocha --opts ./mocha.opts ./tests/**/*.integration.ts",
-    "format": "eslint --fix --ext .ts ."
+    "format": "eslint --fix --ext .ts .",
+    "generate-api-docs": "typedoc ./ts"
   },
   "nyc": {
     "include": [
@@ -101,6 +102,7 @@
     "sinon": "^7.2.5",
     "source-map-support": "^0.5.10",
     "ts-node": "^8.0.2",
+    "typedoc": "^0.14.2",
     "typescript": "^3.4.1",
     "web3": "1.0.0-beta.35"
   }
