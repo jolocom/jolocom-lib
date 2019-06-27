@@ -2,9 +2,10 @@ import { fromSeed } from 'bip32'
 import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
-import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
+import { IVaultedKeyProvider, IKeyDerivationArgs, KeyTypes } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
+import { keccak256 } from 'ethereumjs-util'
 
 const ALG = 'aes-256-cbc'
 
@@ -194,7 +195,13 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
       this._encryptedSeed,
       this._iv,
     )
-    return entropyToMnemonic(seed)
+    const did = keccak256(
+      this.getPublicKey({
+        derivationPath: KeyTypes.jolocomIdentityKey,
+        encryptionPass: encryptionPass,
+      }),
+    )
+    return entropyToMnemonic(did) + ' ' + entropyToMnemonic(seed)
   }
 
   /**
