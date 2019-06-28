@@ -9,6 +9,10 @@ export const testSeed = Buffer.from(
   'hex',
 )
 
+//corresponds to testSeed
+export const testMnemonic =
+  'primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary foster'
+
 export const testPrivateIdentityKey = Buffer.from(
   '38a2eb228140a343696431939eedc14b937b0041872541df095c1b266fb55aea',
   'hex',

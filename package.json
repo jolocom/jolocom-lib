@@ -1,6 +1,6 @@
 {
   "name": "jolocom-lib",
-  "version": "2.4.3",
+  "version": "3.0.0",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "files": [
@@ -8,14 +8,17 @@
   ],
   "typings": "js/index.d.ts",
   "scripts": {
-    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts",
+    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts --exit",
     "clean": "rm -rf ./js",
     "prepublish": "yarn clean; yarn build",
     "build": "tsc -p .",
+    "build:watch": "tsc -w -p .",
     "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
+    "test:debug": "mocha --opts ./mocha.opts --inspect -w ./tests/**/*.test.ts",
     "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
     "test:integration": "mocha --opts ./mocha.opts ./tests/**/*.integration.ts",
-    "format": "eslint --fix --ext .ts ."
+    "format": "eslint --fix --ext .ts .",
+    "generate-api-docs": "typedoc ./ts"
   },
   "nyc": {
     "include": [
@@ -62,6 +65,7 @@
   "dependencies": {
     "base64url": "^3.0.1",
     "bip32": "^1.0.2",
+    "bip39": "^3.0.1",
     "class-transformer": "^0.1.10",
     "create-hash": "^1.2.0",
     "cred-types-jolocom-core": "^0.0.10",
@@ -81,6 +85,7 @@
     "tiny-secp256k1": "^1.0.1"
   },
   "devDependencies": {
+    "@types/bip39": "^2.4.2",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
     "@types/node": "^11.9.4",
@@ -99,6 +104,7 @@
     "sinon": "^7.2.5",
     "source-map-support": "^0.5.10",
     "ts-node": "^8.0.2",
+    "typedoc": "^0.14.2",
     "typescript": "^3.4.1",
     "web3": "1.0.0-beta.35"
   }

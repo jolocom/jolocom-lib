@@ -3,9 +3,18 @@ import { randomBytes, createCipher, createDecipher } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
+import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 
 export class SoftwareKeyProvider implements IVaultedKeyProvider {
   private readonly encryptedSeed: Buffer
+
+  /**
+   * Initializes the vault with an already encrypted aes 256 cbc seed
+   * @param encryptedSeed
+   */
+  public constructor(encryptedSeed: Buffer) {
+    this.encryptedSeed = encryptedSeed
+  }
 
   /**
    * Initializes the vault with the aes 256 cbc encrypted seed
@@ -13,9 +22,30 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param encryptionPass - password used to generate encryption cipher
    * @example `const vault = new SoftwareKeyProvider(Buffer.from('abc...', 'hex'), 'secret')`
    */
+  public static fromSeed(
+    seed: Buffer,
+    encryptionPass: string,
+  ): SoftwareKeyProvider {
+    const encryptedSeed = SoftwareKeyProvider.encrypt(encryptionPass, seed)
+    return new SoftwareKeyProvider(encryptedSeed)
+  }
 
-  constructor(seed: Buffer, encryptionPass: string) {
-    this.encryptedSeed = this.encrypt(encryptionPass, seed)
+  /**
+   * Recover the Key Provider based on a bip39 mnemonic seed phrase
+   * @param mnemonic - string that contains the seed phrase
+   * @param encryptionPass - password used to generated encryption cipher
+   * @returns an instance of the VaultedKeyProvider
+   * @example SoftwareKeyProvider.recoverKeyPair('fluid purse degree ...', 'secret')
+   */
+  public static recoverKeyPair(
+    mnemonic: string,
+    encryptionPass: string,
+  ): IVaultedKeyProvider {
+    if (!validateMnemonic(mnemonic)) {
+      throw new Error('Invalid Mnemonic.')
+    }
+    const seed = Buffer.from(mnemonicToEntropy(mnemonic), 'hex')
+    return SoftwareKeyProvider.fromSeed(seed, encryptionPass)
   }
 
   /**
@@ -26,18 +56,18 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   public getPublicKey(derivationArgs: IKeyDerivationArgs): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
-    const seed = this.decrypt(encryptionPass, this.encryptedSeed)
+    const seed = SoftwareKeyProvider.decrypt(encryptionPass, this.encryptedSeed)
     return fromSeed(seed).derivePath(derivationPath).publicKey
   }
 
   /**
    * Returns N bytes of random data
-   * @param nrBytes - Number of bytes to verify
+   * @param nr - Number of bytes to verify
    * @example `vault.getRandom(32) // Buffer <...>`
    */
 
   // TODO - Use csprng implementation
-  public static getRandom(nr): Buffer {
+  public static getRandom(nr: number): Buffer {
     return randomBytes(nr)
   }
 
@@ -50,7 +80,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   public sign(derivationArgs: IKeyDerivationArgs, digest: Buffer): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
-    const seed = this.decrypt(encryptionPass, this.encryptedSeed)
+    const seed = SoftwareKeyProvider.decrypt(encryptionPass, this.encryptedSeed)
     const signingKey = fromSeed(seed).derivePath(derivationPath)
     return signingKey.sign(digest)
   }
@@ -78,12 +108,21 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `vault.getPrivateKey({derivationPath: ..., decryptionPass: ...}) // Buffer <...>`
    */
 
-  public getPrivateKey(derivationArgs: IKeyDerivationArgs) {
+  public getPrivateKey(derivationArgs: IKeyDerivationArgs): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
-    const seed = this.decrypt(encryptionPass, this.encryptedSeed)
+    const seed = SoftwareKeyProvider.decrypt(encryptionPass, this.encryptedSeed)
 
     console.warn('METHOD WILL BE DEPRECATED SOON, ANTIPATTERN')
     return fromSeed(seed).derivePath(derivationPath).privateKey
+  }
+
+  /**
+   * Returns the mnemonic of the stored seed
+   * @param password - Password for seed decryption
+   */
+  public getMnemonic(password: string): string {
+    const seed = SoftwareKeyProvider.decrypt(password, this.encryptedSeed)
+    return entropyToMnemonic(seed)
   }
 
   /**
@@ -126,7 +165,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `this.encrypt('secret', Buffer.from('abc..fe', 'hex'))`
    */
 
-  private encrypt(password: string, data: Buffer): Buffer {
+  private static encrypt(password: string, data: Buffer): Buffer {
     const cipher = createCipher('aes-256-cbc', password)
     return Buffer.concat([cipher.update(data), cipher.final()])
   }
@@ -138,7 +177,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `this.dencrypt('secret', encrypted)`
    */
 
-  private decrypt(password: string, data: Buffer): Buffer {
+  private static decrypt(password: string, data: Buffer): Buffer {
     const decipher = createDecipher('aes-256-cbc', password)
     return Buffer.concat([decipher.update(data), decipher.final()])
   }

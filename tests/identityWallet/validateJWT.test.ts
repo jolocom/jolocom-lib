@@ -28,7 +28,7 @@ describe('IdentityWallet validate JWT', () => {
   const encryptionPass = 'secret'
   const didDocument = DidDocument.fromJSON(didDocumentJSON)
   const identity = Identity.fromDidDocument({ didDocument })
-  const vault = new SoftwareKeyProvider(testSeed, encryptionPass)
+  const vault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
 
   let iw: IdentityWallet
 

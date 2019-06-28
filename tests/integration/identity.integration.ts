@@ -133,7 +133,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
   })
 
   it('should correctly fail to authenticate as non existing did', async () => {
-    const mockVault = new SoftwareKeyProvider(testSeed, 'pass')
+    const mockVault = SoftwareKeyProvider.fromSeed(testSeed, 'pass')
 
     try {
       await jolocomRegistry.authenticate(mockVault, {
