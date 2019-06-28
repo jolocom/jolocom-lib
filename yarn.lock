@@ -1959,10 +1959,10 @@ create-hmac@^1.1.0, create-hmac@^1.1.2, create-hmac@^1.1.4, create-hmac@^1.1.7:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-cred-types-jolocom-core@^0.0.10:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/cred-types-jolocom-core/-/cred-types-jolocom-core-0.0.10.tgz#69dabc0fdb41a795fa6d63230d44a82d98e55dba"
-  integrity sha512-AuqPaIz2RCIbcdwnQXGN0oenAMMpWbiD0ulz4NJWSV5Iyn77Pa9jwYMCbGtqjWrABMQdSUhDOOCBSpUgPSbnNQ==
+cred-types-jolocom-core@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/cred-types-jolocom-core/-/cred-types-jolocom-core-0.0.11.tgz#7cc8c23e511590fede0f9a072854f3892127e0ed"
+  integrity sha512-jnLdSo45XvMhPmecAve41GhYPRUqTIumCyjBa4rpUsTCsLSKR1LHq6XC0C9B0RKyk4S7/DZHjGc9q/WdkjVNCg==
 
 cross-fetch@^2.1.0, cross-fetch@^2.1.1:
   version "2.2.3"
