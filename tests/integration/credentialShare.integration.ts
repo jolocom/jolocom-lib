@@ -1,6 +1,5 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import {
   userPass,
   servicePass,
@@ -54,25 +53,18 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
         jolocomRegistry,
       )
     } catch (err) {
-      expect(true).to.be.false
+      return expect(true).to.be.false
     }
 
     const emailSignedCred = await userIdentityWallet.create.signedCredential(
       emailCredJSON,
       userPass,
     )
-    const emailSecondCred = SignedCredential.fromJSON(emailSignedCred.toJSON())
-    emailSecondCred.issuer =
-      'did:jolo:bf8095f75ec116362eb31d5e68736be6688f82db616d1dd7df5e9f99047347c3'
-    const filteredCred = decodedCredRequest.interactionToken.applyConstraints([
-      emailSignedCred.toJSON(),
-      emailSecondCred.toJSON(),
-    ])
 
     const credResponseJWT = await userIdentityWallet.create.interactionTokens.response.share(
       {
         callbackURL: decodedCredRequest.interactionToken.callbackURL,
-        suppliedCredentials: filteredCred,
+        suppliedCredentials: [emailSignedCred.toJSON()],
       },
       userPass,
       decodedCredRequest,
@@ -103,10 +95,10 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
         jolocomRegistry,
       )
     } catch (err) {
-      expect(true).to.be.false
+      return expect(true).to.be.false
     }
 
-    expect(
+    return expect(
       decodedCredResponse.interactionToken.satisfiesRequest(
         credRequestJWT.interactionToken,
       ),

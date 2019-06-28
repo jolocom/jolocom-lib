@@ -8,7 +8,7 @@
   ],
   "typings": "js/index.d.ts",
   "scripts": {
-    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts",
+    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts --exit",
     "clean": "rm -rf ./js",
     "prepublish": "yarn clean; yarn build",
     "build": "tsc -p .",
@@ -17,7 +17,8 @@
     "test:debug": "mocha --opts ./mocha.opts --inspect -w ./tests/**/*.test.ts",
     "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
     "test:integration": "mocha --opts ./mocha.opts ./tests/**/*.integration.ts",
-    "format": "eslint --fix --ext .ts ."
+    "format": "eslint --fix --ext .ts .",
+    "generate-api-docs": "typedoc ./ts"
   },
   "nyc": {
     "include": [
@@ -103,6 +104,7 @@
     "sinon": "^7.2.5",
     "source-map-support": "^0.5.10",
     "ts-node": "^8.0.2",
+    "typedoc": "^0.14.2",
     "typescript": "^3.4.1",
     "web3": "1.0.0-beta.35"
   }
