@@ -1,5 +1,11 @@
 import 'reflect-metadata'
-import { classToPlain, plainToClass, Exclude, Expose, Transform } from 'class-transformer'
+import {
+  classToPlain,
+  plainToClass,
+  Exclude,
+  Expose,
+  Transform,
+} from 'class-transformer'
 import { IServiceEndpointSectionAttrs } from './types'
 
 /**
