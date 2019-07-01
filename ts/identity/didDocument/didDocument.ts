@@ -5,12 +5,16 @@ import {
   Exclude,
   Expose,
   Transform,
-  ClassTransformOptions
+  ClassTransformOptions,
 } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
 import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
-import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections'
+import {
+  AuthenticationSection,
+  PublicKeySection,
+  ServiceEndpointsSection,
+} from './sections'
 import { ISigner } from '../../registries/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
@@ -62,10 +66,13 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose({ name: '@context' })
-  @Transform((val, obj) => {
-    if (obj.id.startsWith('did:jolo')) return defaultContextIdentity
-    else return val
-  }, { toClassOnly: true })
+  @Transform(
+    (val, obj) => {
+      if (obj.id.startsWith('did:jolo')) return defaultContextIdentity
+      else return val
+    },
+    { toClassOnly: true },
+  )
   public get context(): ContextEntry[] {
     return this._context
   }
@@ -105,10 +112,10 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose({ name: 'authentication' })
-  @Transform(
-    auths => auths.map(a => a.publicKey),
-    { toClassOnly: true, until: 0.13 }
-  )
+  @Transform(auths => auths.map(a => a.publicKey), {
+    toClassOnly: true,
+    until: 0.13,
+  })
   public get authentication(): AuthenticationSection[] {
     return this._authentication
   }
@@ -392,9 +399,10 @@ export class DidDocument implements IDigestable {
    */
 
   public static fromJSON(json: IDidDocumentAttrs): DidDocument {
-    const options: ClassTransformOptions | undefined =
-      json.id.startsWith('did:jolo')
-      ?  { version: json.specVersion || 0 }
+    const options: ClassTransformOptions | undefined = json.id.startsWith(
+      'did:jolo',
+    )
+      ? { version: json.specVersion || 0 }
       : undefined
 
     return plainToClass(DidDocument, json, options)

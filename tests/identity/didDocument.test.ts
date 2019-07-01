@@ -14,7 +14,10 @@ import {
   mockPublicKey2,
   mockPubProfServiceEndpointJSON,
 } from '../data/didDocumentSections.data'
-import { ServiceEndpointsSection, PublicKeySection } from '../../ts/identity/didDocument/sections'
+import {
+  ServiceEndpointsSection,
+  PublicKeySection,
+} from '../../ts/identity/didDocument/sections'
 const expect = chai.expect
 
 describe('DidDocument', () => {
@@ -47,20 +50,24 @@ describe('DidDocument', () => {
 
   it('Should not try to migrate if DID is not "did:jolo:*"', () => {
     const didDocJSON = {
-      "@context": "https://w3id.org/did/v1",
-      "id": "did:uknow:d34db33f",
-      "publicKey": [{
-        "id": "did:uknow:d34db33f#cooked",
-        "type": "Secp256k1VerificationKey2018",
-        "owner": "did:uknow:d34db33f",
-        "publicKeyHex": "b9c5714089478a327f09197987f16f9e5d936e8a"
-      }],
-      "authentication": [{
-        "type": "Secp256k1SignatureAuthentication2018",
-        "publicKey": "did:uknow:d34db33f#cooked",
-      }],
+      '@context': 'https://w3id.org/did/v1',
+      id: 'did:uknow:d34db33f',
+      publicKey: [
+        {
+          id: 'did:uknow:d34db33f#cooked',
+          type: 'Secp256k1VerificationKey2018',
+          owner: 'did:uknow:d34db33f',
+          publicKeyHex: 'b9c5714089478a327f09197987f16f9e5d936e8a',
+        },
+      ],
+      authentication: [
+        {
+          type: 'Secp256k1SignatureAuthentication2018',
+          publicKey: 'did:uknow:d34db33f#cooked',
+        },
+      ],
       service: [],
-      created: ''
+      created: '',
     }
     expect(() => DidDocument.fromJSON(didDocJSON)).to.not.throw()
   })
