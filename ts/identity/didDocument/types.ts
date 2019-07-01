@@ -11,7 +11,9 @@ export interface IDidDocumentAttrs {
   '@context': ContextEntry[] | string
   specVersion?: number
   id: string
-  authentication?: IAuthenticationSectionAttrs_v0[] | IAuthenticationSectionAttrs[]
+  authentication?:
+    | IAuthenticationSectionAttrs_v0[]
+    | IAuthenticationSectionAttrs[]
   publicKey?: IPublicKeySectionAttrs[]
   service?: IServiceEndpointSectionAttrs[]
   created?: string
