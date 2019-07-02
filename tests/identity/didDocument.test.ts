@@ -1,9 +1,9 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as crypto from 'crypto'
-import { testPublicIdentityKey } from '../data/keys.data'
+import { testPublicIdentityKey, testSeed } from '../data/keys.data'
 import {
-  didDocumentJSON_v0,
+  didDocumentJSONv0,
   didDocumentJSON,
   mockDid,
   mockKeyId,
@@ -18,10 +18,18 @@ import {
   ServiceEndpointsSection,
   PublicKeySection,
 } from '../../ts/identity/didDocument/sections'
+import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
+import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
+
 const expect = chai.expect
 
 describe('DidDocument', () => {
   const sandbox = sinon.createSandbox()
+  const vault = SoftwareKeyProvider.fromSeed(testSeed, 'password')
+  const derivationArgs = {
+    derivationPath: KeyTypes.jolocomIdentityKey,
+    encryptionPass: 'password',
+  }
 
   let referenceDidDocument
   let clock
@@ -41,6 +49,7 @@ describe('DidDocument', () => {
     referenceDidDocument.addServiceEndpoint(
       ServiceEndpointsSection.fromJSON(mockPubProfServiceEndpointJSON),
     )
+    await referenceDidDocument.sign(vault, derivationArgs, mockKeyId)
   })
 
   after(() => {
@@ -73,14 +82,15 @@ describe('DidDocument', () => {
   })
 
   it('Should correctly implement fromJSON for version 0', () => {
-    const didDocFromJSON_v0 = DidDocument.fromJSON(didDocumentJSON_v0)
-    didDocFromJSON_v0.addAuthKey(mockPublicKey2 as PublicKeySection)
-    expect(referenceDidDocument).to.deep.eq(didDocFromJSON_v0)
+    const didDocumentv0 = DidDocument.fromJSON(didDocumentJSONv0)
+
+    didDocumentv0.addAuthKey(mockPublicKey2 as PublicKeySection)
+    expect(didDocumentv0).to.deep.eq(referenceDidDocument)
   })
 
   it('Should correctly implement fromJSON', () => {
     const didDocFromJSON = DidDocument.fromJSON(didDocumentJSON)
-    expect(referenceDidDocument).to.deep.eq(didDocFromJSON)
+    expect(didDocFromJSON).to.deep.eq(referenceDidDocument)
   })
 
   it('Should correctly implement toJSON', () => {
@@ -91,6 +101,21 @@ describe('DidDocument', () => {
     const normalized = await referenceDidDocument.normalize()
 
     expect(normalized).to.deep.eq(normalizedDidDocument)
+  })
+
+  it('should correctly sign the DID document', async () => {
+    await referenceDidDocument.sign(
+      vault,
+      {
+        derivationPath: KeyTypes.jolocomIdentityKey,
+        encryptionPass: 'password',
+      },
+      mockKeyId,
+    )
+
+    expect(referenceDidDocument.signature).to.eq(
+      '3e4bca6a08643c4a67c02abd109accd19f2f9ad1c93cd9f39d3f23edc122de7a72d1de44420b456c20b1875ed254417efdf8dd16fb8ded818d830dac475ec55a',
+    )
   })
 
   it('implements getters', () => {
