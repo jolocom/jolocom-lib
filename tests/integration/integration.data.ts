@@ -51,14 +51,7 @@ export const integrationCredRequestJSON = {
   credentialRequirements: [
     {
       type: ['Credential', 'ProofOfEmailCredential'],
-      constraints: [
-        {
-          '==': [
-            { var: 'issuer' },
-            'did:jolo:bf8095f75ec116362eb31d5e68736be6688f82db616d1dd7df5e9f99047347b2',
-          ],
-        },
-      ],
+      constraints: [],
     },
   ],
 }

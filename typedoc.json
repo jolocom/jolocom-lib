@@ -1,0 +1,8 @@
+{
+  "mode": "file",
+  "out": "api_docs/documentation",
+  "theme": "minimal",
+  "includeDeclarations": true,
+  "excludeExternals": true,
+  "excludePrivate": true
+}

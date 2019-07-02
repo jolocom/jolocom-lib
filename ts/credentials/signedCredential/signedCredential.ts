@@ -326,7 +326,7 @@ export class SignedCredential implements IDigestable {
    * @internal
    */
 
-  private async prepareSignature(keyId: string) {
+  private prepareSignature(keyId: string) {
     const inOneYear = new Date()
     inOneYear.setFullYear(new Date().getFullYear() + 1)
 
