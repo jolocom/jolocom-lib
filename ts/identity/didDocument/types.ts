@@ -1,5 +1,5 @@
 import {
-  IAuthenticationSectionAttrs_v0,
+  IAuthenticationSectionAttrsv0,
   IAuthenticationSectionAttrs,
   IPublicKeySectionAttrs,
   IServiceEndpointSectionAttrs,
@@ -12,7 +12,7 @@ export interface IDidDocumentAttrs {
   specVersion?: number
   id: string
   authentication?:
-    | IAuthenticationSectionAttrs_v0[]
+    | IAuthenticationSectionAttrsv0[]
     | IAuthenticationSectionAttrs[]
   publicKey?: IPublicKeySectionAttrs[]
   service?: IServiceEndpointSectionAttrs[]

@@ -10,7 +10,7 @@ export const mockPublicKeyHex =
 
 /* JSON form to ensure toJSON and fromJSON work as intended */
 
-export const didDocumentJSON_v0 = {
+export const didDocumentJSONv0 = {
   authentication: [
     {
       publicKey: mockKeyId,
@@ -38,7 +38,8 @@ export const didDocumentJSON_v0 = {
     type: 'EcdsaKoblitzSignature2016',
     creator: mockKeyId,
     nonce: '1842fb5f567dd532',
-    signatureValue: '',
+    signatureValue:
+      '3e4bca6a08643c4a67c02abd109accd19f2f9ad1c93cd9f39d3f23edc122de7a72d1de44420b456c20b1875ed254417efdf8dd16fb8ded818d830dac475ec55a',
     created: '1970-01-01T00:00:00.000Z',
   },
   '@context': defaultContextIdentity,
@@ -78,7 +79,8 @@ export const didDocumentJSON = {
     type: 'EcdsaKoblitzSignature2016',
     creator: mockKeyId,
     nonce: '1842fb5f567dd532',
-    signatureValue: '',
+    signatureValue:
+      '3e4bca6a08643c4a67c02abd109accd19f2f9ad1c93cd9f39d3f23edc122de7a72d1de44420b456c20b1875ed254417efdf8dd16fb8ded818d830dac475ec55a',
     created: '1970-01-01T00:00:00.000Z',
   },
   '@context': defaultContextIdentity,

@@ -1,11 +1,11 @@
 import {
-  plainToClass,
   classToPlain,
-  Type,
+  ClassTransformOptions,
   Exclude,
   Expose,
+  plainToClass,
   Transform,
-  ClassTransformOptions,
+  Type,
 } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
 import { canonize } from 'jsonld'
@@ -18,12 +18,16 @@ import {
 import { ISigner } from '../../registries/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
-import { sha256, publicKeyToDID } from '../../utils/crypto'
+import { publicKeyToDID, sha256 } from '../../utils/crypto'
 import {
-  ILinkedDataSignature,
   IDigestable,
+  ILinkedDataSignature
 } from '../../linkedDataSignature/types'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
+import {
+  IKeyDerivationArgs,
+  IVaultedKeyProvider,
+} from '../../vaultedKeyProvider/types'
 
 /**
  * Class modelling a Did Document
@@ -330,25 +334,32 @@ export class DidDocument implements IDigestable {
       PublicKeySection.fromEcdsa(publicKey, keyId, did),
     )
     didDocument.addAuthKeyId(didDocument.publicKey[0].id)
-    await didDocument.prepareSignature(keyId)
-
     return didDocument
   }
 
   /**
-   * Sets all fields on the instance necessary to compute the signature
+   * Sets all fields on the instance necessary to compute the signature and signes the DID Document
+   * @param vaultedKeyProvider VaultedKeyProvider instance the holds the private key to sign the DID Document
+   * @param derivationArgs Should contain the derivation path and the password for the key provider
    * @param keyId - Public key identifier, as defined in the {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}.
-   * @example `didDocument.prepareSignature('did:jolo:...#keys-1')`
+   * @example `didDocument.sign(vault, { derivationPath: KeyTypes.jolocomIdentityKey, encryptionPass: 'password', }, keyId)`
    */
 
-  private prepareSignature(keyId: string) {
-    const inOneYear = new Date()
-    inOneYear.setFullYear(new Date().getFullYear() + 1)
-
+  public async sign(
+    vaultedKeyProvider: IVaultedKeyProvider,
+    derivationArgs: IKeyDerivationArgs,
+    keyId: string,
+  ): Promise<void> {
     this._proof = new EcdsaLinkedDataSignature()
     this._proof.creator = keyId
     this._proof.signature = ''
     this._proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
+
+    const didDocumentSignature = await vaultedKeyProvider.signDigestable(
+      derivationArgs,
+      this,
+    )
+    this._proof.signature = didDocumentSignature.toString('hex')
   }
 
   /**

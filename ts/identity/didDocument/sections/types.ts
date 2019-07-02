@@ -11,7 +11,7 @@ export interface IServiceEndpointSectionAttrs {
   description: string
 }
 
-export interface IAuthenticationSectionAttrs_v0 {
+export interface IAuthenticationSectionAttrsv0 {
   publicKey: string
   type: string
 }
