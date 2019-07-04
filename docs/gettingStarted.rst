@@ -1,6 +1,11 @@
 Getting Started
 ===============
 
+.. warning::
+
+  Please be aware that the Jolocom library is still undergoing active development. All identities are currently anchored on the Rinkeby testnet.
+  Please do not transfer any real ether to your Jolocom identity.
+
 How to install the Jolocom library
 ###################################
 
@@ -14,10 +19,43 @@ To begin using the Jolocom protocol, first install the Jolocom library as a depe
   # using yarn
   yarn add jolocom-lib
 
-.. warning:: Please be aware that the Jolocom library is still undergoing active development. All identities are currently anchored on the Rinkeby testnet.
+Browser and React Native Environments
+#####################################
 
-  Please do not transfer any real ether to your Jolocom identity.
+To use the library in a browser or react native environment, you also need some polyfills as some of the dependencies assume running in a node environment
 
+.. code-block:: bash
+
+  # using npm
+  npm install --save vm-browserify crypto-browserify assert stream-browserify events
+
+  # using yarn
+  yarn add vm-browserify crypto-browserify assert stream-browserify events
+
+
+Also, you will need to configure your bundler (webpack, parcel, metro, etc) with aliases for the modules named \*-browserify
+
+For React Native's metro.config.js:
+
+.. code-block:: javascript
+
+  module.exports = {
+    resolver: {
+      extraNodeModules: {
+        // Polyfills for node libraries
+        "crypto": require.resolve("crypto-browserify"),
+        "stream": require.resolve("stream-browserify"),
+        "vm": require.resolve("vm-browserify")
+      }
+    },
+  }
+
+
+Also :code:`process.version` must be defined, so you might need to just set it in your index file:
+
+.. code-block:: javascript
+
+  process.version = 'v11.13.0'
 
 How to create a self-sovereign identity
 #########################################
