@@ -33,7 +33,7 @@ export interface IRegistry {
     vaultedKeyProvider: IVaultedKeyProvider,
     decryptionPassword: string,
   ) => Promise<IdentityWallet>
-  commit: (commitArgs: IRegistryCommitArgs) => Promise<void>
+  commit: (commitArgs: IRegistryCommitArgs) => Promise<Date>
   resolve: (did) => Promise<Identity>
   authenticate: (
     vaultedKeyProvider: IVaultedKeyProvider,

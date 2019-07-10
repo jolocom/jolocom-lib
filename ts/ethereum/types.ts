@@ -14,7 +14,7 @@ export interface IEthereumResolverUpdateDIDArgs {
 
 export interface IEthereumConnector {
   resolveDID: (did: string) => Promise<IdentityData>
-  updateDIDRecord: (args: IEthereumResolverUpdateDIDArgs) => Promise<void>
+  updateDIDRecord: (args: IEthereumResolverUpdateDIDArgs) => Promise<Date>
   getUpdated: (did: string) => Promise<Date>
   getCreated: (did: string) => Promise<Date>
 }

@@ -70,13 +70,9 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       serviceIdentityWallet.did,
     )
 
-    // FIXME add created
-    delete remoteUserIdentity.created
     expect(remoteUserIdentity.toDidDocument()).to.deep.eq(
       userIdentityWallet.didDocument,
     )
-    // FIXME add created
-    delete remoteServiceIdentity.created
     expect(remoteServiceIdentity.toDidDocument()).to.deep.eq(
       serviceIdentityWallet.didDocument,
     )
@@ -103,8 +99,6 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
     expect(remoteServiceIdentity.publicProfileCredential).to.deep.eq(
       servicePublicProfile,
     )
-    // FIXME add created to identity
-    delete remoteServiceIdentity.created
     expect(remoteServiceIdentity.toDidDocument()).to.deep.eq(
       serviceIdentityWallet.didDocument,
     )
@@ -116,9 +110,6 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       encryptionPass: userPass,
     })
 
-    // FIXME add created
-    // @ts-ignore
-    delete wallet.identity.created
     expect(wallet.identity.toDidDocument()).to.deep.eq(
       userIdentityWallet.identity.toDidDocument(),
     )
@@ -140,8 +131,6 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
 
     const localPubProf = serviceIdentityWallet.identity.publicProfileCredential.toJSON()
 
-    // FIXME add created
-    delete remoteDidDoc.created
     expect(remoteDidDoc).to.deep.eq(localDidDoc)
     expect(remotePubProf).to.deep.eq(localPubProf)
   })

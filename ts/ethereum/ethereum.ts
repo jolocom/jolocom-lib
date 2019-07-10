@@ -60,10 +60,10 @@ export class EthResolver implements IEthereumConnector {
     did,
     owner,
     newHash,
-  }: IEthereumResolverUpdateDIDArgs): Promise<void> {
+  }: IEthereumResolverUpdateDIDArgs): Promise<Date> {
     const uncompressedKey =
       '0x' + ethers.utils.computePublicKey(owner, false).slice(4)
-    await this.ethResolver.updateIdentity(
+    return await this.ethResolver.updateIdentity(
       ethereumKey,
       did,
       uncompressedKey,

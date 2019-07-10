@@ -65,7 +65,7 @@ export class JolocomRegistry implements IRegistry {
       contractsAdapter: this.contractsAdapter,
       contractsGateway: this.contractsGateway,
     })
-    await this.commit({
+    identityWallet.identity.created = await this.commit({
       identityWallet,
       vaultedKeyProvider,
       keyMetadata: {
@@ -83,11 +83,12 @@ export class JolocomRegistry implements IRegistry {
    * @param commitArgs.vaultedKeyProvider - Vaulted key store
    * @param commitArgs.keyMetadata - Derivation path and decryption pass
    * @param commitArgs.identityWallet - Wallet containing did document and public profile
+   * @returns the date of the last update of the identity entry in the registry
    * @deprecated Will be modified in next major release to not require access to the vault
    * @example `await registry.commit({ vaultedKeyProvider, keyMetadata, identityWallet })`
    */
 
-  public async commit(commitArgs: IRegistryCommitArgs) {
+  public async commit(commitArgs: IRegistryCommitArgs): Promise<Date> {
     const { identityWallet, keyMetadata, vaultedKeyProvider } = commitArgs
     let serviceHash = ''
     try {
@@ -99,7 +100,7 @@ export class JolocomRegistry implements IRegistry {
       const privateKey = vaultedKeyProvider.getPrivateKey(keyMetadata)
       const owner = vaultedKeyProvider.getPublicKey(keyMetadata)
 
-      await this.ethereumConnector.updateDIDRecord({
+      return await this.ethereumConnector.updateDIDRecord({
         ethereumKey: privateKey,
         did: identityWallet.identity.did,
         owner: '0x' + owner.toString('hex'),
