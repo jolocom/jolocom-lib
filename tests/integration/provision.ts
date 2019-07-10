@@ -8,8 +8,7 @@ import { ethers } from 'ethers'
 const IPFSFactory = require('ipfsd-ctl')
 
 const PORT = 8945
-
-const balance = 1e24
+const balance = 1000000000000000000
 const ganacheServer = ganache.server({
   accounts: [
     { secretKey: deployerEthKey, balance },

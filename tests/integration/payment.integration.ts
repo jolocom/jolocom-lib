@@ -46,7 +46,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
         ...paymentReqCreationArgs,
         transactionOptions: {
           ...paymentReqCreationArgs.transactionOptions,
-          to: '0x10ed0857fd6d752f2089a6b0d3fe7f0392e046e0', // Defaulted to service's eth addr.
+          to: '0xd8ae5d226b6c928c95e6c7f26f6aa4359ccd5587', // Defaulted to service's eth addr.
           gasLimit: 21e3,
           gasPrice: 10e9,
         },
@@ -122,9 +122,10 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
   })
 
   it('Should transfer the funds and correctly increment the nonce', async () => {
-    const userPubKey = userIdentityWallet.getPublicKeys(userPass).ethereumKey
+    const userPubKey = userIdentityWallet.getPublicKeys(userPass)
+      .jolocomIdentityKey
     const servicePubKey = serviceIdentityWallet.getPublicKeys(servicePass)
-      .ethereumKey
+      .jolocomIdentityKey
 
     const userAddr = publicKeyToAddress(Buffer.from(userPubKey, 'hex'))
     const serviceAddr = publicKeyToAddress(Buffer.from(servicePubKey, 'hex'))

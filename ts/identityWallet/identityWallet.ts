@@ -376,7 +376,7 @@ export class IdentityWallet {
         to: transactionOptions.to
           ? transactionOptions.to
           : publicKeyToAddress(
-              Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex'),
+              Buffer.from(this.getPublicKeys(pass).jolocomIdentityKey, 'hex'),
             ),
         ...transactionOptions,
       },
@@ -480,7 +480,7 @@ export class IdentityWallet {
     pass: string,
   ) => {
     const publicKey = this._vaultedKeyProvider.getPublicKey({
-      derivationPath: KeyTypes.ethereumKey,
+      derivationPath: KeyTypes.jolocomIdentityKey,
       encryptionPass: pass,
     })
 

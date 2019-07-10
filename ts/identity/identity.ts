@@ -1,13 +1,10 @@
 import { DidDocument } from './didDocument/didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import {
-  AuthenticationSection,
-  PublicKeySection,
-  ServiceEndpointsSection,
-} from './didDocument/sections'
+import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './didDocument/sections'
 import { PublicKey } from './types'
 import { keyIdToNumber, keyNumberToKeyId } from '../utils/helper'
 import { publicKeyToDID } from '../utils/crypto'
+import { generatePublicProfileServiceSection } from './didDocument/sections/serviceEndpointsSection'
 
 /**
  * @class
@@ -19,9 +16,21 @@ export class Identity {
   public publicKey: PublicKey
   public recoveryKey?: PublicKey
   public services?: ServiceEndpointsSection[]
-  public publicProfileCredential?: SignedCredential
   public created: Date
   public updated: Date
+
+  public get publicProfileCredential(): SignedCredential {
+    const publicProfile = this.services.find(
+      s => s.type == 'JolocomPublicProfile',
+    )
+    if (publicProfile) return publicProfile.serviceEndpoint as SignedCredential
+  }
+
+  public set publicProfileCredential(publicProfile: SignedCredential) {
+    this.services.push(
+      generatePublicProfileServiceSection(this.did, publicProfile),
+    )
+  }
 
   /**
    * Create the Identity object based on identity data. DID and public key are required.
@@ -36,7 +45,7 @@ export class Identity {
     did: string,
     publicKey: PublicKey,
     recoveryKey?: PublicKey,
-    serviceSection?: ServiceEndpointsSection[],
+    serviceSection: ServiceEndpointsSection[] = [],
     created?: Date,
     updated?: Date,
   ) {
@@ -44,11 +53,6 @@ export class Identity {
     this.publicKey = publicKey
     this.recoveryKey = recoveryKey
     this.services = serviceSection
-    const publicProfileSection = serviceSection
-      ? serviceSection.find(s => s.type === 'JolocomPublicProfile')
-      : null
-    if (publicProfileSection)
-      this.publicProfileCredential = publicProfileSection.serviceEndpoint as SignedCredential
     this.created = created
     this.updated = updated
   }
@@ -74,7 +78,7 @@ export class Identity {
     // const recoveryKey = didDocument.publicKey.find(
     //   p => p.id == didDocument.authorization[0].publicKey,
     // )
-    const identity = new Identity(
+    return new Identity(
       didDocument.did,
       {
         hexValue: ownerKey.publicKeyHex,
@@ -84,14 +88,6 @@ export class Identity {
       didDocument.service,
       didDocument.created,
     )
-    const publicProfileSection = didDocument.service.find(
-      s => s.type === 'JolocomPublicProfile',
-    )
-    if (publicProfileSection) {
-      identity.publicProfileCredential = publicProfileSection.serviceEndpoint as SignedCredential
-    }
-
-    return identity
   }
 
   public toDidDocument(): DidDocument {

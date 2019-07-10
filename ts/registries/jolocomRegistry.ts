@@ -89,12 +89,13 @@ export class JolocomRegistry implements IRegistry {
 
   public async commit(commitArgs: IRegistryCommitArgs) {
     const { identityWallet, keyMetadata, vaultedKeyProvider } = commitArgs
-
+    let serviceHash = ''
     try {
-      const serviceHash = await this.ipfsConnector.storeJSON({
-        data: identityWallet.identity.services.map(s => s.toJSON()),
-        pin: true,
-      })
+      if (identityWallet.identity.services)
+        serviceHash = await this.ipfsConnector.storeJSON({
+          data: identityWallet.identity.services.map(s => s.toJSON()),
+          pin: true,
+        })
       const privateKey = vaultedKeyProvider.getPrivateKey(keyMetadata)
       const owner = vaultedKeyProvider.getPublicKey(keyMetadata)
 
@@ -130,9 +131,9 @@ export class JolocomRegistry implements IRegistry {
       if (!owner) {
         throw new Error('No record for DID found.')
       }
-      let servicesJSON = (await this.ipfsConnector.catJSON(
-        serviceHash,
-      )) as object[] // will always be an array
+      let servicesJSON = serviceHash
+        ? ((await this.ipfsConnector.catJSON(serviceHash)) as object[])
+        : []
       const services = []
       servicesJSON.forEach((s: IServiceEndpointSectionAttrs) =>
         services.push(ServiceEndpointsSection.fromJSON(s)),
