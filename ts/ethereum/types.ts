@@ -17,4 +17,5 @@ export interface IEthereumConnector {
   updateDIDRecord: (args: IEthereumResolverUpdateDIDArgs) => Promise<Date>
   getUpdated: (did: string) => Promise<Date>
   getCreated: (did: string) => Promise<Date>
+  getUpdatedCount: (did: string) => Promise<number>
 }

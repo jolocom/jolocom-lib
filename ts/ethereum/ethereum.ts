@@ -77,6 +77,9 @@ export class EthResolver implements IEthereumConnector {
   public async getUpdated(did: string): Promise<Date> {
     return await this.ethResolver.getUpdated(did)
   }
+  public async getUpdatedCount(did: string): Promise<number> {
+    return await this.ethResolver.getUpdatedCount(did)
+  }
 }
 
 /* Instantiates a resolver using the default configuration */

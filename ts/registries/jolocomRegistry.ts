@@ -128,6 +128,7 @@ export class JolocomRegistry implements IRegistry {
       } = await this.ethereumConnector.resolveDID(did)
       const created = await this.ethereumConnector.getCreated(did)
       const updated = await this.ethereumConnector.getUpdated(did)
+      const updatedCount = await this.ethereumConnector.getUpdatedCount(did)
 
       if (!owner) {
         throw new Error('No record for DID found.')
@@ -141,11 +142,11 @@ export class JolocomRegistry implements IRegistry {
       )
       const ownerKey: PublicKey = {
         hexValue: owner.split('0x').pop(),
-        keyId: 1,
+        keyId: 2 * updatedCount,
       }
       const recoveryKey: PublicKey = {
         hexValue: recovery,
-        keyId: 2,
+        keyId: 2 * updatedCount + 1,
       }
       return new Identity(
         did,
