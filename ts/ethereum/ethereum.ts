@@ -1,9 +1,10 @@
-import EthereumResolver from 'jolocom-registry-contract'
+import EthereumResolver, { IdentityData } from 'jolocom-registry-contract'
 import {
-  IEthereumResolverConfig,
   IEthereumConnector,
+  IEthereumResolverConfig,
   IEthereumResolverUpdateDIDArgs,
 } from './types'
+import { ethers } from 'ethers'
 
 /**
  * @class
@@ -19,7 +20,7 @@ export class EthResolver implements IEthereumConnector {
    * @param config - Configuration to connect to a remote Ethereum node, and the address of the registry contract
    */
 
-  constructor(config: IEthereumResolverConfig) {
+  public constructor(config: IEthereumResolverConfig) {
     this.ethResolver = new EthereumResolver(
       config.contractAddress,
       config.providerUrl,
@@ -33,25 +34,48 @@ export class EthResolver implements IEthereumConnector {
    */
 
   /*  @TODO - This should throw an error, or return false in case no record is found */
-  public async resolveDID(did: string): Promise<string> {
-    return this.ethResolver.resolveDID(did)
+  public async resolveDID(did: string): Promise<IdentityData> {
+    const data = await this.ethResolver.resolveDID(did)
+    return {
+      ...data,
+      owner:
+        data.owner !== '0x'
+          ? ethers.utils.computePublicKey('0x04' + data.owner.slice(2), true)
+          : '',
+    }
   }
 
   /**
    * Updates the mapping in the smart contract to reference a new pointer
    * @deprecated - Will be deprecated in next major release to avoid relying on private keys in the codebase
    * @param ethereumKey - Ethereum private key to sign the transaction
-   * @param did - Did to update
-   * @param newHash - New IPFS hash to associate with the did
-   * @example `await resolver.updateDIDRecord({ethereumKey: Buffer.from('...'), did: 'did:jolo:...', 'QmZCEmf...'})`
+   * @param did - DID to update
+   * @param owner - Public key of the owner of the DID
+   * @param newHash - New IPFS hash to associate with the DID
+   * @example `await resolver.updateDIDRecord({ethereumKey: Buffer.from('...'), did: 'did:jolo:...', owner: '0x3f2a2123...', newHash: 'QmZCEmf...'})`
    */
 
   public async updateDIDRecord({
     ethereumKey,
     did,
+    owner,
     newHash,
   }: IEthereumResolverUpdateDIDArgs): Promise<void> {
-    await this.ethResolver.updateDIDRecord(ethereumKey, did, newHash)
+    const uncompressedKey =
+      '0x' + ethers.utils.computePublicKey(owner, false).slice(4)
+    await this.ethResolver.updateIdentity(
+      ethereumKey,
+      did,
+      uncompressedKey,
+      newHash,
+    )
+  }
+
+  public async getCreated(did: string): Promise<Date> {
+    return await this.ethResolver.getCreated(did)
+  }
+  public async getUpdated(did: string): Promise<Date> {
+    return await this.ethResolver.getUpdated(did)
   }
 }
 
@@ -59,5 +83,5 @@ export class EthResolver implements IEthereumConnector {
 
 export const jolocomEthereumResolver = new EthResolver({
   providerUrl: 'https://rinkeby.infura.io/',
-  contractAddress: '0xd4351c3f383d79ba378ed1875275b1e7b960f120',
+  contractAddress: '0x4481afd2EbA586dcF002968F6a8e8b7A5C1fF78e',
 })

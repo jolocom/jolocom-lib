@@ -5,7 +5,7 @@ import {
 } from '../../ts/registries/jolocomRegistry'
 import { Identity } from '../../ts/identity/identity'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
-import { testPublicIdentityKey, testSeed } from '../data/keys.data'
+import { testPublicKey, testSeed } from '../data/keys.data'
 import { encryptionPass, keyMetadata } from './jolocomRegistry.data'
 import { mockDid, didDocumentJSON } from '../data/didDocument.data'
 import { expect } from 'chai'
@@ -19,15 +19,10 @@ describe('Jolocom Registry - authenticate', () => {
   const registry = createJolocomRegistry()
 
   before(async () => {
-    sandbox.stub(mockVault, 'getPublicKey').returns(testPublicIdentityKey)
+    sandbox.stub(mockVault, 'getPublicKey').returns(testPublicKey)
     sandbox
-      .stub(JolocomRegistry.prototype, 'resolve')
-      .resolves(Identity.fromDidDocument({ didDocument: mockDidDoc }))
-    sandbox.stub(Identity.prototype, 'publicKeySection').returns([
-      {
-        getIdentifier: sinon.stub(),
-      },
-    ])
+      .stub(registry, 'resolve')
+      .resolves(Identity.fromDidDocument(mockDidDoc))
   })
 
   after(() => {
@@ -37,7 +32,7 @@ describe('Jolocom Registry - authenticate', () => {
   it('should correctly authenticate', async () => {
     const iw = await registry.authenticate(mockVault, keyMetadata)
     sandbox.assert.calledWith(mockVault.getPublicKey, keyMetadata)
-    sandbox.assert.calledWith(JolocomRegistry.prototype.resolve, mockDid)
+    sandbox.assert.calledWith(registry.resolve, mockDid)
     expect(iw.didDocument.toJSON()).to.deep.eq(didDocumentJSON)
   })
 })

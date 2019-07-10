@@ -12,6 +12,7 @@ export interface IDidDocumentAttrs {
   authentication: IAuthenticationSectionAttrs[]
   publicKey: IPublicKeySectionAttrs[]
   service: IServiceEndpointSectionAttrs[]
-  created: string
-  proof: ILinkedDataSignatureAttrs
+  created?: string
+  updated?: string
+  proof?: ILinkedDataSignatureAttrs
 }

@@ -1,6 +1,5 @@
 import { JolocomLib } from '../index'
 import { IDigestable } from '../linkedDataSignature/types'
-import { getIssuerPublicKey } from './helper'
 import { IRegistry } from '../registries/types'
 
 /**
@@ -19,9 +18,9 @@ export const validateDigestable = async (
   const reg = customRegistry || JolocomLib.registries.jolocom.create()
   const issuerIdentity = await reg.resolve(toValidate.signer.did)
   try {
-    const issuerPublicKey = getIssuerPublicKey(
-      toValidate.signer.keyId,
-      issuerIdentity.didDocument,
+    const issuerPublicKey = Buffer.from(
+      issuerIdentity.publicKey.hexValue,
+      'hex',
     )
     return JolocomLib.KeyProvider.verifyDigestable(issuerPublicKey, toValidate)
   } catch {

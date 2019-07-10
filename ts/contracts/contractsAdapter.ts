@@ -50,7 +50,7 @@ export class ContractsAdapter implements IContractsAdapter {
     })
 
     const privateKey = vault.getPrivateKey({
-      derivationPath: KeyTypes.ethereumKey,
+      derivationPath: KeyTypes.jolocomIdentityKey,
       encryptionPass: password,
     })
 

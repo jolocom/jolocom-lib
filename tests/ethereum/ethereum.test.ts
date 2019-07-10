@@ -2,8 +2,11 @@ import * as sinon from 'sinon'
 import { expect } from 'chai'
 import { EthResolver } from '../../ts/ethereum/ethereum'
 import EthereumResolver from 'jolocom-registry-contract'
-import { mockIssuerDid } from '../data/credential/signedCredential.data'
-import { testPrivateEthereumKey } from '../data/keys.data'
+import {
+  mockIssuerDid,
+  mockPubKey,
+} from '../data/credential/signedCredential.data'
+import { testPrivateKey } from '../data/keys.data'
 import { testHash } from '../data/ipfs.data'
 
 describe('EthResolver', () => {
@@ -22,7 +25,7 @@ describe('EthResolver', () => {
 
   before(() => {
     stubbedResolve = sandbox.stub(EthereumResolver.prototype, 'resolveDID')
-    stubbedUpdate = sandbox.stub(EthereumResolver.prototype, 'updateDIDRecord')
+    stubbedUpdate = sandbox.stub(EthereumResolver.prototype, 'updateIdentity')
   })
 
   after(() => {
@@ -36,14 +39,16 @@ describe('EthResolver', () => {
 
   it('Should attempt to update did record', () => {
     eth.updateDIDRecord({
-      ethereumKey: testPrivateEthereumKey,
+      ethereumKey: testPrivateKey,
       did: mockIssuerDid,
+      owner: mockPubKey,
       newHash: testHash,
     })
 
     expect(stubbedUpdate.getCall(0).args).to.deep.eq([
-      testPrivateEthereumKey,
+      testPrivateKey,
       mockIssuerDid,
+      '0x9166c289b9f905e55f9e3df9f69d7f356b4a22095f894f4715714aa4b56606aff181eb966be4acb5cff9e16b66d809be94e214f06c93fd091099af98499255e7',
       testHash,
     ])
   })

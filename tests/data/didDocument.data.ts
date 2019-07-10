@@ -26,11 +26,32 @@ export const didDocumentJSON = {
   ],
   service: [],
   created: '1970-01-01T00:00:00.000Z',
+  '@context': defaultContextIdentity,
+  id: mockDid,
+}
+export const didDocumentWithProofJSON = {
+  authentication: [
+    {
+      publicKey: mockKeyId,
+      type: 'Secp256k1SignatureAuthentication2018',
+    },
+  ],
+  publicKey: [
+    {
+      id: mockKeyId,
+      type: 'Secp256k1VerificationKey2018',
+      owner: mockDid,
+      publicKeyHex: mockPublicKeyHex,
+    },
+  ],
+  service: [],
+  created: '1970-01-01T00:00:00.000Z',
   proof: {
     type: 'EcdsaKoblitzSignature2016',
     creator: mockKeyId,
     nonce: '1842fb5f567dd532',
-    signatureValue: '',
+    signatureValue:
+      'f46ffee01f80b8b861e364f46b1f971599d7597949d76f5883fbd306aa34bb8132b31f08cf037eabe79c7de2506f75b9a08924eb685853ceab57f92dc3fd7e29',
     created: '1970-01-01T00:00:00.000Z',
   },
   '@context': defaultContextIdentity,

@@ -5,6 +5,6 @@ export const testIpfsConfig = {
 }
 
 export const testEthereumConfig = {
-  providerUrl: 'testEthereumURL',
+  providerUrl: 'http://localhost:2342',
   contractAddress: '0x8389B5a24a1c56aFAD7309EF3b8e04bBadC935c4',
 }

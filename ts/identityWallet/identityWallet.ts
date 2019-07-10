@@ -99,7 +99,7 @@ export class IdentityWallet {
    */
 
   get didDocument() {
-    return this.identity.didDocument
+    return this.identity.toDidDocument()
   }
 
   /**
@@ -108,7 +108,7 @@ export class IdentityWallet {
    */
 
   set didDocument(didDocument) {
-    this.identity.didDocument = didDocument
+    this.identity = Identity.fromDidDocument(didDocument)
   }
 
   /**
@@ -463,10 +463,7 @@ export class IdentityWallet {
     const remoteIdentity = await registry.resolve(
       keyIdToDid(receivedJWT.issuer),
     )
-    const pubKey = getIssuerPublicKey(
-      receivedJWT.issuer,
-      remoteIdentity.didDocument,
-    )
+    const pubKey = Buffer.from(remoteIdentity.publicKey.hexValue, 'hex')
 
     handleValidationStatus(
       await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT),

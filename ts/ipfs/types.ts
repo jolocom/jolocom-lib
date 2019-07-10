@@ -6,6 +6,6 @@ export interface IIpfsConfig {
 
 export interface IIpfsConnector {
   storeJSON: ({ data, pin }: { data: object; pin: boolean }) => Promise<string>
-  catJSON: (hash: string) => Promise<object>
+  catJSON: (hash: string) => Promise<object | object[]>
   removePinnedHash: (hash: string) => Promise<void>
 }

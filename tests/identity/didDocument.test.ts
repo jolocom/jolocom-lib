@@ -2,9 +2,10 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as crypto from 'crypto'
 import * as jsonld from 'jsonld'
-import { testPublicIdentityKey } from '../data/keys.data'
+import { testPublicKey } from '../data/keys.data'
 import {
   didDocumentJSON,
+  didDocumentWithProofJSON,
   mockDid,
   mockKeyId,
   normalizedDidDocument,
@@ -16,7 +17,7 @@ const expect = chai.expect
 describe('DidDocument', () => {
   const sandbox = sinon.createSandbox()
 
-  let referenceDidDocument = DidDocument.fromPublicKey(testPublicIdentityKey)
+  let referenceDidDocument = DidDocument.fromPublicKey(testPublicKey)
   let clock
 
   before(() => {
@@ -28,7 +29,8 @@ describe('DidDocument', () => {
   })
 
   beforeEach(() => {
-    referenceDidDocument = DidDocument.fromPublicKey(testPublicIdentityKey)
+    referenceDidDocument = DidDocument.fromPublicKey(testPublicKey)
+    referenceDidDocument.created = new Date()
   })
 
   after(() => {
@@ -36,16 +38,23 @@ describe('DidDocument', () => {
     clock.restore()
   })
 
-  it('Should correctly implement fromJSON', () => {
-    const didDocFromJSON = DidDocument.fromJSON(didDocumentJSON)
-    expect(referenceDidDocument).to.deep.eq(didDocFromJSON)
+  it('Should correctly implement fromJSON', async () => {
+    let didDocFromJSON = DidDocument.fromJSON(didDocumentJSON)
+    // @ts-ignore
+    referenceDidDocument._proof = undefined
+    expect(didDocFromJSON).to.deep.eq(referenceDidDocument)
   })
+
+  // TODO test signatures and signature validation
 
   it('Should correctly implement toJSON', () => {
     expect(referenceDidDocument.toJSON()).to.deep.eq(didDocumentJSON)
   })
 
   it('Should correctly implement normalize', async () => {
+    await referenceDidDocument.prepareSignature(
+      referenceDidDocument.publicKey[0].id,
+    )
     await referenceDidDocument.digest()
 
     const excludingProof = { ...didDocumentJSON } as IDidDocumentAttrs
@@ -54,7 +63,7 @@ describe('DidDocument', () => {
     sandbox.assert.calledWith(jsonld.canonize, excludingProof)
   })
 
-  it('implements getters', () => {
+  it('implements getters', async () => {
     /* Makes later comparisons simpler */
     const {
       authentication,
@@ -63,11 +72,12 @@ describe('DidDocument', () => {
       id,
       service,
       created,
-    } = didDocumentJSON
+    } = didDocumentWithProofJSON
+    proof.signatureValue = ''
+    await referenceDidDocument.prepareSignature(publicKey[0].id)
     const auth = referenceDidDocument.authentication.map(auth => auth.toJSON())
     const pub = referenceDidDocument.publicKey.map(pub => pub.toJSON())
     const serv = referenceDidDocument.service.map(ser => ser.toJSON())
-
     expect(auth).to.deep.eq(authentication)
     expect(pub).to.deep.eq(publicKey)
     expect(serv).to.deep.eq(service)

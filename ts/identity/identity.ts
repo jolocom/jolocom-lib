@@ -1,6 +1,13 @@
 import { DidDocument } from './didDocument/didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { IIdentityCreateArgs } from './types'
+import {
+  AuthenticationSection,
+  PublicKeySection,
+  ServiceEndpointsSection,
+} from './didDocument/sections'
+import { PublicKey } from './types'
+import { keyIdToNumber, keyNumberToKeyId } from '../utils/helper'
+import { publicKeyToDID } from '../utils/crypto'
 
 /**
  * @class
@@ -8,98 +15,110 @@ import { IIdentityCreateArgs } from './types'
  */
 
 export class Identity {
-  private _didDocument: DidDocument
-  private _publicProfileCredential?: SignedCredential
+  public did: string
+  public publicKey: PublicKey
+  public recoveryKey?: PublicKey
+  public services?: ServiceEndpointsSection[]
+  public publicProfileCredential?: SignedCredential
+  public created: Date
+  public updated: Date
 
   /**
-   * Get the identity did
-   * @example `console.log(identity.did) // 'did:jolo:...'`
+   * Create the Identity object based on identity data. DID and public key are required.
+   * @param did - DID of the identity object
+   * @param publicKey - current owner public key
+   * @param recoveryKey - recovery key to recovery the users DID in case of
+   * @param serviceSection - service section
+   * @param created - Date when the identity has been created
+   * @param updated - Date when the identity has last been updated
    */
-
-  get did() {
-    return this.didDocument.did
+  public constructor(
+    did: string,
+    publicKey: PublicKey,
+    recoveryKey?: PublicKey,
+    serviceSection?: ServiceEndpointsSection[],
+    created?: Date,
+    updated?: Date,
+  ) {
+    this.did = did
+    this.publicKey = publicKey
+    this.recoveryKey = recoveryKey
+    this.services = serviceSection
+    const publicProfileSection = serviceSection
+      ? serviceSection.find(s => s.type === 'JolocomPublicProfile')
+      : null
+    if (publicProfileSection)
+      this.publicProfileCredential = publicProfileSection.serviceEndpoint as SignedCredential
+    this.created = created
+    this.updated = updated
   }
 
-  /**
-   * Set the identity did
-   * @example `identity.did = 'did:jolo:...'`
-   */
-
-  set did(did: string) {
-    this.didDocument.did = did
-  }
-
-  /**
-   * Get the did document associated with the identity
-   * @example `console.log(identity.didDocument) // DidDocument {...}`
-   */
-
-  get didDocument(): DidDocument {
-    return this._didDocument
-  }
-
-  /**
-   * Set did document associated with the identity
-   * @example `identity.didDocument = DidDocument.fromPublicKey(...)`
-   */
-
-  set didDocument(didDocument: DidDocument) {
-    this._didDocument = didDocument
-  }
-
-  /**
-   * Get the identity service endpoint sections
-   * @example `console.log(identity.serviceEndpointSections) // [ServiceEndpointSection {...}, ...]`
-   */
-
-  get serviceEndpointSections() {
-    return this.didDocument.service
-  }
-
-  /**
-   * Get the identity public key sections
-   * @example `console.log(identity.publicKeySection) // [PublicKeySection {...}, ...]`
-   */
-
-  get publicKeySection() {
-    return this.didDocument.publicKey
-  }
-
-  /**
-   * Get the public profile signed credential associated with the identity
-   * @example `console.log(identity.publicProfile) // SignedCredential {...}`
-   */
-
-  get publicProfile() {
-    return this._publicProfileCredential
-  }
-
-  /**
-   * Get the public profile signed credential associated with the identity
-   * @example `identity.publicProfile = publicProfileSignedCredential`
-   */
-
-  set publicProfile(publicProfile: SignedCredential | undefined) {
-    this._publicProfileCredential = publicProfile
+  public static create(publicKey: Buffer): Identity {
+    const did = publicKeyToDID(publicKey)
+    return new Identity(did, {
+      hexValue: publicKey.toString('hex'),
+      keyId: 1,
+    })
   }
 
   /**
    * Instantiates the {@link Identity} class based on a did document and public profile
    * @param didDocument - The did document associated with a did
-   * @param publicProfile - Verifiable credential containing public claims (e.g. name, website)
    * @example `const identity = Identity.fromDidDocument({didDocument, publicProfile})`
    */
 
-  public static fromDidDocument({
-    didDocument,
-    publicProfile,
-  }: IIdentityCreateArgs): Identity {
-    const identity = new Identity()
-    identity.didDocument = didDocument
-    if (publicProfile) {
-      identity.publicProfile = publicProfile
+  public static fromDidDocument(didDocument: DidDocument): Identity {
+    const ownerKey = didDocument.publicKey.find(
+      p => p.id == didDocument.authentication[0].publicKey,
+    )
+    // const recoveryKey = didDocument.publicKey.find(
+    //   p => p.id == didDocument.authorization[0].publicKey,
+    // )
+    const identity = new Identity(
+      didDocument.did,
+      {
+        hexValue: ownerKey.publicKeyHex,
+        keyId: keyIdToNumber(ownerKey.id),
+      },
+      null, // TODO add once authorization is finished
+      didDocument.service,
+      didDocument.created,
+    )
+    const publicProfileSection = didDocument.service.find(
+      s => s.type === 'JolocomPublicProfile',
+    )
+    if (publicProfileSection) {
+      identity.publicProfileCredential = publicProfileSection.serviceEndpoint as SignedCredential
     }
 
     return identity
+  }
+
+  public toDidDocument(): DidDocument {
+    const didDocument = new DidDocument()
+    didDocument.did = this.did
+    didDocument.addPublicKeySection(
+      PublicKeySection.fromEcdsa(
+        Buffer.from(this.publicKey.hexValue, 'hex'),
+        keyNumberToKeyId(this.publicKey.keyId, this.did),
+        this.did,
+      ),
+    )
+    didDocument.addAuthSection(
+      AuthenticationSection.fromEcdsa(didDocument.publicKey[0]),
+    )
+    if (this.recoveryKey) {
+      didDocument.addPublicKeySection(
+        PublicKeySection.fromEcdsa(
+          Buffer.from(this.recoveryKey.hexValue, 'hex'),
+          keyNumberToKeyId(this.recoveryKey.keyId, this.did),
+          this.did,
+        ),
+      )
+      //TODO add authorization section
+    }
+    didDocument.service = this.services
+    if (this.created) didDocument.created = this.created
+    return didDocument
   }
 }

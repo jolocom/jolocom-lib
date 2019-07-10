@@ -39,7 +39,7 @@ const stubbedCredential = {
 describe('IdentityWallet', () => {
   const encryptionPass = 'secret'
   const didDocument = DidDocument.fromJSON(didDocumentJSON)
-  const identity = Identity.fromDidDocument({ didDocument })
+  const identity = Identity.fromDidDocument(didDocument)
 
   let iw: IdentityWallet
 

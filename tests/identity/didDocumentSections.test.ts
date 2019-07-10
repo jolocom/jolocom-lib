@@ -10,12 +10,15 @@ import {
   mockPubKeySectionJSON,
   mockAuthSectionJSON,
   mockPubProfServiceEndpointJSON,
+  mockServiceEndpointJSON,
 } from '../data/didDocumentSections.data'
 import {
   ServiceEndpointsSection,
   generatePublicProfileServiceSection,
 } from '../../ts/identity/didDocument/sections/serviceEndpointsSection'
-import { mockDid, mockIpfsHash } from '../data/didDocument.data'
+import { mockDid } from '../data/didDocument.data'
+import { publicProfileCredJSON } from '../data/identity.data'
+import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 const expect = chai.expect
 
 describe('DidDocumentSections', () => {
@@ -55,7 +58,7 @@ describe('DidDocumentSections', () => {
   describe('Public profile ServiceEndpoint', () => {
     const pubProfEndpSection = generatePublicProfileServiceSection(
       mockDid,
-      mockIpfsHash,
+      SignedCredential.fromJSON(publicProfileCredJSON),
     )
 
     it('Should correctly instantiate from keyId and did', () => {
@@ -64,16 +67,25 @@ describe('DidDocumentSections', () => {
       )
     })
 
-    it('Should correctly implement fromJSON', () => {
+    it('Should correctly implement fromJSON with public profile', () => {
       const serviceEndpointFromJson = ServiceEndpointsSection.fromJSON(
         mockPubProfServiceEndpointJSON,
       )
-      const {
-        description,
-        serviceEndpoint,
-        id,
-        type,
-      } = mockPubProfServiceEndpointJSON
+      const { description, id, type } = mockPubProfServiceEndpointJSON
+
+      expect(serviceEndpointFromJson.description).to.eq(description)
+      expect(serviceEndpointFromJson.serviceEndpoint).to.deep.eq(
+        SignedCredential.fromJSON(publicProfileCredJSON),
+      )
+      expect(serviceEndpointFromJson.id).to.eq(id)
+      expect(serviceEndpointFromJson.type).to.eq(type)
+    })
+
+    it('Should correctly implement fromJSON without public profile', () => {
+      const serviceEndpointFromJson = ServiceEndpointsSection.fromJSON(
+        mockServiceEndpointJSON,
+      )
+      const { description, serviceEndpoint, id, type } = mockServiceEndpointJSON
 
       expect(serviceEndpointFromJson.description).to.eq(description)
       expect(serviceEndpointFromJson.serviceEndpoint).to.eq(serviceEndpoint)

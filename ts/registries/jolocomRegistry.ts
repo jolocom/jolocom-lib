@@ -1,28 +1,29 @@
 import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
-import { DidDocument } from '../identity/didDocument/didDocument'
-import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
 import {
+  IRegistry,
   IRegistryCommitArgs,
   IRegistryStaticCreationArgs,
-  IRegistry,
 } from './types'
 import { jolocomIpfsStorageAgent } from '../ipfs/ipfs'
 import { jolocomEthereumResolver } from '../ethereum/ethereum'
 import { publicKeyToDID } from '../utils/crypto'
 import {
-  IVaultedKeyProvider,
   IKeyDerivationArgs,
+  IVaultedKeyProvider,
+  KeyTypes,
 } from '../vaultedKeyProvider/types'
-import { KeyTypes } from '../vaultedKeyProvider/types'
-import { generatePublicProfileServiceSection } from '../identity/didDocument/sections/serviceEndpointsSection'
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
+import { PublicKey } from '../identity/types'
+import { IServiceEndpointSectionAttrs } from '../identity/didDocument/sections/types'
+import { keyNumberToKeyId } from '../utils/helper'
+import { ServiceEndpointsSection } from '../identity/didDocument/sections'
 
 /**
  * @class
@@ -46,41 +47,30 @@ export class JolocomRegistry implements IRegistry {
     vaultedKeyProvider: IVaultedKeyProvider,
     decryptionPassword: string,
   ): Promise<IdentityWallet> {
-    const { jolocomIdentityKey, ethereumKey } = KeyTypes
-
     const derivationArgs = {
-      derivationPath: jolocomIdentityKey,
+      derivationPath: KeyTypes.jolocomIdentityKey,
       encryptionPass: decryptionPassword,
     }
 
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
-
-    const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
-    const didDocumentSignature = await vaultedKeyProvider.signDigestable(
-      derivationArgs,
-      didDocument,
-    )
-
-    didDocument.signature = didDocumentSignature.toString('hex')
-    const identity = Identity.fromDidDocument({ didDocument })
+    const identity = Identity.create(publicIdentityKey)
 
     const identityWallet = new IdentityWallet({
       identity,
       vaultedKeyProvider,
       publicKeyMetadata: {
-        derivationPath: jolocomIdentityKey,
-        keyId: didDocument.publicKey[0].id,
+        derivationPath: KeyTypes.jolocomIdentityKey,
+        keyId: keyNumberToKeyId(identity.publicKey.keyId, identity.did),
       },
       contractsAdapter: this.contractsAdapter,
       contractsGateway: this.contractsGateway,
     })
-
     await this.commit({
       identityWallet,
       vaultedKeyProvider,
       keyMetadata: {
         encryptionPass: decryptionPassword,
-        derivationPath: ethereumKey,
+        derivationPath: KeyTypes.jolocomIdentityKey,
       },
     })
 
@@ -100,39 +90,19 @@ export class JolocomRegistry implements IRegistry {
   public async commit(commitArgs: IRegistryCommitArgs) {
     const { identityWallet, keyMetadata, vaultedKeyProvider } = commitArgs
 
-    const didDocument = identityWallet.didDocument
-    const publicProfile = identityWallet.identity.publicProfile
-
-    const remote = await this.resolveSafe(didDocument.did)
-    const remotePubProf = remote && remote.publicProfile
-
     try {
-      if (publicProfile) {
-        const publicProfileHash = await this.ipfsConnector.storeJSON({
-          data: publicProfile.toJSON(),
-          pin: true,
-        })
-        const publicProfileSection = generatePublicProfileServiceSection(
-          didDocument.did,
-          publicProfileHash,
-        )
-        didDocument.addServiceEndpoint(publicProfileSection)
-      }
-
-      if (remotePubProf && !publicProfile) {
-        didDocument.resetServiceEndpoints()
-      }
-
-      const ipfsHash = await this.ipfsConnector.storeJSON({
-        data: didDocument.toJSON(),
+      const serviceHash = await this.ipfsConnector.storeJSON({
+        data: identityWallet.identity.services.map(s => s.toJSON()),
         pin: true,
       })
-      const privateEthKey = vaultedKeyProvider.getPrivateKey(keyMetadata)
+      const privateKey = vaultedKeyProvider.getPrivateKey(keyMetadata)
+      const owner = vaultedKeyProvider.getPublicKey(keyMetadata)
 
       await this.ethereumConnector.updateDIDRecord({
-        ethereumKey: privateEthKey,
-        did: didDocument.did,
-        newHash: ipfsHash,
+        ethereumKey: privateKey,
+        did: identityWallet.identity.did,
+        owner: '0x' + owner.toString('hex'),
+        newHash: serviceHash,
       })
     } catch (error) {
       throw new Error(
@@ -149,28 +119,40 @@ export class JolocomRegistry implements IRegistry {
 
   public async resolve(did): Promise<Identity> {
     try {
-      const ddoHash = await this.ethereumConnector.resolveDID(did)
+      const {
+        owner,
+        recovery,
+        serviceHash,
+      } = await this.ethereumConnector.resolveDID(did)
+      const created = await this.ethereumConnector.getCreated(did)
+      const updated = await this.ethereumConnector.getUpdated(did)
 
-      if (!ddoHash) {
+      if (!owner) {
         throw new Error('No record for DID found.')
       }
-
-      const didDocument = DidDocument.fromJSON(
-        (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs,
+      let servicesJSON = (await this.ipfsConnector.catJSON(
+        serviceHash,
+      )) as object[] // will always be an array
+      const services = []
+      servicesJSON.forEach((s: IServiceEndpointSectionAttrs) =>
+        services.push(ServiceEndpointsSection.fromJSON(s)),
       )
-
-      const publicProfileSection = didDocument.service.find(
-        endpoint => endpoint.type === 'JolocomPublicProfile',
+      const ownerKey: PublicKey = {
+        hexValue: owner.split('0x').pop(),
+        keyId: 1,
+      }
+      const recoveryKey: PublicKey = {
+        hexValue: recovery,
+        keyId: 2,
+      }
+      return new Identity(
+        did,
+        ownerKey,
+        recovery ? recoveryKey : null,
+        services,
+        created,
+        updated,
       )
-
-      const publicProfile =
-        publicProfileSection &&
-        (await this.fetchPublicProfile(publicProfileSection.serviceEndpoint))
-
-      return Identity.fromDidDocument({
-        didDocument,
-        publicProfile,
-      })
     } catch (error) {
       throw new Error(`Could not retrieve DID Document. ${error.message}`)
     }
@@ -190,12 +172,13 @@ export class JolocomRegistry implements IRegistry {
     derivationArgs: IKeyDerivationArgs,
   ): Promise<IdentityWallet> {
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
+
     const did = publicKeyToDID(publicIdentityKey)
     const identity = await this.resolve(did)
 
     const publicKeyMetadata = {
       derivationPath: derivationArgs.derivationPath,
-      keyId: identity.publicKeySection[0].id,
+      keyId: keyNumberToKeyId(identity.publicKey.keyId, identity.did),
     }
 
     return new IdentityWallet({

@@ -9,6 +9,8 @@ export const mockIssuerDid =
   'did:jolo:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 const mockSubject =
   'did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+export const mockPubKey =
+  '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 /* Defining fixture for a signedCredential in JSON form */
 

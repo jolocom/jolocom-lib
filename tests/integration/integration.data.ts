@@ -1,11 +1,5 @@
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { claimsMetadata } from 'cred-types-jolocom-core'
-/* Local configuration for ganache server. the contract address is deterministic */
-
-export const testEthereumConfig = {
-  providerUrl: 'http://localhost:8945',
-  contractAddress: '0xF2aB668ABA031cF5Cb5567933e910A59072B1965',
-}
 
 /* Local configuration for the ipfs daemon */
 
@@ -28,7 +22,7 @@ export const userVault = SoftwareKeyProvider.fromSeed(userSeed, userPass)
 
 /* The private eth key derived from the user's seed */
 export const userEthKey =
-  '0x211ac58274315777e2bbcfd185b955147086fd61e1e1a40839dc413a953f0f60'
+  '0x9c29b2cb941418d1f82f042b1cd67abbe2b9872a175de5aef5516b5440e9d6c5'
 
 /* The seed for instantiating the service's vault */
 const serviceSeed = Buffer.from(
@@ -42,7 +36,7 @@ export const serviceVault = SoftwareKeyProvider.fromSeed(
 
 /* The private eth key derived from the service's seed */
 export const serviceEthKey =
-  '0x3b781643bbfdf3964b2c6be0ac1ddf48e874975a88dadc69a719ed3b6bf4f51f'
+  '0x7d550d944448771de554da01d3c8b0c6bef8cbdd339e836660847ba445d6f4b7'
 
 /* Creation attributes for interaction flows */
 

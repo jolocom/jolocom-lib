@@ -1,6 +1,13 @@
 import 'reflect-metadata'
-import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
+import {
+  classToPlain,
+  plainToClass,
+  Exclude,
+  Expose,
+  Type,
+} from 'class-transformer'
 import { IServiceEndpointSectionAttrs } from './types'
+import { SignedCredential } from '../../../credentials/signedCredential/signedCredential'
 
 /**
  * Class modelling a Did Document Service Endpoint section
@@ -14,7 +21,7 @@ import { IServiceEndpointSectionAttrs } from './types'
 export class ServiceEndpointsSection {
   protected _id: string
   protected _type: string
-  protected _serviceEndpoint: string
+  protected _serviceEndpoint: string | SignedCredential
   protected _description: string
 
   /**
@@ -56,7 +63,8 @@ export class ServiceEndpointsSection {
    */
 
   @Expose()
-  get serviceEndpoint() {
+  @Type(() => SignedCredential)
+  public get serviceEndpoint(): string | SignedCredential {
     return this._serviceEndpoint
   }
 
@@ -64,7 +72,7 @@ export class ServiceEndpointsSection {
    * Set the the service endpoint
    */
 
-  set serviceEndpoint(service: string) {
+  public set serviceEndpoint(service: string | SignedCredential) {
     this._serviceEndpoint = service
   }
 
@@ -110,17 +118,17 @@ export class ServiceEndpointsSection {
 /**
  * Instantiates the {@link ServiceEndpointsSection} class based on passed arguments
  * @param did - The did of the did document owner
- * @param pubProfIpfsHash - IPFS hash that can be used to dereference the public profile credential
+ * @param publicProfile - public profile credential
  * @internal
  */
 
 export const generatePublicProfileServiceSection = (
   did: string,
-  profileIpfsHash: string,
+  publicProfile: SignedCredential,
 ): ServiceEndpointsSection => {
   const PubProfSec = new ServiceEndpointsSection()
   PubProfSec.id = `${did};jolocomPubProfile`
-  PubProfSec.serviceEndpoint = `ipfs://${profileIpfsHash}`
+  PubProfSec.serviceEndpoint = publicProfile
   PubProfSec.description = 'Verifiable Credential describing entity profile'
   PubProfSec.type = 'JolocomPublicProfile'
   return PubProfSec

@@ -10,17 +10,31 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { publicProfileCredJSON } from '../data/identity.data'
 import { Identity } from '../../ts/identity/identity'
 import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
+import { testPublicKey } from '../data/keys.data'
 
 describe('Jolocom Registry - resolve', () => {
   let registry: any = createJolocomRegistry()
+  let clock
 
   before(() => {
-    registry.ethereumConnector.resolveDID = sinon.stub().returns(mockIpfsHash)
-    registry.ipfsConnector.catJSON = sinon.stub().returns(didDocumentJSON)
+    clock = sinon.useFakeTimers()
+
+    registry.ethereumConnector.resolveDID = sinon.stub().returns({
+      owner: '0x' + testPublicKey.toString('hex'),
+      recovery: '',
+      serviceHash: mockIpfsHash,
+    })
+    registry.ipfsConnector.catJSON = sinon
+      .stub()
+      .returns(didDocumentJSON.service)
   })
 
   afterEach(() => {
     registry = createJolocomRegistry()
+  })
+
+  after(() => {
+    clock.restore()
   })
 
   it('should resolve with no public profile', async () => {
@@ -28,7 +42,7 @@ describe('Jolocom Registry - resolve', () => {
     expect(registry.ethereumConnector.resolveDID.getCall(0).args).to.deep.eq([
       mockDid,
     ])
-    expect(identity.publicProfile).to.be.undefined
+    expect(identity.publicProfileCredential).to.be.undefined
   })
 
   it('should throw if resolution fails', async () => {
@@ -48,16 +62,23 @@ describe('Jolocom Registry - resolve', () => {
       ...didDocumentJSON,
       service: [mockPubProfServiceEndpointJSON],
     }
-
-    registry.ethereumConnector.resolveDID = sinon.stub().returns(mockIpfsHash)
-    registry.ipfsConnector.catJSON = sinon.stub().resolves(extendedDidDoc)
-    registry.fetchPublicProfile = sinon
+    registry.ethereumConnector.resolveDID = sinon.stub().returns({
+      owner: '0x' + testPublicKey.toString('hex'),
+      recovery: '',
+      serviceHash: mockIpfsHash,
+    })
+    registry.ethereumConnector.getCreated = sinon.stub().returns(new Date())
+    registry.ethereumConnector.getUpdated = sinon.stub().returns(new Date())
+    registry.ipfsConnector.catJSON = sinon
       .stub()
-      .resolves(SignedCredential.fromJSON(publicProfileCredJSON))
+      .resolves(extendedDidDoc.service)
 
     const identity: Identity = await registry.resolve(mockDid)
-    expect(identity.didDocument.toJSON()).to.deep.eq(extendedDidDoc)
-    expect(identity.publicProfile.toJSON()).to.deep.eq(publicProfileCredJSON)
+
+    expect(identity.toDidDocument().toJSON()).to.deep.eq(extendedDidDoc)
+    expect(identity.publicProfileCredential.toJSON()).to.deep.eq(
+      publicProfileCredJSON,
+    )
   })
 
   it('should implement fetchPublicProfile', async () => {

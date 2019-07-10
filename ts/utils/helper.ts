@@ -13,6 +13,21 @@ export function keyIdToDid(keyId: string): string {
   return keyId.substring(0, keyId.indexOf('#'))
 }
 
+/**
+ * Helper function to extract the number of the key identifier
+ * @param keyId - public key identifier
+ * @example `keyIdToNumber('did:jolo:abc...fe#keys-1') // '1'`
+ * @internal
+ */
+
+export function keyIdToNumber(keyId: string): number {
+  return Number(keyId.split('#keys-').pop())
+}
+
+export function keyNumberToKeyId(keyId: number, did: string): string {
+  return `${did}#keys-${keyId}`
+}
+
 export function getIssuerPublicKey(keyId: string, ddo: DidDocument): Buffer {
   const relevantKeySection = ddo.publicKey.find(section => section.id === keyId)
 
@@ -43,7 +58,7 @@ const ErrorKeys = {
  * @example `await fuelKeyWithEther(Buffer.from('03848...', 'hex'))`
  */
 
-export function fuelKeyWithEther(publicKey: Buffer) {
+export function fuelKeyWithEther(publicKey: Buffer): Promise<void> {
   return fetch('https://faucet.jolocom.com/request/', {
     method: 'POST',
     body: JSON.stringify({ address: publicKeyToAddress(publicKey) }),
@@ -62,3 +77,10 @@ export function fuelKeyWithEther(publicKey: Buffer) {
 
 export const publicKeyToAddress = (publicKey: Buffer): string =>
   addHexPrefix(pubToAddress(publicKey, true).toString('hex'))
+
+export function clearUndefindProperties(object: object): object {
+  Object.keys(object).map(key => {
+    if (object[key] == undefined) delete object[key]
+  })
+  return object
+}

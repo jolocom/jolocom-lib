@@ -6,7 +6,7 @@ import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { Identity } from '../../ts/identity/identity'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { IKeyDerivationArgs } from '../../ts/vaultedKeyProvider/types'
-import { testPrivateEthereumKey, testSeed } from '../data/keys.data'
+import { testPrivateKey, testPublicKey, testSeed } from '../data/keys.data'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import {
   didDocumentJSON,
@@ -49,7 +49,7 @@ describe('Jolocom registry - commit', () => {
     sandbox.stub(testRegistry.ipfsConnector, 'storeJSON').returns(mockIpfsHash)
 
     const identityWallet = new IdentityWallet({
-      identity: Identity.fromDidDocument({ didDocument }),
+      identity: Identity.fromDidDocument(didDocument),
       vaultedKeyProvider: vault,
       publicKeyMetadata: {
         derivationPath: KeyTypes.jolocomIdentityKey,
@@ -62,23 +62,23 @@ describe('Jolocom registry - commit', () => {
     await testRegistry.commit({
       vaultedKeyProvider: vault,
       identityWallet,
-      keyMetadata: { ...keyMetadata, derivationPath: KeyTypes.ethereumKey },
+      keyMetadata: keyMetadata,
     })
-
     sandbox.assert.calledOnce(testRegistry.ipfsConnector.storeJSON)
-    sandbox.assert.calledWith(testRegistry.resolve, mockDid)
+
     expect(
       testRegistry.ethereumConnector.updateDIDRecord.getCall(0).args,
     ).to.deep.eq([
       {
         did: mockDid,
-        ethereumKey: testPrivateEthereumKey,
+        ethereumKey: testPrivateKey,
+        owner: '0x' + testPublicKey.toString('hex'),
         newHash: mockIpfsHash,
       },
     ])
 
     sandbox.assert.calledWith(testRegistry.ipfsConnector.storeJSON, {
-      data: didDocumentJSON,
+      data: didDocumentJSON.service,
       pin: true,
     })
   })
@@ -90,13 +90,11 @@ describe('Jolocom registry - commit', () => {
       ...didDocumentJSON,
       service: [mockPubProfServiceEndpointJSON],
     }
-    const publicProfile = SignedCredential.fromJSON(publicProfileCredJSON)
 
-    const localIdentity = Identity.fromDidDocument({
-      didDocument,
-      publicProfile,
-    })
-    const remoteIdentity = Identity.fromDidDocument({ didDocument })
+    const localIdentity = Identity.fromDidDocument(
+      DidDocument.fromJSON(extendedDidDocumentJSON),
+    )
+    const remoteIdentity = Identity.fromDidDocument(didDocument)
 
     sandbox.stub(testRegistry, 'resolve').resolves(remoteIdentity)
     sandbox.stub(testRegistry.ipfsConnector, 'storeJSON').returns(mockIpfsHash)
@@ -116,22 +114,19 @@ describe('Jolocom registry - commit', () => {
     await testRegistry.commit({
       vaultedKeyProvider: vault,
       identityWallet,
-      keyMetadata: { ...keyMetadata, derivationPath: KeyTypes.ethereumKey },
+      keyMetadata: keyMetadata,
     })
 
-    sandbox.assert.calledWith(testRegistry.resolve, mockDid)
-    sandbox.assert.calledTwice(testRegistry.ipfsConnector.storeJSON)
-    sandbox.assert.calledWith(testRegistry.ipfsConnector.storeJSON, {
-      data: extendedDidDocumentJSON,
+    sandbox.assert.calledOnce(testRegistry.ipfsConnector.storeJSON)
+    expect(testRegistry.ipfsConnector.storeJSON.getCall(0).args[0]).to.deep.eq({
+      data: extendedDidDocumentJSON.service,
       pin: true,
     })
-    sandbox.assert.calledWith(testRegistry.ipfsConnector.storeJSON, {
-      data: publicProfileCredJSON,
-      pin: true,
-    })
+    sandbox.assert.calledWith(testRegistry.ipfsConnector.storeJSON)
     sandbox.assert.calledWith(testRegistry.ethereumConnector.updateDIDRecord, {
+      ethereumKey: testPrivateKey,
       did: mockDid,
-      ethereumKey: testPrivateEthereumKey,
+      owner: '0x' + testPublicKey.toString('hex'),
       newHash: mockIpfsHash,
     })
   })
@@ -146,14 +141,8 @@ describe('Jolocom registry - commit', () => {
     const extendedDidDocument = DidDocument.fromJSON(extendedDidDocumentJSON)
     const publicProfile = SignedCredential.fromJSON(publicProfileCredJSON)
 
-    const localIdentity = Identity.fromDidDocument({
-      didDocument: extendedDidDocument,
-      publicProfile,
-    })
-    const remoteIdentity = Identity.fromDidDocument({
-      didDocument: extendedDidDocument,
-      publicProfile,
-    })
+    const localIdentity = Identity.fromDidDocument(extendedDidDocument)
+    const remoteIdentity = Identity.fromDidDocument(extendedDidDocument)
 
     sandbox.stub(testRegistry, 'resolve').resolves(remoteIdentity)
     sandbox.stub(testRegistry.ipfsConnector, 'storeJSON').returns(mockIpfsHash)
@@ -173,22 +162,19 @@ describe('Jolocom registry - commit', () => {
     await testRegistry.commit({
       vaultedKeyProvider: vault,
       identityWallet,
-      keyMetadata: { ...keyMetadata, derivationPath: KeyTypes.ethereumKey },
+      keyMetadata: keyMetadata,
     })
 
-    sandbox.assert.calledWith(testRegistry.resolve, mockDid)
-    sandbox.assert.calledTwice(testRegistry.ipfsConnector.storeJSON)
+    sandbox.assert.calledOnce(testRegistry.ipfsConnector.storeJSON)
     sandbox.assert.calledWith(testRegistry.ipfsConnector.storeJSON, {
-      data: extendedDidDocumentJSON,
+      data: extendedDidDocumentJSON.service,
       pin: true,
     })
-    sandbox.assert.calledWith(testRegistry.ipfsConnector.storeJSON, {
-      data: publicProfileCredJSON,
-      pin: true,
-    })
+
     sandbox.assert.calledWith(testRegistry.ethereumConnector.updateDIDRecord, {
       did: mockDid,
-      ethereumKey: testPrivateEthereumKey,
+      ethereumKey: testPrivateKey,
+      owner: '0x' + testPublicKey.toString('hex'),
       newHash: mockIpfsHash,
     })
   })
@@ -196,22 +182,8 @@ describe('Jolocom registry - commit', () => {
   it('should commit with removed public profile', async () => {
     const testRegistry: any = createJolocomRegistry()
 
-    const extendedDidDocumentJSON = {
-      ...didDocumentJSON,
-      service: [mockPubProfServiceEndpointJSON],
-    }
-    const extendedDidDocument = DidDocument.fromJSON(extendedDidDocumentJSON)
-    const publicProfile = SignedCredential.fromJSON(publicProfileCredJSON)
+    const localIdentity = Identity.fromDidDocument(didDocument)
 
-    const localIdentity = Identity.fromDidDocument({
-      didDocument: extendedDidDocument,
-    })
-    const remoteIdentity = Identity.fromDidDocument({
-      didDocument: extendedDidDocument,
-      publicProfile,
-    })
-
-    sandbox.stub(testRegistry, 'resolve').resolves(remoteIdentity)
     sandbox.stub(testRegistry.ipfsConnector, 'storeJSON').returns(mockIpfsHash)
     sandbox.stub(testRegistry.ethereumConnector, 'updateDIDRecord').returns()
 
@@ -229,18 +201,18 @@ describe('Jolocom registry - commit', () => {
     await testRegistry.commit({
       vaultedKeyProvider: vault,
       identityWallet,
-      keyMetadata: { ...keyMetadata, derivationPath: KeyTypes.ethereumKey },
+      keyMetadata: keyMetadata,
     })
 
-    sandbox.assert.calledWith(testRegistry.resolve, mockDid)
     sandbox.assert.calledOnce(testRegistry.ipfsConnector.storeJSON)
     sandbox.assert.calledWith(testRegistry.ipfsConnector.storeJSON, {
-      data: didDocumentJSON,
+      data: didDocumentJSON.service,
       pin: true,
     })
     sandbox.assert.calledWith(testRegistry.ethereumConnector.updateDIDRecord, {
       did: mockDid,
-      ethereumKey: testPrivateEthereumKey,
+      ethereumKey: testPrivateKey,
+      owner: '0x' + testPublicKey.toString('hex'),
       newHash: mockIpfsHash,
     })
   })
@@ -248,7 +220,7 @@ describe('Jolocom registry - commit', () => {
   it('should correctly throw', async () => {
     const testRegistry = createJolocomRegistry()
 
-    const localIdentity = Identity.fromDidDocument({ didDocument })
+    const localIdentity = Identity.fromDidDocument(didDocument)
 
     const identityWallet = new IdentityWallet({
       identity: localIdentity,

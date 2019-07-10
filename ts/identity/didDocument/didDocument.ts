@@ -1,10 +1,10 @@
 import {
-  plainToClass,
   classToPlain,
-  Type,
   Exclude,
   Expose,
+  plainToClass,
   Transform,
+  Type,
 } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
 import { canonize } from 'jsonld'
@@ -17,12 +17,15 @@ import {
 import { ISigner } from '../../registries/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
-import { sha256, publicKeyToDID } from '../../utils/crypto'
+import { publicKeyToDID, sha256 } from '../../utils/crypto'
 import {
-  ILinkedDataSignature,
   IDigestable,
+  ILinkedDataSignature,
 } from '../../linkedDataSignature/types'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
+import { IServiceEndpointSectionAttrs } from './sections/types'
+import { PublicKey } from '../types'
+import { clearUndefindProperties } from '../../utils/helper'
 
 /**
  * Class modelling a Did Document
@@ -35,7 +38,7 @@ export class DidDocument implements IDigestable {
   private _authentication: AuthenticationSection[] = []
   private _publicKey: PublicKeySection[] = []
   private _service: ServiceEndpointsSection[] = []
-  private _created: Date = new Date()
+  private _created: Date
   private _proof: ILinkedDataSignature
   private '_@context': ContextEntry[] = defaultContextIdentity
 
@@ -200,7 +203,7 @@ export class DidDocument implements IDigestable {
 
   @Expose()
   @Type(() => EcdsaLinkedDataSignature)
-  @Transform(value => value || new EcdsaLinkedDataSignature(), {
+  @Transform(value => value, {
     toClassOnly: true,
   })
   get proof(): ILinkedDataSignature {
@@ -230,25 +233,25 @@ export class DidDocument implements IDigestable {
    * @param section - Configured {@link PublicKeySection} instance
    */
 
-  public addPublicKeySection(section: PublicKeySection) {
+  public addPublicKeySection(section: PublicKeySection): void {
     this.publicKey.push(section)
   }
 
   /**
    * Adds a new {@link ServiceEndpointsSection} to the did document instance
-   * @param section - Configured {@link ServiceEndpointsSection} instance
+   * @param endpoint - Configured {@link ServiceEndpointsSection} instance
    */
 
-  public addServiceEndpoint(endpoint: ServiceEndpointsSection) {
+  public addServiceEndpoint(endpoint: ServiceEndpointsSection): void {
     this.service = [endpoint]
   }
 
   /**
-   * Clears all {@link ServiceEndpointSection} members from the instance, usefull when removing all public profile data
+   * Clears all {@link ServiceEndpointSection} members from the instance, useful when removing all public profile data
    * @example `didDocument.resetServiceEndpoints()`
    */
 
-  public resetServiceEndpoints() {
+  public resetServiceEndpoints(): void {
     this.service = []
   }
 
@@ -270,33 +273,47 @@ export class DidDocument implements IDigestable {
     didDocument.addAuthSection(
       AuthenticationSection.fromEcdsa(didDocument.publicKey[0]),
     )
-    didDocument.prepareSignature(keyId)
 
     return didDocument
   }
 
   public static fromDidRegistry(
     didString: string,
-    publicKey: string,
-    recoveryKey: string,
-    servicesHash: string,
+    publicKey: PublicKey,
+    recoveryKey: PublicKey,
+    servicesData: IServiceEndpointSectionAttrs[],
   ): DidDocument {
     const didDocument = new DidDocument()
-    const did = 'did:jolo:' + didString
+    const did = didString
     didDocument.did = did
+    // Adding the owner key to public-key and authentication section
     didDocument.addPublicKeySection(
       PublicKeySection.fromEcdsa(
-        Buffer.from(publicKey, 'hex'),
-        `${did}#keys-1`,
+        Buffer.from(publicKey.hexValue.replace('0x', ''), 'hex'),
+        `${did}#keys-${publicKey.keyId}`,
         did,
       ),
     )
     didDocument.addAuthSection(
       AuthenticationSection.fromEcdsa(didDocument.publicKey[0]),
     )
+    // Adding the recovery key to public-key and authorization section
+    if (recoveryKey) {
+      didDocument.addPublicKeySection(
+        PublicKeySection.fromEcdsa(
+          Buffer.from(recoveryKey.hexValue.replace('0x', ''), 'hex'),
+          `${did}#keys-${publicKey.keyId}`,
+          did,
+        ),
+      )
+      // TODO add authorization section
+    }
 
-    // TODO add authorization section
-    // TODO parse service section
+    servicesData.forEach(service => {
+      const serviceSection = ServiceEndpointsSection.fromJSON(service)
+      return didDocument.addServiceEndpoint(serviceSection)
+    })
+
     return didDocument
   }
 
@@ -306,7 +323,7 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.prepareSignature('did:jolo:...#keys-1')`
    */
 
-  private async prepareSignature(keyId: string) {
+  public async prepareSignature(keyId: string) {
     const inOneYear = new Date()
     inOneYear.setFullYear(new Date().getFullYear() + 1)
 
@@ -347,7 +364,7 @@ export class DidDocument implements IDigestable {
    */
 
   public toJSON(): IDidDocumentAttrs {
-    return classToPlain(this) as IDidDocumentAttrs
+    return clearUndefindProperties(classToPlain(this)) as IDidDocumentAttrs
   }
 
   /**

@@ -1,13 +1,10 @@
-import { testPublicIdentityKey } from './keys.data'
-import {
-  mockDid,
-  mockKeyId,
-  mockPublicKeyHex,
-  mockIpfsHash,
-} from './didDocument.data'
+import { testPublicKey } from './keys.data'
+import { mockDid, mockKeyId, mockPublicKeyHex } from './didDocument.data'
+import { publicProfileCredJSON } from './identity.data'
+import { PublicProfileClaimMetadata } from 'cred-types-jolocom-core/js/types'
 
 export const mockPubKeySectionCreationAttrs = {
-  publicKey: testPublicIdentityKey,
+  publicKey: testPublicKey,
   did: mockDid,
   keyId: mockKeyId,
 }
@@ -26,7 +23,14 @@ export const mockAuthSectionJSON = {
 
 export const mockPubProfServiceEndpointJSON = {
   id: `${mockDid};jolocomPubProfile`,
-  serviceEndpoint: `ipfs://${mockIpfsHash}`,
+  serviceEndpoint: publicProfileCredJSON as PublicProfileClaimMetadata,
   description: 'Verifiable Credential describing entity profile',
   type: 'JolocomPublicProfile',
+}
+
+export const mockServiceEndpointJSON = {
+  id: `${mockDid};service`,
+  serviceEndpoint: 'https://some-endpoint.io',
+  description: 'Endpoint Description',
+  type: 'Endpoint',
 }

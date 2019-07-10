@@ -1,18 +1,15 @@
 import * as ganache from 'ganache-core'
-import * as registryContract from 'jolocom-registry-contract'
-import { userEthKey, serviceEthKey, deployerEthKey } from './integration.data'
+import { deployerEthKey, serviceEthKey, userEthKey } from './integration.data'
 import { ContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import * as RegistryContract from 'jolocom-registry-contract/build/contracts/Registry.json'
 import { ethers } from 'ethers'
-const Web3 = require('web3')
+
 const IPFSFactory = require('ipfsd-ctl')
 
 const PORT = 8945
-const web3 = new Web3()
-web3.setProvider(new Web3.providers.HttpProvider(`http://localhost:${PORT}`))
 
-const balance = web3.utils.toWei('1')
-
+const balance = 1e24
 const ganacheServer = ganache.server({
   accounts: [
     { secretKey: deployerEthKey, balance },
@@ -21,20 +18,26 @@ const ganacheServer = ganache.server({
   ],
 })
 
-const daemonFactory = IPFSFactory.create({ type: 'go' })
-
 /**
  * @description - Helper function to deploy the registry contract on the local eth network
  * @returns {void} - Would normally return the address of the deployed contract, but we know
  *   it already since we know the deployer addr, and their account nonce (0)
  */
 
-const deployContract = async () => {
-  const deployerAddress = (await web3.eth.getAccounts())[0]
-  return registryContract.TestDeployment.deployIdentityContract(
-    web3,
-    deployerAddress,
+const deployContract = async (port: number): Promise<string> => {
+  let provider = new ethers.providers.JsonRpcProvider(
+    `http://localhost:${port}`,
   )
+  let wallet = new ethers.Wallet(deployerEthKey, provider)
+  let factory = new ethers.ContractFactory(
+    RegistryContract.abi,
+    RegistryContract.bytecode,
+    wallet,
+  )
+  let contract = await factory.deploy()
+  await contract.deployed()
+  console.log('deployed')
+  return contract.address
 }
 
 /**
@@ -44,6 +47,8 @@ const deployContract = async () => {
  */
 
 const spawnIpfsNode = async () => {
+  const daemonFactory = IPFSFactory.create({ type: 'go' })
+
   return new Promise((resolve, reject) =>
     daemonFactory.spawn(
       {
@@ -68,29 +73,16 @@ const spawnIpfsNode = async () => {
  * @returns {void}
  */
 
-interface ContractClassess {
-  testContractsGateway: ContractsGateway
-  testContractsAdapter: ContractsAdapter
+export const init = async (): Promise<{
+  ganache
+  contractAddress: string
+}> => {
+  ganacheServer.listen(PORT, (err, blockchain) => blockchain)
+
+  const contractAddress = await deployContract(PORT)
+  await spawnIpfsNode()
+  return {
+    ganache: ganacheServer,
+    contractAddress: contractAddress,
+  }
 }
-
-export const init = async () =>
-  new Promise<ContractClassess>(async (resolve, reject) => {
-    ganacheServer.listen(PORT, async ganacheErr => {
-      if (ganacheErr) {
-        return reject(ganacheErr)
-      }
-
-      await deployContract()
-      await spawnIpfsNode()
-
-      const testContractsGateway = new ContractsGateway(
-        new ethers.providers.Web3Provider(web3.currentProvider),
-      )
-      const testContractsAdapter = new ContractsAdapter()
-
-      return resolve({
-        testContractsGateway,
-        testContractsAdapter,
-      })
-    })
-  })

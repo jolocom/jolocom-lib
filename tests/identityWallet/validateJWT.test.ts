@@ -27,7 +27,7 @@ describe('IdentityWallet validate JWT', () => {
   const sandbox = sinon.createSandbox()
   const encryptionPass = 'secret'
   const didDocument = DidDocument.fromJSON(didDocumentJSON)
-  const identity = Identity.fromDidDocument({ didDocument })
+  const identity = Identity.fromDidDocument(didDocument)
   const vault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
 
   let iw: IdentityWallet
@@ -36,7 +36,7 @@ describe('IdentityWallet validate JWT', () => {
     sinon.useFakeTimers()
     sandbox
       .stub(JolocomRegistry.prototype, 'resolve')
-      .resolves(Identity.fromDidDocument({ didDocument }))
+      .resolves(Identity.fromDidDocument(didDocument))
     iw = new IdentityWallet({
       identity,
       vaultedKeyProvider: vault,

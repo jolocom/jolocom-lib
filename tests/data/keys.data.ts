@@ -18,13 +18,13 @@ export const testPrivateIdentityKey = Buffer.from(
   'hex',
 )
 
-export const testPublicIdentityKey = Buffer.from(
+export const testPublicKey = Buffer.from(
   '03848af62bffceb57631780ac0e0726106ee1c23262d6fd7ef906559d68f53a551',
   'hex',
 )
 
-export const testPrivateEthereumKey = Buffer.from(
-  '204878ffe22c92f4aa7714aba37d6c0dcc43c45f67205b161b73c78e21dbf512<Paste>',
+export const testPrivateKey = Buffer.from(
+  '38a2eb228140a343696431939eedc14b937b0041872541df095c1b266fb55aea',
   'hex',
 )
 

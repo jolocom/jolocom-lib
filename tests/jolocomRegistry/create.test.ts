@@ -5,17 +5,22 @@ import {
 } from '../../ts/registries/jolocomRegistry'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { Identity } from '../../ts/identity/identity'
-import { didDocumentJSON } from '../data/didDocument.data'
-import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
+import {
+  didDocumentJSON,
+  mockDid,
+  mockKeyId,
+  mockPublicKeyHex,
+} from '../data/didDocument.data'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import {
   testPrivateIdentityKey,
-  testPublicIdentityKey,
+  testPublicKey,
   testSeed,
 } from '../data/keys.data'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { msgSignature } from '../data/keyProvider.data'
 import { encryptionPass, keyMetadata } from './jolocomRegistry.data'
+import { keyIdToNumber } from '../../ts/utils/helper'
 
 describe('Jolocom Registry - create', () => {
   const sandbox = sinon.createSandbox()
@@ -24,7 +29,7 @@ describe('Jolocom Registry - create', () => {
   const mockVault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
 
   before(async () => {
-    sandbox.stub(mockVault, 'getPublicKey').returns(testPublicIdentityKey)
+    sandbox.stub(mockVault, 'getPublicKey').returns(testPublicKey)
     sandbox.stub(mockVault, 'signDigestable').returns(msgSignature)
     sandbox.stub(mockVault, 'getPrivateKey').returns(testPrivateIdentityKey)
 
@@ -32,7 +37,12 @@ describe('Jolocom Registry - create', () => {
     sandbox
       .stub(DidDocument, 'fromPublicKey')
       .returns(DidDocument.fromJSON(didDocumentJSON))
-    sandbox.stub(Identity, 'fromDidDocument').returns(new Identity())
+    sandbox.stub(Identity, 'create').returns(
+      new Identity(mockDid, {
+        hexValue: mockPublicKeyHex,
+        keyId: keyIdToNumber(mockKeyId),
+      }),
+    )
   })
 
   after(() => {
@@ -42,18 +52,16 @@ describe('Jolocom Registry - create', () => {
   it('should create new identity', async () => {
     const jolocomRegistry = createJolocomRegistry()
 
-    const expectedDidDoc = Object.assign({}, didDocumentJSON)
-    expectedDidDoc.proof.signatureValue = msgSignature.toString('hex')
-
     identityWallet = await jolocomRegistry.create(mockVault, encryptionPass)
 
     sandbox.assert.calledWith(mockVault.getPublicKey, keyMetadata)
-    sandbox.assert.calledWith(Identity.fromDidDocument, {
-      didDocument: DidDocument.fromJSON(expectedDidDoc),
-    })
+    sandbox.assert.calledWith(
+      Identity.create,
+      Buffer.from(mockPublicKeyHex, 'hex'),
+    )
     sandbox.assert.calledWith(JolocomRegistry.prototype.commit, {
       identityWallet: identityWallet,
-      keyMetadata: { ...keyMetadata, derivationPath: KeyTypes.ethereumKey },
+      keyMetadata: keyMetadata,
       vaultedKeyProvider: mockVault,
     })
   })

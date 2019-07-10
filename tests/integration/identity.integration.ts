@@ -12,7 +12,6 @@ import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { publicProfileCredJSON } from '../data/identity.data'
 import {
-  testEthereumConfig,
   testIpfsConfig,
   userVault,
   userPass,
@@ -27,26 +26,27 @@ import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
 chai.use(sinonChai)
 const expect = chai.expect
 
-/* global before and after hook for integration tests & shared variables */
+// global before and after hook for integration tests & shared variables
 export let jolocomRegistry: JolocomRegistry
 export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
 export let testContractsGateway: ContractsGateway
 export let testContractsAdapter: ContractsAdapter
+let ganacheServer
 
 before(async () => {
-  const {
-    testContractsGateway: gateway,
-    testContractsAdapter: adapter,
-  } = await integrationHelper.init()
-
-  testContractsGateway = gateway
-  testContractsAdapter = adapter
+  const { ganache, contractAddress } = await integrationHelper.init()
+  ganacheServer = ganache
+  testContractsGateway = new ContractsGateway(ganache.provider)
+  testContractsAdapter = new ContractsAdapter()
 
   jolocomRegistry = createJolocomRegistry({
     ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
-    ethereumConnector: new EthResolver(testEthereumConfig),
-    contracts: { gateway, adapter },
+    ethereumConnector: new EthResolver({
+      providerUrl: 'http://localhost:8945',
+      contractAddress: contractAddress,
+    }),
+    contracts: { gateway: testContractsGateway, adapter: testContractsAdapter },
   })
 
   userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
@@ -57,6 +57,7 @@ before(async () => {
 })
 
 after(() => {
+  ganacheServer.close()
   process.exit(0)
 })
 
@@ -69,11 +70,11 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       serviceIdentityWallet.did,
     )
 
-    expect(remoteUserIdentity.didDocument).to.deep.eq(
+    expect(remoteUserIdentity.toDidDocument()).to.deep.eq(
       userIdentityWallet.didDocument,
     )
-    expect(remoteServiceIdentity.didDocument).to.deep.eq(
-      remoteServiceIdentity.didDocument,
+    expect(remoteServiceIdentity.toDidDocument()).to.deep.eq(
+      serviceIdentityWallet.didDocument,
     )
   })
 
@@ -81,13 +82,13 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
     const servicePublicProfile = SignedCredential.fromJSON(
       publicProfileCredJSON,
     )
-    serviceIdentityWallet.identity.publicProfile = servicePublicProfile
+    serviceIdentityWallet.identity.publicProfileCredential = servicePublicProfile
 
     await jolocomRegistry.commit({
       vaultedKeyProvider: serviceVault,
       identityWallet: serviceIdentityWallet,
       keyMetadata: {
-        derivationPath: KeyTypes.ethereumKey,
+        derivationPath: KeyTypes.jolocomIdentityKey,
         encryptionPass: servicePass,
       },
     })
@@ -95,10 +96,11 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
     const remoteServiceIdentity = await jolocomRegistry.resolve(
       serviceIdentityWallet.did,
     )
-
-    expect(remoteServiceIdentity.publicProfile).to.deep.eq(servicePublicProfile)
-    expect(remoteServiceIdentity.didDocument).to.deep.eq(
-      remoteServiceIdentity.didDocument,
+    expect(remoteServiceIdentity.publicProfileCredential).to.deep.eq(
+      servicePublicProfile,
+    )
+    expect(remoteServiceIdentity.toDidDocument()).to.deep.eq(
+      serviceIdentityWallet.didDocument,
     )
   })
 
@@ -107,11 +109,11 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       derivationPath: KeyTypes.jolocomIdentityKey,
       encryptionPass: userPass,
     })
-    expect(wallet.identity.didDocument).to.deep.eq(
-      userIdentityWallet.identity.didDocument,
+    expect(wallet.identity.toDidDocument()).to.deep.eq(
+      userIdentityWallet.identity.toDidDocument(),
     )
-    expect(wallet.identity.publicProfile).to.deep.eq(
-      userIdentityWallet.identity.publicProfile,
+    expect(wallet.identity.publicProfileCredential).to.deep.eq(
+      userIdentityWallet.identity.publicProfileCredential,
     )
   })
 
@@ -124,9 +126,9 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
     const remoteDidDoc = wallet.didDocument.toJSON()
     const localDidDoc = serviceIdentityWallet.didDocument.toJSON()
 
-    const remotePubProf = wallet.identity.publicProfile.toJSON()
+    const remotePubProf = wallet.identity.publicProfileCredential.toJSON()
 
-    const localPubProf = serviceIdentityWallet.identity.publicProfile.toJSON()
+    const localPubProf = serviceIdentityWallet.identity.publicProfileCredential.toJSON()
 
     expect(remoteDidDoc).to.deep.eq(localDidDoc)
     expect(remotePubProf).to.deep.eq(localPubProf)

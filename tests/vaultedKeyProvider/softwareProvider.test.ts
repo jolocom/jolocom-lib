@@ -6,7 +6,7 @@ import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvide
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import {
   testSeed,
-  testPublicIdentityKey,
+  testPublicKey,
   testIncorrectPublicIdentityKey,
   testPrivateIdentityKey,
   testMnemonic,
@@ -24,8 +24,6 @@ import {
 import { IDigestable } from '../../ts/linkedDataSignature/types'
 import { publicProfileCredJSON, emailCredential } from '../data/identity.data'
 import { keyDerivationArgs } from '../data/identityWallet.data'
-import { JolocomLib } from '../../ts/index'
-import { claimsMetadata } from 'cred-types-jolocom-core'
 
 chai.use(sinonChai)
 describe('Software Vaulted Key Provider', () => {
@@ -61,9 +59,7 @@ describe('Software Vaulted Key Provider', () => {
 
   describe('getPublicKey', () => {
     it('Should correctly derive public key given path and pasword', () => {
-      expect(vault.getPublicKey(keyDerivationArgs)).to.deep.eq(
-        testPublicIdentityKey,
-      )
+      expect(vault.getPublicKey(keyDerivationArgs)).to.deep.eq(testPublicKey)
     })
 
     it('Should fail if password is missing', () => {
