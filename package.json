@@ -73,7 +73,7 @@
     "ethereumjs-util": "^6.1.0",
     "ethers": "^4.0.32",
     "form-data": "^2.3.3",
-    "jolocom-registry-contract": "../registry-contract/jolocom-registry-contract-0.1.7.tgz",
+    "jolocom-registry-contract": "./jolocom-registry-contract-0.1.7.tgz",
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.5.3",
     "jsontokens": "^1.0.0",
