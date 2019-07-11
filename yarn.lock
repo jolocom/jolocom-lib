@@ -5072,7 +5072,7 @@ joi@^14.3.1:
 
 jolocom-registry-contract@./jolocom-registry-contract-0.1.7.tgz:
   version "0.1.7"
-  resolved "./jolocom-registry-contract-0.1.7.tgz#cf41d4da3410370f43272d6837af5069bb86df72"
+  resolved "./jolocom-registry-contract-0.1.7.tgz#8783be27ab3f56a44ae4f876e52c5e6b4a7fd07c"
   dependencies:
     ethereumjs-tx "^1.3.7"
     ethereumjs-wallet "^0.6.3"

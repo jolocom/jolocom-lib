@@ -99,8 +99,8 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
     expect(remoteServiceIdentity.publicProfileCredential).to.deep.eq(
       servicePublicProfile,
     )
-    expect(remoteServiceIdentity.toDidDocument()).to.deep.eq(
-      serviceIdentityWallet.didDocument,
+    expect(remoteServiceIdentity.toDidDocument().service).to.deep.eq(
+      serviceIdentityWallet.didDocument.service,
     )
   })
 
@@ -119,6 +119,8 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
   })
 
   it('should correctly implement authenticate with public profile', async () => {
+    // as the remote identity has been updated the keyId also increased
+    serviceIdentityWallet.identity.publicKey.keyId = 4
     const wallet = await jolocomRegistry.authenticate(serviceVault, {
       derivationPath: KeyTypes.jolocomIdentityKey,
       encryptionPass: servicePass,

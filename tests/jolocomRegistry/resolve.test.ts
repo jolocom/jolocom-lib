@@ -69,6 +69,7 @@ describe('Jolocom Registry - resolve', () => {
     })
     registry.ethereumConnector.getCreated = sinon.stub().returns(new Date())
     registry.ethereumConnector.getUpdated = sinon.stub().returns(new Date())
+    registry.ethereumConnector.getUpdatedCount = sinon.stub().returns(1)
     registry.ipfsConnector.catJSON = sinon
       .stub()
       .resolves(extendedDidDoc.service)

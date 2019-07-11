@@ -1,6 +1,10 @@
 import { DidDocument } from './didDocument/didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './didDocument/sections'
+import {
+  AuthenticationSection,
+  PublicKeySection,
+  ServiceEndpointsSection,
+} from './didDocument/sections'
 import { PublicKey } from './types'
 import { keyIdToNumber, keyNumberToKeyId } from '../utils/helper'
 import { publicKeyToDID } from '../utils/crypto'
@@ -61,7 +65,7 @@ export class Identity {
     const did = publicKeyToDID(publicKey)
     return new Identity(did, {
       hexValue: publicKey.toString('hex'),
-      keyId: 1,
+      keyId: 2,
     })
   }
 

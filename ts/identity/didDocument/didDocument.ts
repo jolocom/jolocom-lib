@@ -263,7 +263,7 @@ export class DidDocument implements IDigestable {
 
   public static fromPublicKey(publicKey: Buffer): DidDocument {
     const did = publicKeyToDID(publicKey)
-    const keyId = `${did}#keys-1`
+    const keyId = `${did}#keys-2`
 
     const didDocument = new DidDocument()
     didDocument.did = did
