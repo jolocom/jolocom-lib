@@ -188,20 +188,16 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   /**
    * Returns the mnemonic of the stored seed
    * @param encryptionPass - Password for seed decryption
+   * @param did - [optional] id-string of the corresponding DID, this is needed to recover after key rotations
    */
-  public getMnemonic(encryptionPass: string): string {
+  public getMnemonic(encryptionPass: string, did?: string): string {
     const seed = SoftwareKeyProvider.decrypt(
       SoftwareKeyProvider.normalizePassword(encryptionPass),
       this._encryptedSeed,
       this._iv,
     )
-    const did = keccak256(
-      this.getPublicKey({
-        derivationPath: KeyTypes.jolocomIdentityKey,
-        encryptionPass: encryptionPass,
-      }),
-    )
-    return entropyToMnemonic(did) + ' ' + entropyToMnemonic(seed)
+    if (did) return entropyToMnemonic(did) + ' ' + entropyToMnemonic(seed)
+    return entropyToMnemonic(seed)
   }
 
   /**

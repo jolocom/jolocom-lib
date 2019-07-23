@@ -24,6 +24,7 @@ import {
 import { IDigestable } from '../../ts/linkedDataSignature/types'
 import { publicProfileCredJSON, emailCredential } from '../data/identity.data'
 import { keyDerivationArgs } from '../data/identityWallet.data'
+import { mockDid } from '../data/didDocument.data'
 
 chai.use(sinonChai)
 describe('Software Vaulted Key Provider', () => {
@@ -239,16 +240,26 @@ describe('Software Vaulted Key Provider', () => {
         testMnemonic,
       )
     })
+
+    it('should return mnemonic phrase containing the DID', () => {
+      const idString = mockDid.substring(mockDid.lastIndexOf(':') + 1)
+      console.log(idString)
+      expect(
+        vault.getMnemonic(keyDerivationArgs.encryptionPass, idString),
+      ).to.eq(
+        'ready put cup oblige divorce boost all hedgehog peasant rule item pepper aware brother treat middle spin tooth diet crack skill trap fruit undo primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary foster',
+      )
+    })
   })
 
   describe('recoverKeyPair', () => {
     it('should correctly return a VaultedKeyProvider', function() {
-      const vault = SoftwareKeyProvider.recoverKeyPair(
+      const newVault = SoftwareKeyProvider.recoverKeyPair(
         testMnemonic,
         keyDerivationArgs.encryptionPass,
       )
-      expect(vault.getPrivateKey(keyDerivationArgs)).to.deep.eq(
-        testPrivateIdentityKey,
+      expect(newVault).to.deep.eq(
+        vault
       )
     })
 
