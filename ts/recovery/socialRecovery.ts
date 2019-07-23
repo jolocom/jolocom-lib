@@ -1,4 +1,12 @@
-import * as secrets from 'secrets.js-grempe'
+import {
+  pack,
+  unpack,
+  share,
+  validateShard,
+  combine,
+} from 'dark-crystal-secrets'
+
+const darkCrystalVersion = '2.0.0'
 
 export class SocialRecovery {
   public static createHorcruxes(
@@ -7,20 +15,25 @@ export class SocialRecovery {
     amount: number,
     threshold: number,
   ): string[] {
-    const hexString = `${did}${secret}`
-    return secrets.share(hexString, amount, threshold)
+    const labeledSecret = pack(secret, did)
+    return share(labeledSecret, amount, threshold)
+  }
+
+  public static validateHorcrux(horcurx: string): any {
+    return validateShard(horcurx, darkCrystalVersion)
   }
 
   public static combineHorcurxes(
     horcruxes: string[],
   ): { did: string; secret: string } {
-    const result = secrets.combine(horcruxes)
+    const result = unpack(
+      combine(horcruxes, darkCrystalVersion),
+      darkCrystalVersion,
+    )
 
     return {
-      // did: result.split(hexColon)[0],
-      // secret: result.split(hexColon)[1],
-      did: result.slice(0, 64),
-      secret: result.slice(64),
+      did: result.label,
+      secret: result.secret,
     }
   }
 }
