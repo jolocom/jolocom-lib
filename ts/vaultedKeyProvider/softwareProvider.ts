@@ -6,6 +6,14 @@ import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
 
+const ALG = 'aes-256-cbc'
+
+/** @dev length in bytes */
+const PASSWORD_LENGTH = 32
+const CIPHERTEXT_LENGTH = 48
+const IV_LENGTH = 16
+const ENCRYPTED_SEED_LENGTH = IV_LENGTH + CIPHERTEXT_LENGTH
+
 export class SoftwareKeyProvider implements IVaultedKeyProvider {
   private readonly _encryptedSeed: Buffer
   private readonly _iv: Buffer
@@ -16,16 +24,16 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    */
 
   public constructor(encryptedSeed: Buffer) {
-    if (encryptedSeed.length !== 64) {
+    if (encryptedSeed.length !== ENCRYPTED_SEED_LENGTH) {
       throw new Error(
-        `Expected encrypted seed to be 64 bytes long (16 IV + 48 ciphertext), got ${
+        `Expected encrypted seed to be ${ENCRYPTED_SEED_LENGTH} bytes long (${IV_LENGTH} IV + ${CIPHERTEXT_LENGTH} ciphertext), got ${
           encryptedSeed.length
         }`,
       )
     }
 
-    this._iv = encryptedSeed.slice(0, 16)
-    this._encryptedSeed = encryptedSeed.slice(16)
+    this._iv = encryptedSeed.slice(0, IV_LENGTH)
+    this._encryptedSeed = encryptedSeed.slice(IV_LENGTH)
   }
 
   /**
@@ -46,7 +54,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     seed: Buffer,
     encryptionPass: string,
   ): SoftwareKeyProvider {
-    const iv = SoftwareKeyProvider.getRandom(16)
+    const iv = SoftwareKeyProvider.getRandom(IV_LENGTH)
     const encryptedSeed = SoftwareKeyProvider.encrypt(
       SoftwareKeyProvider.normalizePassword(encryptionPass),
       seed,
@@ -210,7 +218,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    */
 
   private static encrypt(key: Buffer, data: Buffer, iv: Buffer): Buffer {
-    const cipher = createCipheriv('aes-256-cbc', key, iv)
+    const cipher = createCipheriv(ALG, key, iv)
     return Buffer.concat([cipher.update(data), cipher.final()])
   }
 
@@ -222,7 +230,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    */
 
   private static decrypt(key: Buffer, data: Buffer, iv: Buffer): Buffer {
-    const decipher = createDecipheriv('aes-256-cbc', key, iv)
+    const decipher = createDecipheriv(ALG, key, iv)
     return Buffer.concat([decipher.update(data), decipher.final()])
   }
 
@@ -238,9 +246,9 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     const passwordBuffer = Buffer.from(password)
 
     if (!passwordBuffer.length) return
-    if (passwordBuffer.length !== 32) {
+    if (passwordBuffer.length !== PASSWORD_LENGTH) {
       console.warn(
-        `Provided password must have a length of 32 bytes, received ${
+        `Provided password must have a length of ${PASSWORD_LENGTH} bytes, received ${
           passwordBuffer.length
         }. We will compute the sha256 hash of the provided password and use it instead`,
       )
