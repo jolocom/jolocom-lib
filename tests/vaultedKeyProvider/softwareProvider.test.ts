@@ -24,8 +24,6 @@ import {
 import { IDigestable } from '../../ts/linkedDataSignature/types'
 import { publicProfileCredJSON, emailCredential } from '../data/identity.data'
 import { keyDerivationArgs } from '../data/identityWallet.data'
-import { JolocomLib } from '../../ts/index'
-import { claimsMetadata } from 'cred-types-jolocom-core'
 
 chai.use(sinonChai)
 describe('Software Vaulted Key Provider', () => {
@@ -36,26 +34,25 @@ describe('Software Vaulted Key Provider', () => {
 
   describe('constructor', () => {
     it('Should fail to instantiate if entropy too short', () => {
-      const faultyVault = SoftwareKeyProvider.fromSeed(
+      expect(() => SoftwareKeyProvider.fromSeed(
         Buffer.from('a'),
         keyDerivationArgs.encryptionPass,
-      )
-      expect(() => faultyVault.getPrivateKey(keyDerivationArgs)).to.throw(
-        TypeError,
-        'Seed should be at least 128 bits',
-      )
+      )).to.throw()
     })
 
     it('Should fail to instantiate if entropy too long', () => {
       const longEntropy = Buffer.concat([testSeed, testSeed, testSeed])
-      const faultyVault = SoftwareKeyProvider.fromSeed(
+      expect(() => SoftwareKeyProvider.fromSeed(
         longEntropy,
         keyDerivationArgs.encryptionPass,
-      )
-      expect(() => faultyVault.getPrivateKey(keyDerivationArgs)).to.throw(
-        TypeError,
-        'Seed should be at most 512 bits',
-      )
+      )).to.throw()
+    })
+
+    it('Should fail to instantiate if password is empty', () => {
+      expect(() => SoftwareKeyProvider.fromSeed(
+        testSeed,
+        ''
+      )).to.throw()
     })
   })
 
@@ -87,7 +84,7 @@ describe('Software Vaulted Key Provider', () => {
 
       const random = sinon.stub(crypto, 'randomBytes').returns(fixedRandom)
       expect(SoftwareKeyProvider.getRandom(nrOfBytes)).to.deep.eq(fixedRandom)
-      expect(random.calledWith(nrOfBytes)).to.be.true
+      expect(random.calledWith(nrOfBytes)).to.eq(true)
 
       random.restore()
     })
@@ -110,13 +107,11 @@ describe('Software Vaulted Key Provider', () => {
     const pubKey = vault.getPublicKey(keyDerivationArgs)
 
     it('Should correctly validate signature given digest signature, and public key', () => {
-      expect(SoftwareKeyProvider.verify(msgToSign, pubKey, msgSignature)).to.be
-        .true
+      expect(SoftwareKeyProvider.verify(msgToSign, pubKey, msgSignature)).to.eq(true)
     })
 
     it('Should correctly detect invalid signature', () => {
-      expect(SoftwareKeyProvider.verify(msgToSign, pubKey, incorrectSignature))
-        .to.be.false
+      expect(SoftwareKeyProvider.verify(msgToSign, pubKey, incorrectSignature)).to.eq(false)
     })
 
     it('Should throw given invalid input', () => {
@@ -187,7 +182,7 @@ describe('Software Vaulted Key Provider', () => {
     it('Should correctly digest passed object and validate the signature', async () => {
       expect(
         await SoftwareKeyProvider.verifyDigestable(pubKey, credentialToSign),
-      ).to.be.true
+      ).to.eq(true)
     })
 
     it('Should correctly detect incorrect signature', async () => {
@@ -196,7 +191,7 @@ describe('Software Vaulted Key Provider', () => {
       )
       expect(
         await SoftwareKeyProvider.verifyDigestable(pubKey, corruptedCredential),
-      ).to.be.false
+      ).to.eq(false)
     })
   })
 
