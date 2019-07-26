@@ -41,7 +41,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    */
 
   public get encryptedSeed() {
-    return Buffer.concat([this._encryptedSeed, this._iv])
+    return Buffer.concat([this._iv, this._encryptedSeed])
   }
 
   /**

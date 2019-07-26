@@ -32,7 +32,7 @@ describe('Software Vaulted Key Provider', () => {
     keyDerivationArgs.encryptionPass,
   )
 
-  describe('constructor', () => {
+  describe('static fromSeed', () => {
     it('Should fail to instantiate if entropy too short', () => {
       expect(() => SoftwareKeyProvider.fromSeed(
         Buffer.from('a'),
@@ -53,6 +53,17 @@ describe('Software Vaulted Key Provider', () => {
         testSeed,
         ''
       )).to.throw()
+    })
+  })
+
+  describe('encryptedSeed accessor', () => {
+    it('should correctly concatenate IV with ciphertext', () => {
+      const testIV = Buffer.from('a'.repeat(32), 'hex')
+      const testCiphertext = Buffer.from('a'.repeat(96), 'hex')
+      const testEncryptedSeed = Buffer.concat([testIV, testCiphertext])
+
+      const vault = new SoftwareKeyProvider(testEncryptedSeed)
+      expect(vault.encryptedSeed).to.deep.eq(testEncryptedSeed)
     })
   })
 
