@@ -24,7 +24,6 @@ describe('SignedCredential', () => {
 
   before(async () => {
     create = sandbox.spy(Credential, 'create')
-    sandbox.stub(Math, 'random').returns(0.3378666668190271)
     sandbox
       .stub(crypto, 'randomBytes')
       .returns(Buffer.from('1842fb5f567dd532', 'hex'))
