@@ -1,5 +1,6 @@
 import * as sinon from 'sinon'
-import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
+
+import {createJolocomRegistry, JolocomRegistry} from '../../ts/registries/jolocomRegistry'
 import {
   mockDid,
   didDocumentJSON,
@@ -10,6 +11,7 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { publicProfileCredJSON } from '../data/identity.data'
 import { Identity } from '../../ts/identity/identity'
 import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
+import {MultiResolver} from '../../ts/resolver'
 
 describe('Jolocom Registry - resolve', () => {
   let registry: any = createJolocomRegistry()
@@ -34,7 +36,7 @@ describe('Jolocom Registry - resolve', () => {
   it('should throw if resolution fails', async () => {
     registry.ethereumConnector.resolveDID = sinon.stub().returns('')
     try {
-      await registry.resolve('did:x')
+      await registry.resolve('did:jolo:abd')
       expect(true).to.be.false
     } catch (err) {
       expect(err.message).to.eq(
@@ -70,5 +72,18 @@ describe('Jolocom Registry - resolve', () => {
     expect(registry.ipfsConnector.catJSON.getCall(0).args).to.deep.eq([
       mockIpfsHash,
     ])
+  })
+
+  it('should correctly use custom resolver if passed', async () => {
+    const customMethod = 'test'
+    const testResolver = sinon.stub().returns(didDocumentJSON)
+
+    const customResolver = new MultiResolver({
+      [customMethod]: testResolver
+    })
+
+    const registry = new JolocomRegistry(customResolver)
+
+    expect(registry.resolver.supportedMethods).to.deep.eq([customMethod])
   })
 })

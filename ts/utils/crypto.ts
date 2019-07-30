@@ -26,3 +26,14 @@ export function publicKeyToDID(publicKey: Buffer): string {
   const suffix = keccak256(publicKey)
   return prefix + suffix.toString('hex')
 }
+
+/**
+ * Returns the did method prefix, given a did
+ * @param did
+ * @example `getMethodPrefixFromDid('did:jolo:abc') // jolo`
+ */
+
+export const getMethodPrefixFromDid = (did: string) => {
+  return did.substring(4, did.lastIndexOf(':'))
+}
+
