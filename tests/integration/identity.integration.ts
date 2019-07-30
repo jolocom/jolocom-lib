@@ -65,6 +65,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
     const remoteUserIdentity = await jolocomRegistry.resolve(
       userIdentityWallet.did,
     )
+
     const remoteServiceIdentity = await jolocomRegistry.resolve(
       serviceIdentityWallet.did,
     )
@@ -72,6 +73,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
     expect(remoteUserIdentity.didDocument).to.deep.eq(
       userIdentityWallet.didDocument,
     )
+
     expect(remoteServiceIdentity.didDocument).to.deep.eq(
       remoteServiceIdentity.didDocument,
     )

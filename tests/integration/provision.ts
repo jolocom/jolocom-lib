@@ -8,6 +8,7 @@ const Web3 = require('web3')
 const IPFSFactory = require('ipfsd-ctl')
 
 const PORT = 8945
+
 const web3 = new Web3()
 web3.setProvider(new Web3.providers.HttpProvider(`http://localhost:${PORT}`))
 

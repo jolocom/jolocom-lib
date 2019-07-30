@@ -2,7 +2,6 @@ import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { DidDocument } from '../identity/didDocument/didDocument'
-import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
@@ -23,6 +22,7 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
+import {createJolocomResolver, MultiResolver} from '../resolver'
 
 /**
  * @class
@@ -34,6 +34,11 @@ export class JolocomRegistry implements IRegistry {
   public ethereumConnector: IEthereumConnector
   public contractsAdapter: IContractsAdapter
   public contractsGateway: IContractsGateway
+  public readonly resolver: MultiResolver
+
+  constructor(resolver: MultiResolver) {
+    this.resolver = resolver
+  }
 
   /**
    * Registers a  new Jolocom identity on Ethereum and IPFS and returns an instance of the Identity Wallet class
@@ -144,20 +149,16 @@ export class JolocomRegistry implements IRegistry {
   /**
    * Resolves a jolocom did and returns an {@link Identity} class instance
    * @param did - The jolocom did to resolve
+   * @deprecated - The resolution related methods will eventually be removed from the registry
+   *  in favor of the {@link MultiResolver} class
    * @example `const serviceIdentity = await registry.resolve('did:jolo:...')`
    */
 
   public async resolve(did): Promise<Identity> {
     try {
-      const ddoHash = await this.ethereumConnector.resolveDID(did)
+      const didDocumentJson = await this.resolver.resolve(did)
 
-      if (!ddoHash) {
-        throw new Error('No record for DID found.')
-      }
-
-      const didDocument = DidDocument.fromJSON(
-        (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs,
-      )
+      const didDocument = DidDocument.fromJSON(didDocumentJson)
 
       const publicProfileSection = didDocument.service.find(
         endpoint => endpoint.type === 'JolocomPublicProfile',
@@ -259,7 +260,12 @@ export const createJolocomRegistry = (
   },
 ): JolocomRegistry => {
   const { ipfsConnector, contracts, ethereumConnector } = configuration
-  const jolocomRegistry = new JolocomRegistry()
+
+  const multiResolver = new MultiResolver({
+    jolo: createJolocomResolver(ethereumConnector, ipfsConnector)
+  })
+
+  const jolocomRegistry = new JolocomRegistry(multiResolver)
 
   jolocomRegistry.ipfsConnector = ipfsConnector
   jolocomRegistry.ethereumConnector = ethereumConnector
