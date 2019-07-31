@@ -13,10 +13,10 @@ const mockSubject =
 /* Defining fixture for a signedCredential in JSON form */
 
 export const emailVerifiableCredentialHash =
-  'b516dc3d9d125efe41dd5bc30b94aa2a9bb8b8676f90dbd8d5d9104d18e6a426'
+  '7d659e5e3088453ba7e668297efdd985e74a49cebd3ce1f9951a09ee74530011'
 export const emailVerifiableCredential = {
   '@context': [...defaultContext, ...claimsMetadata.emailAddress.context],
-  id: 'claimId:567e6e0c6570a',
+  id: 'claimId:1842fb5f567dd532',
   name: 'Email address',
   issuer: mockIssuerDid,
   type: ['Credential', 'ProofOfEmailCredential'],
