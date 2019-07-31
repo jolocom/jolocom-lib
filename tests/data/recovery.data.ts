@@ -1,0 +1,33 @@
+// 16 bit Seed
+export const testSecret16 = '56e3da56e3da30464d975db26093f647'
+
+export const testSeedPhrase16 =
+  'finger burst noble sibling perfect case curve two raven afraid work month'
+
+export const testSeedPhraseWithDid16 =
+  'finger burst noble sibling perfect case curve two raven afraid work month river inherit peace able demise hub endless spring sunny glow cream art guilt garden gold camera aunt pig umbrella position reason bird banner gauge'
+
+export const testDID16 =
+  'did:jolo:bace7a870023a4dd126e99d96c78cb86667abf5911050f5493b0d43b302d0493'
+
+// 32 bit Seed
+export const testSecret32 =
+  'a2985156e3da3046101ae2b26093f647fed9d6ce31ffeb4d975d143ac69e5b46'
+
+export const testSeedPhrase32 =
+  'penalty secret fiber sibling perfect cart document fox raven afraid work morning unique twin decide divide twice hole struggle chronic property execute home scatter'
+
+export const testSeedPhraseWithDid32 =
+  'penalty secret fiber sibling perfect cart document fox raven afraid work morning unique twin decide divide twice hole struggle chronic property execute home scatter quit humor provide diary upper tired arena slight fiction tiger lottery duty purse drastic legend faith popular arrow fire discover income silver burger nurse'
+
+export const testDID32 =
+  'did:jolo:afcde2b39eaef1c542de5d55dc3e10224ae8849fe290a821955c9f77299187ac'
+
+// encoding 32 bytes seed and DID
+export const testShares = [
+  '801Uxst+XTNWWFyv4Wq5Lklut53gZIln4KnvqsOVp03cNFGpG2/cK2GKGCWYGnkp/PRk59MAL2oW9k/oxgGJgfWY3umXogCh9/7ao+O9qbNNi//1CH68lLknqWx0p/a1npoO7MKqERc0DrvGOnnQC5VQHDdLTC9fsUYXa8so9sbtkpXkrCPBc0d01yOp4sy2mnkU08/RRLP7fQN1P6Jiw8NrYwGFC5wXm6ZX1AqPxx0x/2TgQ1tevaR+o2ZOS3qdsejfjDEUhXjtj8WUAHMclG5avMpxrVo7mnBoGeh7eZ05PqSVRr3OXUpGq9M+RpCl3BX1HORmRdxAhVTnoddp1euUfPIUx4cEJej4OfsBju/eRB5pdagG+5yx5EHkegDjL34',
+  '80212rnpIxgUTPuxvBYi4VF+/+mCkkqvesBSDD367JFfXSfi0ylMbsCea4fbGHU1bcj39a3so7MCR0SWss4Ruu7s9ibT8IA7jV7Z+yUAuLQDTv4R24EzZ+L3rHhW40slcNrKi+iM16CS7p60VO2mmbISug+2lbyJ4eqHcj6RJ4MqcJzB5o/o/0AY4h8CqFm2C0GGRELLDhRt22ETUX/pytuIvWNjoLPZm0y1LLcHSdinMOe88+98eqTwG0thS8w0uFjBFA2tpLwEMzq4JzgnIT4BEw2d3Q0RpNDu0lZCukhvLtJqdk/tHHyZeZq7Rmt95qEsdcd/7T8AHJ9E2YOh2IWWkpUi8s63iI51C6qlrww4guIvYy/NL+jZDS/51fbPaLA',
+  '803hHAguSrT8UoQHdwbBvtFRYZ0i4YPAGnF9vr5ii9KDZTZFiEjQSSEZs6+DG4wS0SRTHz7hzNdUvUty9MGYI1t4KMEEXgCDOrmDVoawEQlOywH9k+fP/lvchRiiSL2crlmEa+o+Bq6m7WV/Lo12n2db5iH91RPbUKHQATW1kVxH+0k9CrVpgkdg9SQrRhUZ0SGSj00Dyr/WruJtbtULBJju3npmpm/XQOSi9T2QTt3Ww0NRsLhi3gCD+CDvDvawCb0egLygYd1ppX8gZ0f7rBBDb8psaVckfrmG0v4gQ9iWHXbysOujTfbRkkWFDXvUuqxZZaMA6PsAlYuveFiIAO4P7ms2OYmr7X+NPpG9Ye5my7xKVoqL2nRmqWKdt7Ykx9j',
+  '804araykVLLRw1+GR9KA4F4pYVxQBPJxiRcNIR46hdTtOFvLvoSAa9IduSmUgyx714HFHzPtYLB1MqJo0DVpG1DvxVedZEQOwi0OCRb3i+Jg4qBSGyOV/5uacCOGYh2pUcpOQ+7iMPXaUgqIuzeQRoYsu0Ek2eXNFMlnJBb9vXICPW145KnxWjonc0Vbd7EXYFB9C/fwgDYrmNX5CDn2a0R/BA9o3g/qiRqAB6/oDLDGRePXfDk64OxB29y7O2jZwoXz2TaEONpuU/2wmdI2KSLZH7OUcLf0CL31J2qPy9h3A9PbDxRSqhD6X82z6nj19y5b2SyrSeIEJux4wX0ZPxtQmrmv2x8awDBkZPoSmoemYT46vHyYPNaSUSOlOn4eWpX',
+  '805Oax1jPR453SAwjMJjv94G/yjwdzse6aYik52i4pcxAEps5eUcTDOaYQHMgNVca21h9aDgD9QjyK2MljrgguV7G7BKysS2dcpUpLVHIl8tZ1++U0VpZiKxWUNyyesQj0kAo+xQ4fvuUfFDwVdAQFNl529vmUqfpYIwVx3ZC61vtriECJNwJz1fZH5ymf24ujBpwPg4RJ2Q7VaHN5MUpQcZZxZt2NPkUrKX3iV/C7W3tkc6P24kREgyOLc1flJdc2AsTYeJ/bsDxbgo2a3qpAybY3RlxO3B0tSdJ8LtMkiOMHdDybAc+5qytBKNoWhcqyMuyUjUTCYEr/iTYKYw53DJ5ke7EFgGpcGcUcEKVGX4KGBfidneyUot9W7BWD719f0',
+]

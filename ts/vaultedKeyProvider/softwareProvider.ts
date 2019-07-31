@@ -196,7 +196,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
       this._encryptedSeed,
       this._iv,
     )
-    if (did) return entropyToMnemonic(did) + ' ' + entropyToMnemonic(seed)
+    if (did) return entropyToMnemonic(seed) + ' ' + entropyToMnemonic(did)
     return entropyToMnemonic(seed)
   }
 
@@ -208,7 +208,6 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param derivationArgs.derivationPath - The bip32 derivation path
    * @example `await vault.signDigestable(derivationArgs, publicProfileCredential) // Buffer <...>`
    */
-
   public async signDigestable(
     derivationArgs: IKeyDerivationArgs,
     toSign: IDigestable,

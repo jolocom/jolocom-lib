@@ -243,11 +243,10 @@ describe('Software Vaulted Key Provider', () => {
 
     it('should return mnemonic phrase containing the DID', () => {
       const idString = mockDid.substring(mockDid.lastIndexOf(':') + 1)
-      console.log(idString)
       expect(
         vault.getMnemonic(keyDerivationArgs.encryptionPass, idString),
       ).to.eq(
-        'ready put cup oblige divorce boost all hedgehog peasant rule item pepper aware brother treat middle spin tooth diet crack skill trap fruit undo primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary foster',
+        'primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary fetch primary foster ready put cup oblige divorce boost all hedgehog peasant rule item pepper aware brother treat middle spin tooth diet crack skill trap fruit undo',
       )
     })
   })
