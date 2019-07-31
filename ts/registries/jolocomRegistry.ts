@@ -22,7 +22,12 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
-import {createJolocomResolver, MultiResolver} from '../resolver'
+import {
+  createJolocomResolver,
+  createValidatingResolver,
+  MultiResolver,
+} from '../resolver'
+import { noValidation } from '../utils/validation'
 
 /**
  * @class
@@ -261,8 +266,12 @@ export const createJolocomRegistry = (
 ): JolocomRegistry => {
   const { ipfsConnector, contracts, ethereumConnector } = configuration
 
+  const validatingJolocomResolver = createValidatingResolver(
+    createJolocomResolver(ethereumConnector, ipfsConnector),
+  )(noValidation)
+
   const multiResolver = new MultiResolver({
-    jolo: createJolocomResolver(ethereumConnector, ipfsConnector)
+    jolo: validatingJolocomResolver,
   })
 
   const jolocomRegistry = new JolocomRegistry(multiResolver)
