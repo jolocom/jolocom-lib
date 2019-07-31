@@ -9,11 +9,8 @@ import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import {
   invalidSignature,
-  validSignature,
   validSignedCredReqJWT,
-  validSignedCredResJWT,
-  invalidNonce,
-  validNonce,
+  invalidNonce, validSignedCredResJWT
 } from '../data/interactionTokens/jsonWebToken.data'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
@@ -32,11 +29,12 @@ describe('IdentityWallet validate JWT', () => {
 
   let iw: IdentityWallet
 
-  before(() => {
+  beforeEach(() => {
     sinon.useFakeTimers()
     sandbox
       .stub(JolocomRegistry.prototype, 'resolve')
       .resolves(Identity.fromDidDocument({ didDocument }))
+
     iw = new IdentityWallet({
       identity,
       vaultedKeyProvider: vault,
@@ -49,38 +47,70 @@ describe('IdentityWallet validate JWT', () => {
     })
   })
 
-  after(() => {
+  afterEach(() => {
     sandbox.restore()
   })
 
-  it('Should sucessfully perform necessary validation steps on received jwt', async () => {
-    try {
-      await iw.validateJWT(JSONWebToken.fromJSON(validSignedCredReqJWT))
-    } catch (err) {
-      expect(false).to.be.true
-    }
+  it('Should sucessfully perform necessary validation steps on received jwt', done => {
+    iw.validateJWT(JSONWebToken.fromJSON(validSignedCredReqJWT)).then(
+      done,
+      done,
+    )
   })
 
   it('Should throw error on invalid signature', async () => {
-    validSignedCredReqJWT.signature = invalidSignature
+    const tokenWithInvalidSignature = {
+      ...validSignedCredReqJWT,
+      signature: invalidSignature,
+    }
     try {
-      await iw.validateJWT(JSONWebToken.fromJSON(validSignedCredReqJWT))
+      await iw.validateJWT(JSONWebToken.fromJSON(tokenWithInvalidSignature))
     } catch (err) {
-      validSignedCredReqJWT.signature = validSignature
       expect(err.message).to.eq('Signature on token is invalid')
     }
   })
 
-  it('Should thow error on invalid nonce', async () => {
-    validSignedCredReqJWT.payload.jti = invalidNonce
+  it('Should throw error on invalid nonce', async () => {
+    const tokenWIthInvalidNonce = {
+      ...validSignedCredResJWT,
+      payload: {
+        ...validSignedCredResJWT.payload,
+        nonce: invalidNonce,
+      },
+    }
+
+    /** @dev Restored in afterEach */
+    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+
     try {
       await iw.validateJWT(
-        JSONWebToken.fromJSON(validSignedCredResJWT),
-        JSONWebToken.fromJSON(validSignedCredReqJWT),
+        JSONWebToken.fromJSON(tokenWIthInvalidNonce),
+        JSONWebToken.fromJSON(validSignedCredReqJWT)
       )
     } catch (err) {
-      validSignedCredReqJWT.payload.jti = validNonce
       expect(err.message).to.eq('The token nonce deviates from request')
+    }
+  })
+
+  it('Should throw error if the aud is not correct', async () => {
+    const tokenWIthInvalidAud = {
+      ...validSignedCredResJWT,
+      payload: {
+        ...validSignedCredReqJWT.payload,
+        aud: 'did:jolo:ff'
+      },
+    }
+
+    /** @dev Restored in afterEach */
+    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+
+    try {
+      await iw.validateJWT(
+        JSONWebToken.fromJSON(tokenWIthInvalidAud),
+        JSONWebToken.fromJSON(validSignedCredReqJWT)
+      )
+    } catch (err) {
+      expect(err.message).to.eq('You are not the intended audience of received token')
     }
   })
 })

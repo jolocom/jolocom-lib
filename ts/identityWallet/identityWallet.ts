@@ -33,7 +33,6 @@ import {
   handleValidationStatus,
   publicKeyToAddress,
 } from '../utils/helper'
-import { generateRandomID } from '../utils/crypto'
 import { createJolocomRegistry } from '../registries/jolocomRegistry'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 import {
@@ -464,7 +463,7 @@ export class IdentityWallet {
     receivedJWT ? (jwt.audience = keyIdToDid(receivedJWT.issuer)) : null
     receivedJWT
       ? (jwt.nonce = receivedJWT.nonce)
-      : (jwt.nonce = generateRandomID(8))
+      : (jwt.nonce = SoftwareKeyProvider.getRandom(8).toString('hex'))
 
     const signature = await this.vaultedKeyProvider.signDigestable(
       { derivationPath, encryptionPass: pass },

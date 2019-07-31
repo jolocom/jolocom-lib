@@ -8,7 +8,7 @@ import {
   Transform,
 } from 'class-transformer'
 import { canonize } from 'jsonld'
-import { generateRandomID, sha256 } from '../../utils/crypto'
+import { sha256 } from '../../utils/crypto'
 import { ISignedCredentialAttrs, ISignedCredCreationArgs } from './types'
 import {
   ILinkedDataSignature,
@@ -391,6 +391,5 @@ export class SignedCredential implements IDigestable {
  * @param length - The length of the random part of the identifier
  */
 
-const generateClaimId = (length: number): string => {
-  return `claimId:${generateRandomID(length)}`
-}
+const generateClaimId = (length: number): string =>
+  `claimId:${SoftwareKeyProvider.getRandom(length).toString('hex')}`

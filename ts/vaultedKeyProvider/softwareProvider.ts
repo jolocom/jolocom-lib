@@ -1,33 +1,67 @@
 import { fromSeed } from 'bip32'
-import { randomBytes, createCipher, createDecipher } from 'crypto'
+import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
+import { sha256 } from '../utils/crypto'
+
+const ALG = 'aes-256-cbc'
+
+/** @dev length in bytes */
+const PASSWORD_LENGTH = 32
+const CIPHERTEXT_LENGTH = 48
+const IV_LENGTH = 16
+const ENCRYPTED_SEED_LENGTH = IV_LENGTH + CIPHERTEXT_LENGTH
 
 export class SoftwareKeyProvider implements IVaultedKeyProvider {
-  public readonly encryptedSeed: Buffer
+  private readonly _encryptedSeed: Buffer
+  private readonly _iv: Buffer
 
   /**
    * Initializes the vault with an already encrypted aes 256 cbc seed
-   * @param encryptedSeed
+   * @param encryptedSeed - the ciphertext; format: IV || ciphertext, where '||' denotes concatenation
    */
+
   public constructor(encryptedSeed: Buffer) {
-    this.encryptedSeed = encryptedSeed
+    if (encryptedSeed.length !== ENCRYPTED_SEED_LENGTH) {
+      throw new Error(
+        `Expected encrypted seed to be ${ENCRYPTED_SEED_LENGTH} bytes long (${IV_LENGTH} IV + ${CIPHERTEXT_LENGTH} ciphertext), got ${
+          encryptedSeed.length
+        }`,
+      )
+    }
+
+    this._iv = encryptedSeed.slice(0, IV_LENGTH)
+    this._encryptedSeed = encryptedSeed.slice(IV_LENGTH)
+  }
+
+  /**
+   * Get the encrypted seed; format: IV || ciphertext, where '||' denotes concatenation
+   */
+
+  public get encryptedSeed() {
+    return Buffer.concat([this._iv, this._encryptedSeed])
   }
 
   /**
    * Initializes the vault with the aes 256 cbc encrypted seed
    * @param seed - 32 byte seed for creating bip32 wallet
-   * @param encryptionPass - password used to generate encryption cipher
+   * @param encryptionPass - password used to generate encryption cipher, UTF-8, 32 bytes
    * @example `const vault = new SoftwareKeyProvider(Buffer.from('abc...', 'hex'), 'secret')`
    */
   public static fromSeed(
     seed: Buffer,
     encryptionPass: string,
   ): SoftwareKeyProvider {
-    const encryptedSeed = SoftwareKeyProvider.encrypt(encryptionPass, seed)
-    return new SoftwareKeyProvider(encryptedSeed)
+    const iv = SoftwareKeyProvider.getRandom(IV_LENGTH)
+    const encryptedSeed = SoftwareKeyProvider.encrypt(
+      SoftwareKeyProvider.normalizePassword(encryptionPass),
+      seed,
+      iv,
+    )
+
+    return new SoftwareKeyProvider(Buffer.concat([iv, encryptedSeed]))
   }
 
   /**
@@ -44,6 +78,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     if (!validateMnemonic(mnemonic)) {
       throw new Error('Invalid Mnemonic.')
     }
+
     const seed = Buffer.from(mnemonicToEntropy(mnemonic), 'hex')
     return SoftwareKeyProvider.fromSeed(seed, encryptionPass)
   }
@@ -56,7 +91,12 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   public getPublicKey(derivationArgs: IKeyDerivationArgs): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
-    const seed = SoftwareKeyProvider.decrypt(encryptionPass, this.encryptedSeed)
+
+    const seed = SoftwareKeyProvider.decrypt(
+      SoftwareKeyProvider.normalizePassword(encryptionPass),
+      this._encryptedSeed,
+      this._iv,
+    )
     return fromSeed(seed).derivePath(derivationPath).publicKey
   }
 
@@ -80,7 +120,11 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   public sign(derivationArgs: IKeyDerivationArgs, digest: Buffer): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
-    const seed = SoftwareKeyProvider.decrypt(encryptionPass, this.encryptedSeed)
+    const seed = SoftwareKeyProvider.decrypt(
+      SoftwareKeyProvider.normalizePassword(encryptionPass),
+      this._encryptedSeed,
+      this._iv,
+    )
     const signingKey = fromSeed(seed).derivePath(derivationPath)
     return signingKey.sign(digest)
   }
@@ -110,7 +154,11 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   public getPrivateKey(derivationArgs: IKeyDerivationArgs): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
-    const seed = SoftwareKeyProvider.decrypt(encryptionPass, this.encryptedSeed)
+    const seed = SoftwareKeyProvider.decrypt(
+      SoftwareKeyProvider.normalizePassword(encryptionPass),
+      this._encryptedSeed,
+      this._iv,
+    )
 
     console.warn('METHOD WILL BE DEPRECATED SOON, ANTIPATTERN')
     return fromSeed(seed).derivePath(derivationPath).privateKey
@@ -118,10 +166,14 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   /**
    * Returns the mnemonic of the stored seed
-   * @param password - Password for seed decryption
+   * @param encryptionPass - Password for seed decryption
    */
-  public getMnemonic(password: string): string {
-    const seed = SoftwareKeyProvider.decrypt(password, this.encryptedSeed)
+  public getMnemonic(encryptionPass: string): string {
+    const seed = SoftwareKeyProvider.decrypt(
+      SoftwareKeyProvider.normalizePassword(encryptionPass),
+      this._encryptedSeed,
+      this._iv,
+    )
     return entropyToMnemonic(seed)
   }
 
@@ -161,24 +213,49 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   /**
    * Encrypts data using the aes 256 cbc cipher
    * @param data - The data to encrypt
-   * @param password - The encrpyion password
-   * @example `this.encrypt('secret', Buffer.from('abc..fe', 'hex'))`
+   * @param key - The encryption key
+   * @param iv - Random initialisation vector
    */
 
-  private static encrypt(password: string, data: Buffer): Buffer {
-    const cipher = createCipher('aes-256-cbc', password)
+  private static encrypt(key: Buffer, data: Buffer, iv: Buffer): Buffer {
+    const cipher = createCipheriv(ALG, key, iv)
     return Buffer.concat([cipher.update(data), cipher.final()])
   }
 
   /**
-   * Dencrypts data using the aes 256 cbc cipher
-   * @param data - The data to dencrypt
-   * @param password - The dencrpyion password
-   * @example `this.dencrypt('secret', encrypted)`
+   * Decrypts data using the aes 256 cbc cipher
+   * @param data - The data to decrypt
+   * @param key - The decryption password
+   * @param iv - Random initialisation vector
    */
 
-  private static decrypt(password: string, data: Buffer): Buffer {
-    const decipher = createDecipher('aes-256-cbc', password)
+  private static decrypt(key: Buffer, data: Buffer, iv: Buffer): Buffer {
+    const decipher = createDecipheriv(ALG, key, iv)
     return Buffer.concat([decipher.update(data), decipher.final()])
+  }
+
+  /**
+   * aes 256 cbc with IV requires 32 byte encryption keys, in case the user provided
+   *  password is not long enough, we digest it using sha256 and print a warning instead
+   *  of throwing an error
+   * @param password - The user provided password, treated as UTF-8 string
+   * @returns normalizePassword - 32 byte long buffer used as encryption key, either original password, or it's sha256 digest
+   */
+
+  private static normalizePassword(password: string): Buffer {
+    const passwordBuffer = Buffer.from(password)
+
+    if (!passwordBuffer.length) return
+    if (passwordBuffer.length !== PASSWORD_LENGTH) {
+      console.warn(
+        `Provided password must have a length of ${PASSWORD_LENGTH} bytes, received ${
+          passwordBuffer.length
+        }. We will compute the sha256 hash of the provided password and use it instead`,
+      )
+
+      return sha256(passwordBuffer)
+    }
+
+    return passwordBuffer
   }
 }

@@ -1,5 +1,4 @@
 import { simpleCredRequestJSON } from './credentialRequest.data'
-import { mockKeyId } from '../didDocument.data'
 import { credentialSet } from './credentialRequest.data'
 
 /* Credential request wrapped in signed JWT*/
@@ -19,8 +18,6 @@ export const validSignedCredReqJWT = {
     'd904b6ca775f555121012ed7ec55be5958703411f5e9af0d93f17994d5e3bb3b3afdbb49216ffc0b005562d928690e4c94803e9f17ac811480dc0fff46b28623',
 }
 
-export const validSignature =
-  'd904b6ca775f555121012ed7ec55be5958703411f5e9af0d93f17994d5e3bb3b3afdbb49216ffc0b005562d928690e4c94803e9f17ac811480dc0fff46b28623'
 export const invalidSignature =
   'd904b6ca775f555121012ed7ec55be5958703411f5e9af0d93f17994d5e3bb3b3afdbb49216ffc0b005562d928690e4c94803e9f17ac811480dc0fff46b28613'
 
@@ -44,8 +41,7 @@ export const validSignedCredResJWT = {
   header: { typ: 'JWT', alg: 'ES256K' },
 }
 
-export const validNonce = '2a97b35fe74b5'
-export const invalidNonce = 'hhhhhhhhhhhhh'
+export const invalidNonce = 'h'.repeat(16)
 
 /* Same credential request in base64 encoded form */
 
