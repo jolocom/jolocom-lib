@@ -82,7 +82,6 @@ describe('IdentityWallet validate JWT', () => {
     /** @dev Restored in afterEach */
     sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
 
-    console.log(tokenWIthInvalidNonce)
     try {
       await iw.validateJWT(
         JSONWebToken.fromJSON(tokenWIthInvalidNonce),
