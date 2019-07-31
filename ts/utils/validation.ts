@@ -2,6 +2,7 @@ import { JolocomLib } from '../index'
 import { IDigestable } from '../linkedDataSignature/types'
 import { getIssuerPublicKey } from './helper'
 import { IRegistry } from '../registries/types'
+import {IDidDocumentAttrs} from '../identity/didDocument/types'
 
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
@@ -47,3 +48,8 @@ export const validateDigestables = async (
       validateDigestable(digestable, customRegistry),
     ),
   )
+
+/** @TODO replace the validation function once the JSON validation function is added */
+export const noValidation = async (didDocument: IDidDocumentAttrs) => {
+  return !!didDocument;
+}
