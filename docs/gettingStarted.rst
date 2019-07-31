@@ -62,18 +62,17 @@ How to create a self-sovereign identity
 
 In broad strokes, the creation of a self-sovereign identity comprises the following steps:
 
-* Instantiate the ``SoftwareKeyProvider`` class by providing a 32 byte random seed ``Buffer``, and a password for encryption
-* Use the ``keyProvider`` to derive two keys, one to control your Jolocom identity, the other to sign Ethereum transactions
-* Transfer a small amount of ether to your second key to later pay for updating the registry contract
-* Instantiate and use a ``JolocomRegistry`` to anchor the newly created DID document on the Ethereum network
+* Instantiate a ``SoftwareKeyProvider``
+* Use the instantiated ``keyProvider`` to derive two keys, one to control your Jolocom identity, and another one to sign Ethereum transactions (e.g. for anchoring the identity, rotating keys, etc.)
+* Fuel the second derived key with enough Ether to pay for the transaction anchoring the identity
+* Instantiate and use the ``JolocomRegistry`` to create and anchor the DID document on the Ethereum network
 
-The following sections present these steps in greater detail.
+The following sections elaborate on these steps.
 
 **Instantiate the Key Provider class**
 
 The ``SoftwareKeyProvider`` class abstracts all functionality related to `deriving key pairs <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ and creating / validating cryptographic signatures.
-The 32 byte seed used to instantiate the key provider is persisted in the instance, encrypted using the provided password.  Therefore, all operations which involve key derivation require the password as well.
-This is what instantiating a key provider looks like:
+Currently two ways of instantiating the class are supported, namely using the constructor or using the static ``fromSeed`` method:
 
 .. code-block:: typescript
 
@@ -82,11 +81,31 @@ This is what instantiating a key provider looks like:
 
   // Feel free to use a better rng module
   const seed = crypto.randomBytes(32)
-  const password = 'correct horse battery staple'
+  const password = 'secret'
 
-  const vaultedKeyProvider = new JolocomLib.KeyProvider(seed, password)
+  const vaultedKeyProvider = JolocomLib.KeyProvider.fromSeed(seed, password)
 
-.. note:: In the next release, the constructor will be modified to require only the encrypted seed value, thereby reducing the amount of time during which the seed is exposed.
+In the snippet above the ``fromSeed`` method is used. It takes the seed in cleartext, and a password that will be used as a key to encrypt the provided seed on the instance.
+
+.. note:: The password must be 32 bytes long **(the expected encoding is UTF-8)**. In case a password of a different length is provided (e.g. the example above), it will be hashed using ``sha256`` internally before usage. An appropriate warning will be printed to the console.
+
+The encrypted seed can be retrieved from the class instance using:
+
+.. code-block:: typescript
+
+  const encryptedSeed = vaultedKeyProvider.encryptedSeed
+
+.. note:: The returned value is a 64 byte ``Buffer``, containing the initialization vector (IV) (16 bytes) concatenated with the ciphertext (48 bytes). ``aes-256-cbc`` is used for encryption.
+
+The alternative way to instantiate the class by using it's constructor:
+
+.. code-block:: typescript
+
+  import { JolocomLib } from 'jolocom-lib'
+
+  const vaultedKeyProvider = new JolocomLib.KeyProvider(encryptedSeed)
+
+.. note:: The expected value for ``encryptedSeed`` is a 64 byte ``Buffer``, containing the initialization vector (IV) (16 bytes) concatenated with the ciphertext (48 bytes). ``aes-256-cbc`` will be used for decryption.
 
 **Derive a key to sign the Ethereum transaction**
 
