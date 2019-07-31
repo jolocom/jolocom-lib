@@ -20,15 +20,15 @@ export class SocialRecovery {
     return share(labeledSecret, amount, threshold)
   }
 
-  public static validateShard(horcurx: string): any {
-    return validateShard(horcurx, darkCrystalVersion)
+  public static validateShard(shards: string): any {
+    return validateShard(shards, darkCrystalVersion)
   }
 
   public static combineShard(
-    horcruxes: string[],
+    shards: string[],
   ): { did: string; secret: string } {
     const result = unpack(
-      combine(horcruxes, darkCrystalVersion),
+      combine(shards, darkCrystalVersion),
       darkCrystalVersion,
     )
 

@@ -4,26 +4,26 @@ import { testDID32, testSecret32, testShares } from '../data/recovery.data'
 
 describe('Social Recovery', () => {
   it('should create and combine', function() {
-    const shards = 255
+    const amount = 255
     const threshold = 50
-    const horcruxes = SocialRecovery.createShards(
+    const shards = SocialRecovery.createShards(
       testDID32,
       testSecret32,
-      shards,
+      amount,
       threshold,
     )
 
     const { did, secret } = SocialRecovery.combineShard(
-      horcruxes.slice(0, threshold),
+      shards.slice(0, threshold),
     )
     expect(secret).to.equal(testSecret32)
     expect(did).to.equal(testDID32)
   })
 
   it('should create shares correctly', () => {
-    const horcruxes = SocialRecovery.createShards(testDID32, testSecret32, 5, 3)
-    console.log(horcruxes)
-    expect(horcruxes.length).to.equal(5)
+    const shards = SocialRecovery.createShards(testDID32, testSecret32, 5, 3)
+    console.log(shards)
+    expect(shards.length).to.equal(5)
   })
 
   it('should combine shares correctly', () => {
