@@ -15,17 +15,32 @@ export function sha256(data: Buffer): Buffer {
 }
 
 /**
- * Converts a public key to the corresponding did
- * @param publicKey
- * @example `publicKeyToDid(Buffer.from('03848a...', 'hex')) // 'did:jolo:...'`
- * @ignore
+ * @TODO Find better place for these.
+ */
+type DigestFunction = (toDigest: Buffer) => Buffer
+export type DidBuilder = (publicKey: Buffer) => string
+
+/**
+ * Curried function for assembling a {@link DidBuilder}.
+ *   Curried to take a DID prefix string, followed by a {@link DigestFunction} (used for generating the ID from the public key)
+ * @param prefix: DID method prefix, e.g. 'jolo'
+ * @example `publicKeyToDid('jolo')(Buffer.from('03848a...', 'hex')) // 'did:jolo:...'`
+ * @returns - configured {@link DidBuilder}
  */
 
-export function publicKeyToDID(publicKey: Buffer): string {
-  const prefix = 'did:jolo:'
-  const suffix = keccak256(publicKey)
-  return prefix + suffix.toString('hex')
-}
+export const publicKeyToDID = (prefix: string) => (
+  digestFunction: DigestFunction,
+): DidBuilder => publicKey =>
+  `did:${prefix}:${digestFunction(publicKey).toString('hex')}`
+
+/**
+ * Creates a {@link DidBuilder} configured to generate Jolocom DIDs (e.g. "did:jolo:aaa...aaa")
+ * @param publicKey - A buffer containing the user's public identity key.
+ * @example `publicKeyToJoloDID(Buffer.from('03848a...', 'hex')) // 'did:jolo:...'`
+ * @returns
+ */
+
+export const publicKeyToJoloDID = publicKeyToDID('jolo')(keccak256)
 
 /**
  * Returns the did method prefix, given a did
