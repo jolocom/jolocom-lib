@@ -10,19 +10,29 @@ import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { CredentialResponse } from '../../ts/interactionTokens/credentialResponse'
 import { keyIdToDid } from '../../ts/utils/helper'
-import {
-  userIdentityWallet,
-  serviceIdentityWallet,
-  resolver,
-} from './identity.integration'
+import { DependencyIndex } from './index'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe('Integration Test - Token interaction flow Credential Request and Response', () => {
+export const credentialShare = (
+  dependencies: Partial<DependencyIndex>,
+) => () => {
   let credRequestJWT
   let credRequestEncoded
   let credResponseEncoded
+
+  let jolocomRegistry
+  let userIdentityWallet
+  let serviceIdentityWallet
+  let resolver
+
+  before(() => {
+    resolver = dependencies.resolver
+    jolocomRegistry = dependencies.jolocomRegistry
+    userIdentityWallet = dependencies.userIdentityWallet
+    serviceIdentityWallet = dependencies.serviceIdentityWallet
+  })
 
   it('Should correctly create a credential request token by service', async () => {
     credRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.share(
@@ -100,4 +110,4 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
       ),
     ).to.be.true
   })
-})
+}

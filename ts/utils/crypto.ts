@@ -37,7 +37,7 @@ export const publicKeyToDID = (prefix: string) => (
  * Creates a {@link DidBuilder} configured to generate Jolocom DIDs (e.g. "did:jolo:aaa...aaa")
  * @param publicKey - A buffer containing the user's public identity key.
  * @example `publicKeyToJoloDID(Buffer.from('03848a...', 'hex')) // 'did:jolo:...'`
- * @returns
+ * @returns - configured {@link DidBuilder}
  */
 
 export const publicKeyToJoloDID = publicKeyToDID('jolo')(keccak256)

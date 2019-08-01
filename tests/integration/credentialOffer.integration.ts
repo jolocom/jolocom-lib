@@ -7,25 +7,35 @@ import {
   credentialOfferRequestCreationArgs,
   credentialOfferResponseCreationArgs,
 } from '../data/interactionTokens/credentialOffer.data'
-import {
-  userIdentityWallet,
-  serviceIdentityWallet,
-  resolver,
-} from './identity.integration'
 import { claimsMetadata } from 'cred-types-jolocom-core'
 import { CredentialsReceive } from '../../ts/interactionTokens/credentialsReceive'
 import { CredentialOfferRequest } from '../../ts/interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../../ts/interactionTokens/credentialOfferResponse'
+import { DependencyIndex } from './index'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe('Integration Test - Token interaction flow Credential Offer', () => {
+export const credentialOffer = (
+  dependencies: Partial<DependencyIndex>,
+) => () => {
   let credOfferRequestJWT
   let credOfferRequestEncoded
   let credOfferResponseJWT
   let credOfferResponseEncoded
   let credReceiveEncoded
+
+  let jolocomRegistry
+  let userIdentityWallet
+  let serviceIdentityWallet
+  let resolver
+
+  before(() => {
+    resolver = dependencies.resolver
+    jolocomRegistry = dependencies.jolocomRegistry
+    userIdentityWallet = dependencies.userIdentityWallet
+    serviceIdentityWallet = dependencies.serviceIdentityWallet
+  })
 
   it('Should correctly create a credential offer request token by service', async () => {
     credOfferRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.offer(
@@ -150,4 +160,4 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       decodedCredReceive.interactionToken.signedCredentials[0].subject,
     ).to.eq(userIdentityWallet.did)
   })
-})
+}

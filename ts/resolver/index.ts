@@ -113,6 +113,7 @@ export class MultiResolver {
     return resolver(did)
   }
 }
+
 export const mutliResolver = new MultiResolver({
   jolo: createValidatingResolver(
     createJolocomResolver(jolocomEthereumResolver, jolocomIpfsStorageAgent),

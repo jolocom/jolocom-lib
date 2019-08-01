@@ -14,7 +14,6 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { publicProfileCredJSON } from '../data/identity.data'
 import { Identity } from '../../ts/identity/identity'
 import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
-import { MultiResolver } from '../../ts/resolver'
 
 describe('Jolocom Registry - resolve', () => {
   let registry: any = createJolocomRegistry()
@@ -79,7 +78,8 @@ describe('Jolocom Registry - resolve', () => {
 
   it('should correctly use custom resolution function if passed', async () => {
     const testResolver = sinon.stub().returns(didDocumentJSON)
-    const registry = new JolocomRegistry(testResolver)
+    const testDidBuilder = sinon.stub().returns('did:test:0')
+    const registry = new JolocomRegistry(testResolver, testDidBuilder)
     expect(registry.resolver).to.deep.eq(testResolver)
   })
 })
