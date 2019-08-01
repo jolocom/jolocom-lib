@@ -22,13 +22,9 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
-import {
-  createJolocomResolver,
-  createValidatingResolver,
-  MultiResolver,
-} from '../resolver'
-import { noValidation } from '../utils/validation'
-import { DidDocumentResolver } from '../resolver/types'
+import {createJolocomResolver, createValidatingResolver, MultiResolver, validatingJolocomResolver} from '../resolver'
+import {DidDocumentResolver} from '../resolver/types'
+import {noValidation} from '../utils/validation'
 
 /**
  * @class
@@ -46,10 +42,10 @@ export class JolocomRegistry implements IRegistry {
   /**
    * Instantiates a new {@link JolocomRegistry}.
    * @param resolver - instance of a {@link MultiResolver} used by the registry for resolving identities
-   * @param didBuilder - custom function to assemble DIDs given a public key, defaults to {@link publicKeyToJoloDID}
+   * @param didBuilder - custom function to assemble DIDs given a public key, for example {@link publicKeyToJoloDID}
    */
 
-  constructor(resolver: DidDocumentResolver, didBuilder = publicKeyToJoloDID) {
+  constructor(resolver: DidDocumentResolver, didBuilder) {
     this.resolver = resolver
     this.didBuilder = didBuilder
   }
@@ -74,7 +70,11 @@ export class JolocomRegistry implements IRegistry {
 
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
 
-    const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
+    const didDocument = await DidDocument.fromPublicKey(
+      publicIdentityKey,
+      this.didBuilder,
+    )
+
     const didDocumentSignature = await vaultedKeyProvider.signDigestable(
       derivationArgs,
       didDocument,
@@ -279,19 +279,19 @@ export const createJolocomRegistry = (
     ipfsConnector,
     contracts,
     ethereumConnector,
-    didResolver,
+    didResolver: customResolver,
     didBuilder: customDidBuilder
   } = configuration
 
-  const validatingJolocomResolver =
-    didResolver ||
+  const didResolver =
+    customResolver ||
     createValidatingResolver(
       createJolocomResolver(ethereumConnector, ipfsConnector),
       noValidation,
     )
 
   const didBuilder = customDidBuilder || publicKeyToJoloDID
-  const jolocomRegistry = new JolocomRegistry(validatingJolocomResolver, didBuilder)
+  const jolocomRegistry = new JolocomRegistry(didResolver, didBuilder)
 
   jolocomRegistry.ipfsConnector = ipfsConnector
   jolocomRegistry.ethereumConnector = ethereumConnector

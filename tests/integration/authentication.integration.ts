@@ -5,19 +5,29 @@ import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { keyIdToDid } from '../../ts/utils/helper'
 import { jsonAuthentication } from '../data/interactionTokens/authentication.data'
 import { Authentication } from '../../ts/interactionTokens/authentication'
-import {
-  userIdentityWallet,
-  serviceIdentityWallet,
-  resolver,
-} from './identity.integration'
+import { DependencyIndex } from './index'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe('Integration Test - Token interaction flow Authentication', () => {
+export const authenticationRequest = (
+  dependencies: Partial<DependencyIndex>,
+) => () => {
   let authRequestJWT
   let authRequestEncoded
   let authResponseEncoded
+
+  let jolocomRegistry
+  let userIdentityWallet
+  let serviceIdentityWallet
+  let resolver
+
+  before(() => {
+    resolver = dependencies.resolver
+    jolocomRegistry = dependencies.jolocomRegistry
+    userIdentityWallet = dependencies.userIdentityWallet
+    serviceIdentityWallet = dependencies.serviceIdentityWallet
+  })
 
   it('Should correctly create an authentication request token by service', async () => {
     authRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.auth(
@@ -80,4 +90,4 @@ describe('Integration Test - Token interaction flow Authentication', () => {
       return expect(true).to.be.false
     }
   })
-})
+}
