@@ -32,15 +32,15 @@ export const createValidatingResolver: ValidatingDidResolver = (
 }
 
 /**
- * Creates a configured Jolocom {@link DidDocumentResolver}
+ * Creates a configurable Jolocom {@link DidDocumentResolver}
  * @param ethereumConnector - Instance of an Ethereum connector to interface with Ethereum
  * @param ipfsConnector - Instance of IPFS connector to interface with IPFS
  * @returns DidDocumentResolver configured to resolve identities according to the Jolocom method spec
  */
 
 export const createJolocomResolver = (
-  ethereumConnector: IEthereumConnector,
-  ipfsConnector: IIpfsConnector,
+  ethereumConnector: IEthereumConnector = jolocomEthereumResolver,
+  ipfsConnector: IIpfsConnector = jolocomIpfsStorageAgent,
 ): DidDocumentResolver => async (did: string) => {
   const didDocumentHash = await ethereumConnector.resolveDID(did)
 
@@ -51,6 +51,12 @@ export const createJolocomResolver = (
   /** @TODO Use an http agent, so that ipfsConnector.catJSON<IDidDocumentAttrs>() can be used */
   return ipfsConnector.catJSON(didDocumentHash) as Promise<IDidDocumentAttrs>
 }
+
+/**
+ * Default {@link ValidatingDidResolver} used for `did:jolo` DIDs
+ */
+
+export const validatingJolocomResolver = createValidatingResolver(createJolocomResolver(), noValidation)
 
 /**
  * @description Class aggregating multiple {@link ValidatingDidResolver}, and delegating

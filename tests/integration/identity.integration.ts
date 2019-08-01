@@ -34,7 +34,6 @@ export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
 export let testContractsGateway: ContractsGateway
 export let testContractsAdapter: ContractsAdapter
-export let resolver: MultiResolver
 
 before(async () => {
   const {
@@ -45,17 +44,14 @@ before(async () => {
   testContractsGateway = gateway
   testContractsAdapter = adapter
 
-  resolver = new MultiResolver({
-    jolo: createJolocomResolver(
-      new EthResolver(testEthereumConfig),
-      new IpfsStorageAgent(testIpfsConfig),
-    ),
-  })
+  const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
+  const ethereumConnector = new EthResolver(testEthereumConfig)
 
   jolocomRegistry = createJolocomRegistry({
-    ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
-    ethereumConnector: new EthResolver(testEthereumConfig),
+    ipfsConnector,
+    ethereumConnector,
     contracts: { gateway, adapter },
+    didResolver: createJolocomResolver(ethereumConnector, ipfsConnector)
   })
 
   userIdentityWallet = await jolocomRegistry.create(userVault, userPass)

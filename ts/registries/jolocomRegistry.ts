@@ -12,7 +12,7 @@ import {
 } from './types'
 import { jolocomIpfsStorageAgent } from '../ipfs/ipfs'
 import { jolocomEthereumResolver } from '../ethereum/ethereum'
-import { publicKeyToDID } from '../utils/crypto'
+import { DidBuilder, publicKeyToJoloDID } from '../utils/crypto'
 import {
   IVaultedKeyProvider,
   IKeyDerivationArgs,
@@ -41,9 +41,17 @@ export class JolocomRegistry implements IRegistry {
   public contractsAdapter: IContractsAdapter
   public contractsGateway: IContractsGateway
   public readonly resolver: DidDocumentResolver
+  private readonly didBuilder: DidBuilder
 
-  constructor(resolver: DidDocumentResolver) {
+  /**
+   * Instantiates a new {@link JolocomRegistry}.
+   * @param resolver - instance of a {@link MultiResolver} used by the registry for resolving identities
+   * @param didBuilder - custom function to assemble DIDs given a public key, defaults to {@link publicKeyToJoloDID}
+   */
+
+  constructor(resolver: DidDocumentResolver, didBuilder = publicKeyToJoloDID) {
     this.resolver = resolver
+    this.didBuilder = didBuilder
   }
 
   /**
@@ -138,6 +146,7 @@ export class JolocomRegistry implements IRegistry {
         data: didDocument.toJSON(),
         pin: true,
       })
+
       const privateEthKey = vaultedKeyProvider.getPrivateKey(keyMetadata)
 
       await this.ethereumConnector.updateDIDRecord({
@@ -197,7 +206,7 @@ export class JolocomRegistry implements IRegistry {
     derivationArgs: IKeyDerivationArgs,
   ): Promise<IdentityWallet> {
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
-    const did = publicKeyToDID(publicIdentityKey)
+    const did = this.didBuilder(publicIdentityKey)
     const identity = await this.resolve(did)
 
     const publicKeyMetadata = {
@@ -248,6 +257,7 @@ export class JolocomRegistry implements IRegistry {
 
 /**
  * Returns a instance of the Jolocom registry given connector, defaults to Jolocom defined connectors.
+ * @TODO Simplify (e.g. rename to createCustomJolocomRegistry), break down into simpler functions.
  * @param configuration - Connectors required for smart contract, storage, and anchoring interactions
  * @param configuration.ipfsConnector - Instance of class implementing the {@link IIpfsConnector} interface
  * @param configuration.ethereumConnector - Instance of class implementing the {@link IEthereumConnector} interface
@@ -270,6 +280,7 @@ export const createJolocomRegistry = (
     contracts,
     ethereumConnector,
     didResolver,
+    didBuilder: customDidBuilder
   } = configuration
 
   const validatingJolocomResolver =
@@ -279,7 +290,8 @@ export const createJolocomRegistry = (
       noValidation,
     )
 
-  const jolocomRegistry = new JolocomRegistry(validatingJolocomResolver)
+  const didBuilder = customDidBuilder || publicKeyToJoloDID
+  const jolocomRegistry = new JolocomRegistry(validatingJolocomResolver, didBuilder)
 
   jolocomRegistry.ipfsConnector = ipfsConnector
   jolocomRegistry.ethereumConnector = ethereumConnector

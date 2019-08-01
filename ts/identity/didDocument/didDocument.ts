@@ -17,7 +17,10 @@ import {
 import { ISigner } from '../../registries/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
-import { sha256, publicKeyToDID } from '../../utils/crypto'
+import {
+  sha256,
+  publicKeyToJoloDID,
+} from '../../utils/crypto'
 import {
   ILinkedDataSignature,
   IDigestable,
@@ -255,11 +258,16 @@ export class DidDocument implements IDigestable {
   /**
    * Instantiates a barebones {@link DidDocument} class based on a public key
    * @param publicKey - A secp256k1 public key that will be listed in the did document
+   * @param didBuilder - custom function to derive the DID from the public key.
+   *  defaults to {@link publicKeyToJoloDID}
    * @example `const didDocument = DidDocument.fromPublicKey(Buffer.from('abc...ffe', 'hex'))`
    */
 
-  public static fromPublicKey(publicKey: Buffer): DidDocument {
-    const did = publicKeyToDID(publicKey)
+  public static fromPublicKey(
+    publicKey: Buffer,
+    didBuilder = publicKeyToJoloDID,
+  ): DidDocument {
+    const did = didBuilder(publicKey)
     const keyId = `${did}#keys-1`
 
     const didDocument = new DidDocument()
