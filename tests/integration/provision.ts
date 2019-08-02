@@ -73,9 +73,10 @@ export const init = () =>
         return reject(`Ganache failed to start: ${ganacheErr.message}`)
       }
 
-      await deployContract()
       await spawnIpfsNode()
-
+      await deployContract()
+      /** Second registry contract, for testing cross deployment interactions */
+      await deployContract()
       return resolve()
     }),
   )

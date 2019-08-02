@@ -1,5 +1,4 @@
 import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { publicProfileCredJSON } from '../data/identity.data'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
@@ -13,7 +12,6 @@ import {
 } from './integration.data'
 import { DependencyIndex } from './index'
 
-chai.use(sinonChai)
 const expect = chai.expect
 
 export const identityCreation = (

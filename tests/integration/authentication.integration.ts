@@ -63,6 +63,7 @@ export const authenticationRequest = (
       userPass,
       decodedAuthRequest,
     )
+
     authResponseEncoded = authResponseJWT.encode()
 
     expect(authResponseJWT.interactionToken).to.be.instanceOf(Authentication)
