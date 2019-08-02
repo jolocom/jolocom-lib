@@ -10,7 +10,7 @@ import {
 import { IJWTHeader } from './types'
 import { IJSONWebTokenAttrs, InteractionType } from './types'
 import { sha256 } from '../utils/crypto'
-import { IDigestable } from '../linkedDataSignature/types'
+import { IDigestible } from '../linkedDataSignature/types'
 import { CredentialResponse } from './credentialResponse'
 import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
@@ -65,7 +65,7 @@ const convertPayload = <T extends JWTEncodable>(args: TransformArgs) => ({
 /* Generic class encoding and decodes various interaction tokens as and from JSON web tokens */
 
 @Exclude()
-export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
+export class JSONWebToken<T extends JWTEncodable> implements IDigestible {
   /* ES256K stands for ec signatures on secp256k1, de facto standard */
   private _header: IJWTHeader = {
     typ: 'JWT',
