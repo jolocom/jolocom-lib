@@ -3,9 +3,9 @@ import * as sinonChai from 'sinon-chai'
 import * as integrationHelper from './provision'
 import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
 import { EthResolver } from '../../ts/ethereum/ethereum'
-import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import {createJolocomRegistry, JolocomRegistry} from '../../ts/registries/jolocomRegistry'
 import { createJolocomResolver, MultiResolver } from '../../ts/resolver'
-import { publicKeyToDID } from '../../ts/utils/crypto'
+import { publicKeyToDID, publicKeyToJoloDID } from '../../ts/utils/crypto'
 import { keccak256 } from 'ethereumjs-util'
 import { identityCreation } from './identity.integration'
 import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
@@ -18,12 +18,13 @@ import {
   userPass,
   serviceVault,
   servicePass,
+  testCustomEthereumConfig,
 } from './integration.data'
-import { IRegistry } from '../../ts/registries/types'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { credentialOffer } from './credentialOffer.integration'
 import { credentialShare } from './credentialShare.integration'
 import { authenticationRequest } from './authentication.integration'
+import {testCustomDeployments} from './customDeployment.integration'
 const Web3 = require('web3')
 
 chai.use(sinonChai)
@@ -33,7 +34,8 @@ const web3 = new Web3()
 web3.setProvider(new Web3.providers.HttpProvider(`http://localhost:${PORT}`))
 
 export interface DependencyIndex {
-  jolocomRegistry: IRegistry
+  jolocomRegistry: JolocomRegistry
+  customRegistry: JolocomRegistry
   userIdentityWallet: IdentityWallet
   serviceIdentityWallet: IdentityWallet
   contracts: Partial<{
@@ -58,22 +60,36 @@ before(async () => {
 
   const ipfsConnector = new IpfsStorageAgent(testIpfsConfig)
   const ethereumConnector = new EthResolver(testEthereumConfig)
+  const customDeploymentEthConnector = new EthResolver(testCustomEthereumConfig)
 
-  const resolutionFunction = createJolocomResolver(ethereumConnector, ipfsConnector)
+  const joloResolver = createJolocomResolver(ethereumConnector, ipfsConnector)
+  const testResolver = createJolocomResolver(customDeploymentEthConnector, ipfsConnector)
 
   mutatingDependencies.resolver = new MultiResolver({
-    test: resolutionFunction
+    jolo: joloResolver,
+    test: testResolver,
   })
+
+  const commonConfiguration = {
+    ipfsConnector,
+    contracts: { gateway, adapter },
+  }
 
   const jolocomRegistry = (mutatingDependencies.jolocomRegistry = createJolocomRegistry(
     {
-      ipfsConnector,
+      ...commonConfiguration,
       ethereumConnector,
-      contracts: { gateway, adapter },
-      didResolver: resolutionFunction,
-      didBuilder: publicKeyToDID('test')(keccak256),
+      didBuilder: publicKeyToJoloDID,
+      didResolver: joloResolver
     },
   ))
+
+  mutatingDependencies.customRegistry = createJolocomRegistry({
+    ...commonConfiguration,
+    ethereumConnector: customDeploymentEthConnector,
+    didBuilder: publicKeyToDID('test')(keccak256),
+    didResolver: testResolver
+  })
 
   mutatingDependencies.userIdentityWallet = await jolocomRegistry.create(
     userVault,
@@ -112,4 +128,9 @@ describe(
 describe(
   'Integration Test - Token interaction flow Credential Request and Response',
   credentialShare(mutatingDependencies).bind(this),
+)
+
+describe(
+  'Integration Test - Interacting with custom deployments',
+  testCustomDeployments(mutatingDependencies).bind(this),
 )

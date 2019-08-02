@@ -7,6 +7,11 @@ export const testEthereumConfig = {
   contractAddress: '0xF2aB668ABA031cF5Cb5567933e910A59072B1965',
 }
 
+export const testCustomEthereumConfig = {
+  ...testEthereumConfig,
+  contractAddress: "0x9c6aF6DE3aC72545FeC97154c9813839C6E1903D"
+}
+
 /* Local configuration for the ipfs daemon */
 
 export const testIpfsConfig = {
