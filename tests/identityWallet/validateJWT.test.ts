@@ -10,7 +10,8 @@ import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import {
   invalidSignature,
   validSignedCredReqJWT,
-  invalidNonce, validSignedCredResJWT
+  invalidNonce,
+  validSignedCredResJWT,
 } from '../data/interactionTokens/jsonWebToken.data'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
@@ -85,7 +86,7 @@ describe('IdentityWallet validate JWT', () => {
     try {
       await iw.validateJWT(
         JSONWebToken.fromJSON(tokenWIthInvalidNonce),
-        JSONWebToken.fromJSON(validSignedCredReqJWT)
+        JSONWebToken.fromJSON(validSignedCredReqJWT),
       )
     } catch (err) {
       expect(err.message).to.eq('The token nonce deviates from request')
@@ -97,7 +98,7 @@ describe('IdentityWallet validate JWT', () => {
       ...validSignedCredResJWT,
       payload: {
         ...validSignedCredReqJWT.payload,
-        aud: 'did:jolo:ff'
+        aud: 'did:jolo:ff',
       },
     }
 
@@ -107,10 +108,12 @@ describe('IdentityWallet validate JWT', () => {
     try {
       await iw.validateJWT(
         JSONWebToken.fromJSON(tokenWIthInvalidAud),
-        JSONWebToken.fromJSON(validSignedCredReqJWT)
+        JSONWebToken.fromJSON(validSignedCredReqJWT),
       )
     } catch (err) {
-      expect(err.message).to.eq('You are not the intended audience of received token')
+      expect(err.message).to.eq(
+        'You are not the intended audience of received token',
+      )
     }
   })
 })
