@@ -1,4 +1,4 @@
-import { IDigestable } from '../linkedDataSignature/types'
+import { IDigestible } from '../linkedDataSignature/types'
 
 export enum KeyTypes {
   jolocomIdentityKey = "m/73'/0'/0'/0",
@@ -11,7 +11,7 @@ export interface IVaultedKeyProvider {
   sign: (derivationArgs: IKeyDerivationArgs, digest: Buffer) => Buffer
   signDigestable: (
     derivationArgs: IKeyDerivationArgs,
-    toSign: IDigestable,
+    toSign: IDigestible,
   ) => Promise<Buffer>
 }
 
