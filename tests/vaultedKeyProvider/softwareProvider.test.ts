@@ -257,7 +257,9 @@ describe('Software Vaulted Key Provider', () => {
         testMnemonic,
         keyDerivationArgs.encryptionPass,
       )
-      expect(newVault).to.deep.eq(vault)
+      expect(newVault.getPublicKey(keyDerivationArgs)).to.deep.eq(
+        vault.getPublicKey(keyDerivationArgs),
+      )
     })
 
     it('should fail if the mnemonic is wrong', function() {

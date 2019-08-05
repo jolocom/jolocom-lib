@@ -24,7 +24,7 @@ const MAX_ENCRYPTED_SEED_LENGTH = IV_LENGTH + MAX_SEED_LENGTH + PADDING_LENGTH
  * @param encryptedSeed - aes256-cbc encrypted seed
  */
 
-function isEncryptedSeedLengthValid(encryptedSeed: Buffer): Boolean {
+function isEncryptedSeedLengthValid(encryptedSeed: Buffer): boolean {
   const { length } = encryptedSeed
 
   const inBounds =
