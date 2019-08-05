@@ -24,11 +24,15 @@ import {
   testSeedPhraseWithDid32,
   testShares,
 } from '../data/recovery.data'
+import * as crypto from 'crypto'
 
 describe('Recovery', () => {
   const sandbox = sinon.createSandbox()
   const registry = createJolocomRegistry()
   const mockDidDoc = DidDocument.fromJSON(didDocumentJSON)
+  sinon
+    .stub(crypto, 'randomBytes')
+    .returns(Buffer.from('12345678123456781234567812345678', 'hex'))
   const referenceVault32 = SoftwareKeyProvider.fromSeed(
     Buffer.from(testSecret32, 'hex'),
     keyDerivationArgs.encryptionPass,
