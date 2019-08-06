@@ -7,15 +7,14 @@ import {
   Expose,
   Transform,
 } from 'class-transformer'
-import { canonize } from 'jsonld'
 import {
   ILinkedDataSignature,
   ILinkedDataSignatureAttrs,
   IDigestible,
 } from '../types'
 import { sha256 } from '../../utils/crypto'
-import { defaultContext } from '../../utils/contexts'
 import { keyIdToDid } from '../../utils/helper'
+import { normalizeJsonLD } from '../../validation/jsonLdValidator'
 
 /**
  * @class A EcdsaKoblitz linked data signature implementation
@@ -138,21 +137,14 @@ export class EcdsaLinkedDataSignature
       keyId: this.creator,
     }
   }
+
   /**
    * Converts the lined data signature to canonical form
    * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
    */
 
-  private async normalize(): Promise<string> {
-    const json: ILinkedDataSignatureAttrs = this.toJSON()
-
-    json['@context'] = defaultContext
-
-    delete json.signatureValue
-    delete json.type
-    delete json.id
-
-    return await canonize(json)
+  public async normalize() {
+    return normalizeLdProof(this.toJSON())
   }
 
   /**
@@ -182,4 +174,11 @@ export class EcdsaLinkedDataSignature
   public toJSON(): ILinkedDataSignatureAttrs {
     return classToPlain(this) as ILinkedDataSignatureAttrs
   }
+}
+
+export const normalizeLdProof = async (
+  proof: ILinkedDataSignatureAttrs,
+): Promise<string> => {
+  const { signatureValue, id, type, ...toNormalize } = proof
+  return normalizeJsonLD(toNormalize)
 }
