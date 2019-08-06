@@ -343,8 +343,7 @@ export class SignedCredential implements IDigestible {
    */
 
   public async digest(): Promise<Buffer> {
-    const digestible = new JsonLdDigestible(this.toJSON())
-    return digestible.digest()
+    return new JsonLdDigestible(this.toJSON()).digest()
   }
 
   /**
