@@ -1,32 +1,24 @@
 import * as sinon from 'sinon'
 import { expect } from 'chai'
-import * as jsonld from 'jsonld'
 
 import { EcdsaLinkedDataSignature } from '../../ts/linkedDataSignature'
 import {
   signatureAttributes,
-  normalizedSignatureSection,
-  digestedSignatureSection,
   incompleteSignatureAttrs,
+  normalizedSignatureSection,
 } from './ecdsaSignature.data'
-import { defaultContext } from '../../ts/utils/contexts'
 import { mockKeyId } from '../data/credential/signedCredential.data'
 
 describe('EcdsaKoblitzSignature', () => {
   let signature: EcdsaLinkedDataSignature
   let clock
-  let stubbedCanonise
 
   before(() => {
     clock = sinon.useFakeTimers()
-    stubbedCanonise = sinon
-      .stub(jsonld, 'canonize')
-      .returns(normalizedSignatureSection)
   })
 
   after(() => {
     clock.restore()
-    stubbedCanonise.restore()
   })
 
   /* Implicitly tests toJSON too */
@@ -58,14 +50,8 @@ describe('EcdsaKoblitzSignature', () => {
   })
 
   it('Should implement normalize', async () => {
-    await signature.digest()
-    const withContext = { ...signatureAttributes, '@context': defaultContext }
-    delete withContext.signatureValue
-    delete withContext.type
-
-    expect(stubbedCanonise.getCall(0).args).to.deep.eq([withContext])
-    expect((await signature.digest()).toString('hex')).to.deep.eq(
-      digestedSignatureSection,
+    expect(await signature.normalize()).to.deep.equal(
+      normalizedSignatureSection,
     )
   })
 

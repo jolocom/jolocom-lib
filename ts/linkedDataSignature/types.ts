@@ -1,3 +1,5 @@
+import {JsonLdObject} from '../validation/jsonLdValidator'
+
 export interface ISerializable {
   toJSON: () => {}
 }
@@ -18,7 +20,7 @@ export interface IDigestible {
   }
 }
 
-export interface ILinkedDataSignatureAttrs {
+export interface ILinkedDataSignatureAttrs extends JsonLdObject {
   type: string
   created: string
   creator: string
