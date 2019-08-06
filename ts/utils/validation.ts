@@ -2,6 +2,7 @@ import { JolocomLib } from '../index'
 import { IDigestible } from '../linkedDataSignature/types'
 import { getIssuerPublicKey } from '../utils/helper'
 import { IRegistry } from '../registries/types'
+import { JsonLdDigestible, SignedJsonLdObject } from './jsonLdValidator'
 
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
@@ -48,3 +49,22 @@ export const validateDigestibles = async (
     ),
   )
 
+export const validateJsonLd = async (
+  json: SignedJsonLdObject,
+  customRegistry?: IRegistry,
+): Promise<boolean> => {
+  const reg = customRegistry || JolocomLib.registries.jolocom.create()
+
+  const toValidate = new JsonLdDigestible(json)
+  const issuerIdentity = await reg.resolve(toValidate.signer.did)
+
+  const issuerPublicKey = getIssuerPublicKey(
+    toValidate.signer.keyId,
+    issuerIdentity.didDocument,
+  )
+
+  return await JolocomLib.KeyProvider.verifyDigestable(
+    issuerPublicKey,
+    toValidate,
+  )
+}

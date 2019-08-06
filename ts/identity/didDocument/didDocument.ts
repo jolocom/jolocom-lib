@@ -8,7 +8,6 @@ import {
   Type,
 } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
-import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import {
   AuthenticationSection,
@@ -18,16 +17,14 @@ import {
 import { ISigner } from '../../registries/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
-import { publicKeyToDID, sha256 } from '../../utils/crypto'
+import { publicKeyToDID } from '../../utils/crypto'
 import {
-  IDigestable,
   ILinkedDataSignature,
+  IDigestible,
 } from '../../linkedDataSignature/types'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
-import {
-  IKeyDerivationArgs,
-  IVaultedKeyProvider,
-} from '../../vaultedKeyProvider/types'
+import { JsonLdDigestible } from '../../validation/jsonLdValidator'
+import {IKeyDerivationArgs, IVaultedKeyProvider} from '../../vaultedKeyProvider/types'
 
 /**
  * Class modelling a Did Document
@@ -37,7 +34,7 @@ import {
 const LATEST_SPEC_VERSION = 0.13
 
 @Exclude()
-export class DidDocument implements IDigestable {
+export class DidDocument implements IDigestible {
   private _id: string
   private _specVersion: number = LATEST_SPEC_VERSION
   private _authentication: AuthenticationSection[] = []
@@ -63,20 +60,11 @@ export class DidDocument implements IDigestable {
 
   /**
    * Get the `@context` section of the JSON-ld document
-   * NOTE: the context from jolocom identities is automatically replaced with
-   * the latest from the library when deserializing from JSON
    * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
    * @example `console.log(didDocument.context) // [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
   @Expose({ name: '@context' })
-  @Transform(
-    (val, obj) => {
-      if (obj.id.startsWith('did:jolo')) return defaultContextIdentity
-      else return val
-    },
-    { toClassOnly: true },
-  )
   public get context(): ContextEntry[] {
     return this._context
   }
@@ -296,7 +284,7 @@ export class DidDocument implements IDigestable {
    * @param section - Configured {@link PublicKeySection} instance
    */
 
-  public addPublicKeySection(section: PublicKeySection): void {
+  public addPublicKeySection(section: PublicKeySection) {
     this.publicKey.push(section)
   }
 
@@ -324,7 +312,7 @@ export class DidDocument implements IDigestable {
    * @example `const didDocument = DidDocument.fromPublicKey(Buffer.from('abc...ffe', 'hex'))`
    */
 
-  public static async fromPublicKey(publicKey: Buffer): Promise<DidDocument> {
+  public static fromPublicKey(publicKey: Buffer): DidDocument {
     const did = publicKeyToDID(publicKey)
     const keyId = `${did}#keys-1`
 
@@ -338,7 +326,9 @@ export class DidDocument implements IDigestable {
   }
 
   /**
-   * Sets all fields on the instance necessary to compute the signature
+   * Sets all fields on the instance necessary to compute the signature and signes the DID Document
+   * @param vaultedKeyProvider VaultedKeyProvider instance the holds the private key to sign the DID Document
+   * @param derivationArgs Should contain the derivation path and the password for the key provider
    * @param keyId - Public key identifier, as defined in the {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}.
    * @example `didDocument.sign(vault, { derivationPath: KeyTypes.jolocomIdentityKey, encryptionPass: 'password', }, keyId)`
    */
@@ -366,24 +356,7 @@ export class DidDocument implements IDigestable {
    */
 
   public async digest(): Promise<Buffer> {
-    const normalized = await this.normalize()
-
-    const docSectionDigest = sha256(Buffer.from(normalized))
-    const proofSectionDigest = await this.proof.digest()
-
-    return sha256(Buffer.concat([proofSectionDigest, docSectionDigest]))
-  }
-
-  /**
-   * Converts the did document to canonical form
-   * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
-   * @internal
-   */
-
-  public async normalize(): Promise<string> {
-    const json = this.toJSON()
-    delete json.proof
-    return canonize(json)
+    return new JsonLdDigestible(this.toJSON()).digest()
   }
 
   /**
