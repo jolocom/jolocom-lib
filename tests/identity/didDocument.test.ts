@@ -58,27 +58,9 @@ describe('DidDocument', () => {
   })
 
   it('Should not try to migrate if DID is not "did:jolo:*"', () => {
-    const didDocJSON = {
-      '@context': 'https://w3id.org/did/v1',
-      id: 'did:uknow:d34db33f',
-      publicKey: [
-        {
-          id: 'did:uknow:d34db33f#cooked',
-          type: 'Secp256k1VerificationKey2018',
-          owner: 'did:uknow:d34db33f',
-          publicKeyHex: 'b9c5714089478a327f09197987f16f9e5d936e8a',
-        },
-      ],
-      authentication: [
-        {
-          type: 'Secp256k1SignatureAuthentication2018',
-          publicKey: 'did:uknow:d34db33f#cooked',
-        },
-      ],
-      service: [],
-      created: '',
-    }
-    expect(() => DidDocument.fromJSON(didDocJSON)).to.not.throw()
+    const foreignDidDoc = {...didDocumentJSONv0, id: 'did:unknown:de4bb33f'}
+    const didDoc = DidDocument.fromJSON(foreignDidDoc)
+    expect(didDoc.did).to.contain('did:unknown')
   })
 
   it('Should correctly implement fromJSON for version 0', () => {
