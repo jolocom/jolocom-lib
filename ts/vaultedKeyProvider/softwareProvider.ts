@@ -10,9 +10,29 @@ const ALG = 'aes-256-cbc'
 
 /** @dev length in bytes */
 const PASSWORD_LENGTH = 32
-const CIPHERTEXT_LENGTH = 48
+const PADDING_LENGTH = 16
+const MIN_SEED_LENGTH = 16
+const MAX_SEED_LENGTH = 32
+
 const IV_LENGTH = 16
-const ENCRYPTED_SEED_LENGTH = IV_LENGTH + CIPHERTEXT_LENGTH
+const MIN_ENCRYPTED_SEED_LENGTH = IV_LENGTH + MIN_SEED_LENGTH + PADDING_LENGTH
+const MAX_ENCRYPTED_SEED_LENGTH = IV_LENGTH + MAX_SEED_LENGTH + PADDING_LENGTH
+
+/**
+ * Ensure the encrypted seed is of the correct length (for generating BIP39 seed phrases)
+ * @param encryptedSeed - aes256-cbc encrypted seed
+ */
+
+function isEncryptedSeedLengthValid(encryptedSeed: Buffer): Boolean {
+  const { length } = encryptedSeed
+
+  const inBounds =
+    length >= MIN_ENCRYPTED_SEED_LENGTH && length <= MAX_ENCRYPTED_SEED_LENGTH
+
+  const multipleOfFour = length % 4 === 0
+
+  return inBounds && multipleOfFour
+}
 
 export class SoftwareKeyProvider implements IVaultedKeyProvider {
   private readonly _encryptedSeed: Buffer
@@ -24,11 +44,11 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    */
 
   public constructor(encryptedSeed: Buffer) {
-    if (encryptedSeed.length !== ENCRYPTED_SEED_LENGTH) {
+    if (!isEncryptedSeedLengthValid(encryptedSeed)) {
       throw new Error(
-        `Expected encrypted seed to be ${ENCRYPTED_SEED_LENGTH} bytes long (${IV_LENGTH} IV + ${CIPHERTEXT_LENGTH} ciphertext), got ${
+        `Expected encrypted seed to be between ${MIN_ENCRYPTED_SEED_LENGTH} and ${MAX_ENCRYPTED_SEED_LENGTH} bytes long. Got ${
           encryptedSeed.length
-        }`,
+        }.`,
       )
     }
 

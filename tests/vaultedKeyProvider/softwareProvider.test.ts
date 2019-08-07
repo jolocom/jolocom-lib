@@ -33,26 +33,49 @@ describe('Software Vaulted Key Provider', () => {
   )
 
   describe('static fromSeed', () => {
+    it('Should instantiated with all accepted seed lengths', () => {
+      const { encryptionPass: pass } = keyDerivationArgs
+
+      /** Helper function to save on typing */
+      const testFromSeedAndMnemonic = (seedLength, seedPhraseLength) => {
+        const provider = SoftwareKeyProvider.fromSeed(
+          Buffer.from('a'.repeat(seedLength)),
+          pass,
+        )
+
+        expect(provider.getMnemonic(pass).split(' ').length).to.eq(
+          seedPhraseLength,
+        )
+      }
+
+      testFromSeedAndMnemonic(16, 12)
+      testFromSeedAndMnemonic(20, 15)
+      testFromSeedAndMnemonic(24, 18)
+      testFromSeedAndMnemonic(28, 21)
+      testFromSeedAndMnemonic(32, 24)
+    })
+
     it('Should fail to instantiate if entropy too short', () => {
-      expect(() => SoftwareKeyProvider.fromSeed(
-        Buffer.from('a'),
-        keyDerivationArgs.encryptionPass,
-      )).to.throw()
+      expect(() =>
+        SoftwareKeyProvider.fromSeed(
+          Buffer.from('a'),
+          keyDerivationArgs.encryptionPass,
+        ),
+      ).to.throw()
     })
 
     it('Should fail to instantiate if entropy too long', () => {
       const longEntropy = Buffer.concat([testSeed, testSeed, testSeed])
-      expect(() => SoftwareKeyProvider.fromSeed(
-        longEntropy,
-        keyDerivationArgs.encryptionPass,
-      )).to.throw()
+      expect(() =>
+        SoftwareKeyProvider.fromSeed(
+          longEntropy,
+          keyDerivationArgs.encryptionPass,
+        ),
+      ).to.throw()
     })
 
     it('Should fail to instantiate if password is empty', () => {
-      expect(() => SoftwareKeyProvider.fromSeed(
-        testSeed,
-        ''
-      )).to.throw()
+      expect(() => SoftwareKeyProvider.fromSeed(testSeed, '')).to.throw()
     })
   })
 
@@ -118,11 +141,15 @@ describe('Software Vaulted Key Provider', () => {
     const pubKey = vault.getPublicKey(keyDerivationArgs)
 
     it('Should correctly validate signature given digest signature, and public key', () => {
-      expect(SoftwareKeyProvider.verify(msgToSign, pubKey, msgSignature)).to.eq(true)
+      expect(SoftwareKeyProvider.verify(msgToSign, pubKey, msgSignature)).to.eq(
+        true,
+      )
     })
 
     it('Should correctly detect invalid signature', () => {
-      expect(SoftwareKeyProvider.verify(msgToSign, pubKey, incorrectSignature)).to.eq(false)
+      expect(
+        SoftwareKeyProvider.verify(msgToSign, pubKey, incorrectSignature),
+      ).to.eq(false)
     })
 
     it('Should throw given invalid input', () => {
