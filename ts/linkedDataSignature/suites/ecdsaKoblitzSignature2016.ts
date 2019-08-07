@@ -1,6 +1,5 @@
 import 'reflect-metadata'
 import {
-  Type,
   plainToClass,
   classToPlain,
   Exclude,
