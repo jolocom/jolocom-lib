@@ -64,7 +64,7 @@ be encoded as a QR code that can be scanned by the wallet application. The ``cre
   const jwtEncoded = credentialRequest.encode()
   const QREncoded = new SSO().JWTtoQR(jwtEncoded)
 
-.. note:: The ``JWT`` encoded interaction token can also be sent to the Jolocom SmartWallet via "Deep Links". An example client application making use of this flow can be `here <https://github.com/jolocom/demo-sso-mobile>`_.
+.. note:: The ``JWT`` encoded interaction token can also be sent to the Jolocom SmartWallet via "Deep Links"..
 
 **Consume a Signed Credential Request**
 
