@@ -8,8 +8,9 @@ Want to use our library? Please refer to the following resources:
 
 - [Library documentation](https://jolocom-lib.readthedocs.io/en/latest/gettingStarted.html)
 - [Automatically generated api documentation](https://htmlpreview.github.io/?https://raw.githubusercontent.com/jolocom/jolocom-lib/master/api_docs/documentation/globals.html)
-- [Demo service implementation](https://github.com/jolocom/demo-sso)
-- [Demo service application implementation](https://github.com/jolocom/demo-sso-mobile)
+- [Generic backend](https://github.com/jolocom/generic-backend) - exposes a set of HTTP endpoints for client applications to interact with.
+- [Demo service frontend](https://gitlab.com/jolocom/municipal-service) - to interact with the generic backend.
+  - Instructions can be found in the repository README, more about the project as a whole can be found [here](https://stories.jolocom.com/demo-services-using-ssi-building-blocks-now-available-607e2ccd506d).
 - Various Useful snippets: [Here](https://github.com/Exulansis/web3_snippets), and [here](https://github.com/Exulansis/Validation-Examples)
 
 Integration and unit tests located in the ``./tests`` folder are a good place to start too.
