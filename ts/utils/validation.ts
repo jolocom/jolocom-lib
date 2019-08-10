@@ -52,19 +52,5 @@ export const validateDigestibles = async (
 export const validateJsonLd = async (
   json: SignedJsonLdObject,
   customRegistry?: IRegistry,
-): Promise<boolean> => {
-  const reg = customRegistry || JolocomLib.registries.jolocom.create()
-
-  const toValidate = new JsonLdDigestible(json)
-  const issuerIdentity = await reg.resolve(toValidate.signer.did)
-
-  const issuerPublicKey = getIssuerPublicKey(
-    toValidate.signer.keyId,
-    issuerIdentity.didDocument,
-  )
-
-  return await JolocomLib.KeyProvider.verifyDigestable(
-    issuerPublicKey,
-    toValidate,
-  )
-}
+): Promise<boolean> =>
+  validateDigestible(new JsonLdDigestible(json), customRegistry)
