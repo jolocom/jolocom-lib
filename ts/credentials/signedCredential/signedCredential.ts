@@ -18,10 +18,8 @@ import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { ISigner } from '../../registries/types'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
-import {
-  JsonLdDigestible,
-} from '../../validation/jsonLdValidator'
-import {JsonLdContext, signedCredentialContext} from '../../utils/contexts'
+import { JsonLdDigestible } from '../../validation/jsonLdValidator'
+import { JsonLdContext } from '../../utils/contexts/types'
 
 /**
  * @description Data needed to prepare signature on credential
@@ -41,7 +39,7 @@ interface IIssInfo {
 
 @Exclude()
 export class SignedCredential implements IDigestible {
-  private '_@context': JsonLdContext = signedCredentialContext
+  private '_@context': JsonLdContext
   private _id: string = generateClaimId(8)
   private _name: string
   private _issuer: string

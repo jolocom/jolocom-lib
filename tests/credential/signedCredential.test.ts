@@ -56,7 +56,6 @@ describe('SignedCredential', () => {
   })
 
   it('Should correctly implement toJSON method', () => {
-    console.log(vCred.proof.nonce)
     expect(vCred.toJSON()).to.deep.eq(emailVerifiableCredential)
   })
 

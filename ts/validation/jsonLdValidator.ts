@@ -7,8 +7,8 @@ import { ISigner } from '../registries/types'
 import { keyIdToDid } from '../utils/helper'
 import { sha256 } from '../utils/crypto'
 import { canonize } from 'jsonld'
-import { normalizeLdProof } from '../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
-import {JsonLdContext} from '../utils/contexts'
+import { ContextTransformer, JsonLdContext } from '../utils/contexts/types'
+import { cachedContextTransformer } from '../utils/contexts/contextTransformers'
 
 type JsonLdPrimitive = string | number | boolean | JsonLdObject | JsonLdObject[]
 
@@ -30,7 +30,7 @@ export interface SignedJsonLdObject extends JsonLdObject {
 export class JsonLdDigestible implements IDigestible {
   public readonly data: JsonLdObject
   private readonly proof: ILinkedDataSignatureAttrs
-  private readonly context: JsonLdContext | JsonLdContext[]
+  private readonly context: JsonLdContext
   private readonly _signatureCreator: string
   private readonly _signature: string
 
@@ -92,14 +92,26 @@ export class JsonLdDigestible implements IDigestible {
  * @dev The function expects the JsonLD '@context' to be passed as an argument,
  *  the '@context' on the data will be discarded.
  * @param data - {@link JsonLdObject} without the '@context' section
+ * @param contextTransformer - {@link ContextTransformer} function for custom context
+ *  modifications before it's used for normalization
  * @param context - JsonLD context to use during normalization
  */
 
 export const normalizeJsonLD = async (
   { ['@context']: _, ...data }: JsonLdObject,
-  context: JsonLdContext | JsonLdContext[],
+  context: JsonLdContext,
+  contextTransformer: ContextTransformer = cachedContextTransformer,
 ) => {
   return canonize(data, {
-    expandContext: context,
+    expandContext: contextTransformer(context),
   })
+}
+
+export const normalizeLdProof = (
+  { ['@context']: _, ...proof }: ILinkedDataSignatureAttrs,
+  context: JsonLdContext,
+  contextTransformer: ContextTransformer = cachedContextTransformer,
+): Promise<string> => {
+  const { signatureValue, id, type, ...toNormalize } = proof
+  return normalizeJsonLD(toNormalize, context, contextTransformer)
 }

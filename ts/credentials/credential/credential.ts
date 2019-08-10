@@ -2,7 +2,8 @@ import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { ICredentialAttrs, IClaimSection } from './types'
 import { BaseMetadata } from 'cred-types-jolocom-core'
 import { ISignedCredCreationArgs } from '../signedCredential/types'
-import {JsonLdContext, signedCredentialContext} from '../../utils/contexts'
+import { signedCredentialContext } from '../../utils/contexts'
+import { JsonLdContext } from '../../utils/contexts/types'
 
 /**
  * @class
@@ -12,7 +13,7 @@ import {JsonLdContext, signedCredentialContext} from '../../utils/contexts'
 
 @Exclude()
 export class Credential {
-  private '_@context': JsonLdContext[] = signedCredentialContext
+  private '_@context': JsonLdContext
   private _id: string
   private _type: string[]
   private _claim: IClaimSection
@@ -100,7 +101,7 @@ export class Credential {
    */
 
   @Expose({ name: '@context' })
-  public get context(): JsonLdContext[] {
+  public get context(): JsonLdContext {
     return this['_@context']
   }
 
@@ -110,7 +111,7 @@ export class Credential {
    * @example `credential.context = [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
-  public set context(context: JsonLdContext[]) {
+  public set context(context: JsonLdContext) {
     this['_@context'] = context
   }
 
@@ -130,7 +131,7 @@ export class Credential {
     subject,
   }: ISignedCredCreationArgs<T>) {
     const credential = new Credential()
-    credential.context = [...credential.context, ...context]
+    credential.context = [...signedCredentialContext, ...context]
     credential.type = type
     credential.name = name
     credential.claim = claim
