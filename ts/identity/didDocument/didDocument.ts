@@ -14,14 +14,17 @@ import {
   ServiceEndpointsSection,
 } from './sections'
 import { ISigner } from '../../registries/types'
-import {didDocumentContext } from '../../utils/contexts'
+import { didDocumentContext } from '../../utils/contexts'
 import { publicKeyToDID } from '../../utils/crypto'
 import {
   ILinkedDataSignature,
   IDigestible,
 } from '../../linkedDataSignature/types'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
-import {JsonLdContext, JsonLdDigestible} from '../../validation/jsonLdValidator'
+import {
+  JsonLdContext,
+  JsonLdDigestible,
+} from '../../validation/jsonLdValidator'
 import {
   IKeyDerivationArgs,
   IVaultedKeyProvider,

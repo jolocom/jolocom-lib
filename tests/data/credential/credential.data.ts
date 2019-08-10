@@ -1,5 +1,5 @@
 import { BaseMetadata, claimsMetadata } from 'cred-types-jolocom-core'
-import {signedCredentialContext} from '../../../ts/utils/contexts'
+import { signedCredentialContext } from '../../../ts/utils/contexts'
 
 /* Defining custom metadata objects for custom credentials */
 

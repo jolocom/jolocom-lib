@@ -1,4 +1,4 @@
-import {JsonLdObject} from '../validation/jsonLdValidator'
+import { JsonLdObject } from '../validation/jsonLdValidator'
 
 export interface ISerializable {
   toJSON: () => {}

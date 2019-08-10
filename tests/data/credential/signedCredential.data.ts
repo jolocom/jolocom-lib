@@ -36,8 +36,7 @@ export const emailVerifiableCredential = {
   },
 }
 
-export const normalizedEmailVerifiableCredential =
-  `<claimId:1842fb5f567dd532> <http://schema.org/name> "Email address" .
+export const normalizedEmailVerifiableCredential = `<claimId:1842fb5f567dd532> <http://schema.org/name> "Email address" .
 <claimId:1842fb5f567dd532> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://identity.jolocom.com/terms/ProofOfEmailCredential> .
 <claimId:1842fb5f567dd532> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/credentials#Credential> .
 <claimId:1842fb5f567dd532> <https://w3id.org/credentials#claim> <did:jolo:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff> .
