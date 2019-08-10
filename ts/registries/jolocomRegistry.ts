@@ -28,6 +28,7 @@ import {
   MultiResolver,
 } from '../resolver'
 import { noValidation } from '../utils/validation'
+import { DidDocumentResolver } from '../resolver/types'
 
 /**
  * @class
@@ -39,9 +40,9 @@ export class JolocomRegistry implements IRegistry {
   public ethereumConnector: IEthereumConnector
   public contractsAdapter: IContractsAdapter
   public contractsGateway: IContractsGateway
-  public readonly resolver: MultiResolver
+  public readonly resolver: DidDocumentResolver
 
-  constructor(resolver: MultiResolver) {
+  constructor(resolver: DidDocumentResolver) {
     this.resolver = resolver
   }
 
@@ -161,7 +162,7 @@ export class JolocomRegistry implements IRegistry {
 
   public async resolve(did): Promise<Identity> {
     try {
-      const didDocumentJson = await this.resolver.resolve(did)
+      const didDocumentJson = await this.resolver(did)
 
       const didDocument = DidDocument.fromJSON(didDocumentJson)
 
@@ -264,17 +265,20 @@ export const createJolocomRegistry = (
     },
   },
 ): JolocomRegistry => {
-  const { ipfsConnector, contracts, ethereumConnector } = configuration
+  const {
+    ipfsConnector,
+    contracts,
+    ethereumConnector,
+    didResolver,
+  } = configuration
 
-  const validatingJolocomResolver = createValidatingResolver(
-    createJolocomResolver(ethereumConnector, ipfsConnector),
-  )(noValidation)
+  const validatingJolocomResolver =
+    didResolver ||
+    createValidatingResolver(
+      createJolocomResolver(ethereumConnector, ipfsConnector),
+    )(noValidation)
 
-  const multiResolver = new MultiResolver({
-    jolo: validatingJolocomResolver,
-  })
-
-  const jolocomRegistry = new JolocomRegistry(multiResolver)
+  const jolocomRegistry = new JolocomRegistry(validatingJolocomResolver)
 
   jolocomRegistry.ipfsConnector = ipfsConnector
   jolocomRegistry.ethereumConnector = ethereumConnector

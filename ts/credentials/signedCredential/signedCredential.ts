@@ -211,10 +211,10 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Type(() => EcdsaLinkedDataSignature)
   @Transform(value => value || new EcdsaLinkedDataSignature(), {
     toClassOnly: true,
   })
+  @Type(() => EcdsaLinkedDataSignature)
   get proof(): ILinkedDataSignature {
     return this._proof
   }
