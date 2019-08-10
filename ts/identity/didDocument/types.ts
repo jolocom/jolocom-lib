@@ -5,7 +5,7 @@ import {
   IServiceEndpointSectionAttrs,
 } from './sections/types'
 import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
-import { SignedJsonLdObject} from '../../validation/jsonLdValidator'
+import { SignedJsonLdObject } from '../../validation/jsonLdValidator'
 
 export interface IDidDocumentAttrs extends SignedJsonLdObject {
   specVersion?: number
@@ -17,4 +17,6 @@ export interface IDidDocumentAttrs extends SignedJsonLdObject {
   proof: ILinkedDataSignatureAttrs
 }
 
-export type DidDocAuthenticationSection = IAuthenticationSectionAttrsv0[] | IAuthenticationSectionAttrs[]
+export type DidDocAuthenticationSection =
+  | IAuthenticationSectionAttrsv0[]
+  | IAuthenticationSectionAttrs[]

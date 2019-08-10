@@ -3,7 +3,7 @@ import { ICredentialAttrs, IClaimSection } from './types'
 import { BaseMetadata } from 'cred-types-jolocom-core'
 import { ISignedCredCreationArgs } from '../signedCredential/types'
 import { signedCredentialContext } from '../../utils/contexts'
-import {JsonLdContext } from '../../validation/jsonLdValidator'
+import { JsonLdContext } from '../../validation/jsonLdValidator'
 
 /**
  * @class
@@ -126,7 +126,7 @@ export class Credential {
    */
 
   public static create<T extends BaseMetadata>({
-    metadata: {type, context, name},
+    metadata: { type, context, name },
     claim,
     subject,
   }: ISignedCredCreationArgs<T>) {

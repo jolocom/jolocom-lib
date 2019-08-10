@@ -6,7 +6,7 @@ export interface IPublicKeySectionAttrs extends JsonLdObject {
   publicKeyHex: string
 }
 
-export interface IAuthenticationSectionAttrsv0 extends JsonLdObject{
+export interface IAuthenticationSectionAttrsv0 extends JsonLdObject {
   publicKey: string
   type: string
 }
@@ -17,6 +17,5 @@ export interface IServiceEndpointSectionAttrs extends JsonLdObject {
   serviceEndpoint: string
   description: string
 }
-
 
 export type IAuthenticationSectionAttrs = IPublicKeySectionAttrs | string

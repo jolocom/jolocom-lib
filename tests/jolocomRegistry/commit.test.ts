@@ -43,9 +43,7 @@ describe('Jolocom registry - commit', () => {
 
   before(async () => {
     clock = sinon.useFakeTimers()
-    mock
-      .stub(crypto, 'randomBytes')
-      .returns(Buffer.from('1842fb5f', 'hex'))
+    mock.stub(crypto, 'randomBytes').returns(Buffer.from('1842fb5f', 'hex'))
     await didDocument.sign(vault, keyMetadata, mockKeyId)
   })
 

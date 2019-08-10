@@ -13,7 +13,10 @@ import {
 } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { keyIdToDid } from '../../utils/helper'
-import {JsonLdContext, normalizeJsonLD} from '../../validation/jsonLdValidator'
+import {
+  JsonLdContext,
+  normalizeJsonLD,
+} from '../../validation/jsonLdValidator'
 import { didDocumentContext } from '../../utils/contexts'
 
 /**
@@ -178,8 +181,8 @@ export class EcdsaLinkedDataSignature
 }
 
 export const normalizeLdProof = (
-  { ['@context'] : _ , ...proof}: ILinkedDataSignatureAttrs,
-  context: JsonLdContext | JsonLdContext[]
+  { ['@context']: _, ...proof }: ILinkedDataSignatureAttrs,
+  context: JsonLdContext | JsonLdContext[],
 ): Promise<string> => {
   const { signatureValue, id, type, ...toNormalize } = proof
   return normalizeJsonLD(toNormalize, context)
