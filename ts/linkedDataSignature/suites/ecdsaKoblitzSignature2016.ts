@@ -14,10 +14,9 @@ import {
 import { sha256 } from '../../utils/crypto'
 import { keyIdToDid } from '../../utils/helper'
 import {
-  JsonLdContext,
   normalizeJsonLD,
 } from '../../validation/jsonLdValidator'
-import { didDocumentContext } from '../../utils/contexts'
+import {didDocumentContext, JsonLdContext} from '../../utils/contexts'
 
 /**
  * @class A EcdsaKoblitz linked data signature implementation

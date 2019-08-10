@@ -8,19 +8,24 @@ import { keyIdToDid } from '../utils/helper'
 import { sha256 } from '../utils/crypto'
 import { canonize } from 'jsonld'
 import { normalizeLdProof } from '../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
+import {JsonLdContext} from '../utils/contexts'
+
+type JsonLdPrimitive = string | number | boolean | JsonLdObject | JsonLdObject[]
 
 export interface JsonLdObject {
   '@context'?: JsonLdContext
   [key: string]: JsonLdPrimitive | JsonLdPrimitive[]
 }
-export type JsonLdContext = string | JsonLdObject | Array<string | JsonLdObject>
-
-type JsonLdPrimitive = string | number | boolean | JsonLdObject | JsonLdObject[]
 
 export interface SignedJsonLdObject extends JsonLdObject {
   '@context': JsonLdContext
   proof: ILinkedDataSignatureAttrs
 }
+
+/**
+ * Helper class, implementing the {@link IDigestible} interface,
+ *  which can be instantiated from a JsonLD Document satisfying the {@link SignedJsonLdObject} interface.
+ */
 
 export class JsonLdDigestible implements IDigestible {
   public readonly data: JsonLdObject
@@ -50,16 +55,27 @@ export class JsonLdDigestible implements IDigestible {
   }
 
   /**
-   * Returns the sha256 hash of the linked data signature, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
+   * Returns the sha256 hash of the normalized linked data signature,
+   *  per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
    */
 
   private async digestDataSection(): Promise<Buffer> {
     return sha256(Buffer.from(await this.normalize(this.data, this.context)))
   }
 
+  /**
+   * Returns the sha256 hash of the normalized data section of the JsonLD Document,
+   *  per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
+   */
+
   private async digestProofSection(): Promise<Buffer> {
     return sha256(Buffer.from(await normalizeLdProof(this.proof, this.context)))
   }
+
+  /**
+   * Returns the sha256 hash of the concatenated signature / data digests,
+   *  per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
+   */
 
   public async digest(): Promise<Buffer> {
     const dataSectionDigest = await this.digestDataSection()
@@ -70,6 +86,14 @@ export class JsonLdDigestible implements IDigestible {
 
   public normalize = normalizeJsonLD
 }
+
+/**
+ * Helper function to handle JsonLD normalization.
+ * @dev The function expects the JsonLD '@context' to be passed as an argument,
+ *  the '@context' on the data will be discarded.
+ * @param data - {@link JsonLdObject} without the '@context' section
+ * @param context - JsonLD context to use during normalization
+ */
 
 export const normalizeJsonLD = async (
   { ['@context']: _, ...data }: JsonLdObject,

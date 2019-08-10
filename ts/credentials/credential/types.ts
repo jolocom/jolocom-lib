@@ -1,5 +1,5 @@
 import { ClaimInterface } from 'cred-types-jolocom-core'
-import { JsonLdContext } from '../../validation/jsonLdValidator'
+import {JsonLdContext} from '../../utils/contexts'
 
 type ClaimType = string | number | boolean | {}
 /**
