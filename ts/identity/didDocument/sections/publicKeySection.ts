@@ -128,7 +128,7 @@ export class PublicKeySection {
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
    */
 
-  public fromJSON(json: IPublicKeySectionAttrs): PublicKeySection {
+  public static fromJSON(json: IPublicKeySectionAttrs): PublicKeySection {
     return plainToClass(PublicKeySection, json)
   }
 }
