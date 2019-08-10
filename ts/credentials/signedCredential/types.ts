@@ -1,14 +1,14 @@
-import { ICredentialAttrs, IClaimSection } from '../credential/types'
+import {ICredentialAttrs, ClaimEntry} from '../credential/types'
 import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
 import { BaseMetadata } from 'cred-types-jolocom-core'
-import {SignedJsonLdObject} from '../../validation/jsonLdValidator'
+import { SignedJsonLdObject} from '../../validation/jsonLdValidator'
 
 export interface ISignedCredentialAttrs extends ICredentialAttrs, SignedJsonLdObject {
   id: string
   issuer: string
   issued: string
   expires?: string
-  claim: IClaimSection
+  claim: ClaimEntry
   proof: ILinkedDataSignatureAttrs
 }
 

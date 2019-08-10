@@ -7,32 +7,35 @@ import { ISigner } from '../registries/types'
 import { keyIdToDid } from '../utils/helper'
 import { sha256 } from '../utils/crypto'
 import { canonize } from 'jsonld'
-import { defaultContext } from '../utils/contexts'
-import {normalizeLdProof} from '../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
+import { normalizeLdProof } from '../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
+
+export interface JsonLdObject {
+  '@context'?: JsonLdContext
+  [key: string]: JsonLdPrimitive | JsonLdPrimitive[]
+}
+export type JsonLdContext = string | JsonLdObject | Array<string | JsonLdObject>
 
 type JsonLdPrimitive = string | number | boolean | JsonLdObject | JsonLdObject[]
 
-export interface JsonLdObject {
-  [key: string]: JsonLdPrimitive | JsonLdPrimitive[]
-}
-
 export interface SignedJsonLdObject extends JsonLdObject {
+  '@context': JsonLdContext
   proof: ILinkedDataSignatureAttrs
 }
 
 export class JsonLdDigestible implements IDigestible {
   public readonly data: JsonLdObject
   private readonly proof: ILinkedDataSignatureAttrs
+  private readonly context: JsonLdContext | JsonLdContext[]
   private readonly _signatureCreator: string
   private readonly _signature: string
 
   public constructor({ proof, ...data }: SignedJsonLdObject) {
     const { creator, signature } = EcdsaLinkedDataSignature.fromJSON(proof)
-
     this.data = data
     this.proof = proof
     this._signatureCreator = creator
     this._signature = signature
+    this.context = data['@context']
   }
 
   public get signer(): ISigner {
@@ -50,13 +53,12 @@ export class JsonLdDigestible implements IDigestible {
    * Returns the sha256 hash of the linked data signature, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
    */
 
-  public async digestDataSection(): Promise<Buffer> {
-    return sha256(Buffer.from(await this.normalize(this.data)))
+  private async digestDataSection(): Promise<Buffer> {
+    return sha256(Buffer.from(await this.normalize(this.data, this.context)))
   }
 
-
   private async digestProofSection(): Promise<Buffer> {
-    return sha256(Buffer.from(await normalizeLdProof(this.proof)))
+    return sha256(Buffer.from(await normalizeLdProof(this.proof, this.context)))
   }
 
   public async digest(): Promise<Buffer> {
@@ -70,11 +72,10 @@ export class JsonLdDigestible implements IDigestible {
 }
 
 export const normalizeJsonLD = async (
-  data: JsonLdObject,
-  context = defaultContext,
+  { ['@context']: _, ...data }: JsonLdObject,
+  context: JsonLdContext | JsonLdContext[],
 ) => {
-
   return canonize(data, {
-    expandContext: context
+    expandContext: context,
   })
 }
