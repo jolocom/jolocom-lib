@@ -19,10 +19,9 @@ import { ISigner } from '../../registries/types'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 import {
-  JsonLdContext,
   JsonLdDigestible,
 } from '../../validation/jsonLdValidator'
-import { signedCredentialContext } from '../../utils/contexts'
+import {JsonLdContext, signedCredentialContext} from '../../utils/contexts'
 
 /**
  * @description Data needed to prepare signature on credential

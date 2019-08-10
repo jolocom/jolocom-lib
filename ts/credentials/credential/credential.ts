@@ -2,8 +2,7 @@ import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
 import { ICredentialAttrs, IClaimSection } from './types'
 import { BaseMetadata } from 'cred-types-jolocom-core'
 import { ISignedCredCreationArgs } from '../signedCredential/types'
-import { signedCredentialContext } from '../../utils/contexts'
-import { JsonLdContext } from '../../validation/jsonLdValidator'
+import {JsonLdContext, signedCredentialContext} from '../../utils/contexts'
 
 /**
  * @class
