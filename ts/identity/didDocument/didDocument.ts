@@ -14,7 +14,7 @@ import {
   ServiceEndpointsSection,
 } from './sections'
 import { ISigner } from '../../registries/types'
-import { didDocumentContext } from '../../utils/contexts'
+import {didDocumentContext, JsonLdContext} from '../../utils/contexts'
 import { publicKeyToDID } from '../../utils/crypto'
 import {
   ILinkedDataSignature,
@@ -22,7 +22,6 @@ import {
 } from '../../linkedDataSignature/types'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 import {
-  JsonLdContext,
   JsonLdDigestible,
 } from '../../validation/jsonLdValidator'
 import {
