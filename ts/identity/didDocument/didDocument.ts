@@ -1,6 +1,5 @@
 import {
   classToPlain,
-  ClassTransformOptions,
   Exclude,
   Expose,
   plainToClass,
@@ -15,16 +14,22 @@ import {
   ServiceEndpointsSection,
 } from './sections'
 import { ISigner } from '../../registries/types'
-import { ContextEntry } from 'cred-types-jolocom-core'
-import { defaultContextIdentity } from '../../utils/contexts'
+import {didDocumentContext } from '../../utils/contexts'
 import { publicKeyToDID } from '../../utils/crypto'
 import {
   ILinkedDataSignature,
   IDigestible,
 } from '../../linkedDataSignature/types'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
-import { JsonLdDigestible } from '../../validation/jsonLdValidator'
-import {IKeyDerivationArgs, IVaultedKeyProvider} from '../../vaultedKeyProvider/types'
+import {JsonLdContext, JsonLdDigestible} from '../../validation/jsonLdValidator'
+import {
+  IKeyDerivationArgs,
+  IVaultedKeyProvider,
+} from '../../vaultedKeyProvider/types'
+import {
+  IAuthenticationSectionAttrs,
+  IAuthenticationSectionAttrsv0,
+} from './sections/types'
 
 /**
  * Class modelling a Did Document
@@ -43,7 +48,7 @@ export class DidDocument implements IDigestible {
   private _created: Date = new Date()
   private _updated: Date = new Date()
   private _proof: ILinkedDataSignature
-  private _context: ContextEntry[] = defaultContextIdentity
+  private _context: JsonLdContext = didDocumentContext
 
   /**
    * The DID spec version
@@ -65,7 +70,7 @@ export class DidDocument implements IDigestible {
    */
 
   @Expose({ name: '@context' })
-  public get context(): ContextEntry[] {
+  public get context(): JsonLdContext {
     return this._context
   }
 
@@ -75,7 +80,7 @@ export class DidDocument implements IDigestible {
    * @example `didDocument.context = [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
-  public set context(context: ContextEntry[]) {
+  public set context(context: JsonLdContext) {
     this._context = context
   }
 
@@ -104,10 +109,22 @@ export class DidDocument implements IDigestible {
    */
 
   @Expose({ name: 'authentication' })
-  @Transform(auths => auths.map(a => a.publicKey), {
-    toClassOnly: true,
-    until: 0.13,
-  })
+  @Transform(
+    (auths: IAuthenticationSectionAttrsv0[]) =>
+      auths.map(authEntry => authEntry.publicKey),
+    { toClassOnly: true, until: 0.13 },
+  )
+  @Transform(
+    (auths: IAuthenticationSectionAttrs[], json) =>
+      auths.map(authEntry =>
+        typeof authEntry === 'string'
+          ? authEntry
+          : plainToClass(PublicKeySection, authEntry, {
+              version: getDidDocVersion(json),
+            }),
+      ),
+    { toClassOnly: true },
+  )
   public get authentication(): AuthenticationSection[] {
     return this._authentication
   }
@@ -381,12 +398,16 @@ export class DidDocument implements IDigestible {
    */
 
   public static fromJSON(json: IDidDocumentAttrs): DidDocument {
-    const options: ClassTransformOptions | undefined = json.id.startsWith(
-      'did:jolo',
-    )
-      ? { version: json.specVersion || 0 }
-      : undefined
-
-    return plainToClass(DidDocument, json, options)
+    return plainToClass(DidDocument, json, {
+      version: getDidDocVersion(json),
+    })
   }
+}
+
+const getDidDocVersion = ({ specVersion, id }: IDidDocumentAttrs) => {
+  if (id.startsWith('did:jolo')) {
+    return specVersion || 0
+  }
+
+  return 0
 }

@@ -13,7 +13,8 @@ import {
 } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { keyIdToDid } from '../../utils/helper'
-import { normalizeJsonLD } from '../../validation/jsonLdValidator'
+import {JsonLdContext, normalizeJsonLD} from '../../validation/jsonLdValidator'
+import { didDocumentContext } from '../../utils/contexts'
 
 /**
  * @class A EcdsaKoblitz linked data signature implementation
@@ -30,6 +31,7 @@ export class EcdsaLinkedDataSignature
   private _created: Date = new Date()
   private _nonce: string = ''
   private _signatureValue: string = ''
+  private readonly _context = didDocumentContext
 
   /**
    * Get the creation date of the linked data signature
@@ -143,7 +145,7 @@ export class EcdsaLinkedDataSignature
    */
 
   public async normalize() {
-    return normalizeLdProof(this.toJSON())
+    return normalizeLdProof(this.toJSON(), this._context)
   }
 
   /**
@@ -175,9 +177,10 @@ export class EcdsaLinkedDataSignature
   }
 }
 
-export const normalizeLdProof = async (
-  proof: ILinkedDataSignatureAttrs,
+export const normalizeLdProof = (
+  { ['@context'] : _ , ...proof}: ILinkedDataSignatureAttrs,
+  context: JsonLdContext | JsonLdContext[]
 ): Promise<string> => {
   const { signatureValue, id, type, ...toNormalize } = proof
-  return normalizeJsonLD(toNormalize)
+  return normalizeJsonLD(toNormalize, context)
 }

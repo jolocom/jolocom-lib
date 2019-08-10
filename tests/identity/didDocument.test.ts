@@ -37,16 +37,19 @@ describe('DidDocument', () => {
 
   before(() => {
     clock = sinon.useFakeTimers()
-    sandbox
-      .stub(crypto, 'randomBytes')
-      .returns(Buffer.from('1842fb5f567dd532', 'hex'))
+    sandbox.stub(crypto, 'randomBytes').returns(Buffer.from('1842fb5f', 'hex'))
   })
 
   beforeEach(async () => {
     referenceDidDocument = await DidDocument.fromPublicKey(
       testPublicIdentityKey,
     )
-    referenceDidDocument.addAuthKey(PublicKeySection.fromJSON(mockPublicKey2))
+
+    referenceDidDocument.addAuthKey(
+      PublicKeySection.fromJSON(mockPublicKey2, {
+        version: 0.13,
+      }),
+    )
 
     referenceDidDocument.addServiceEndpoint(
       ServiceEndpointsSection.fromJSON(mockPubProfServiceEndpointJSON),
@@ -65,15 +68,27 @@ describe('DidDocument', () => {
     expect(didDoc.did).to.contain('did:unknown')
   })
 
-  it('Should correctly implement fromJSON for version 0', () => {
-    const didDocumentv0 = DidDocument.fromJSON(didDocumentJSONv0)
+  it('Should correctly produce normalized form', async () => {
+    const normalized = await normalizeJsonLD(
+      referenceDidDocument.toJSON(),
+      referenceDidDocument.context,
+    )
 
-    didDocumentv0.addAuthKey(mockPublicKey2 as PublicKeySection)
+    expect(normalized).to.deep.eq(normalizedDidDocument)
+  })
+
+  it('Should correctly implement fromJSON for version 0', async () => {
+    const didDocumentv0 = DidDocument.fromJSON(didDocumentJSONv0)
+    didDocumentv0.addAuthKey(
+      PublicKeySection.fromJSON(mockPublicKey2, { version: 0.13 }),
+    )
+    await didDocumentv0.sign(vault, derivationArgs, mockKeyId)
     expect(didDocumentv0).to.deep.eq(referenceDidDocument)
   })
 
-  it('Should correctly implement fromJSON', () => {
+  it('Should correctly implement fromJSON', async () => {
     const didDocFromJSON = DidDocument.fromJSON(didDocumentJSON)
+    await didDocFromJSON.sign(vault, derivationArgs, mockKeyId)
     expect(didDocFromJSON).to.deep.eq(referenceDidDocument)
   })
 
@@ -101,7 +116,7 @@ describe('DidDocument', () => {
     )
 
     expect(referenceDidDocument.signature).to.eq(
-      '3e4bca6a08643c4a67c02abd109accd19f2f9ad1c93cd9f39d3f23edc122de7a72d1de44420b456c20b1875ed254417efdf8dd16fb8ded818d830dac475ec55a',
+      didDocumentJSON.proof.signatureValue,
     )
   })
 
@@ -119,7 +134,10 @@ describe('DidDocument', () => {
     const pub = referenceDidDocument.publicKey.map(pub => pub.toJSON())
     const serv = referenceDidDocument.service.map(ser => ser.toJSON())
 
-    expect(auth).to.deep.eq(authentication)
+    expect(auth.length).to.eq(2)
+    expect(auth[0]).to.eq(authentication[0])
+    expect((auth[1] as PublicKeySection).toJSON()).to.deep.eq(authentication[1])
+
     expect(pub).to.deep.eq(publicKey)
     expect(serv).to.deep.eq(service)
     expect(referenceDidDocument.context).to.deep.eq(didDocumentJSON['@context'])

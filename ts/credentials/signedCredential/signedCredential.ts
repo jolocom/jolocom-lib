@@ -12,13 +12,17 @@ import {
   ILinkedDataSignature,
   IDigestible,
 } from '../../linkedDataSignature/types'
-import { ContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
+import { BaseMetadata } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { ISigner } from '../../registries/types'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
-import { JsonLdDigestible } from '../../validation/jsonLdValidator'
+import {
+  JsonLdContext,
+  JsonLdDigestible,
+} from '../../validation/jsonLdValidator'
+import {signedCredentialContext} from '../../utils/contexts'
 
 /**
  * @description Data needed to prepare signature on credential
@@ -38,7 +42,7 @@ interface IIssInfo {
 
 @Exclude()
 export class SignedCredential implements IDigestible {
-  private '_@context': ContextEntry[]
+  private '_@context': JsonLdContext = signedCredentialContext
   private _id: string = generateClaimId(8)
   private _name: string
   private _issuer: string
@@ -65,7 +69,7 @@ export class SignedCredential implements IDigestible {
    * @example `signedCredential.context = [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
-  set context(context: ContextEntry[]) {
+  set context(context: JsonLdContext) {
     this['_@context'] = context
   }
 
@@ -114,9 +118,7 @@ export class SignedCredential implements IDigestible {
    */
 
   @Expose()
-  @Transform((value: Date) => value && value.toISOString(), {
-    toPlainOnly: true,
-  })
+  @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true, })
   @Transform((value: string) => value && new Date(value), { toClassOnly: true })
   get issued(): Date {
     return this._issued
@@ -311,7 +313,6 @@ export class SignedCredential implements IDigestible {
     const credential = Credential.create(credentialOptions)
     const json = credential.toJSON() as ISignedCredentialAttrs
     const signedCredential = SignedCredential.fromJSON(json)
-    signedCredential.claim
 
     signedCredential.prepareSignature(issInfo.keyId)
     signedCredential.issuer = issInfo.issuerDid

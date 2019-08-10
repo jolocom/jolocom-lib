@@ -5,6 +5,7 @@ import {
   Exclude,
   Expose,
   Transform,
+  ClassTransformOptions,
 } from 'class-transformer'
 import { IPublicKeySectionAttrs } from './types'
 
@@ -28,7 +29,7 @@ export class PublicKeySection {
    */
 
   @Expose()
-  @Transform((val, obj) => obj.owner, { toClassOnly: true, until: 0.13 })
+  @Transform((entry, { owner }) => owner, { toClassOnly: true, until: 0.13 })
   public get controller(): string {
     return this._controller
   }
@@ -125,10 +126,15 @@ export class PublicKeySection {
   /**
    * Instantiates an {@link PublicKeySection} from it's JSON form
    * @param json - Section encoded as JSON
+   * @param options - {@link ClassTransformOptions} options to be passed when
+   *  instantiating (e.g. version)
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
    */
 
-  public static fromJSON(json: IPublicKeySectionAttrs): PublicKeySection {
-    return plainToClass(PublicKeySection, json)
+  public static fromJSON(
+    json: IPublicKeySectionAttrs,
+    options?: ClassTransformOptions,
+  ): PublicKeySection {
+    return plainToClass(PublicKeySection, json, options)
   }
 }
