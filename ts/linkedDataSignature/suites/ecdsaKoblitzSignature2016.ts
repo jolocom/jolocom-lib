@@ -13,10 +13,8 @@ import {
 } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { keyIdToDid } from '../../utils/helper'
-import {
-  normalizeJsonLD,
-} from '../../validation/jsonLdValidator'
-import {didDocumentContext, JsonLdContext} from '../../utils/contexts'
+import { normalizeLdProof } from '../../validation/jsonLdValidator'
+import { didDocumentContext } from '../../utils/contexts'
 
 /**
  * @class A EcdsaKoblitz linked data signature implementation
@@ -177,12 +175,4 @@ export class EcdsaLinkedDataSignature
   public toJSON(): ILinkedDataSignatureAttrs {
     return classToPlain(this) as ILinkedDataSignatureAttrs
   }
-}
-
-export const normalizeLdProof = (
-  { ['@context']: _, ...proof }: ILinkedDataSignatureAttrs,
-  context: JsonLdContext | JsonLdContext[],
-): Promise<string> => {
-  const { signatureValue, id, type, ...toNormalize } = proof
-  return normalizeJsonLD(toNormalize, context)
 }

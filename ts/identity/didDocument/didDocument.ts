@@ -14,16 +14,14 @@ import {
   ServiceEndpointsSection,
 } from './sections'
 import { ISigner } from '../../registries/types'
-import {didDocumentContext, JsonLdContext} from '../../utils/contexts'
+import { didDocumentContext } from '../../utils/contexts'
 import { publicKeyToDID } from '../../utils/crypto'
 import {
   ILinkedDataSignature,
   IDigestible,
 } from '../../linkedDataSignature/types'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
-import {
-  JsonLdDigestible,
-} from '../../validation/jsonLdValidator'
+import { JsonLdDigestible } from '../../validation/jsonLdValidator'
 import {
   IKeyDerivationArgs,
   IVaultedKeyProvider,
@@ -32,6 +30,7 @@ import {
   IAuthenticationSectionAttrs,
   IAuthenticationSectionAttrsv0,
 } from './sections/types'
+import { JsonLdContext } from '../../utils/contexts/types'
 
 /**
  * Class modelling a Did Document
@@ -50,7 +49,7 @@ export class DidDocument implements IDigestible {
   private _created: Date = new Date()
   private _updated: Date = new Date()
   private _proof: ILinkedDataSignature
-  private _context: JsonLdContext = didDocumentContext
+  private _context: JsonLdContext
 
   /**
    * The DID spec version
@@ -162,7 +161,7 @@ export class DidDocument implements IDigestible {
 
   /**
    * Get the did document service endpoint sections
-   * @example `console.log(diddocument.service) // [serviceendpointsection {...}, ...]`
+   * @example `console.log(didDocument.service) // [serviceEndpointSection {...}, ...]`
    */
 
   @Expose()
@@ -336,6 +335,7 @@ export class DidDocument implements IDigestible {
     const keyId = `${did}#keys-1`
 
     const didDocument = new DidDocument()
+    didDocument.context = didDocumentContext
     didDocument.did = did
     didDocument.addPublicKeySection(
       PublicKeySection.fromEcdsa(publicKey, keyId, did),
