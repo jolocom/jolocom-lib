@@ -3,7 +3,9 @@ import { ContextEntry } from 'cred-types-jolocom-core'
 /* Expanded default context for verifiable credentials, more verbose, but works in offline use cases */
 
 export const defaultContext: ContextEntry[] = [
+  // @ts-ignore number is not allowed as value of ContextEntry
   {
+    '@version': 1.1,
     id: '@id',
     type: '@type',
     cred: 'https://w3id.org/credentials#',
