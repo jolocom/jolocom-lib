@@ -5,18 +5,16 @@ import {
   IServiceEndpointSectionAttrs,
 } from './sections/types'
 import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
-import { ContextEntry } from 'cred-types-jolocom-core'
-import { SignedJsonLdObject } from '../../validation/jsonLdValidator'
+import { SignedJsonLdObject} from '../../validation/jsonLdValidator'
 
 export interface IDidDocumentAttrs extends SignedJsonLdObject {
-  '@context': ContextEntry[] | string
   specVersion?: number
   id: string
-  authentication?:
-    | IAuthenticationSectionAttrsv0[]
-    | IAuthenticationSectionAttrs[]
+  authentication?: DidDocAuthenticationSection
   publicKey?: IPublicKeySectionAttrs[]
   service?: IServiceEndpointSectionAttrs[]
   created?: string
   proof: ILinkedDataSignatureAttrs
 }
+
+export type DidDocAuthenticationSection = IAuthenticationSectionAttrsv0[] | IAuthenticationSectionAttrs[]

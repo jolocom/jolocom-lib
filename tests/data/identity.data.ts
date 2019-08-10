@@ -1,6 +1,6 @@
-import { defaultContext } from '../../ts/utils/contexts'
-
 /* Saves space later */
+
+import { signedCredentialContext } from '../../ts/utils/contexts'
 
 const publicProfileCreationArgs = {
   name: 'User name',
@@ -15,7 +15,7 @@ const publicProfileCreationArgs = {
 
 export const publicProfileCredJSON = {
   '@context': [
-    ...defaultContext,
+    ...signedCredentialContext,
     {
       PublicProfileCredential:
         'https://identity.jolocom.com/terms/PublicProfileCredential',

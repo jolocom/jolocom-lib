@@ -1,4 +1,5 @@
-import { ContextEntry, ClaimInterface } from 'cred-types-jolocom-core'
+import { ClaimInterface } from 'cred-types-jolocom-core'
+import { JsonLdContext } from '../../validation/jsonLdValidator'
 
 type ClaimType = string | number | boolean | {}
 /**
@@ -24,7 +25,7 @@ export interface IClaimSection {
 }
 
 export interface ICredentialAttrs {
-  '@context': ContextEntry[]
+  '@context': JsonLdContext
   type: string[]
   name?: string
   claim: ClaimEntry

@@ -1,5 +1,5 @@
 import { BaseMetadata, claimsMetadata } from 'cred-types-jolocom-core'
-import { defaultContext } from '../../../ts/utils/contexts'
+import {signedCredentialContext} from '../../../ts/utils/contexts'
 
 /* Defining custom metadata objects for custom credentials */
 
@@ -89,7 +89,7 @@ export const mockBirthdayCredCreationAttrs = {
 
 export const emailCredentialJSON = {
   '@context': [
-    ...defaultContext,
+    ...signedCredentialContext,
     {
       email: 'schema:email',
       schema: 'http://schema.org/',
@@ -107,7 +107,7 @@ export const emailCredentialJSON = {
 
 export const nameCredentialJSON = {
   '@context': [
-    ...defaultContext,
+    ...signedCredentialContext,
     {
       ProofOfNameCredential:
         'https://identity.jolocom.com/terms/ProofOfNameCredential',
@@ -126,7 +126,7 @@ export const nameCredentialJSON = {
 
 export const birthdayCredentialJSON = {
   '@context': [
-    ...defaultContext,
+    ...signedCredentialContext,
     'http://test.com',
     { test: 'http://test.com/terms' },
   ],
@@ -140,7 +140,7 @@ export const birthdayCredentialJSON = {
 
 export const addressCredentialJSON = {
   '@context': [
-    ...defaultContext,
+    ...signedCredentialContext,
     'http://test.com',
     { test: 'http://test.com/terms' },
   ],
