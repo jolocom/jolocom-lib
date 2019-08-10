@@ -54,7 +54,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     )
   })
 
-  it('Should allow for consumption of valid payment request by user', async () => {
+  it('Should allow for consumption of valid payment request by user', done => {
     const decodedPaymentRequest = JSONWebToken.decode<PaymentRequest>(
       paymentRequestEncoded,
     )
@@ -63,15 +63,9 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       PaymentRequest,
     )
 
-    try {
-      await serviceIdentityWallet.validateJWT(
-        decodedPaymentRequest,
-        null,
-        jolocomRegistry,
-      )
-    } catch (err) {
-      expect(true).to.be.false
-    }
+    serviceIdentityWallet
+      .validateJWT(decodedPaymentRequest, null, jolocomRegistry)
+      .then(done, done)
   })
 
   it('Should create a payment response by user', async () => {
@@ -101,7 +95,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     expect(paymentResponseJWT.interactionToken.txHash).to.equal(receipt)
   })
 
-  it('Should allow for consumption of valid payment response by service', async () => {
+  it('Should allow for consumption of valid payment response by service', done => {
     const decodedPaymentResponse = JSONWebToken.decode<PaymentResponse>(
       paymentResponseEncoded,
     )
@@ -109,15 +103,9 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       PaymentResponse,
     )
 
-    try {
-      await serviceIdentityWallet.validateJWT(
-        decodedPaymentResponse,
-        paymentRequestJWT,
-        jolocomRegistry,
-      )
-    } catch (err) {
-      expect(true).to.eq(true)
-    }
+    serviceIdentityWallet
+      .validateJWT(decodedPaymentResponse, paymentRequestJWT, jolocomRegistry)
+      .then(done, done)
   })
 
   it('Should transfer the funds and correctly increment the nonce', async () => {

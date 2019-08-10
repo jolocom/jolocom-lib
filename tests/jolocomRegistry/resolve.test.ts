@@ -74,16 +74,9 @@ describe('Jolocom Registry - resolve', () => {
     ])
   })
 
-  it('should correctly use custom resolver if passed', async () => {
-    const customMethod = 'test'
+  it('should correctly use custom resolution function if passed', async () => {
     const testResolver = sinon.stub().returns(didDocumentJSON)
-
-    const customResolver = new MultiResolver({
-      [customMethod]: testResolver
-    })
-
-    const registry = new JolocomRegistry(customResolver)
-
-    expect(registry.resolver.supportedMethods).to.deep.eq([customMethod])
+    const registry = new JolocomRegistry(testResolver)
+    expect(registry.resolver).to.deep.eq(testResolver)
   })
 })

@@ -54,6 +54,7 @@ describe('SignedCredential', () => {
   })
 
   it('Should correctly implement toJSON method', () => {
+    console.log(vCred.toJSON())
     expect(vCred.toJSON()).to.deep.eq(emailVerifiableCredential)
   })
 
