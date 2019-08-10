@@ -20,6 +20,7 @@ import {
 } from '../../ts/identity/didDocument/sections'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
+import { normalizeJsonLD } from '../../ts/validation/jsonLdValidator'
 
 const expect = chai.expect
 
@@ -31,7 +32,7 @@ describe('DidDocument', () => {
     encryptionPass: 'password',
   }
 
-  let referenceDidDocument
+  let referenceDidDocument: DidDocument
   let clock
 
   before(() => {
@@ -45,7 +46,8 @@ describe('DidDocument', () => {
     referenceDidDocument = await DidDocument.fromPublicKey(
       testPublicIdentityKey,
     )
-    referenceDidDocument.addAuthKey(mockPublicKey2)
+    referenceDidDocument.addAuthKey(PublicKeySection.fromJSON(mockPublicKey2))
+
     referenceDidDocument.addServiceEndpoint(
       ServiceEndpointsSection.fromJSON(mockPubProfServiceEndpointJSON),
     )
@@ -58,7 +60,7 @@ describe('DidDocument', () => {
   })
 
   it('Should not try to migrate if DID is not "did:jolo:*"', () => {
-    const foreignDidDoc = {...didDocumentJSONv0, id: 'did:unknown:de4bb33f'}
+    const foreignDidDoc = { ...didDocumentJSONv0, id: 'did:unknown:de4bb33f' }
     const didDoc = DidDocument.fromJSON(foreignDidDoc)
     expect(didDoc.did).to.contain('did:unknown')
   })
@@ -80,7 +82,10 @@ describe('DidDocument', () => {
   })
 
   it('Should correctly implement normalize', async () => {
-    const normalized = await referenceDidDocument.normalize()
+    const normalized = await normalizeJsonLD(
+      referenceDidDocument.toJSON(),
+      referenceDidDocument.context,
+    )
 
     expect(normalized).to.deep.eq(normalizedDidDocument)
   })
