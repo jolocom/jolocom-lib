@@ -90,7 +90,7 @@ export const didDocumentJSON: IDidDocumentAttrs = {
 
 export const normalizedDidDocument =
   '<did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777#jolocomPubProfile> <http://schema.org/description> "Verifiable Credential describing entity profile" .\n' +
-  `<did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777#jolocomPubProfile> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://identity.jolocom.com/terms/PublicProfile> .\n`+
+  `<did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777#jolocomPubProfile> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://identity.jolocom.com/terms/PublicProfile> .\n` +
   `<did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777#jolocomPubProfile> <https://w3id.org/did#serviceEndpoint> <ipfs://QmZCEmfiKZhRPB88cEqmcHzQu6siSmVpieG6HTQse4e4Js> .\n` +
   `<did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777#keys-1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#Secp256k1VerificationKey2018> .\n` +
   '<did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777#keys-1> <https://w3id.org/security#controller> <did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777> .\n' +

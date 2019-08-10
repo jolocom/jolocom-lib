@@ -5,7 +5,10 @@ import { SoftwareKeyProvider } from './vaultedKeyProvider/softwareProvider'
 import { KeyTypes } from './vaultedKeyProvider/types'
 import { constraintFunctions } from './interactionTokens/credentialRequest'
 import { fuelKeyWithEther, getIssuerPublicKey } from './utils/helper'
-import { validateDigestible, validateDigestibles } from './validation/validation'
+import {
+  validateDigestible,
+  validateDigestibles,
+} from './validation/validation'
 
 export const JolocomLib = {
   parse,

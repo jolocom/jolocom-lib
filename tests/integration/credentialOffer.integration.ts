@@ -5,7 +5,7 @@ import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { keyIdToDid } from '../../ts/utils/helper'
 import {
   credentialOfferRequestCreationArgs,
-  credentialOfferResponseCreationArgs
+  credentialOfferResponseCreationArgs,
 } from '../data/interactionTokens/credentialOffer.data'
 import {
   userIdentityWallet,

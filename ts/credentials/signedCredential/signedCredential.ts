@@ -22,7 +22,7 @@ import {
   JsonLdContext,
   JsonLdDigestible,
 } from '../../validation/jsonLdValidator'
-import {signedCredentialContext} from '../../utils/contexts'
+import { signedCredentialContext } from '../../utils/contexts'
 
 /**
  * @description Data needed to prepare signature on credential
@@ -118,7 +118,9 @@ export class SignedCredential implements IDigestible {
    */
 
   @Expose()
-  @Transform((value: Date) => value && value.toISOString(), { toPlainOnly: true, })
+  @Transform((value: Date) => value && value.toISOString(), {
+    toPlainOnly: true,
+  })
   @Transform((value: string) => value && new Date(value), { toClassOnly: true })
   get issued(): Date {
     return this._issued
