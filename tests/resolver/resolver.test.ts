@@ -48,7 +48,7 @@ describe('Validating resolver creator function', () => {
   const validator = sinon.stub().resolves(true)
 
   it('Should correctly compose resolver and validator', async () => {
-    const validatingResolver = createValidatingResolver(resolver)(validator)
+    const validatingResolver = createValidatingResolver(resolver, validator)
     expect(await validatingResolver(testDid)).to.deep.eq(didDocumentJSON)
     sinon.assert.calledWith(resolver, testDid)
     sinon.assert.calledWith(validator, didDocumentJSON)
@@ -56,7 +56,8 @@ describe('Validating resolver creator function', () => {
 
   it('Should correctly throw if validation fails', async () => {
     const throwingValidator = async () => false
-    const brokenValidatingResolver = createValidatingResolver(resolver)(
+    const brokenValidatingResolver = createValidatingResolver(
+      resolver,
       throwingValidator,
     )
 

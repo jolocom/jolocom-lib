@@ -8,15 +8,21 @@ import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { getMethodPrefixFromDid } from '../utils/crypto'
 import { IEthereumConnector } from '../ethereum/types'
 import { IIpfsConnector } from '../ipfs/types'
+import { jolocomEthereumResolver } from '../ethereum/ethereum'
+import { jolocomIpfsStorageAgent } from '../ipfs/ipfs'
+import { noValidation } from '../utils/validation'
 
 /**
- * Curried function for assembling a resolver to be used as a {@link ValidatingDidResolver} in the {@link MultiResolver}.
- *   Curried to take a {@link DidDocumentResolver}, followed by a {@link DidDocumentValidator}
+ * Function for assembling a resolver to be used as a {@link ValidatingDidResolver} in the {@link MultiResolver}.
+ * @param resolver - {@link DidDocumentResolver} function to use
+ * @param validator - {@link DidDocumentValidator} function to use
+ * @returns configured {@link DidDocumentResolver}
  */
 
-export const createValidatingResolver: ValidatingDidResolver = resolver => (
+export const createValidatingResolver: ValidatingDidResolver = (
+  resolver,
   validator,
-): DidDocumentResolver => async (did: string): Promise<IDidDocumentAttrs> => {
+) => async (did: string): Promise<IDidDocumentAttrs> => {
   const didDocument = await resolver(did)
   const valid = await validator(didDocument)
   if (!valid) {
@@ -101,3 +107,9 @@ export class MultiResolver {
     return resolver(did)
   }
 }
+export const mutliResolver = new MultiResolver({
+  jolo: createValidatingResolver(
+    createJolocomResolver(jolocomEthereumResolver, jolocomIpfsStorageAgent),
+    noValidation,
+  ),
+})

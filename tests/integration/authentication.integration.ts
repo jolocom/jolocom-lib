@@ -8,7 +8,7 @@ import { Authentication } from '../../ts/interactionTokens/authentication'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  jolocomRegistry,
+  resolver,
 } from './identity.integration'
 
 chai.use(sinonChai)
@@ -40,11 +40,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     expect(decodedAuthRequest.interactionToken).to.be.instanceOf(Authentication)
 
     try {
-      await userIdentityWallet.validateJWT(
-        decodedAuthRequest,
-        null,
-        jolocomRegistry,
-      )
+      await userIdentityWallet.validateJWT(decodedAuthRequest, null, resolver)
     } catch (err) {
       return expect(true).to.be.false
     }
@@ -78,7 +74,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
       await serviceIdentityWallet.validateJWT(
         decodedAuthResponse,
         authRequestJWT,
-        jolocomRegistry,
+        resolver,
       )
     } catch (err) {
       return expect(true).to.be.false

@@ -1,6 +1,6 @@
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
 
-/** @TODO Should these use JSON or DidDocument json attributes? */
+/** @TODO Should return Promise<JsonLdObject> once #377 is merged */
 export type DidDocumentResolver = (did: string) => Promise<IDidDocumentAttrs>
 
 export type DidDocumentValidator = (
@@ -10,8 +10,9 @@ export type DidDocumentValidator = (
 /** A function composing the resolver and validator. */
 export type ValidatingDidResolver = (
   resolver: DidDocumentResolver,
-) => (validator: DidDocumentValidator) => DidDocumentResolver
+  validator: DidDocumentValidator,
+) => DidDocumentResolver
 
-export type ResolutionMap = {
+export interface ResolutionMap {
   [method: string]: DidDocumentResolver
 }

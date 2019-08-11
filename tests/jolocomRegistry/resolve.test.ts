@@ -1,6 +1,9 @@
 import * as sinon from 'sinon'
 
-import {createJolocomRegistry, JolocomRegistry} from '../../ts/registries/jolocomRegistry'
+import {
+  createJolocomRegistry,
+  JolocomRegistry,
+} from '../../ts/registries/jolocomRegistry'
 import {
   mockDid,
   didDocumentJSON,
@@ -11,7 +14,7 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { publicProfileCredJSON } from '../data/identity.data'
 import { Identity } from '../../ts/identity/identity'
 import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
-import {MultiResolver} from '../../ts/resolver'
+import { MultiResolver } from '../../ts/resolver'
 
 describe('Jolocom Registry - resolve', () => {
   let registry: any = createJolocomRegistry()

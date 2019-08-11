@@ -23,6 +23,7 @@ import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvide
 import { testSeed } from '../data/keys.data'
 import { ContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import { createJolocomResolver, MultiResolver } from '../../ts/resolver'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -33,6 +34,7 @@ export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
 export let testContractsGateway: ContractsGateway
 export let testContractsAdapter: ContractsAdapter
+export let resolver: MultiResolver
 
 before(async () => {
   const {
@@ -42,6 +44,13 @@ before(async () => {
 
   testContractsGateway = gateway
   testContractsAdapter = adapter
+
+  resolver = new MultiResolver({
+    jolo: createJolocomResolver(
+      new EthResolver(testEthereumConfig),
+      new IpfsStorageAgent(testIpfsConfig),
+    ),
+  })
 
   jolocomRegistry = createJolocomRegistry({
     ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
