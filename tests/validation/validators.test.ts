@@ -1,6 +1,7 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { validateJsonLd } from '../../ts/validation/validation'
+import { didDocumentJSONv0 } from '../data/didDocument.data'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -135,5 +136,24 @@ describe('Utils/Validation functions', () => {
   it('validateJsonLd should correctly validate, maintaining backwards compatibility', async () => {
     expect(await validateJsonLd(DID_DOC_V0)).to.eq(true)
     expect(await validateJsonLd(DID_DOC_V0_13)).to.eq(true)
+
+    const mallformedV0 = {
+      ...DID_DOC_V0,
+      proof: {
+        ...DID_DOC_V0.proof,
+        nonce: '0',
+      },
+    }
+
+    const mallformedV013 = {
+      ...DID_DOC_V0_13,
+      proof: {
+        ...DID_DOC_V0_13.proof,
+        nonce: '0',
+      },
+    }
+
+    expect(await validateJsonLd(mallformedV0)).to.eq(false)
+    expect(await validateJsonLd(mallformedV013)).to.eq(false)
   })
 })
