@@ -1,7 +1,9 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { validateJsonLd } from '../../ts/validation/validation'
-import { didDocumentJSONv0 } from '../data/didDocument.data'
+import { IRegistry } from '../../ts/registries/types'
+import { Identity } from '../../ts/identity/identity'
+import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -134,8 +136,17 @@ const DID_DOC_V0_13 = {
 
 describe('Utils/Validation functions', () => {
   it('validateJsonLd should correctly validate, maintaining backwards compatibility', async () => {
-    expect(await validateJsonLd(DID_DOC_V0)).to.eq(true)
-    expect(await validateJsonLd(DID_DOC_V0_13)).to.eq(true)
+    //@ts-ignore
+    const mockRegistry: IRegistry = {
+      resolve: async did =>
+        did === DID_DOC_V0.id
+          ? Identity.fromDidDocument({
+              didDocument: DidDocument.fromJSON(DID_DOC_V0),
+            })
+          : Identity.fromDidDocument({
+              didDocument: DidDocument.fromJSON(DID_DOC_V0_13),
+            }),
+    }
 
     const mallformedV0 = {
       ...DID_DOC_V0,
@@ -153,7 +164,10 @@ describe('Utils/Validation functions', () => {
       },
     }
 
-    expect(await validateJsonLd(mallformedV0)).to.eq(false)
-    expect(await validateJsonLd(mallformedV013)).to.eq(false)
+    expect(await validateJsonLd(DID_DOC_V0, mockRegistry)).to.eq(true)
+    expect(await validateJsonLd(DID_DOC_V0_13, mockRegistry)).to.eq(true)
+
+    expect(await validateJsonLd(mallformedV0, mockRegistry)).to.eq(false)
+    expect(await validateJsonLd(mallformedV013, mockRegistry)).to.eq(false)
   })
 })
