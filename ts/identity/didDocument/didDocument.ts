@@ -362,7 +362,7 @@ export class DidDocument implements IDigestible {
     this._proof.signature = ''
     this._proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
 
-    const didDocumentSignature = await vaultedKeyProvider.signDigestable(
+    const didDocumentSignature = await vaultedKeyProvider.signDigestible(
       derivationArgs,
       this,
     )

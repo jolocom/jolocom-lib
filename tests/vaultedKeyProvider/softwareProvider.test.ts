@@ -21,7 +21,7 @@ import {
   credentialDigest,
   corruptedSignedCredentialJSON,
 } from '../data/keyProvider.data'
-import { IDigestable } from '../../ts/linkedDataSignature/types'
+import { IDigestible } from '../../ts/linkedDataSignature/types'
 import { publicProfileCredJSON, emailCredential } from '../data/identity.data'
 import { keyDerivationArgs } from '../data/identityWallet.data'
 
@@ -179,7 +179,7 @@ describe('Software Vaulted Key Provider', () => {
     })
   })
 
-  describe('signDigestable', () => {
+  describe('signDigestible', () => {
     const credentialToSign = SignedCredential.fromJSON(publicProfileCredJSON)
     let sign
 
@@ -192,7 +192,7 @@ describe('Software Vaulted Key Provider', () => {
     })
 
     it('Should correctly digest passed object and call compute signature', async () => {
-      await vault.signDigestable(keyDerivationArgs, credentialToSign)
+      await vault.signDigestible(keyDerivationArgs, credentialToSign)
       const [argPubKey, argDigest] = sign.getCall(0).args
 
       expect(argPubKey).to.deep.eq(keyDerivationArgs)
@@ -203,7 +203,7 @@ describe('Software Vaulted Key Provider', () => {
 
     it('Should fail to compute signature if object or key data is invalid', async () => {
       try {
-        await vault.signDigestable(keyDerivationArgs, {} as IDigestable)
+        await vault.signDigestible(keyDerivationArgs, {} as IDigestible)
         expect(false).to.be.true
       } catch (err) {
         expect(err.message).to.eq('toSign.digest is not a function')
@@ -211,15 +211,15 @@ describe('Software Vaulted Key Provider', () => {
     })
   })
 
-  /* Invalid input is covered in vault.signDigestable and vault.verify blocks */
+  /* Invalid input is covered in vault.signDigestible and vault.verify blocks */
 
-  describe('validateDigestable', () => {
+  describe('validateDigestible', () => {
     const credentialToSign = SignedCredential.fromJSON(emailCredential)
     const pubKey = vault.getPublicKey(keyDerivationArgs)
 
     it('Should correctly digest passed object and validate the signature', async () => {
       expect(
-        await SoftwareKeyProvider.verifyDigestable(pubKey, credentialToSign),
+        await SoftwareKeyProvider.verifyDigestible(pubKey, credentialToSign),
       ).to.eq(true)
     })
 
@@ -228,7 +228,7 @@ describe('Software Vaulted Key Provider', () => {
         corruptedSignedCredentialJSON,
       )
       expect(
-        await SoftwareKeyProvider.verifyDigestable(pubKey, corruptedCredential),
+        await SoftwareKeyProvider.verifyDigestible(pubKey, corruptedCredential),
       ).to.eq(false)
     })
   })

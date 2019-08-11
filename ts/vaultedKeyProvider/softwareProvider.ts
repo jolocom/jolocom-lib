@@ -1,7 +1,7 @@
 import { fromSeed } from 'bip32'
 import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
-import { IDigestable } from '../linkedDataSignature/types'
+import { IDigestible } from '../linkedDataSignature/types'
 import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
@@ -200,15 +200,15 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   /**
    * Digests the passed object, and computes the signature
    * @param derivationArgs - Password for seed decryption and derivation path
-   * @param toSign - Instance of class that implements the {@link IDigestable} interface
+   * @param toSign - Instance of class that implements the {@link IDigestible} interface
    * @param derivationArgs.encryptionPass - The encryption password
    * @param derivationArgs.derivationPath - The bip32 derivation path
-   * @example `await vault.signDigestable(derivationArgs, publicProfileCredential) // Buffer <...>`
+   * @example `await vault.signDigestible(derivationArgs, publicProfileCredential) // Buffer <...>`
    */
 
-  public async signDigestable(
+  public async signDigestible(
     derivationArgs: IKeyDerivationArgs,
-    toSign: IDigestable,
+    toSign: IDigestible,
   ): Promise<Buffer> {
     const digest = await toSign.digest()
     return this.sign(derivationArgs, digest)
@@ -216,14 +216,14 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   /**
    * Digest the passed object, and validate the signature using a provided public key
-   * @param toVerify - Instance of class that implements IDigestable
+   * @param toVerify - Instance of class that implements IDigestible
    * @param publicKey - Public key used to generate the signature
-   * @example `await SoftwareKeyProvider.verifyDigestable(publicKey, publicProfileSignedCredential) // true`
+   * @example `await SoftwareKeyProvider.verifyDigestible(publicKey, publicProfileSignedCredential) // true`
    */
 
-  public static async verifyDigestable(
+  public static async verifyDigestible(
     publicKey: Buffer,
-    toVerify: IDigestable,
+    toVerify: IDigestible,
   ): Promise<boolean> {
     const digest = await toVerify.digest()
     const signature = Buffer.from(toVerify.signature, 'hex')

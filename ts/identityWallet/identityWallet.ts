@@ -207,7 +207,7 @@ export class IdentityWallet {
       },
     )
 
-    const signature = await this.vaultedKeyProvider.signDigestable(
+    const signature = await this.vaultedKeyProvider.signDigestible(
       { derivationPath, encryptionPass: pass },
       vCred,
     )
@@ -465,7 +465,7 @@ export class IdentityWallet {
       ? (jwt.nonce = receivedJWT.nonce)
       : (jwt.nonce = SoftwareKeyProvider.getRandom(8).toString('hex'))
 
-    const signature = await this.vaultedKeyProvider.signDigestable(
+    const signature = await this.vaultedKeyProvider.signDigestible(
       { derivationPath, encryptionPass: pass },
       jwt,
     )
@@ -496,7 +496,7 @@ export class IdentityWallet {
     )
 
     handleValidationStatus(
-      await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT),
+      await SoftwareKeyProvider.verifyDigestible(pubKey, receivedJWT),
       'sig',
     )
     sendJWT &&

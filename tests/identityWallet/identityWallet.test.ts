@@ -25,7 +25,7 @@ const expect = chai.expect
 /* Saves some space during stubbing, helper functions */
 
 const stubbedKeyProvider = {
-  signDigestable: sinon
+  signDigestible: sinon
     .stub()
     .returns(Buffer.from(validSignedCredReqJWT.signature, 'hex')),
 } as IVaultedKeyProvider

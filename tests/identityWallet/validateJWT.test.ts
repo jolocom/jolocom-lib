@@ -81,7 +81,7 @@ describe('IdentityWallet validate JWT', () => {
     }
 
     /** @dev Restored in afterEach */
-    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+    sandbox.stub(SoftwareKeyProvider, 'verifyDigestible').resolves(true)
 
     try {
       await iw.validateJWT(
@@ -103,7 +103,7 @@ describe('IdentityWallet validate JWT', () => {
     }
 
     /** @dev Restored in afterEach */
-    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+    sandbox.stub(SoftwareKeyProvider, 'verifyDigestible').resolves(true)
 
     try {
       await iw.validateJWT(

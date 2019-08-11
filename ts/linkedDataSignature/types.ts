@@ -4,13 +4,14 @@ export interface ISerializable {
   toJSON: () => {}
 }
 
-export interface ILinkedDataSignature extends IDigestable, ISerializable {
+export interface ILinkedDataSignature extends IDigestible, ISerializable {
   creator: string
   type: string
   nonce: string
   created: Date
 }
-export interface IDigestable {
+
+export interface IDigestible {
   signature: string
   digest: () => Promise<Buffer>
   signer: {

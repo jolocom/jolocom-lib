@@ -130,7 +130,7 @@ If you already know the public key corresponding to the signing party, it is not
      * the signature is simply being verified, without checking against any external resources.
    */
 
-  console.log(await JolocomLib.keyProvider.verifyDigestable(issuerPublicKey, signedCred)) // true
+  console.log(await JolocomLib.keyProvider.verifyDigestible(issuerPublicKey, signedCred)) // true
 
 Working with custom credentials
 ################################

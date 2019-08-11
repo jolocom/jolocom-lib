@@ -8,7 +8,7 @@ import { fuelKeyWithEther, getIssuerPublicKey } from './utils/helper'
 import {
   validateDigestible,
   validateDigestibles,
-} from './validation/validation'
+} from './utils/validation'
 
 export const JolocomLib = {
   parse,
