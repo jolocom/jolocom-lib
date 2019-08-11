@@ -276,7 +276,8 @@ export const createJolocomRegistry = (
     didResolver ||
     createValidatingResolver(
       createJolocomResolver(ethereumConnector, ipfsConnector),
-    )(noValidation)
+      noValidation,
+    )
 
   const jolocomRegistry = new JolocomRegistry(validatingJolocomResolver)
 

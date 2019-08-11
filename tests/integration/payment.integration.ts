@@ -4,8 +4,8 @@ import { userPass, servicePass } from './integration.data'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  jolocomRegistry,
   testContractsGateway,
+  resolver,
 } from './identity.integration'
 import { publicKeyToAddress } from '../../ts/utils/helper'
 import { PaymentRequest } from '../../ts/interactionTokens/paymentRequest'
@@ -64,7 +64,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     )
 
     serviceIdentityWallet
-      .validateJWT(decodedPaymentRequest, null, jolocomRegistry)
+      .validateJWT(decodedPaymentRequest, null, resolver)
       .then(done, done)
   })
 
@@ -104,7 +104,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     )
 
     serviceIdentityWallet
-      .validateJWT(decodedPaymentResponse, paymentRequestJWT, jolocomRegistry)
+      .validateJWT(decodedPaymentResponse, paymentRequestJWT, resolver)
       .then(done, done)
   })
 

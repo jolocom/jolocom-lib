@@ -7,7 +7,7 @@ import {
 } from '../vaultedKeyProvider/types'
 import { Identity } from '../identity/identity'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
-import {DidDocumentResolver, ValidatingDidResolver} from '../resolver/types'
+import { DidDocumentResolver } from '../resolver/types'
 
 export interface IRegistryStaticCreationArgs {
   contracts: {

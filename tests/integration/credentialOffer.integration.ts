@@ -5,12 +5,12 @@ import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { keyIdToDid } from '../../ts/utils/helper'
 import {
   credentialOfferRequestCreationArgs,
-  credentialOfferResponseCreationArgs
+  credentialOfferResponseCreationArgs,
 } from '../data/interactionTokens/credentialOffer.data'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  jolocomRegistry,
+  resolver,
 } from './identity.integration'
 import { claimsMetadata } from 'cred-types-jolocom-core'
 import { CredentialsReceive } from '../../ts/interactionTokens/credentialsReceive'
@@ -56,7 +56,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       await userIdentityWallet.validateJWT(
         decodedCredOfferRequest,
         null,
-        jolocomRegistry,
+        resolver,
       )
     } catch (err) {
       return expect(true).to.be.false
@@ -92,7 +92,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       await serviceIdentityWallet.validateJWT(
         decodedCredOfferResponse,
         credOfferRequestJWT,
-        jolocomRegistry,
+        resolver,
       )
     } catch (err) {
       return expect(true).to.be.false
@@ -140,7 +140,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       await userIdentityWallet.validateJWT(
         decodedCredReceive,
         credOfferResponseJWT,
-        jolocomRegistry,
+        resolver,
       )
     } catch (err) {
       return expect(true).to.be.false

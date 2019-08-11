@@ -36,4 +36,3 @@ export function publicKeyToDID(publicKey: Buffer): string {
 export const getMethodPrefixFromDid = (did: string) => {
   return did.substring(4, did.lastIndexOf(':'))
 }
-
