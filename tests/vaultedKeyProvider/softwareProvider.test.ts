@@ -86,7 +86,7 @@ describe('Software Vaulted Key Provider', () => {
       const testEncryptedSeed = Buffer.concat([testIV, testCiphertext])
 
       const vault = new SoftwareKeyProvider(testEncryptedSeed)
-      expect(vault.encryptedSeed).to.deep.eq(testEncryptedSeed)
+      expect(vault.encryptedSeed).to.deep.eq(testEncryptedSeed.toString('hex'))
     })
   })
 
