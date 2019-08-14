@@ -9,6 +9,9 @@ import { mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { JolocomRegistry } from '../registries/jolocomRegistry'
 import { SocialRecovery } from './socialRecovery'
 
+/**
+ * List of possible seed phrase lengths referring to the BIP39 spec (https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
+ */
 const SEED_PHRASE_LENGTH_LIST = [12, 15, 18, 21, 24]
 
 /**

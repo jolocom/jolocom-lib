@@ -24,7 +24,6 @@ import {
   testSeedPhraseWithDid32,
   testShares,
 } from '../data/recovery.data'
-import * as crypto from 'crypto'
 
 describe('Recovery', () => {
   const sandbox = sinon.createSandbox()
