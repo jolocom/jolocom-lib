@@ -41,7 +41,7 @@ import {
 } from '../contracts/types'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
-import { MultiResolver, mutliResolver } from '../resolver'
+import { MultiResolver, multiResolver } from '../resolver'
 import { DidDocument } from '../identity/didDocument/didDocument'
 
 /**
@@ -484,7 +484,7 @@ export class IdentityWallet {
   public async validateJWT<T extends JWTEncodable, A extends JWTEncodable>(
     receivedJWT: JSONWebToken<T>,
     sendJWT?: JSONWebToken<A>,
-    resolver: MultiResolver = mutliResolver,
+    resolver: MultiResolver = multiResolver,
   ): Promise<void> {
     const remoteIdentityJson = await resolver.resolve(
       keyIdToDid(receivedJWT.issuer),

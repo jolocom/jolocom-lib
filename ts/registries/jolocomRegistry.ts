@@ -22,9 +22,8 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
-import {createJolocomResolver, MultiResolver} from '../resolver'
+import {createJolocomResolver, createValidatingResolver, MultiResolver} from '../resolver'
 import {DidDocumentResolver} from '../resolver/types'
-import {createValidatingResolver} from '../../js/resolver'
 import {noValidation} from '../validation/validation'
 
 /**
@@ -71,7 +70,7 @@ export class JolocomRegistry implements IRegistry {
 
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
 
-    const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
+    const didDocument = await DidDocument.fromPublicKey(publicIdentityKey, this.didBuilder)
 
     const identity = Identity.fromDidDocument({ didDocument })
 

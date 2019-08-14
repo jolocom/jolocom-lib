@@ -10,7 +10,7 @@ import { IEthereumConnector } from '../ethereum/types'
 import { IIpfsConnector } from '../ipfs/types'
 import { jolocomEthereumResolver } from '../ethereum/ethereum'
 import { jolocomIpfsStorageAgent } from '../ipfs/ipfs'
-import { noValidation } from '../utils/validation'
+import {noValidation} from '../validation/validation'
 
 /**
  * Function for assembling a resolver to be used as a {@link ValidatingDidResolver} in the {@link MultiResolver}.
@@ -114,7 +114,7 @@ export class MultiResolver {
   }
 }
 
-export const mutliResolver = new MultiResolver({
+export const multiResolver = new MultiResolver({
   jolo: createValidatingResolver(
     createJolocomResolver(jolocomEthereumResolver, jolocomIpfsStorageAgent),
     noValidation,

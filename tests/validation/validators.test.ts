@@ -4,6 +4,7 @@ import { validateJsonLd } from '../../ts/validation/validation'
 import { IRegistry } from '../../ts/registries/types'
 import { Identity } from '../../ts/identity/identity'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
+import {MultiResolver} from '../../ts/resolver'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -137,16 +138,9 @@ const DID_DOC_V0_13 = {
 describe('Utils/Validation functions', () => {
   it('validateJsonLd should correctly validate, maintaining backwards compatibility', async () => {
     //@ts-ignore
-    const mockRegistry: IRegistry = {
-      resolve: async did =>
-        did === DID_DOC_V0.id
-          ? Identity.fromDidDocument({
-              didDocument: DidDocument.fromJSON(DID_DOC_V0),
-            })
-          : Identity.fromDidDocument({
-              didDocument: DidDocument.fromJSON(DID_DOC_V0_13),
-            }),
-    }
+    const mockResolver = new MultiResolver({
+      jolo: async did => did === DID_DOC_V0.id ? DID_DOC_V0 : DID_DOC_V0_13
+    })
 
     const mallformedV0 = {
       ...DID_DOC_V0,
@@ -164,10 +158,10 @@ describe('Utils/Validation functions', () => {
       },
     }
 
-    expect(await validateJsonLd(DID_DOC_V0, mockRegistry)).to.eq(true)
-    expect(await validateJsonLd(DID_DOC_V0_13, mockRegistry)).to.eq(true)
+    expect(await validateJsonLd(DID_DOC_V0, mockResolver)).to.eq(true)
+    expect(await validateJsonLd(DID_DOC_V0_13, mockResolver)).to.eq(true)
 
-    expect(await validateJsonLd(mallformedV0, mockRegistry)).to.eq(false)
-    expect(await validateJsonLd(mallformedV013, mockRegistry)).to.eq(false)
+    expect(await validateJsonLd(mallformedV0, mockResolver)).to.eq(false)
+    expect(await validateJsonLd(mallformedV013, mockResolver)).to.eq(false)
   })
 })

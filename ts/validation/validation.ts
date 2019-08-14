@@ -2,12 +2,10 @@ import { JolocomLib } from '../index'
 import { IDigestible } from '../linkedDataSignature/types'
 import { IRegistry } from '../registries/types'
 import { JsonLdDigestible, SignedJsonLdObject } from './jsonLdValidator'
-import { IDigestable } from '../linkedDataSignature/types'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
-import { MultiResolver } from '../resolver'
+import {multiResolver, MultiResolver} from '../resolver'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import {getIssuerPublicKey} from '../utils/helper'
-import {multiResolver} from '../../js/resolver'
 
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
@@ -59,9 +57,9 @@ export const validateDigestibles = async (
 
 export const validateJsonLd = async (
   json: SignedJsonLdObject,
-  customRegistry?: IRegistry,
+  resolver: MultiResolver = multiResolver,
 ): Promise<boolean> =>
-  validateDigestible(new JsonLdDigestible(json), customRegistry)
+  validateDigestible(new JsonLdDigestible(json), resolver)
 
 /** @TODO replace the validation function once the JSON validation function is added */
 export const noValidation = async (didDocument: IDidDocumentAttrs) => {

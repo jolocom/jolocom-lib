@@ -54,6 +54,7 @@ describe('DidDocument', () => {
     referenceDidDocument.addServiceEndpoint(
       ServiceEndpointsSection.fromJSON(mockPubProfServiceEndpointJSON),
     )
+
     await referenceDidDocument.sign(vault, derivationArgs, mockKeyId)
   })
 

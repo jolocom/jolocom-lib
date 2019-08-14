@@ -180,7 +180,7 @@ export class DidDocument implements IDigestible {
   }
 
   /**
-   * Get the creation date of the did document
+   * Get the creation date of the nt
    * @example `console.log(didDocument.created) // Date 2018-11-11T15:46:09.720Z`
    */
 
@@ -200,6 +200,29 @@ export class DidDocument implements IDigestible {
 
   public set created(value: Date) {
     this._created = value
+  }
+
+  /**
+   * Get the updated date of the did document
+   * @example `console.log(didDocument.updated) // Date 2018-11-11T15:46:09.720Z`
+   */
+
+  @Expose({ since: 0.13 })
+  @Transform((value: Date) => value && value.toISOString(), {
+    toPlainOnly: true,
+  })
+  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+  public get updated(): Date {
+    return this._updated
+  }
+
+  /**
+   * Set the updated date of the did document
+   * @example `didDocument.updated = new Date('2018-11-11T15:46:09.720Z')`
+   */
+
+  public set updated(value: Date) {
+    this._updated = value
   }
 
   /**
