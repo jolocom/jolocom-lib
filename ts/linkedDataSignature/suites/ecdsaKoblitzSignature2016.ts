@@ -1,37 +1,37 @@
 import 'reflect-metadata'
 import {
-  Type,
   plainToClass,
   classToPlain,
   Exclude,
   Expose,
   Transform,
 } from 'class-transformer'
-import { canonize } from 'jsonld'
 import {
   ILinkedDataSignature,
   ILinkedDataSignatureAttrs,
-  IDigestable,
+  IDigestible,
 } from '../types'
 import { sha256 } from '../../utils/crypto'
-import { defaultContext } from '../../utils/contexts'
 import { keyIdToDid } from '../../utils/helper'
+import { normalizeLdProof } from '../../validation/jsonLdValidator'
+import { didDocumentContext } from '../../utils/contexts'
 
 /**
  * @class A EcdsaKoblitz linked data signature implementation
  * @implements {ILinkedDataSignature}
- * @implements {IDigestable}
+ * @implements {IDigestible}
  * @internal
  */
 
 @Exclude()
 export class EcdsaLinkedDataSignature
-  implements ILinkedDataSignature, IDigestable {
+  implements ILinkedDataSignature, IDigestible {
   private _type = 'EcdsaKoblitzSignature2016'
   private _creator: string = ''
   private _created: Date = new Date()
   private _nonce: string = ''
   private _signatureValue: string = ''
+  private readonly _context = didDocumentContext
 
   /**
    * Get the creation date of the linked data signature
@@ -39,7 +39,6 @@ export class EcdsaLinkedDataSignature
    */
 
   @Expose()
-  @Type(() => Date)
   @Transform((value: string) => value && new Date(value), { toClassOnly: true })
   @Transform((value: Date) => value && value.toISOString(), {
     toPlainOnly: true,
@@ -139,21 +138,14 @@ export class EcdsaLinkedDataSignature
       keyId: this.creator,
     }
   }
+
   /**
    * Converts the lined data signature to canonical form
    * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
    */
 
-  private async normalize(): Promise<string> {
-    const json: ILinkedDataSignatureAttrs = this.toJSON()
-
-    json['@context'] = defaultContext
-
-    delete json.signatureValue
-    delete json.type
-    delete json.id
-
-    return canonize(json)
+  public async normalize() {
+    return normalizeLdProof(this.toJSON(), this._context)
   }
 
   /**

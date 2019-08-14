@@ -7,12 +7,14 @@ import {
   mockIssuerDid,
   emailVerifiableCredential,
   emailVerifiableCredentialHash,
+  normalizedEmailVerifiableCredential,
 } from '../data/credential/signedCredential.data'
 import { EmailClaimMetadata } from 'cred-types-jolocom-core/js/types'
 import { Credential } from '../../ts/credentials/credential/credential'
 import { mockEmailCredCreationAttrs } from '../data/credential/credential.data'
 import { expect } from 'chai'
 import * as crypto from 'crypto'
+import { normalizeJsonLD } from '../../ts/validation/jsonLdValidator'
 
 chai.use(sinonChai)
 
@@ -62,9 +64,15 @@ describe('SignedCredential', () => {
     expect(fromJson).to.deep.eq(vCred)
   })
 
+  it('Should produce correct normalized output', async () => {
+    expect(await normalizeJsonLD(vCred.toJSON(), vCred.context)).to.deep.eq(
+      normalizedEmailVerifiableCredential,
+    )
+  })
+
   it('Should produce expected digest', async () => {
-    const normalized = (await vCred.digest()).toString('hex')
-    expect(normalized).to.eq(emailVerifiableCredentialHash)
+    const digest = (await vCred.digest()).toString('hex')
+    expect(digest).to.eq(emailVerifiableCredentialHash)
   })
 
   describe('Getters', () => {

@@ -22,9 +22,10 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
-import {createJolocomResolver, createValidatingResolver, MultiResolver, validatingJolocomResolver} from '../resolver'
+import {createJolocomResolver, MultiResolver} from '../resolver'
 import {DidDocumentResolver} from '../resolver/types'
-import {noValidation} from '../utils/validation'
+import {createValidatingResolver} from '../../js/resolver'
+import {noValidation} from '../validation/validation'
 
 /**
  * @class
@@ -70,17 +71,8 @@ export class JolocomRegistry implements IRegistry {
 
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
 
-    const didDocument = await DidDocument.fromPublicKey(
-      publicIdentityKey,
-      this.didBuilder,
-    )
+    const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
 
-    const didDocumentSignature = await vaultedKeyProvider.signDigestable(
-      derivationArgs,
-      didDocument,
-    )
-
-    didDocument.signature = didDocumentSignature.toString('hex')
     const identity = Identity.fromDidDocument({ didDocument })
 
     const identityWallet = new IdentityWallet({
@@ -141,6 +133,17 @@ export class JolocomRegistry implements IRegistry {
       if (remotePubProf && !publicProfile) {
         didDocument.resetServiceEndpoints()
       }
+
+      didDocument.hasBeenUpdated()
+
+      await didDocument.sign(
+        vaultedKeyProvider,
+        {
+          derivationPath: KeyTypes.jolocomIdentityKey,
+          encryptionPass: keyMetadata.encryptionPass,
+        },
+        didDocument.publicKey[0].id,
+      )
 
       const ipfsHash = await this.ipfsConnector.storeJSON({
         data: didDocument.toJSON(),

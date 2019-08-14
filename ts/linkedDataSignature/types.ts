@@ -1,15 +1,17 @@
+import { JsonLdObject } from '../validation/jsonLdValidator'
+
 export interface ISerializable {
   toJSON: () => {}
 }
 
-export interface ILinkedDataSignature extends IDigestable, ISerializable {
+export interface ILinkedDataSignature extends IDigestible, ISerializable {
   creator: string
   type: string
   nonce: string
   created: Date
 }
 
-export interface IDigestable {
+export interface IDigestible {
   signature: string
   digest: () => Promise<Buffer>
   signer: {
@@ -18,7 +20,7 @@ export interface IDigestable {
   }
 }
 
-export interface ILinkedDataSignatureAttrs {
+export interface ILinkedDataSignatureAttrs extends JsonLdObject {
   type: string
   created: string
   creator: string

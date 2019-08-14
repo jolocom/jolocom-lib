@@ -20,7 +20,9 @@ describe('Jolocom Registry - resolve', () => {
 
   before(() => {
     registry.ethereumConnector.resolveDID = sinon.stub().returns(mockIpfsHash)
-    registry.ipfsConnector.catJSON = sinon.stub().returns(didDocumentJSON)
+    registry.ipfsConnector.catJSON = sinon
+      .stub()
+      .returns({ ...didDocumentJSON, service: [] })
   })
 
   afterEach(() => {

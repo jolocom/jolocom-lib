@@ -104,7 +104,7 @@ export const paymentRequest = (dependencies: DependencyIndex) => () => {
     expect(paymentResponseJWT.interactionToken.txHash).to.equal(receipt)
   })
 
-  it('Should allow for consumption of valid payment response by service', done => {
+  it('Should allow for consumption of valid payment response by service', (done) => {
     const decodedPaymentResponse = JSONWebToken.decode<PaymentResponse>(
       paymentResponseEncoded,
     )
