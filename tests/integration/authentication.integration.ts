@@ -5,19 +5,29 @@ import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { keyIdToDid } from '../../ts/utils/helper'
 import { jsonAuthentication } from '../data/interactionTokens/authentication.data'
 import { Authentication } from '../../ts/interactionTokens/authentication'
-import {
-  userIdentityWallet,
-  serviceIdentityWallet,
-  jolocomRegistry,
-} from './identity.integration'
+import { DependencyIndex } from './index'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe('Integration Test - Token interaction flow Authentication', () => {
+export const authenticationRequest = (
+  dependencies: Partial<DependencyIndex>,
+) => () => {
   let authRequestJWT
   let authRequestEncoded
   let authResponseEncoded
+
+  let jolocomRegistry
+  let userIdentityWallet
+  let serviceIdentityWallet
+  let resolver
+
+  before(() => {
+    resolver = dependencies.resolver
+    jolocomRegistry = dependencies.jolocomRegistry
+    userIdentityWallet = dependencies.userIdentityWallet
+    serviceIdentityWallet = dependencies.serviceIdentityWallet
+  })
 
   it('Should correctly create an authentication request token by service', async () => {
     authRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.auth(
@@ -40,11 +50,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     expect(decodedAuthRequest.interactionToken).to.be.instanceOf(Authentication)
 
     try {
-      await userIdentityWallet.validateJWT(
-        decodedAuthRequest,
-        null,
-        jolocomRegistry,
-      )
+      await userIdentityWallet.validateJWT(decodedAuthRequest, null, resolver)
     } catch (err) {
       return expect(true).to.be.false
     }
@@ -57,6 +63,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
       userPass,
       decodedAuthRequest,
     )
+
     authResponseEncoded = authResponseJWT.encode()
 
     expect(authResponseJWT.interactionToken).to.be.instanceOf(Authentication)
@@ -78,10 +85,10 @@ describe('Integration Test - Token interaction flow Authentication', () => {
       await serviceIdentityWallet.validateJWT(
         decodedAuthResponse,
         authRequestJWT,
-        jolocomRegistry,
+        resolver,
       )
     } catch (err) {
       return expect(true).to.be.false
     }
   })
-})
+}

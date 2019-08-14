@@ -7,6 +7,11 @@ export const testEthereumConfig = {
   contractAddress: '0xF2aB668ABA031cF5Cb5567933e910A59072B1965',
 }
 
+export const testCustomEthereumConfig = {
+  ...testEthereumConfig,
+  contractAddress: "0x9c6aF6DE3aC72545FeC97154c9813839C6E1903D"
+}
+
 /* Local configuration for the ipfs daemon */
 
 export const testIpfsConfig = {
@@ -22,19 +27,20 @@ export const deployerEthKey =
 /* The seed for instantiating the user's vault */
 const userSeed = Buffer.from(
   '901271e3f39bc97987193bfaf986a1590191d83f12d136d3039f6d5a5d837201',
-  'hex'
+  'hex',
 )
 
 export const userPass = 'a'.repeat(32)
 export const userVault = SoftwareKeyProvider.fromSeed(userSeed, userPass)
 
 /* The private eth key derived from the user's seed */
-export const userEthKey = '0x58b03b7b5a44f763fa3387dd68dc9552b31ebff0086fd9d85a202f960e46f315'
+export const userEthKey =
+  '0x58b03b7b5a44f763fa3387dd68dc9552b31ebff0086fd9d85a202f960e46f315'
 
 /* The seed for instantiating the service's vault */
 const serviceSeed = Buffer.from(
   'f4a95507498d649fdc444fe5525978f24acd179dce79f2d0330372b2908d892b',
-  'hex'
+  'hex',
 )
 export const servicePass = 's'.repeat(32)
 export const serviceVault = SoftwareKeyProvider.fromSeed(
@@ -43,7 +49,8 @@ export const serviceVault = SoftwareKeyProvider.fromSeed(
 )
 
 /* The private eth key derived from the service's seed */
-export const serviceEthKey = '0x0290c9f6e4f73dd5718674493b69956f3d65969acaf7205478c20ae4086f5df2'
+export const serviceEthKey =
+  '0x0290c9f6e4f73dd5718674493b69956f3d65969acaf7205478c20ae4086f5df2'
 
 /* Creation attributes for interaction flows */
 

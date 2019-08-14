@@ -1,26 +1,35 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { userPass, servicePass } from './integration.data'
-import {
-  userIdentityWallet,
-  serviceIdentityWallet,
-  jolocomRegistry,
-  testContractsGateway,
-} from './identity.integration'
 import { publicKeyToAddress } from '../../ts/utils/helper'
 import { PaymentRequest } from '../../ts/interactionTokens/paymentRequest'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { PaymentResponse } from '../../ts/interactionTokens/paymentResponse'
 import { PaymentRequestCreationArgs } from '../../ts/identityWallet/types'
+import { DependencyIndex } from './index'
+import { IRegistry } from '../../ts/registries/types'
+import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
-describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () => {
+export const paymentRequest = (dependencies: DependencyIndex) => () => {
   let paymentRequestJWT
   let paymentRequestEncoded
   let paymentResponseJWT
   let paymentResponseEncoded
+
+  let jolocomRegistry: IRegistry
+  let userIdentityWallet: IdentityWallet
+  let serviceIdentityWallet: IdentityWallet
+  let resolver
+
+  before(() => {
+    resolver = dependencies.resolver
+    jolocomRegistry = dependencies.jolocomRegistry
+    userIdentityWallet = dependencies.userIdentityWallet
+    serviceIdentityWallet = dependencies.serviceIdentityWallet
+  })
 
   it('Should create a payment request token by service', async () => {
     const paymentReqCreationArgs: PaymentRequestCreationArgs = {
@@ -54,7 +63,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     )
   })
 
-  it('Should allow for consumption of valid payment request by user', async () => {
+  it('Should allow for consumption of valid payment request by user', done => {
     const decodedPaymentRequest = JSONWebToken.decode<PaymentRequest>(
       paymentRequestEncoded,
     )
@@ -63,15 +72,9 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       PaymentRequest,
     )
 
-    try {
-      await serviceIdentityWallet.validateJWT(
-        decodedPaymentRequest,
-        null,
-        jolocomRegistry,
-      )
-    } catch (err) {
-      expect(true).to.be.false
-    }
+    serviceIdentityWallet
+      .validateJWT(decodedPaymentRequest, null, resolver)
+      .then(done, done)
   })
 
   it('Should create a payment response by user', async () => {
@@ -101,7 +104,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     expect(paymentResponseJWT.interactionToken.txHash).to.equal(receipt)
   })
 
-  it('Should allow for consumption of valid payment response by service', async () => {
+  it('Should allow for consumption of valid payment response by service', done => {
     const decodedPaymentResponse = JSONWebToken.decode<PaymentResponse>(
       paymentResponseEncoded,
     )
@@ -109,16 +112,9 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       PaymentResponse,
     )
 
-    try {
-      await serviceIdentityWallet.validateJWT(
-        decodedPaymentResponse,
-        paymentRequestJWT,
-        jolocomRegistry,
-      )
-    } catch (err) {
-      console.log('ERROR: ', err)
-      expect(true).to.be.false
-    }
+    serviceIdentityWallet
+      .validateJWT(decodedPaymentResponse, paymentRequestJWT, resolver)
+      .then(done, done)
   })
 
   it('Should transfer the funds and correctly increment the nonce', async () => {
@@ -129,8 +125,12 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     const userAddr = publicKeyToAddress(Buffer.from(userPubKey, 'hex'))
     const serviceAddr = publicKeyToAddress(Buffer.from(servicePubKey, 'hex'))
 
-    const userInfo = await testContractsGateway.getAddressInfo(userAddr)
-    const serviceInfo = await testContractsGateway.getAddressInfo(serviceAddr)
+    const userInfo = await dependencies.contracts.gateway.getAddressInfo(
+      userAddr,
+    )
+    const serviceInfo = await dependencies.contracts.gateway.getAddressInfo(
+      serviceAddr,
+    )
 
     expect(userInfo.nonce).to.equal(2)
     expect(userInfo.balance.toString()).to.eq('497601680000000000')
@@ -138,4 +138,4 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     expect(serviceInfo.nonce).to.equal(2)
     expect(serviceInfo.balance.toString()).to.eq('1496995780000000000')
   })
-})
+}

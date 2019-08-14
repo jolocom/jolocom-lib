@@ -1,5 +1,9 @@
 import * as sinon from 'sinon'
-import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
+
+import {
+  createJolocomRegistry,
+  JolocomRegistry,
+} from '../../ts/registries/jolocomRegistry'
 import {
   mockDid,
   didDocumentJSON,
@@ -34,7 +38,7 @@ describe('Jolocom Registry - resolve', () => {
   it('should throw if resolution fails', async () => {
     registry.ethereumConnector.resolveDID = sinon.stub().returns('')
     try {
-      await registry.resolve('did:x')
+      await registry.resolve('did:jolo:abd')
       expect(true).to.be.false
     } catch (err) {
       expect(err.message).to.eq(
@@ -70,5 +74,12 @@ describe('Jolocom Registry - resolve', () => {
     expect(registry.ipfsConnector.catJSON.getCall(0).args).to.deep.eq([
       mockIpfsHash,
     ])
+  })
+
+  it('should correctly use custom resolution function if passed', async () => {
+    const testResolver = sinon.stub().returns(didDocumentJSON)
+    const testDidBuilder = sinon.stub().returns('did:test:0')
+    const registry = new JolocomRegistry(testResolver, testDidBuilder)
+    expect(registry.resolver).to.deep.eq(testResolver)
   })
 })

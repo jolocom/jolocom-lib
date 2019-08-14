@@ -7,6 +7,8 @@ import {
 } from '../vaultedKeyProvider/types'
 import { Identity } from '../identity/identity'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
+import { DidDocumentResolver } from '../resolver/types'
+import {DidBuilder} from '../utils/crypto'
 
 export interface IRegistryStaticCreationArgs {
   contracts: {
@@ -15,6 +17,8 @@ export interface IRegistryStaticCreationArgs {
   }
   ipfsConnector: IIpfsConnector
   ethereumConnector: IEthereumConnector
+  didResolver?: DidDocumentResolver
+  didBuilder?: DidBuilder
 }
 
 export interface IRegistryCommitArgs {

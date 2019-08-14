@@ -33,16 +33,16 @@ import {
   handleValidationStatus,
   publicKeyToAddress,
 } from '../utils/helper'
-import { createJolocomRegistry } from '../registries/jolocomRegistry'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 import {
   IContractsAdapter,
   IContractsGateway,
   ITransactionEncodable,
 } from '../contracts/types'
-import { IRegistry } from '../registries/types'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
+import { MultiResolver, mutliResolver } from '../resolver'
+import { DidDocument } from '../identity/didDocument/didDocument'
 
 /**
  * @class
@@ -478,18 +478,22 @@ export class IdentityWallet {
    * Validates interaction tokens for signature - if only received token passed - and for audience (aud) and token nonce (jti) if send token passed also
    * @param receivedJWT - received JSONWebToken Class
    * @param sendJWT - optional send JSONWebToken Class which is used to validate the token nonce and the aud field on received token
-   * @param customRegistry - optional custom registry
+   * @param resolver - optional custom resolver used to fetch signer public keys
    */
 
   public async validateJWT<T extends JWTEncodable, A extends JWTEncodable>(
     receivedJWT: JSONWebToken<T>,
     sendJWT?: JSONWebToken<A>,
-    customRegistry?: IRegistry,
+    resolver: MultiResolver = mutliResolver,
   ): Promise<void> {
-    const registry = customRegistry || createJolocomRegistry()
-    const remoteIdentity = await registry.resolve(
+    const remoteIdentityJson = await resolver.resolve(
       keyIdToDid(receivedJWT.issuer),
     )
+
+    const remoteIdentity = Identity.fromDidDocument({
+      didDocument: DidDocument.fromJSON(remoteIdentityJson),
+    })
+
     const pubKey = getIssuerPublicKey(
       receivedJWT.issuer,
       remoteIdentity.didDocument,

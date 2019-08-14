@@ -1,18 +1,14 @@
 import * as ganache from 'ganache-core'
 import * as registryContract from 'jolocom-registry-contract'
 import { userEthKey, serviceEthKey, deployerEthKey } from './integration.data'
-import { ContractsGateway } from '../../ts/contracts/contractsGateway'
-import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
-import { ethers } from 'ethers'
 const Web3 = require('web3')
 const IPFSFactory = require('ipfsd-ctl')
+const web3 = new Web3()
 
 const PORT = 8945
-const web3 = new Web3()
 web3.setProvider(new Web3.providers.HttpProvider(`http://localhost:${PORT}`))
 
 const balance = web3.utils.toWei('1')
-
 const ganacheServer = ganache.server({
   accounts: [
     { secretKey: deployerEthKey, balance },
@@ -30,11 +26,8 @@ const daemonFactory = IPFSFactory.create({ type: 'go' })
  */
 
 const deployContract = async () => {
-  const deployerAddress = (await web3.eth.getAccounts())[0]
-  return registryContract.TestDeployment.deployIdentityContract(
-    web3,
-    deployerAddress,
-  )
+  const [deployer, ...other] = await web3.eth.getAccounts()
+  return registryContract.TestDeployment.deployIdentityContract(web3, deployer)
 }
 
 /**
@@ -51,12 +44,17 @@ const spawnIpfsNode = async () => {
         disposable: true,
         defaultAddrs: true,
       },
-      (spawnErr, ipfsd) => {
+      (spawnErr: Error, ipfsd) => {
         if (spawnErr) {
-          return reject(spawnErr)
+          return reject(spawnErr.message)
         }
 
-        ipfsd.api.id(apiErr => (apiErr ? reject(apiErr) : resolve()))
+        ipfsd.api.id((error: Error) => {
+          if (error) {
+            return reject(error.message)
+          }
+          return resolve()
+        })
       },
     ),
   )
@@ -68,29 +66,17 @@ const spawnIpfsNode = async () => {
  * @returns {void}
  */
 
-interface ContractClassess {
-  testContractsGateway: ContractsGateway
-  testContractsAdapter: ContractsAdapter
-}
-
-export const init = async () =>
-  new Promise<ContractClassess>(async (resolve, reject) => {
-    ganacheServer.listen(PORT, async ganacheErr => {
+export const init = () =>
+  new Promise((resolve, reject) =>
+    ganacheServer.listen(PORT, async (ganacheErr: Error) => {
       if (ganacheErr) {
-        return reject(ganacheErr)
+        return reject(`Ganache failed to start: ${ganacheErr.message}`)
       }
 
-      await deployContract()
       await spawnIpfsNode()
-
-      const testContractsGateway = new ContractsGateway(
-        new ethers.providers.Web3Provider(web3.currentProvider),
-      )
-      const testContractsAdapter = new ContractsAdapter()
-
-      return resolve({
-        testContractsGateway,
-        testContractsAdapter,
-      })
-    })
-  })
+      await deployContract()
+      /** Second registry contract, for testing cross deployment interactions */
+      await deployContract()
+      return resolve()
+    }),
+  )

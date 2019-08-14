@@ -1,70 +1,37 @@
 import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
-import * as integrationHelper from './provision'
-import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
-import { EthResolver } from '../../ts/ethereum/ethereum'
-import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
-import {
-  createJolocomRegistry,
-  JolocomRegistry,
-} from '../../ts/registries/jolocomRegistry'
-import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { publicProfileCredJSON } from '../data/identity.data'
-import {
-  testEthereumConfig,
-  testIpfsConfig,
-  userVault,
-  userPass,
-  serviceVault,
-  servicePass,
-} from './integration.data'
+import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
-import { ContractsGateway } from '../../ts/contracts/contractsGateway'
-import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import {
+  servicePass,
+  serviceVault,
+  userPass,
+  userVault,
+} from './integration.data'
+import { DependencyIndex } from './index'
 
-chai.use(sinonChai)
 const expect = chai.expect
 
-/* global before and after hook for integration tests & shared variables */
-export let jolocomRegistry: JolocomRegistry
-export let userIdentityWallet: IdentityWallet
-export let serviceIdentityWallet: IdentityWallet
-export let testContractsGateway: ContractsGateway
-export let testContractsAdapter: ContractsAdapter
+export const identityCreation = (
+  dependencies: Partial<DependencyIndex>,
+) => () => {
+  let jolocomRegistry
+  let userIdentityWallet
+  let serviceIdentityWallet
 
-before(async () => {
-  const {
-    testContractsGateway: gateway,
-    testContractsAdapter: adapter,
-  } = await integrationHelper.init()
-
-  testContractsGateway = gateway
-  testContractsAdapter = adapter
-
-  jolocomRegistry = createJolocomRegistry({
-    ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
-    ethereumConnector: new EthResolver(testEthereumConfig),
-    contracts: { gateway, adapter },
+  before(() => {
+    jolocomRegistry = dependencies.jolocomRegistry
+    userIdentityWallet = dependencies.userIdentityWallet
+    serviceIdentityWallet = dependencies.serviceIdentityWallet
   })
 
-  userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
-  serviceIdentityWallet = await jolocomRegistry.create(
-    serviceVault,
-    servicePass,
-  )
-})
-
-after(() => {
-  process.exit(0)
-})
-
-describe('Integration Test - Create, Resolve, Public Profile', () => {
   it('should correctly create user and service identities', async () => {
     const remoteUserIdentity = await jolocomRegistry.resolve(
       userIdentityWallet.did,
     )
+
     const remoteServiceIdentity = await jolocomRegistry.resolve(
       serviceIdentityWallet.did,
     )
@@ -72,6 +39,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
     expect(remoteUserIdentity.didDocument).to.deep.eq(
       userIdentityWallet.didDocument,
     )
+
     expect(remoteServiceIdentity.didDocument).to.deep.eq(
       remoteServiceIdentity.didDocument,
     )
@@ -146,4 +114,4 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       )
     }
   })
-})
+}
