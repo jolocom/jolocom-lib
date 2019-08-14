@@ -23,7 +23,7 @@ const MAX_ENCRYPTED_SEED_LENGTH = IV_LENGTH + MAX_SEED_LENGTH + PADDING_LENGTH
  * @param encryptedSeed - aes256-cbc encrypted seed
  */
 
-function isEncryptedSeedLengthValid(encryptedSeed: Buffer): Boolean {
+function isEncryptedSeedLengthValid(encryptedSeed: Buffer): boolean {
   const { length } = encryptedSeed
 
   const inBounds =
@@ -57,11 +57,11 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   }
 
   /**
-   * Get the encrypted seed; format: IV || ciphertext, where '||' denotes concatenation
+   * Get the encrypted seed hex encoded; format: IV || ciphertext, where '||' denotes concatenation
    */
 
-  public get encryptedSeed() {
-    return Buffer.concat([this._iv, this._encryptedSeed])
+  public get encryptedSeed(): string {
+    return Buffer.concat([this._iv, this._encryptedSeed]).toString('hex')
   }
 
   /**
@@ -94,7 +94,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   public static recoverKeyPair(
     mnemonic: string,
     encryptionPass: string,
-  ): IVaultedKeyProvider {
+  ): SoftwareKeyProvider {
     if (!validateMnemonic(mnemonic)) {
       throw new Error('Invalid Mnemonic.')
     }
