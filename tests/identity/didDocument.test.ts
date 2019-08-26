@@ -81,7 +81,7 @@ describe('DidDocument', () => {
   it('Should correctly implement fromJSON for version 0', async () => {
     const didDocumentv0 = DidDocument.fromJSON(didDocumentJSONv0)
     didDocumentv0.addAuthKey(
-      PublicKeySection.fromJSON(mockPublicKey2, { version: 0.13 }),
+      PublicKeySection.fromJSON(mockPublicKey2, {version: 0.13}),
     )
     await didDocumentv0.sign(vault, derivationArgs, mockKeyId)
     expect(didDocumentv0).to.deep.eq(referenceDidDocument)

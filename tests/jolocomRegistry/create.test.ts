@@ -14,7 +14,6 @@ import {
   testSeed,
 } from '../data/keys.data'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
-import { msgSignature } from '../data/keyProvider.data'
 import { encryptionPass, keyMetadata } from './jolocomRegistry.data'
 
 describe('Jolocom Registry - create', () => {
@@ -40,20 +39,11 @@ describe('Jolocom Registry - create', () => {
 
   it('should create new identity', async () => {
     const jolocomRegistry = createJolocomRegistry()
-
-    const expectedDidDoc = {
-      ...didDocumentJSON,
-      proof: {
-        ...didDocumentJSON.proof,
-        signatureValue: msgSignature.toString('hex')
-      }
-    }
-
     identityWallet = await jolocomRegistry.create(mockVault, encryptionPass)
 
     sandbox.assert.calledWith(mockVault.getPublicKey, keyMetadata)
     sandbox.assert.calledWith(Identity.fromDidDocument, {
-      didDocument: DidDocument.fromJSON(expectedDidDoc),
+      didDocument: DidDocument.fromJSON(didDocumentJSON),
     })
     sandbox.assert.calledWith(JolocomRegistry.prototype.commit, {
       identityWallet: identityWallet,

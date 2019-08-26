@@ -1,10 +1,10 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { validateJsonLd } from '../../ts/validation/validation'
-import { IRegistry } from '../../ts/registries/types'
 import { Identity } from '../../ts/identity/identity'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
-import {MultiResolver} from '../../ts/resolver'
+import { MultiResolver } from '../../ts/resolver'
+import { IDidDocumentAttrs } from '../../ts/identity/didDocument/types'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -137,9 +137,16 @@ const DID_DOC_V0_13 = {
 
 describe('Utils/Validation functions', () => {
   it('validateJsonLd should correctly validate, maintaining backwards compatibility', async () => {
-    //@ts-ignore
+    const identityFromDidDoc = (didDoc: IDidDocumentAttrs) =>
+      Identity.fromDidDocument({
+        didDocument: DidDocument.fromJSON(didDoc),
+      })
+
     const mockResolver = new MultiResolver({
-      jolo: async did => did === DID_DOC_V0.id ? DID_DOC_V0 : DID_DOC_V0_13
+      jolo: async did =>
+        did === DID_DOC_V0.id
+          ? identityFromDidDoc(DID_DOC_V0)
+          : identityFromDidDoc(DID_DOC_V0_13),
     })
 
     const mallformedV0 = {

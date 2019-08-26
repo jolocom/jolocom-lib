@@ -24,12 +24,6 @@ export class PublicKeySection {
   private _controller: string
   private _publicKeyHex: string
 
-  /**
-   * Get the did of the public key owner
-   */
-
-  @Expose()
-  @Transform((entry, { owner }) => owner, { toClassOnly: true, until: 0.13 })
   public get controller(): string {
     return this._controller
   }
@@ -38,6 +32,15 @@ export class PublicKeySection {
    * Set the did of the public key owner
    */
 
+  /**
+   * Get the did of the public key owner
+   */
+
+  @Expose()
+  @Transform((entry, section) => section.owner, {
+    toClassOnly: true,
+    until: 0.13,
+  })
   public set controller(controller: string) {
     this._controller = controller
   }

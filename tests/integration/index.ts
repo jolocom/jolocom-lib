@@ -32,9 +32,8 @@ import { credentialOffer } from './credentialOffer.integration'
 import { credentialShare } from './credentialShare.integration'
 import { authenticationRequest } from './authentication.integration'
 import { testCustomDeployments } from './customDeployment.integration'
-import { noValidation } from '../../ts/utils/validation'
 import { Identity } from '../../ts/identity/identity'
-import { DidDocument } from '../../ts/identity/didDocument/didDocument'
+import {noValidation} from '../../ts/validation/validation'
 const Web3 = require('web3')
 
 chai.use(sinonChai)
