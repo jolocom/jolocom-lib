@@ -2,8 +2,6 @@ import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { DidDocument } from '../identity/didDocument/didDocument'
-import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
 import {
   IRegistryCommitArgs,
@@ -23,12 +21,12 @@ import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
 import {
+  createJolocomResolver,
+  createValidatingIdentityResolver,
   MultiResolver,
-  validatingJolocomResolver,
 } from '../resolver'
-import {
-  ValidatingIdentityResolver,
-} from '../resolver/types'
+import { ValidatingIdentityResolver } from '../resolver/types'
+import { noValidation } from '../utils/validation'
 
 /**
  * @class
@@ -174,11 +172,7 @@ export class JolocomRegistry implements IRegistry {
    */
 
   public async resolve(did): Promise<Identity> {
-    try {
-      return this.resolver(did)
-    } catch (error) {
-      throw new Error(`Could not retrieve DID Document. ${error.message}`)
-    }
+    return this.resolver(did)
   }
 
   /**
@@ -229,8 +223,8 @@ export class JolocomRegistry implements IRegistry {
 }
 
 /**
- * Returns a instance of the Jolocom registry given connector, defaults to Jolocom defined connectors.
  * @TODO Simplify (e.g. rename to createCustomJolocomRegistry), break down into simpler functions.
+ * Returns a instance of the Jolocom registry given connector, defaults to Jolocom defined connectors.
  * @param configuration - Connectors required for smart contract, storage, and anchoring interactions
  * @param configuration.ipfsConnector - Instance of class implementing the {@link IIpfsConnector} interface
  * @param configuration.ethereumConnector - Instance of class implementing the {@link IEthereumConnector} interface
@@ -256,7 +250,11 @@ export const createJolocomRegistry = (
     didBuilder: customDidBuilder,
   } = configuration
 
-  const didResolver = customResolver || validatingJolocomResolver
+  const didResolver =
+    customResolver ||
+    createValidatingIdentityResolver(
+      createJolocomResolver(ethereumConnector, ipfsConnector),
+    )(noValidation)(Identity.fromDidDocument)
 
   const didBuilder = customDidBuilder || publicKeyToJoloDID
   const jolocomRegistry = new JolocomRegistry(didResolver, didBuilder)

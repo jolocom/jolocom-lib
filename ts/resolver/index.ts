@@ -15,6 +15,7 @@ import { SignedCredential } from '../credentials/signedCredential/signedCredenti
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
 import { DidDocument } from '../identity/didDocument/didDocument'
+import {IIdentityCreateArgs} from '../identity/types'
 
 /**
  * Function for assembling a resolver to be used as a {@link ValidatingDidResolver} in the {@link MultiResolver}.
@@ -43,7 +44,7 @@ export const createValidatingIdentityResolver: ValidatingIdentityResolverBuilder
 export const createJolocomResolver = (
   ethereumConnector: IEthereumConnector = jolocomEthereumResolver,
   ipfsConnector: IIpfsConnector = jolocomIpfsStorageAgent,
-): DidDocumentResolver<JolocomIdentityResolutionResult> => async (
+): DidDocumentResolver<IIdentityCreateArgs> => async (
   did: string,
 ) => {
   const fetchPublicProfile = async (entry: string) => {
@@ -58,16 +59,20 @@ export const createJolocomResolver = (
   }
 
   /** @TODO Use an http agent, so that ipfsConnector.catJSON<IDidDocumentAttrs>() can be used */
-  const didDocument = (await ipfsConnector.catJSON(
+  const didDocumentJson = (await ipfsConnector.catJSON(
     didDocumentHash,
   )) as IDidDocumentAttrs
+
+  const didDocument = DidDocument.fromJSON(didDocumentJson)
 
   const publicProfileSection = didDocument.service.find(
     endpoint => endpoint.type === 'JolocomPublicProfile',
   )
 
   const publicProfile = publicProfileSection
-    ? await fetchPublicProfile(publicProfileSection.serviceEndpoint)
+    ? SignedCredential.fromJSON(
+        await fetchPublicProfile(publicProfileSection.serviceEndpoint),
+      )
     : undefined
 
   return {
@@ -76,28 +81,13 @@ export const createJolocomResolver = (
   }
 }
 
-// TODO Rethink, rename, move
-export const instantiateIdentity = ({
-  didDocument,
-  publicProfile,
-}: JolocomIdentityResolutionResult) =>
-  Identity.fromDidDocument({
-    didDocument: DidDocument.fromJSON(didDocument),
-    publicProfile: SignedCredential.fromJSON(publicProfile),
-  })
-
 /**
- * Default {@link ValidatingDidResolver} used for `did:jolo` DIDs
+ * Default {@link ValidatingIdentityResolverBuilder} used for `did:jolo` DIDs
  */
-
-export type JolocomIdentityResolutionResult = {
-  didDocument: IDidDocumentAttrs
-  publicProfile: ISignedCredentialAttrs
-}
 
 export const validatingJolocomResolver = createValidatingIdentityResolver(
   createJolocomResolver(),
-)(noValidation)(instantiateIdentity)
+)(noValidation)(Identity.fromDidDocument)
 
 /**
  * @description Class aggregating multiple {@link ValidatingDidResolver}, and delegating

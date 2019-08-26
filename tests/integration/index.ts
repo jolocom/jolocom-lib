@@ -10,7 +10,6 @@ import {
 import {
   createJolocomResolver,
   createValidatingIdentityResolver,
-  instantiateIdentity,
   MultiResolver,
 } from '../../ts/resolver'
 import { publicKeyToDID, publicKeyToJoloDID } from '../../ts/utils/crypto'
@@ -75,15 +74,11 @@ before(async () => {
 
   const joloResolver = createValidatingIdentityResolver(
     createJolocomResolver(ethereumConnector, ipfsConnector),
-  )(noValidation)(instantiateIdentity)
+  )(noValidation)(Identity.fromDidDocument)
 
   const testResolver = createValidatingIdentityResolver(
     createJolocomResolver(customDeploymentEthConnector, ipfsConnector),
-  )(noValidation)(({ didDocument }) =>
-    Identity.fromDidDocument({
-      didDocument: DidDocument.fromJSON(didDocument),
-    }),
-  )
+  )(noValidation)(Identity.fromDidDocument)
 
   mutatingDependencies.resolver = new MultiResolver({
     jolo: joloResolver,
