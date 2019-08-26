@@ -34,7 +34,7 @@ import { authenticationRequest } from './authentication.integration'
 import { testCustomDeployments } from './customDeployment.integration'
 import { noValidation } from '../../ts/utils/validation'
 import { Identity } from '../../ts/identity/identity'
-import {DidDocument} from '../../ts/identity/didDocument/didDocument'
+import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 const Web3 = require('web3')
 
 chai.use(sinonChai)
@@ -74,11 +74,15 @@ before(async () => {
 
   const joloResolver = createValidatingIdentityResolver(
     createJolocomResolver(ethereumConnector, ipfsConnector),
-  )(noValidation)(Identity.fromDidDocument)
+    noValidation,
+    Identity.fromDidDocument,
+  )
 
   const testResolver = createValidatingIdentityResolver(
     createJolocomResolver(customDeploymentEthConnector, ipfsConnector),
-  )(noValidation)(Identity.fromDidDocument)
+    noValidation,
+    Identity.fromDidDocument,
+  )
 
   mutatingDependencies.resolver = new MultiResolver({
     jolo: joloResolver,

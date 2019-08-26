@@ -254,7 +254,9 @@ export const createJolocomRegistry = (
     customResolver ||
     createValidatingIdentityResolver(
       createJolocomResolver(ethereumConnector, ipfsConnector),
-    )(noValidation)(Identity.fromDidDocument)
+      noValidation,
+      Identity.fromDidDocument,
+    )
 
   const didBuilder = customDidBuilder || publicKeyToJoloDID
   const jolocomRegistry = new JolocomRegistry(didResolver, didBuilder)

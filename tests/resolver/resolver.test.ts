@@ -58,9 +58,11 @@ describe('Validating resolver creator function', () => {
   )
 
   it('Should correctly compose resolver and validator', async () => {
-    const validatingResolver = createValidatingIdentityResolver(resolver)(
+    const validatingResolver = createValidatingIdentityResolver(
+      resolver,
       validator,
-    )(assembler)
+      assembler,
+    )
 
     const identity = await validatingResolver(testDid)
     sinon.assert.calledWith(resolver, testDid)
@@ -70,9 +72,12 @@ describe('Validating resolver creator function', () => {
 
   it('Should correctly throw if validation fails', async () => {
     const throwingValidator = async () => false
-    const brokenValidatingResolver = createValidatingIdentityResolver(resolver)(
+
+    const brokenValidatingResolver = createValidatingIdentityResolver(
+      resolver,
       throwingValidator,
-    )(assembler)
+      assembler,
+    )
 
     /** @TODO correctly test with chai-as-promised */
     try {

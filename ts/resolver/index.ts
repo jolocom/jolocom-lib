@@ -15,7 +15,7 @@ import { SignedCredential } from '../credentials/signedCredential/signedCredenti
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
 import { DidDocument } from '../identity/didDocument/didDocument'
-import {IIdentityCreateArgs} from '../identity/types'
+import { IIdentityCreateArgs } from '../identity/types'
 
 /**
  * Function for assembling a resolver to be used as a {@link ValidatingDidResolver} in the {@link MultiResolver}.
@@ -24,7 +24,7 @@ import {IIdentityCreateArgs} from '../identity/types'
  * @returns configured {@link DidDocumentResolver}
  */
 
-export const createValidatingIdentityResolver: ValidatingIdentityResolverBuilder = resolver => validator => assembler => did => {
+export const createValidatingIdentityResolver: ValidatingIdentityResolverBuilder = (resolver, validator, assembler) => did => {
   return resolver(did).then(async identityData => {
     if (await validator(identityData)) {
       return assembler(identityData)
@@ -44,9 +44,7 @@ export const createValidatingIdentityResolver: ValidatingIdentityResolverBuilder
 export const createJolocomResolver = (
   ethereumConnector: IEthereumConnector = jolocomEthereumResolver,
   ipfsConnector: IIpfsConnector = jolocomIpfsStorageAgent,
-): DidDocumentResolver<IIdentityCreateArgs> => async (
-  did: string,
-) => {
+): DidDocumentResolver<IIdentityCreateArgs> => async (did: string) => {
   const fetchPublicProfile = async (entry: string) => {
     return ipfsConnector.catJSON(entry.replace('ipfs://', '')) as Promise<
       ISignedCredentialAttrs
@@ -87,7 +85,9 @@ export const createJolocomResolver = (
 
 export const validatingJolocomResolver = createValidatingIdentityResolver(
   createJolocomResolver(),
-)(noValidation)(Identity.fromDidDocument)
+  noValidation,
+  Identity.fromDidDocument,
+)
 
 /**
  * @description Class aggregating multiple {@link ValidatingDidResolver}, and delegating

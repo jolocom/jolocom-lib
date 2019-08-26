@@ -7,9 +7,9 @@ export type IdentityAssembler<T> = (data: T) => Identity
 
 export type ValidatingIdentityResolverBuilder = <T>(
   resolver: DidDocumentResolver<T>,
-) => (
   validator: DidDocumentValidator<T>,
-) => (assembler: IdentityAssembler<T>) => ValidatingIdentityResolver
+  assembler: IdentityAssembler<T>,
+) => ValidatingIdentityResolver
 
 /**
  * A function composing the resolver, validator, and assembler.
