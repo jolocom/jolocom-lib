@@ -83,16 +83,17 @@ describe('DidDocument', () => {
       PublicKeySection.fromJSON(mockPublicKey2, { version: 0.13 }),
     )
     await didDocumentv0.sign(vault, derivationArgs, mockKeyId)
-    expect(didDocumentv0).to.deep.eq(referenceDidDocument)
+      expect(didDocumentv0.toJSON()).to.deep.eq(referenceDidDocument.toJSON())
   })
 
   it('Should correctly implement fromJSON', async () => {
     const didDocFromJSON = DidDocument.fromJSON(didDocumentJSON)
     await didDocFromJSON.sign(vault, derivationArgs, mockKeyId)
-    expect(didDocFromJSON).to.deep.eq(referenceDidDocument)
+      expect(didDocFromJSON.toJSON()).to.deep.eq(referenceDidDocument.toJSON())
   })
 
-  it('Should correctly implement toJSON', () => {
+    it('Should correctly implement toJSON', () => {
+        console.log(referenceDidDocument.toJSON())
     expect(referenceDidDocument.toJSON()).to.deep.eq(didDocumentJSON)
   })
 

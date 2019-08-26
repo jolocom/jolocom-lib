@@ -3,7 +3,8 @@ import { JsonLdObject } from '../../../validation/jsonLdValidator'
 export interface IPublicKeySectionAttrs extends JsonLdObject {
   id: string
   type: string
-  publicKeyHex: string
+  publicKeyHex?: string
+  ethereumAddress?: string
 }
 
 export interface IAuthenticationSectionAttrsv0 extends JsonLdObject {
