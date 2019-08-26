@@ -23,7 +23,7 @@ import { DidDocument } from '../identity/didDocument/didDocument'
  * @returns configured {@link DidDocumentResolver}
  */
 
-const createValidatingIdentityResolver: ValidatingIdentityResolverBuilder = resolver => validator => assembler => did => {
+export const createValidatingIdentityResolver: ValidatingIdentityResolverBuilder = resolver => validator => assembler => did => {
   return resolver(did).then(async identityData => {
     if (await validator(identityData)) {
       return assembler(identityData)
@@ -43,10 +43,9 @@ const createValidatingIdentityResolver: ValidatingIdentityResolverBuilder = reso
 export const createJolocomResolver = (
   ethereumConnector: IEthereumConnector = jolocomEthereumResolver,
   ipfsConnector: IIpfsConnector = jolocomIpfsStorageAgent,
-): DidDocumentResolver<{
-  didDocument: IDidDocumentAttrs
-  publicProfile: ISignedCredentialAttrs
-}> => async (did: string) => {
+): DidDocumentResolver<JolocomIdentityResolutionResult> => async (
+  did: string,
+) => {
   const fetchPublicProfile = async (entry: string) => {
     return ipfsConnector.catJSON(entry.replace('ipfs://', '')) as Promise<
       ISignedCredentialAttrs
@@ -55,7 +54,7 @@ export const createJolocomResolver = (
 
   const didDocumentHash = await ethereumConnector.resolveDID(did)
   if (!didDocumentHash) {
-    throw new Error('No record for DID found.')
+    throw new Error('Could not retrieve DID Document. No record for DID found.')
   }
 
   /** @TODO Use an http agent, so that ipfsConnector.catJSON<IDidDocumentAttrs>() can be used */
@@ -77,18 +76,28 @@ export const createJolocomResolver = (
   }
 }
 
+// TODO Rethink, rename, move
+export const instantiateIdentity = ({
+  didDocument,
+  publicProfile,
+}: JolocomIdentityResolutionResult) =>
+  Identity.fromDidDocument({
+    didDocument: DidDocument.fromJSON(didDocument),
+    publicProfile: SignedCredential.fromJSON(publicProfile),
+  })
+
 /**
  * Default {@link ValidatingDidResolver} used for `did:jolo` DIDs
  */
 
+export type JolocomIdentityResolutionResult = {
+  didDocument: IDidDocumentAttrs
+  publicProfile: ISignedCredentialAttrs
+}
+
 export const validatingJolocomResolver = createValidatingIdentityResolver(
   createJolocomResolver(),
-)(noValidation)(({ publicProfile, didDocument }) =>
-  Identity.fromDidDocument({
-    didDocument: DidDocument.fromJSON(didDocument),
-    publicProfile: SignedCredential.fromJSON(publicProfile),
-  }),
-)
+)(noValidation)(instantiateIdentity)
 
 /**
  * @description Class aggregating multiple {@link ValidatingDidResolver}, and delegating

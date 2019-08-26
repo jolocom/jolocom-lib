@@ -3,8 +3,16 @@ import * as sinonChai from 'sinon-chai'
 import * as integrationHelper from './provision'
 import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
 import { EthResolver } from '../../ts/ethereum/ethereum'
-import {createJolocomRegistry, JolocomRegistry} from '../../ts/registries/jolocomRegistry'
-import { createJolocomResolver, MultiResolver } from '../../ts/resolver'
+import {
+  createJolocomRegistry,
+  JolocomRegistry,
+} from '../../ts/registries/jolocomRegistry'
+import {
+  createJolocomResolver,
+  createValidatingIdentityResolver,
+  instantiateIdentity,
+  MultiResolver,
+} from '../../ts/resolver'
 import { publicKeyToDID, publicKeyToJoloDID } from '../../ts/utils/crypto'
 import { keccak256 } from 'ethereumjs-util'
 import { identityCreation } from './identity.integration'
@@ -24,7 +32,10 @@ import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { credentialOffer } from './credentialOffer.integration'
 import { credentialShare } from './credentialShare.integration'
 import { authenticationRequest } from './authentication.integration'
-import {testCustomDeployments} from './customDeployment.integration'
+import { testCustomDeployments } from './customDeployment.integration'
+import { noValidation } from '../../ts/utils/validation'
+import { Identity } from '../../ts/identity/identity'
+import {DidDocument} from '../../ts/identity/didDocument/didDocument'
 const Web3 = require('web3')
 
 chai.use(sinonChai)
@@ -62,8 +73,17 @@ before(async () => {
   const ethereumConnector = new EthResolver(testEthereumConfig)
   const customDeploymentEthConnector = new EthResolver(testCustomEthereumConfig)
 
-  const joloResolver = createJolocomResolver(ethereumConnector, ipfsConnector)
-  const testResolver = createJolocomResolver(customDeploymentEthConnector, ipfsConnector)
+  const joloResolver = createValidatingIdentityResolver(
+    createJolocomResolver(ethereumConnector, ipfsConnector),
+  )(noValidation)(instantiateIdentity)
+
+  const testResolver = createValidatingIdentityResolver(
+    createJolocomResolver(customDeploymentEthConnector, ipfsConnector),
+  )(noValidation)(({ didDocument }) =>
+    Identity.fromDidDocument({
+      didDocument: DidDocument.fromJSON(didDocument),
+    }),
+  )
 
   mutatingDependencies.resolver = new MultiResolver({
     jolo: joloResolver,
@@ -80,7 +100,7 @@ before(async () => {
       ...commonConfiguration,
       ethereumConnector,
       didBuilder: publicKeyToJoloDID,
-      didResolver: joloResolver
+      didResolver: joloResolver,
     },
   ))
 
@@ -88,7 +108,7 @@ before(async () => {
     ...commonConfiguration,
     ethereumConnector: customDeploymentEthConnector,
     didBuilder: publicKeyToDID('test')(keccak256),
-    didResolver: testResolver
+    didResolver: testResolver,
   })
 
   mutatingDependencies.userIdentityWallet = await jolocomRegistry.create(
