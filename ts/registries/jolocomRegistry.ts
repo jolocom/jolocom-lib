@@ -22,9 +22,13 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
-import {createJolocomResolver, createValidatingResolver, MultiResolver, validatingJolocomResolver} from '../resolver'
-import {DidDocumentResolver} from '../resolver/types'
-import {noValidation} from '../utils/validation'
+import {
+  MultiResolver,
+  validatingJolocomResolver,
+} from '../resolver'
+import {
+  ValidatingIdentityResolver,
+} from '../resolver/types'
 
 /**
  * @class
@@ -36,7 +40,7 @@ export class JolocomRegistry implements IRegistry {
   public ethereumConnector: IEthereumConnector
   public contractsAdapter: IContractsAdapter
   public contractsGateway: IContractsGateway
-  public readonly resolver: DidDocumentResolver
+  public readonly resolver: ValidatingIdentityResolver
   private readonly didBuilder: DidBuilder
 
   /**
@@ -45,7 +49,7 @@ export class JolocomRegistry implements IRegistry {
    * @param didBuilder - custom function to assemble DIDs given a public key, for example {@link publicKeyToJoloDID}
    */
 
-  constructor(resolver: DidDocumentResolver, didBuilder) {
+  constructor(resolver: ValidatingIdentityResolver, didBuilder) {
     this.resolver = resolver
     this.didBuilder = didBuilder
   }
@@ -171,22 +175,7 @@ export class JolocomRegistry implements IRegistry {
 
   public async resolve(did): Promise<Identity> {
     try {
-      const didDocumentJson = await this.resolver(did)
-
-      const didDocument = DidDocument.fromJSON(didDocumentJson)
-
-      const publicProfileSection = didDocument.service.find(
-        endpoint => endpoint.type === 'JolocomPublicProfile',
-      )
-
-      const publicProfile =
-        publicProfileSection &&
-        (await this.fetchPublicProfile(publicProfileSection.serviceEndpoint))
-
-      return Identity.fromDidDocument({
-        didDocument,
-        publicProfile,
-      })
+      return this.resolver(did)
     } catch (error) {
       throw new Error(`Could not retrieve DID Document. ${error.message}`)
     }
@@ -280,15 +269,10 @@ export const createJolocomRegistry = (
     contracts,
     ethereumConnector,
     didResolver: customResolver,
-    didBuilder: customDidBuilder
+    didBuilder: customDidBuilder,
   } = configuration
 
-  const didResolver =
-    customResolver ||
-    createValidatingResolver(
-      createJolocomResolver(ethereumConnector, ipfsConnector),
-      noValidation,
-    )
+  const didResolver = customResolver || validatingJolocomResolver
 
   const didBuilder = customDidBuilder || publicKeyToJoloDID
   const jolocomRegistry = new JolocomRegistry(didResolver, didBuilder)

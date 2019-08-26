@@ -2,7 +2,7 @@ import {
   DidDocumentResolver,
   DidDocumentValidator,
   ResolutionMap,
-  ValidatingDidResolver,
+  ValidatingIdentityResolverBuilder,
 } from './types'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { getMethodPrefixFromDid } from '../utils/crypto'
@@ -11,6 +11,10 @@ import { IIpfsConnector } from '../ipfs/types'
 import { jolocomEthereumResolver } from '../ethereum/ethereum'
 import { jolocomIpfsStorageAgent } from '../ipfs/ipfs'
 import { noValidation } from '../utils/validation'
+import { SignedCredential } from '../credentials/signedCredential/signedCredential'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
+import { Identity } from '../identity/identity'
+import { DidDocument } from '../identity/didDocument/didDocument'
 
 /**
  * Function for assembling a resolver to be used as a {@link ValidatingDidResolver} in the {@link MultiResolver}.
@@ -19,16 +23,14 @@ import { noValidation } from '../utils/validation'
  * @returns configured {@link DidDocumentResolver}
  */
 
-export const createValidatingResolver: ValidatingDidResolver = (
-  resolver,
-  validator,
-) => async (did: string): Promise<IDidDocumentAttrs> => {
-  const didDocument = await resolver(did)
-  const valid = await validator(didDocument)
-  if (!valid) {
+const createValidatingIdentityResolver: ValidatingIdentityResolverBuilder = resolver => validator => assembler => did => {
+  return resolver(did).then(async identityData => {
+    if (await validator(identityData)) {
+      return assembler(identityData)
+    }
+
     throw new Error('DID Document validation failed')
-  }
-  return didDocument
+  })
 }
 
 /**
@@ -41,22 +43,52 @@ export const createValidatingResolver: ValidatingDidResolver = (
 export const createJolocomResolver = (
   ethereumConnector: IEthereumConnector = jolocomEthereumResolver,
   ipfsConnector: IIpfsConnector = jolocomIpfsStorageAgent,
-): DidDocumentResolver => async (did: string) => {
-  const didDocumentHash = await ethereumConnector.resolveDID(did)
+): DidDocumentResolver<{
+  didDocument: IDidDocumentAttrs
+  publicProfile: ISignedCredentialAttrs
+}> => async (did: string) => {
+  const fetchPublicProfile = async (entry: string) => {
+    return ipfsConnector.catJSON(entry.replace('ipfs://', '')) as Promise<
+      ISignedCredentialAttrs
+    >
+  }
 
+  const didDocumentHash = await ethereumConnector.resolveDID(did)
   if (!didDocumentHash) {
     throw new Error('No record for DID found.')
   }
 
   /** @TODO Use an http agent, so that ipfsConnector.catJSON<IDidDocumentAttrs>() can be used */
-  return ipfsConnector.catJSON(didDocumentHash) as Promise<IDidDocumentAttrs>
+  const didDocument = (await ipfsConnector.catJSON(
+    didDocumentHash,
+  )) as IDidDocumentAttrs
+
+  const publicProfileSection = didDocument.service.find(
+    endpoint => endpoint.type === 'JolocomPublicProfile',
+  )
+
+  const publicProfile = publicProfileSection
+    ? await fetchPublicProfile(publicProfileSection.serviceEndpoint)
+    : undefined
+
+  return {
+    didDocument,
+    publicProfile,
+  }
 }
 
 /**
  * Default {@link ValidatingDidResolver} used for `did:jolo` DIDs
  */
 
-export const validatingJolocomResolver = createValidatingResolver(createJolocomResolver(), noValidation)
+export const validatingJolocomResolver = createValidatingIdentityResolver(
+  createJolocomResolver(),
+)(noValidation)(({ publicProfile, didDocument }) =>
+  Identity.fromDidDocument({
+    didDocument: DidDocument.fromJSON(didDocument),
+    publicProfile: SignedCredential.fromJSON(publicProfile),
+  }),
+)
 
 /**
  * @description Class aggregating multiple {@link ValidatingDidResolver}, and delegating
@@ -115,8 +147,5 @@ export class MultiResolver {
 }
 
 export const mutliResolver = new MultiResolver({
-  jolo: createValidatingResolver(
-    createJolocomResolver(jolocomEthereumResolver, jolocomIpfsStorageAgent),
-    noValidation,
-  ),
+  jolo: validatingJolocomResolver,
 })

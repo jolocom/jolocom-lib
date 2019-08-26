@@ -1,9 +1,7 @@
 import { JolocomLib } from '../index'
 import { IDigestable } from '../linkedDataSignature/types'
 import { getIssuerPublicKey } from './helper'
-import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { MultiResolver, mutliResolver } from '../resolver'
-import { DidDocument } from '../identity/didDocument/didDocument'
 
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
@@ -18,11 +16,11 @@ export const validateDigestable = async (
   toValidate: IDigestable,
   resolver: MultiResolver = mutliResolver,
 ): Promise<boolean> => {
-  const issuerIdentityJson = await resolver.resolve(toValidate.signer.did)
+  const issuerIdentity = await resolver.resolve(toValidate.signer.did)
   try {
     const issuerPublicKey = getIssuerPublicKey(
       toValidate.signer.keyId,
-      DidDocument.fromJSON(issuerIdentityJson),
+      issuerIdentity.didDocument
     )
     return JolocomLib.KeyProvider.verifyDigestable(issuerPublicKey, toValidate)
   } catch {
@@ -50,6 +48,6 @@ export const validateDigestables = async (
   )
 
 /** @TODO replace the validation function once the JSON validation function is added */
-export const noValidation = async (didDocument: IDidDocumentAttrs) => {
-  return !!didDocument
+export const noValidation = async <T>(toValidate: T) => {
+  return !!toValidate
 }

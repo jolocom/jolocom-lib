@@ -486,13 +486,9 @@ export class IdentityWallet {
     sendJWT?: JSONWebToken<A>,
     resolver: MultiResolver = mutliResolver,
   ): Promise<void> {
-    const remoteIdentityJson = await resolver.resolve(
+    const remoteIdentity = await resolver.resolve(
       keyIdToDid(receivedJWT.issuer),
     )
-
-    const remoteIdentity = Identity.fromDidDocument({
-      didDocument: DidDocument.fromJSON(remoteIdentityJson),
-    })
 
     const pubKey = getIssuerPublicKey(
       receivedJWT.issuer,
