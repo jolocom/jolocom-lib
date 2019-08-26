@@ -39,7 +39,6 @@ export class EcdsaLinkedDataSignature
    */
 
   @Expose()
-  @Type(() => Date)
   @Transform((value: string) => value && new Date(value), { toClassOnly: true })
   @Transform((value: Date) => value && value.toISOString(), {
     toPlainOnly: true,

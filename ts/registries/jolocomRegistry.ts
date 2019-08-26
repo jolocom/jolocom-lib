@@ -213,22 +213,6 @@ export class JolocomRegistry implements IRegistry {
   }
 
   /**
-   * Fetches the public profile signed credential form ipfs
-   * @param entry - IPFS hash of public profile credential
-   * @example `const pubProf = await registry.fetchPublicProfile('ipfs://Qm...')`
-   * @internal
-   */
-
-  public async fetchPublicProfile(entry: string): Promise<SignedCredential> {
-    const hash = entry.replace('ipfs://', '')
-    const publicProfile = (await this.ipfsConnector.catJSON(
-      hash,
-    )) as ISignedCredentialAttrs
-
-    return SignedCredential.fromJSON(publicProfile)
-  }
-
-  /**
    * Proxies to this.resolve, but catches error and returns undefined
    * @param did - The jolocom did to resolve
    * @example `const serviceIdentity = await registry.resolveSafe('did:jolo:...')`

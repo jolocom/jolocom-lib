@@ -42,8 +42,13 @@ describe('Jolocom Registry - create', () => {
   it('should create new identity', async () => {
     const jolocomRegistry = createJolocomRegistry()
 
-    const expectedDidDoc = Object.assign({}, didDocumentJSON)
-    expectedDidDoc.proof.signatureValue = msgSignature.toString('hex')
+    const expectedDidDoc = {
+      ...didDocumentJSON,
+      proof: {
+        ...didDocumentJSON.proof,
+        signatureValue: msgSignature.toString('hex')
+      }
+    }
 
     identityWallet = await jolocomRegistry.create(mockVault, encryptionPass)
 

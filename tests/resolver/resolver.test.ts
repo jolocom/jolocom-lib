@@ -1,7 +1,12 @@
 import { expect } from 'chai'
 import * as sinon from 'sinon'
-import { createValidatingResolver, MultiResolver } from '../../ts/resolver'
+import {
+  createValidatingIdentityResolver,
+  MultiResolver,
+} from '../../ts/resolver'
 import { didDocumentJSON } from '../data/didDocument.data'
+import { Identity } from '../../ts/identity/identity'
+import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 
 describe('MultiResolver', () => {
   const testMethodPrefix = 'test'
@@ -46,20 +51,28 @@ describe('Validating resolver creator function', () => {
 
   const resolver = sinon.stub().resolves(didDocumentJSON)
   const validator = sinon.stub().resolves(true)
+  const assembler = sinon.stub().returns(
+    Identity.fromDidDocument({
+      didDocument: DidDocument.fromJSON(didDocumentJSON),
+    }),
+  )
 
   it('Should correctly compose resolver and validator', async () => {
-    const validatingResolver = createValidatingResolver(resolver, validator)
-    expect(await validatingResolver(testDid)).to.deep.eq(didDocumentJSON)
+    const validatingResolver = createValidatingIdentityResolver(resolver)(
+      validator,
+    )(assembler)
+
+    const identity = await validatingResolver(testDid)
     sinon.assert.calledWith(resolver, testDid)
     sinon.assert.calledWith(validator, didDocumentJSON)
+    expect(identity.didDocument.toJSON()).to.deep.eq(didDocumentJSON)
   })
 
   it('Should correctly throw if validation fails', async () => {
     const throwingValidator = async () => false
-    const brokenValidatingResolver = createValidatingResolver(
-      resolver,
+    const brokenValidatingResolver = createValidatingIdentityResolver(resolver)(
       throwingValidator,
-    )
+    )(assembler)
 
     /** @TODO correctly test with chai-as-promised */
     try {
