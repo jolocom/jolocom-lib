@@ -2,8 +2,6 @@ import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { DidDocument } from '../identity/didDocument/didDocument'
-import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
 import {
   IRegistryCommitArgs,
@@ -22,8 +20,12 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
-import {createJolocomResolver, createValidatingResolver, MultiResolver} from '../resolver'
-import {DidDocumentResolver} from '../resolver/types'
+import {
+  createJolocomResolver,
+  createValidatingIdentityResolver,
+  MultiResolver,
+} from '../resolver'
+import { ValidatingIdentityResolver} from '../resolver/types'
 import {noValidation} from '../validation/validation'
 
 /**
@@ -36,7 +38,7 @@ export class JolocomRegistry implements IRegistry {
   public ethereumConnector: IEthereumConnector
   public contractsAdapter: IContractsAdapter
   public contractsGateway: IContractsGateway
-  public readonly resolver: DidDocumentResolver
+  public readonly resolver: ValidatingIdentityResolver
   private readonly didBuilder: DidBuilder
 
   /**
@@ -45,7 +47,7 @@ export class JolocomRegistry implements IRegistry {
    * @param didBuilder - custom function to assemble DIDs given a public key, for example {@link publicKeyToJoloDID}
    */
 
-  constructor(resolver: DidDocumentResolver, didBuilder) {
+  constructor(resolver: ValidatingIdentityResolver, didBuilder) {
     this.resolver = resolver
     this.didBuilder = didBuilder
   }
@@ -172,26 +174,7 @@ export class JolocomRegistry implements IRegistry {
    */
 
   public async resolve(did): Promise<Identity> {
-    try {
-      const didDocumentJson = await this.resolver(did)
-
-      const didDocument = DidDocument.fromJSON(didDocumentJson)
-
-      const publicProfileSection = didDocument.service.find(
-        endpoint => endpoint.type === 'JolocomPublicProfile',
-      )
-
-      const publicProfile =
-        publicProfileSection &&
-        (await this.fetchPublicProfile(publicProfileSection.serviceEndpoint))
-
-      return Identity.fromDidDocument({
-        didDocument,
-        publicProfile,
-      })
-    } catch (error) {
-      throw new Error(`Could not retrieve DID Document. ${error.message}`)
-    }
+    return this.resolver(did)
   }
 
   /**
@@ -223,22 +206,6 @@ export class JolocomRegistry implements IRegistry {
       contractsGateway: this.contractsGateway,
       contractsAdapter: this.contractsAdapter,
     })
-  }
-
-  /**
-   * Fetches the public profile signed credential form ipfs
-   * @param entry - IPFS hash of public profile credential
-   * @example `const pubProf = await registry.fetchPublicProfile('ipfs://Qm...')`
-   * @internal
-   */
-
-  public async fetchPublicProfile(entry: string): Promise<SignedCredential> {
-    const hash = entry.replace('ipfs://', '')
-    const publicProfile = (await this.ipfsConnector.catJSON(
-      hash,
-    )) as ISignedCredentialAttrs
-
-    return SignedCredential.fromJSON(publicProfile)
   }
 
   /**
@@ -282,14 +249,15 @@ export const createJolocomRegistry = (
     contracts,
     ethereumConnector,
     didResolver: customResolver,
-    didBuilder: customDidBuilder
+    didBuilder: customDidBuilder,
   } = configuration
 
   const didResolver =
     customResolver ||
-    createValidatingResolver(
+    createValidatingIdentityResolver(
       createJolocomResolver(ethereumConnector, ipfsConnector),
       noValidation,
+      Identity.fromDidDocument,
     )
 
   const didBuilder = customDidBuilder || publicKeyToJoloDID
