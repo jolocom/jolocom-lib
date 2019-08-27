@@ -116,16 +116,22 @@ export class DidDocument implements IDigestible {
       auths.map(authEntry => authEntry.publicKey),
     { toClassOnly: true, until: 0.13 },
   )
+    @Transform(
+        (auths: AuthenticationSection[]) =>
+            auths.map(authEntry =>
+                      typeof authEntry === 'string'
+                      ? authEntry
+                      : authEntry.toJSON()),
+        { toPlainOnly: true }
+    )
   @Transform(
-    (auths: IAuthenticationSectionAttrs[], json) =>
+    (auths: IAuthenticationSectionAttrs[]) =>
       auths.map(authEntry =>
         typeof authEntry === 'string'
           ? authEntry
-          : plainToClass(PublicKeySection, authEntry, {
-              version: getDidDocVersion(json),
-            }),
+                : PublicKeySection.fromJSON(authEntry),
       ),
-    { toClassOnly: true },
+      { toClassOnly: true, since: 0.13},
   )
   public get authentication(): AuthenticationSection[] {
     return this._authentication
@@ -148,8 +154,13 @@ export class DidDocument implements IDigestible {
   @Expose()
     @Transform(
         (sectionAttrs: PublicKeySectionAttrs[]) =>
-                sectionAttrs.map(sec => PublicKeySection.fromJSON(sec)),
-        { toClassOnly: true }
+            sectionAttrs.map(sec => PublicKeySection.fromJSON(sec, {version: 0.13})),
+        { toClassOnly: true, since: 0.13 }
+    )
+    @Transform(
+        (sectionAttrs: PublicKeySectionAttrs[]) =>
+            sectionAttrs.map(sec => PublicKeySection.fromJSON(sec, {version: 0})),
+        { toClassOnly: true, until: 0.13}
     )
     @Transform(
         (sections: PublicKeySection[]) =>
