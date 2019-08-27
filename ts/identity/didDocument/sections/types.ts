@@ -74,15 +74,27 @@ export namespace PublicKeyRepresentationType {
         }
     }
 
-    export function KeyToBuffer (typ: PublicKeyRepresentationType): (material: string) => Buffer {
+    export function keyToBuffer (typ: PublicKeyRepresentationType): (material: string) => Buffer {
         return (material) => Buffer.from(material, toBufferEncoding(typ))
     }
 
-    export function extractFromJson (json: PublicKeyForm): PublicKeyForm | {} {
-        const ks = Object.keys(json).filter(has)
-        if (ks[0]) return json[ks[0]]
+    export function formToBuffer (form: PublicKeyForm): Buffer {
+        return keyToBuffer(formType(form))(formContent(form))
+    }
 
-        return {}
+    export function formType (form: PublicKeyForm): PublicKeyRepresentationType {
+        const ks = Object.keys(form).filter(has)[0]
+        return fromStr(ks[0])
+    }
+
+    export function formContent (form: PublicKeyForm): string {
+        return Object.values(form)[0] as string
+
+    }
+
+    export function extractFromJson (json: PublicKeyForm): PublicKeyForm {
+        const ks = Object.keys(json).filter(has)
+        return keyToRep(fromStr(ks[0]))(json[ks[0]] as string)
     }
 }
 

@@ -7,7 +7,7 @@ import {
   Transform,
   ClassTransformOptions,
 } from 'class-transformer'
-import { PublicKeySectionAttrs, PublicKeyForm, PublicKeyRepresentationType } from './types'
+import { PublicKeySectionAttrs, PublicKeyForm, PublicKeyRepresentationType, IPublicKeySectionAttrs } from './types'
 
 /**
  * Class modelling a Did Document Pulic Key section
@@ -76,6 +76,11 @@ export class PublicKeySection {
     this._type = type
   }
 
+
+  public keyBuffer(): Buffer {
+    return PublicKeyRepresentationType.formToBuffer(this._pkf)
+  }
+
   /**
    * Instantiates a boilerplate {@link PublicKeySection} based on the passed public key data
    * @param publicKey - A secp256k1 public key to be listed in the "publicKey" section of the did document
@@ -92,7 +97,7 @@ export class PublicKeySection {
     publicKeySecion.controller = did
     publicKeySecion.id = id
     publicKeySecion.type = 'Secp256k1VerificationKey2018'
-    publicKeySecion._pkf = {publicKeyHex: publicKey}
+    publicKeySecion._pkf = {publicKeyHex: publicKey.toString(PublicKeyRepresentationType.toBufferEncoding(PublicKeyRepresentationType.Hex))}
 
     return publicKeySecion
   }
@@ -109,7 +114,7 @@ export class PublicKeySection {
     publicKeySecion._pkf = {ethereumAddress: ethAddr}
 
     return publicKeySecion
-    }
+  }
 
   /**
    * Serializes the {@link PublicKeySection} as JSON
@@ -117,12 +122,12 @@ export class PublicKeySection {
    */
 
     public toJSON(): PublicKeySectionAttrs {
+        const og = classToPlain(this) as IPublicKeySectionAttrs
         return {
-            classToPlain(this),
+            ...og,
             ...this._pkf
         }
     }
-
   /**
    * Instantiates an {@link PublicKeySection} from it's JSON form
    * @param json - Section encoded as JSON
