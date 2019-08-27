@@ -7,8 +7,7 @@ import {
   Transform,
   ClassTransformOptions,
 } from 'class-transformer'
-import { IPublicKeySectionAttrs } from './types'
-import { pick } from 'ramda'
+import { PublicKeySectionAttrs, PublicKeyForm, PublicKeyRepresentationType } from './types'
 
 /**
  * Class modelling a Did Document Pulic Key section
@@ -23,8 +22,7 @@ export class PublicKeySection {
   private _id: string
   private _type: string
   private _controller: string
-  private _publicKeyHex: string
-  private _ethereumAddress: string
+  private _pkf: PublicKeyForm
 
   /**
    * Get the did of the public key owner
@@ -79,41 +77,6 @@ export class PublicKeySection {
   }
 
   /**
-   * Get the public key encoded as hex
-   */
-
-  @Expose()
-  public get publicKeyHex(): string {
-    return this._publicKeyHex
-  }
-
-  /**
-   * Set the public key
-   */
-
-  public set publicKeyHex(keyHex: string) {
-    this._publicKeyHex = keyHex
-  }
-
-  /**
-   * Get the ethereum address encoded as base 64
-   */
-
-  @Expose()
-  public get ethereumAddress(): string {
-    return this._ethereumAddress
-  }
-
-  /**
-   * Set the ethereum address
-   */
-    // TODO the stuff to manage the key representation string will get crazy if we add more this way,
-    // it should be abstracted, possibly with an enum, to ensure it gets managed with minimal logic
-  public set ethereumAddress(ethAddr: string) {
-    this._ethereumAddress = ethAddr
-  }
-
-  /**
    * Instantiates a boilerplate {@link PublicKeySection} based on the passed public key data
    * @param publicKey - A secp256k1 public key to be listed in the "publicKey" section of the did document
    * @param id - An identifier for the public key, normally #keys-X
@@ -129,12 +92,12 @@ export class PublicKeySection {
     publicKeySecion.controller = did
     publicKeySecion.id = id
     publicKeySecion.type = 'Secp256k1VerificationKey2018'
-    publicKeySecion.publicKeyHex = publicKey.toString('hex')
+    publicKeySecion._pkf = {publicKeyHex: publicKey}
 
     return publicKeySecion
   }
 
-    public static fromEthAddress(
+  public static fromEthAddress(
       ethAddr: string,
       id: string,
       did: string,
@@ -143,7 +106,7 @@ export class PublicKeySection {
     publicKeySecion.controller = did
     publicKeySecion.id = id
     publicKeySecion.type = 'Secp256k1VerificationKey2018'
-    publicKeySecion.ethereumAddress = ethAddr
+    publicKeySecion._pkf = {ethereumAddress: ethAddr}
 
     return publicKeySecion
     }
@@ -153,9 +116,11 @@ export class PublicKeySection {
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
    */
 
-    public toJSON(): IPublicKeySectionAttrs {
-        const t = classToPlain(this)
-        return pick(Object.keys(t).filter(key => !!t[key]), t) as IPublicKeySectionAttrs
+    public toJSON(): PublicKeySectionAttrs {
+        return {
+            classToPlain(this),
+            ...this._pkf
+        }
     }
 
   /**
@@ -167,9 +132,11 @@ export class PublicKeySection {
    */
 
   public static fromJSON(
-    json: IPublicKeySectionAttrs,
+    json: PublicKeySectionAttrs,
     options?: ClassTransformOptions,
-  ): PublicKeySection {
-    return plainToClass(PublicKeySection, json, options)
+    ): PublicKeySection {
+      const pks = plainToClass(PublicKeySection, json, options)
+      pks._pkf = PublicKeyRepresentationType.extractFromJson(json)
+      return pks
   }
 }

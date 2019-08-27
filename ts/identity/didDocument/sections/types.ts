@@ -77,6 +77,13 @@ export namespace PublicKeyRepresentationType {
     export function KeyToBuffer (typ: PublicKeyRepresentationType): (material: string) => Buffer {
         return (material) => Buffer.from(material, toBufferEncoding(typ))
     }
+
+    export function extractFromJson (json: PublicKeyForm): PublicKeyForm | {} {
+        const ks = Object.keys(json).filter(has)
+        if (ks[0]) return json[ks[0]]
+
+        return {}
+    }
 }
 
 interface Hex extends JsonLdObject { publicKeyHex: string }
@@ -84,5 +91,6 @@ interface Base58 extends JsonLdObject { publicKeyBase58: string }
 interface Base64 extends JsonLdObject { publicKeyBase64: string }
 interface Pem extends JsonLdObject { publicKeyPem: string }
 interface Eth extends JsonLdObject { ethereumAddress: string }
+
 
 export type PublicKeyForm = Hex | Base58 | Base64 | Pem | Eth

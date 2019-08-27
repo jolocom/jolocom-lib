@@ -1,7 +1,7 @@
 import {
   IAuthenticationSectionAttrsv0,
   IAuthenticationSectionAttrs,
-  IPublicKeySectionAttrs,
+  PublicKeySectionAttrs,
   IServiceEndpointSectionAttrs,
 } from './sections/types'
 import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
@@ -11,7 +11,7 @@ export interface IDidDocumentAttrs extends SignedJsonLdObject {
   specVersion?: number
   id: string
   authentication?: DidDocAuthenticationSection
-  publicKey?: IPublicKeySectionAttrs[]
+  publicKey?: PublicKeySectionAttrs[]
   service?: IServiceEndpointSectionAttrs[]
   created?: string
   proof: ILinkedDataSignatureAttrs
