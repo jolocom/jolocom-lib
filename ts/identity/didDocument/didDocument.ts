@@ -28,7 +28,8 @@ import {
 } from '../../vaultedKeyProvider/types'
 import {
   IAuthenticationSectionAttrs,
-  IAuthenticationSectionAttrsv0,
+    IAuthenticationSectionAttrsv0,
+    PublicKeySectionAttrs,
 } from './sections/types'
 import { JsonLdContext } from '../../utils/contexts/types'
 
@@ -145,7 +146,16 @@ export class DidDocument implements IDigestible {
    */
 
   @Expose()
-  @Type(() => PublicKeySection)
+    @Transform(
+        (sectionAttrs: PublicKeySectionAttrs[]) =>
+                sectionAttrs.map(sec => PublicKeySection.fromJSON(sec)),
+        { toClassOnly: true }
+    )
+    @Transform(
+        (sections: PublicKeySection[]) =>
+            sections.map(sec => sec.toJSON()),
+        { toPlainOnly: true }
+    )
   public get publicKey(): PublicKeySection[] {
     return this._publicKey
   }

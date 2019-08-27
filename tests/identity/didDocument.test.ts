@@ -68,7 +68,8 @@ describe('DidDocument', () => {
     expect(didDoc.did).to.contain('did:unknown')
   })
 
-  it('Should correctly produce normalized form', async () => {
+    it('Should correctly produce normalized form', async () => {
+        console.log(referenceDidDocument.toJSON())
     const normalized = await normalizeJsonLD(
       referenceDidDocument.toJSON(),
       referenceDidDocument.context,

@@ -37,7 +37,7 @@ export namespace PublicKeyRepresentationType {
             case PublicKeyRepresentationType.Base64: return "base64"
             case PublicKeyRepresentationType.Pem: return "base64"
             case PublicKeyRepresentationType.Eth: return "hex"
-            default: throw new Error("invalid public key representation type")
+            default: throw new Error("invalid public key representation type: " + rep)
         }
     }
 
@@ -59,7 +59,7 @@ export namespace PublicKeyRepresentationType {
             case PublicKeyRepresentationType.Base64: return PublicKeyRepresentationType.Base64
             case PublicKeyRepresentationType.Pem: return PublicKeyRepresentationType.Pem
             case PublicKeyRepresentationType.Eth: return PublicKeyRepresentationType.Eth
-            default: throw new Error("invalid public key representation type")
+            default: throw new Error("invalid public key representation type: " + str)
         }
     }
 
@@ -70,7 +70,7 @@ export namespace PublicKeyRepresentationType {
             case PublicKeyRepresentationType.Base64: return (material) => ({publicKeyBase64: material})
             case PublicKeyRepresentationType.Pem: return (material) => ({publicKeyPem: material})
             case PublicKeyRepresentationType.Eth: return (material) => ({ethereumAddress: material})
-            default: return (x: never) => {throw new Error("invalid public key representation type")}
+            default: return (x: never) => {throw new Error("invalid public key representation type: " + typ)}
         }
     }
 
