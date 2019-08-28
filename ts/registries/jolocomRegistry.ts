@@ -181,15 +181,17 @@ export class JolocomRegistry implements IRegistry {
    *   with the vault, decryption pass, and and key metadata
    * @param vaultedKeyProvider - Vaulted key store
    * @param derivationArgs - password for the vault and derivation path
+   * @param did - [optional] DID that should be resolved. If not provided the DID will be generated based on the public key
    * @example `const wallet = registry.authenticate(vault, { derivationPath: '...', encryptionPass: '...'})`
    */
 
   public async authenticate(
     vaultedKeyProvider: IVaultedKeyProvider,
     derivationArgs: IKeyDerivationArgs,
+    did?: string,
   ): Promise<IdentityWallet> {
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
-    const did = this.didBuilder(publicIdentityKey)
+    did = did ? did : this.didBuilder(publicIdentityKey)
     const identity = await this.resolve(did)
 
     const publicKeyMetadata = {

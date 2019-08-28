@@ -2,9 +2,10 @@ import { fromSeed } from 'bip32'
 import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
-import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
+import { IVaultedKeyProvider, IKeyDerivationArgs, KeyTypes } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
+import { keccak256 } from 'ethereumjs-util'
 
 const ALG = 'aes-256-cbc'
 
@@ -23,7 +24,7 @@ const MAX_ENCRYPTED_SEED_LENGTH = IV_LENGTH + MAX_SEED_LENGTH + PADDING_LENGTH
  * @param encryptedSeed - aes256-cbc encrypted seed
  */
 
-function isEncryptedSeedLengthValid(encryptedSeed: Buffer): Boolean {
+function isEncryptedSeedLengthValid(encryptedSeed: Buffer): boolean {
   const { length } = encryptedSeed
 
   const inBounds =
@@ -57,11 +58,11 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   }
 
   /**
-   * Get the encrypted seed; format: IV || ciphertext, where '||' denotes concatenation
+   * Get the encrypted seed hex encoded; format: IV || ciphertext, where '||' denotes concatenation
    */
 
-  public get encryptedSeed() {
-    return Buffer.concat([this._iv, this._encryptedSeed])
+  public get encryptedSeed(): string {
+    return Buffer.concat([this._iv, this._encryptedSeed]).toString('hex')
   }
 
   /**
@@ -94,7 +95,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   public static recoverKeyPair(
     mnemonic: string,
     encryptionPass: string,
-  ): IVaultedKeyProvider {
+  ): SoftwareKeyProvider {
     if (!validateMnemonic(mnemonic)) {
       throw new Error('Invalid Mnemonic.')
     }
@@ -187,13 +188,15 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   /**
    * Returns the mnemonic of the stored seed
    * @param encryptionPass - Password for seed decryption
+   * @param did - [optional] id-string of the corresponding DID, this is needed to recover after key rotations
    */
-  public getMnemonic(encryptionPass: string): string {
+  public getMnemonic(encryptionPass: string, did?: string): string {
     const seed = SoftwareKeyProvider.decrypt(
       SoftwareKeyProvider.normalizePassword(encryptionPass),
       this._encryptedSeed,
       this._iv,
     )
+    if (did) return entropyToMnemonic(seed) + ' ' + entropyToMnemonic(did)
     return entropyToMnemonic(seed)
   }
 
@@ -205,7 +208,6 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param derivationArgs.derivationPath - The bip32 derivation path
    * @example `await vault.signDigestable(derivationArgs, publicProfileCredential) // Buffer <...>`
    */
-
   public async signDigestable(
     derivationArgs: IKeyDerivationArgs,
     toSign: IDigestable,
