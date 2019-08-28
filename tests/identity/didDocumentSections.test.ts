@@ -36,17 +36,17 @@ describe('DidDocumentSections', () => {
   describe('PublicKeySection', () => {
     it('Should correctly instantiate from secp256k1 public key', () => {
       const { publicKey, keyId, did } = mockPubKeySectionCreationAttrs
-        const section = PublicKeySection.fromEcdsa(publicKey, keyId, did)
-        expect(section.toJSON()).to.deep.eq(mockPublicKey)
-          expect(section.toJSON()).to.have.property('publicKeyHex')
+      const section = PublicKeySection.fromEcdsa(publicKey, keyId, did)
+      expect(section.toJSON()).to.deep.eq(mockPublicKey)
+      expect(section.toJSON()).to.have.property('publicKeyHex')
     })
 
-      it('Should correctly instantiate from ethereum address', () => {
-          const { publicKey, keyId, did } = mockPubKeySectionCreationAttrs2
-          const section = PublicKeySection.fromEthAddress( publicKey, keyId, did )
-          expect(section.toJSON()).to.deep.eq(mockPublicKey3)
-          expect(section.toJSON()).to.have.property('ethereumAddress')
-      })
+    it('Should correctly instantiate from ethereum address', () => {
+      const { publicKey, keyId, did } = mockPubKeySectionCreationAttrs2
+      const section = PublicKeySection.fromEthAddress(publicKey, keyId, did)
+      expect(section.toJSON()).to.deep.eq(mockPublicKey3)
+      expect(section.toJSON()).to.have.property('ethereumAddress')
+    })
   })
 
   describe('Public profile ServiceEndpoint', () => {

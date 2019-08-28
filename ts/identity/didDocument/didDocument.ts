@@ -28,8 +28,8 @@ import {
 } from '../../vaultedKeyProvider/types'
 import {
   IAuthenticationSectionAttrs,
-    IAuthenticationSectionAttrsv0,
-    PublicKeySectionAttrs,
+  IAuthenticationSectionAttrsv0,
+  PublicKeySectionAttrs,
 } from './sections/types'
 import { JsonLdContext } from '../../utils/contexts/types'
 
@@ -117,22 +117,23 @@ export class DidDocument implements IDigestible {
     { toClassOnly: true, until: 0.13 },
   )
   @Transform(
-      (auths: IAuthenticationSectionAttrs[], json) =>
+    (auths: IAuthenticationSectionAttrs[], json) =>
       auths.map(authEntry =>
         typeof authEntry === 'string'
-                ? authEntry
-                : PublicKeySection.fromJSON(authEntry, {version: getDidDocVersion(json)}),
+          ? authEntry
+          : PublicKeySection.fromJSON(authEntry, {
+              version: getDidDocVersion(json),
+            }),
       ),
-      { toClassOnly: true, since: 0.13},
+    { toClassOnly: true, since: 0.13 },
   )
-    @Transform(
-        (auths: AuthenticationSection[]) =>
-            auths.map(authEntry =>
-                      typeof authEntry === 'string'
-                      ? authEntry
-                      : authEntry.toJSON()),
-        { toPlainOnly: true }
-    )
+  @Transform(
+    (auths: AuthenticationSection[]) =>
+      auths.map(authEntry =>
+        typeof authEntry === 'string' ? authEntry : authEntry.toJSON(),
+      ),
+    { toPlainOnly: true },
+  )
   public get authentication(): AuthenticationSection[] {
     return this._authentication
   }
@@ -152,16 +153,17 @@ export class DidDocument implements IDigestible {
    */
 
   @Expose()
-    @Transform(
-        (sectionAttrs: PublicKeySectionAttrs[], json) =>
-            sectionAttrs.map(sec => PublicKeySection.fromJSON(sec, {version: getDidDocVersion(json)})),
-        { toClassOnly: true }
-    )
-    @Transform(
-        (sections: PublicKeySection[]) =>
-            sections.map(sec => sec.toJSON()),
-        { toPlainOnly: true }
-    )
+  @Transform(
+    (sectionAttrs: PublicKeySectionAttrs[], json) =>
+      sectionAttrs.map(sec =>
+        PublicKeySection.fromJSON(sec, { version: getDidDocVersion(json) }),
+      ),
+    { toClassOnly: true },
+  )
+  @Transform(
+    (sections: PublicKeySection[]) => sections.map(sec => sec.toJSON()),
+    { toPlainOnly: true },
+  )
   public get publicKey(): PublicKeySection[] {
     return this._publicKey
   }

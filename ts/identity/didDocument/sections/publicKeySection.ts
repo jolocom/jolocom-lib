@@ -7,7 +7,12 @@ import {
   Transform,
   ClassTransformOptions,
 } from 'class-transformer'
-import { PublicKeySectionAttrs, PublicKeyForm, PublicKeyRepresentationType as PKRT, IPublicKeySectionAttrs } from './types'
+import {
+  PublicKeySectionAttrs,
+  PublicKeyForm,
+  PublicKeyRepresentationType as PKRT,
+  IPublicKeySectionAttrs,
+} from './types'
 
 /**
  * Class modelling a Did Document Pulic Key section
@@ -29,7 +34,7 @@ export class PublicKeySection {
    */
 
   @Expose()
-    @Transform((entry, { owner }) => owner, { toClassOnly: true, until: 0.13 })
+  @Transform((entry, { owner }) => owner, { toClassOnly: true, until: 0.13 })
   public get controller(): string {
     return this._controller
   }
@@ -76,8 +81,7 @@ export class PublicKeySection {
     this._type = type
   }
 
-
-    public keyBuffer(): Buffer {
+  public keyBuffer(): Buffer {
     return PKRT.formToBuffer(this._pkf)
   }
 
@@ -97,15 +101,17 @@ export class PublicKeySection {
     publicKeySecion.controller = did
     publicKeySecion.id = id
     publicKeySecion.type = 'Secp256k1VerificationKey2018'
-    publicKeySecion._pkf = PKRT.keyToRep(PKRT.Hex)(publicKey.toString(PKRT.toBufferEncoding(PKRT.Hex)))
+    publicKeySecion._pkf = PKRT.keyToRep(PKRT.Hex)(
+      publicKey.toString(PKRT.toBufferEncoding(PKRT.Hex)),
+    )
 
     return publicKeySecion
   }
 
   public static fromEthAddress(
-      ethAddr: string,
-      id: string,
-      did: string,
+    ethAddr: string,
+    id: string,
+    did: string,
   ): PublicKeySection {
     const publicKeySecion = new PublicKeySection()
     publicKeySecion.controller = did
@@ -121,13 +127,13 @@ export class PublicKeySection {
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
    */
 
-    public toJSON(): PublicKeySectionAttrs {
-        const og = classToPlain(this) as IPublicKeySectionAttrs
-        return {
-            ...og,
-            ...this._pkf
-        }
+  public toJSON(): PublicKeySectionAttrs {
+    const og = classToPlain(this) as IPublicKeySectionAttrs
+    return {
+      ...og,
+      ...this._pkf,
     }
+  }
 
   /**
    * Instantiates an {@link PublicKeySection} from it's JSON form
@@ -140,10 +146,10 @@ export class PublicKeySection {
   public static fromJSON(
     json: PublicKeySectionAttrs,
     options?: ClassTransformOptions,
-    ): PublicKeySection {
-      const pks = plainToClass(PublicKeySection, json, options)
-      pks._pkf = PKRT.extractFromJson(json)
+  ): PublicKeySection {
+    const pks = plainToClass(PublicKeySection, json, options)
+    pks._pkf = PKRT.extractFromJson(json)
 
-      return pks
+    return pks
   }
 }

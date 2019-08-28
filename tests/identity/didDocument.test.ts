@@ -54,7 +54,7 @@ describe('DidDocument', () => {
     referenceDidDocument.addServiceEndpoint(
       ServiceEndpointsSection.fromJSON(mockPubProfServiceEndpointJSON),
     )
-      await referenceDidDocument.sign(vault, derivationArgs, mockKeyId)
+    await referenceDidDocument.sign(vault, derivationArgs, mockKeyId)
   })
 
   after(() => {
@@ -68,7 +68,7 @@ describe('DidDocument', () => {
     expect(didDoc.did).to.contain('did:unknown')
   })
 
-    it('Should correctly produce normalized form', async () => {
+  it('Should correctly produce normalized form', async () => {
     const normalized = await normalizeJsonLD(
       referenceDidDocument.toJSON(),
       referenceDidDocument.context,
@@ -83,20 +83,20 @@ describe('DidDocument', () => {
       PublicKeySection.fromJSON(mockPublicKey2, { version: 0.13 }),
     )
     await didDocumentv0.sign(vault, derivationArgs, mockKeyId)
-      expect(didDocumentv0.toJSON()).to.deep.eq(referenceDidDocument.toJSON())
+    expect(didDocumentv0.toJSON()).to.deep.eq(referenceDidDocument.toJSON())
   })
 
-    it('Should correctly implement fromJSON', async () => {
+  it('Should correctly implement fromJSON', async () => {
     const didDocFromJSON = DidDocument.fromJSON(didDocumentJSON)
     await didDocFromJSON.sign(vault, derivationArgs, mockKeyId)
-      expect(didDocFromJSON.toJSON()).to.deep.eq(referenceDidDocument.toJSON())
+    expect(didDocFromJSON.toJSON()).to.deep.eq(referenceDidDocument.toJSON())
   })
 
-    it('Should correctly implement toJSON', () => {
+  it('Should correctly implement toJSON', () => {
     expect(referenceDidDocument.toJSON()).to.deep.eq(didDocumentJSON)
   })
 
-    it('Should correctly implement normalize', async () => {
+  it('Should correctly implement normalize', async () => {
     const normalized = await normalizeJsonLD(
       referenceDidDocument.toJSON(),
       referenceDidDocument.context,

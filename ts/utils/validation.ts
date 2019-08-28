@@ -2,7 +2,10 @@ import { JolocomLib } from '../index'
 import { IDigestible } from '../linkedDataSignature/types'
 import { getIssuerPublicKey } from '../utils/helper'
 import { IRegistry } from '../registries/types'
-import {JsonLdDigestible, SignedJsonLdObject} from '../validation/jsonLdValidator'
+import {
+  JsonLdDigestible,
+  SignedJsonLdObject,
+} from '../validation/jsonLdValidator'
 
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}

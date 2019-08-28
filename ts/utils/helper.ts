@@ -20,7 +20,7 @@ export function getIssuerPublicKey(keyId: string, ddo: DidDocument): Buffer {
     throw new Error('No relevant key-id found')
   }
 
-    return relevantKeySection.keyBuffer()
+  return relevantKeySection.keyBuffer()
 }
 
 export function handleValidationStatus(success: boolean, key: string) {
