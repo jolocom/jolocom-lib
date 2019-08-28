@@ -1,10 +1,19 @@
 import { JsonLdObject } from '../../../validation/jsonLdValidator'
+import { JsonLdContext } from '../../../utils/contexts/types';
 
-export interface IPublicKeySectionAttrs extends JsonLdObject {
+export interface IPublicKeySectionAttrsV013 extends JsonLdObject {
   id: string
   type: string
+  controller: string
 }
 
+export interface IPublicKeySectionAttrsV0 extends JsonLdObject {
+    id: string
+    type: string
+    owner: string
+}
+
+export type IPublicKeySectionAttrs = IPublicKeySectionAttrsV0 | IPublicKeySectionAttrsV013
 export type PublicKeySectionAttrs = IPublicKeySectionAttrs & PublicKeyForm
 
 export interface IAuthenticationSectionAttrsv0 extends JsonLdObject {
@@ -28,6 +37,23 @@ export enum PublicKeyRepresentationType {
     Pem = "publicKeyPem",
     Eth = "ethereumAddress"
 }
+
+type Hex = { publicKeyHex: string } & JsonLdObject
+type Base58 = { publicKeyBase58: string } & JsonLdObject
+type Base64 = { publicKeyBase64: string } & JsonLdObject
+type Pem = { publicKeyPem: string } & JsonLdObject
+type Eth = { ethereumAddress: string } & JsonLdObject
+
+export type PublicKeyForm = Hex | Base58 | Base64 | Pem | Eth
+
+// this is really abusing typescript, and is probably why assertions aren't liked
+const customObject = <T extends JsonLdObject, V extends keyof JsonLdObject>(key: string) => (value: V): T => ({[key]: value}) as unknown as T
+
+const Hex = (key: string) => customObject<Hex, string>(PublicKeyRepresentationType.Hex)(key)
+const Base58 = (key: string) => customObject<Base58, string>(PublicKeyRepresentationType.Base58)(key)
+const Base64 = (key: string) => customObject<Base64, string>(PublicKeyRepresentationType.Base64)(key)
+const Pem = (key: string) => customObject<Pem, string>(PublicKeyRepresentationType.Pem)(key)
+const Eth = (key: string) => customObject<Eth, string>(PublicKeyRepresentationType.Eth)(key)
 
 export namespace PublicKeyRepresentationType {
     export function toBufferEncoding (rep: PublicKeyRepresentationType): string {
@@ -65,11 +91,11 @@ export namespace PublicKeyRepresentationType {
 
     export function keyToRep (typ: PublicKeyRepresentationType): (material: string) => PublicKeyForm {
         switch (typ) {
-            case PublicKeyRepresentationType.Hex: return (material) => ({publicKeyHex: material});
-            case PublicKeyRepresentationType.Base58: return (material) => ({publicKeyBase58: material})
-            case PublicKeyRepresentationType.Base64: return (material) => ({publicKeyBase64: material})
-            case PublicKeyRepresentationType.Pem: return (material) => ({publicKeyPem: material})
-            case PublicKeyRepresentationType.Eth: return (material) => ({ethereumAddress: material})
+            case PublicKeyRepresentationType.Hex: return Hex;
+            case PublicKeyRepresentationType.Base58: return Base58;
+            case PublicKeyRepresentationType.Base64: return Base64
+            case PublicKeyRepresentationType.Pem: return Pem
+            case PublicKeyRepresentationType.Eth: return Eth
             default: return (x: never) => {throw new Error("invalid public key representation type: " + typ)}
         }
     }
@@ -97,12 +123,3 @@ export namespace PublicKeyRepresentationType {
         return keyToRep(fromStr(ks[0]))(json[ks[0]] as string)
     }
 }
-
-interface Hex extends JsonLdObject { publicKeyHex: string }
-interface Base58 extends JsonLdObject { publicKeyBase58: string }
-interface Base64 extends JsonLdObject { publicKeyBase64: string }
-interface Pem extends JsonLdObject { publicKeyPem: string }
-interface Eth extends JsonLdObject { ethereumAddress: string }
-
-
-export type PublicKeyForm = Hex | Base58 | Base64 | Pem | Eth
