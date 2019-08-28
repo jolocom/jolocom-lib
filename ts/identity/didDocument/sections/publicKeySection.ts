@@ -7,7 +7,7 @@ import {
   Transform,
   ClassTransformOptions,
 } from 'class-transformer'
-import { PublicKeySectionAttrs, PublicKeyForm, PublicKeyRepresentationType, IPublicKeySectionAttrs } from './types'
+import { PublicKeySectionAttrs, PublicKeyForm, PublicKeyRepresentationType as PKRT, IPublicKeySectionAttrs } from './types'
 
 /**
  * Class modelling a Did Document Pulic Key section
@@ -29,7 +29,7 @@ export class PublicKeySection {
    */
 
   @Expose()
-  @Transform((entry, { owner }) => owner, { toClassOnly: true, until: 0.13 })
+    @Transform((entry, { owner }) => owner, { toClassOnly: true, until: 0.13 })
   public get controller(): string {
     return this._controller
   }
@@ -77,8 +77,8 @@ export class PublicKeySection {
   }
 
 
-  public keyBuffer(): Buffer {
-    return PublicKeyRepresentationType.formToBuffer(this._pkf)
+    public keyBuffer(): Buffer {
+    return PKRT.formToBuffer(this._pkf)
   }
 
   /**
@@ -97,7 +97,7 @@ export class PublicKeySection {
     publicKeySecion.controller = did
     publicKeySecion.id = id
     publicKeySecion.type = 'Secp256k1VerificationKey2018'
-    publicKeySecion._pkf = {publicKeyHex: publicKey.toString(PublicKeyRepresentationType.toBufferEncoding(PublicKeyRepresentationType.Hex))}
+    publicKeySecion._pkf = PKRT.keyToRep(PKRT.Hex)(publicKey.toString(PKRT.toBufferEncoding(PKRT.Hex)))
 
     return publicKeySecion
   }
@@ -111,7 +111,7 @@ export class PublicKeySection {
     publicKeySecion.controller = did
     publicKeySecion.id = id
     publicKeySecion.type = 'Secp256k1VerificationKey2018'
-    publicKeySecion._pkf = {ethereumAddress: ethAddr}
+    publicKeySecion._pkf = PKRT.keyToRep(PKRT.Eth)(ethAddr)
 
     return publicKeySecion
   }
@@ -128,6 +128,7 @@ export class PublicKeySection {
             ...this._pkf
         }
     }
+
   /**
    * Instantiates an {@link PublicKeySection} from it's JSON form
    * @param json - Section encoded as JSON
@@ -141,7 +142,8 @@ export class PublicKeySection {
     options?: ClassTransformOptions,
     ): PublicKeySection {
       const pks = plainToClass(PublicKeySection, json, options)
-      pks._pkf = PublicKeyRepresentationType.extractFromJson(json)
+      pks._pkf = PKRT.extractFromJson(json)
+
       return pks
   }
 }

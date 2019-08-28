@@ -4,7 +4,9 @@ import * as crypto from 'crypto'
 import { PublicKeySection } from '../../ts/identity/didDocument/sections'
 import {
   mockPubKeySectionCreationAttrs,
+  mockPubKeySectionCreationAttrs2,
   mockPublicKey,
+  mockPublicKey3,
   mockPubProfServiceEndpointJSON,
 } from '../data/didDocumentSections.data'
 import {
@@ -35,17 +37,15 @@ describe('DidDocumentSections', () => {
     it('Should correctly instantiate from secp256k1 public key', () => {
       const { publicKey, keyId, did } = mockPubKeySectionCreationAttrs
         const section = PublicKeySection.fromEcdsa(publicKey, keyId, did)
-        console.log(section.toJSON())
         expect(section.toJSON()).to.deep.eq(mockPublicKey)
-          expect(section.toJSON()).to.have.property('ethereumAddress')
+          expect(section.toJSON()).to.have.property('publicKeyHex')
     })
 
       it('Should correctly instantiate from ethereum address', () => {
-          const { publicKey, keyId, did } = mockPubKeySectionCreationAttrs
-          const section = PublicKeySection.fromEthAddress( publicKey.toString('base64'), keyId, did )
-          console.log(section.toJSON())
-          expect(section.toJSON()).to.deep.eq(mockPublicKey)
-          expect(section.toJSON()).to.have.property('publicKeyHex')
+          const { publicKey, keyId, did } = mockPubKeySectionCreationAttrs2
+          const section = PublicKeySection.fromEthAddress( publicKey, keyId, did )
+          expect(section.toJSON()).to.deep.eq(mockPublicKey3)
+          expect(section.toJSON()).to.have.property('ethereumAddress')
       })
   })
 

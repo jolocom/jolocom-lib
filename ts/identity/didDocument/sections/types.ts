@@ -108,7 +108,7 @@ export namespace PublicKeyRepresentationType {
     }
 
     export function formType (form: PublicKeyForm): PublicKeyRepresentationType {
-        const ks = Object.keys(form).filter(has)[0]
+        const ks = Object.keys(form).filter(has)
         return fromStr(ks[0])
     }
 

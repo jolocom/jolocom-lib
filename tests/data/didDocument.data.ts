@@ -6,8 +6,10 @@ export const mockDid =
 export const mockIpfsHash = 'QmZCEmfiKZhRPB88cEqmcHzQu6siSmVpieG6HTQse4e4Js'
 export const mockKeyId = `${mockDid}#keys-1`
 export const mockKeyId2 = `${mockDid}#keys-2`
+export const mockKeyId3 = `${mockDid}#keys-3`
 export const mockPublicKeyHex =
-  '03848af62bffceb57631780ac0e0726106ee1c23262d6fd7ef906559d68f53a551'
+    '03848af62bffceb57631780ac0e0726106ee1c23262d6fd7ef906559d68f53a551'
+export const mockPublicKeyEth = '0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B'
 
 /* JSON form to ensure toJSON and fromJSON work as intended */
 
