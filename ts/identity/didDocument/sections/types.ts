@@ -1,5 +1,4 @@
 import { JsonLdObject } from '../../../validation/jsonLdValidator'
-import { JsonLdContext } from '../../../utils/contexts/types';
 
 export interface IPublicKeySectionAttrsV013 extends JsonLdObject {
   id: string

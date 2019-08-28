@@ -153,14 +153,9 @@ export class DidDocument implements IDigestible {
 
   @Expose()
     @Transform(
-        (sectionAttrs: PublicKeySectionAttrs[]) =>
-            sectionAttrs.map(sec => PublicKeySection.fromJSON(sec, {version: 0.13})),
-        { toClassOnly: true, since: 0.13 }
-    )
-    @Transform(
-        (sectionAttrs: PublicKeySectionAttrs[]) =>
-            sectionAttrs.map(sec => PublicKeySection.fromJSON(sec, {version: 0})),
-        { toClassOnly: true, until: 0.13}
+        (sectionAttrs: PublicKeySectionAttrs[], json) =>
+            sectionAttrs.map(sec => PublicKeySection.fromJSON(sec, {version: getDidDocVersion(json)})),
+        { toClassOnly: true }
     )
     @Transform(
         (sections: PublicKeySection[]) =>
