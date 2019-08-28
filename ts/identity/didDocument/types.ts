@@ -1,17 +1,21 @@
 import {
-  IPublicKeySectionAttrs,
+  IAuthenticationSectionAttrsv0,
   IAuthenticationSectionAttrs,
+  IPublicKeySectionAttrs,
   IServiceEndpointSectionAttrs,
 } from './sections/types'
 import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 
 export interface IDidDocumentAttrs {
-  '@context': ContextEntry[]
+  '@context': ContextEntry[] | string
+  specVersion?: number
   id: string
-  authentication: IAuthenticationSectionAttrs[]
-  publicKey: IPublicKeySectionAttrs[]
-  service: IServiceEndpointSectionAttrs[]
-  created: string
-  proof: ILinkedDataSignatureAttrs
+  authentication?:
+    | IAuthenticationSectionAttrsv0[]
+    | IAuthenticationSectionAttrs[]
+  publicKey?: IPublicKeySectionAttrs[]
+  service?: IServiceEndpointSectionAttrs[]
+  created?: string
+  proof?: ILinkedDataSignatureAttrs
 }

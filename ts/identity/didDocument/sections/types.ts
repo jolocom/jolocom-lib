@@ -4,14 +4,16 @@ export interface IPublicKeySectionAttrs {
   publicKeyHex: string
 }
 
-export interface IAuthenticationSectionAttrs {
-  publicKey: string
-  type: string
-}
-
 export interface IServiceEndpointSectionAttrs {
   id: string
   type: string
   serviceEndpoint: string
   description: string
 }
+
+export interface IAuthenticationSectionAttrsv0 {
+  publicKey: string
+  type: string
+}
+
+export type IAuthenticationSectionAttrs = IPublicKeySectionAttrs | string

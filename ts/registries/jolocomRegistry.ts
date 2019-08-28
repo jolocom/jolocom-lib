@@ -56,12 +56,7 @@ export class JolocomRegistry implements IRegistry {
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
 
     const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
-    const didDocumentSignature = await vaultedKeyProvider.signDigestable(
-      derivationArgs,
-      didDocument,
-    )
 
-    didDocument.signature = didDocumentSignature.toString('hex')
     const identity = Identity.fromDidDocument({ didDocument })
 
     const identityWallet = new IdentityWallet({
@@ -123,6 +118,17 @@ export class JolocomRegistry implements IRegistry {
         didDocument.resetServiceEndpoints()
       }
 
+      didDocument.hasBeenUpdated()
+
+      await didDocument.sign(
+        vaultedKeyProvider,
+        {
+          derivationPath: KeyTypes.jolocomIdentityKey,
+          encryptionPass: keyMetadata.encryptionPass,
+        },
+        didDocument.publicKey[0].id,
+      )
+
       const ipfsHash = await this.ipfsConnector.storeJSON({
         data: didDocument.toJSON(),
         pin: true,
@@ -154,7 +160,6 @@ export class JolocomRegistry implements IRegistry {
       if (!ddoHash) {
         throw new Error('No record for DID found.')
       }
-
       const didDocument = DidDocument.fromJSON(
         (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs,
       )
@@ -162,7 +167,6 @@ export class JolocomRegistry implements IRegistry {
       const publicProfileSection = didDocument.service.find(
         endpoint => endpoint.type === 'JolocomPublicProfile',
       )
-
       const publicProfile =
         publicProfileSection &&
         (await this.fetchPublicProfile(publicProfileSection.serviceEndpoint))

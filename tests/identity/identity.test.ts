@@ -7,9 +7,9 @@ import { Identity } from '../../ts/identity/identity'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 const expect = chai.expect
 
-describe('Identity', () => {
+describe('Identity', async () => {
   let clock
-  const mockDidDocument = DidDocument.fromPublicKey(testPublicIdentityKey)
+  const mockDidDocument = await DidDocument.fromPublicKey(testPublicIdentityKey)
   const mockPublicProfile = SignedCredential.fromJSON(publicProfileCredJSON)
 
   before(() => {
