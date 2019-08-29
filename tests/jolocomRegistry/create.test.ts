@@ -25,7 +25,6 @@ describe('Jolocom Registry - create', () => {
 
   before(async () => {
     sandbox.stub(mockVault, 'getPublicKey').returns(testPublicIdentityKey)
-    sandbox.stub(mockVault, 'signDigestable').returns(msgSignature)
     sandbox.stub(mockVault, 'getPrivateKey').returns(testPrivateIdentityKey)
 
     sandbox.stub(JolocomRegistry.prototype, 'commit').resolves()
@@ -42,13 +41,7 @@ describe('Jolocom Registry - create', () => {
   it('should create new identity', async () => {
     const jolocomRegistry = createJolocomRegistry()
 
-    const expectedDidDoc = {
-      ...didDocumentJSON,
-      proof: {
-        ...didDocumentJSON.proof,
-        signatureValue: msgSignature.toString('hex')
-      }
-    }
+    const expectedDidDoc = {...didDocumentJSON}
 
     identityWallet = await jolocomRegistry.create(mockVault, encryptionPass)
 

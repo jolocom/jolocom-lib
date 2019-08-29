@@ -77,12 +77,6 @@ export class JolocomRegistry implements IRegistry {
       this.didBuilder,
     )
 
-    const didDocumentSignature = await vaultedKeyProvider.signDigestable(
-      derivationArgs,
-      didDocument,
-    )
-
-    didDocument.signature = didDocumentSignature.toString('hex')
     const identity = Identity.fromDidDocument({ didDocument })
 
     const identityWallet = new IdentityWallet({
@@ -143,6 +137,17 @@ export class JolocomRegistry implements IRegistry {
       if (remotePubProf && !publicProfile) {
         didDocument.resetServiceEndpoints()
       }
+
+      didDocument.hasBeenUpdated()
+
+      await didDocument.sign(
+        vaultedKeyProvider,
+        {
+          derivationPath: KeyTypes.jolocomIdentityKey,
+          encryptionPass: keyMetadata.encryptionPass,
+        },
+        didDocument.publicKey[0].id,
+      )
 
       const ipfsHash = await this.ipfsConnector.storeJSON({
         data: didDocument.toJSON(),

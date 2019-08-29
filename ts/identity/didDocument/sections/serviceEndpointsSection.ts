@@ -1,5 +1,11 @@
 import 'reflect-metadata'
-import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
+import {
+  classToPlain,
+  plainToClass,
+  Exclude,
+  Expose,
+  Transform,
+} from 'class-transformer'
 import { IServiceEndpointSectionAttrs } from './types'
 
 /**
@@ -22,6 +28,7 @@ export class ServiceEndpointsSection {
    */
 
   @Expose()
+  @Transform(id => id.replace(';', '#'), { toClassOnly: true, until: 0.13 })
   get id(): string {
     return this._id
   }
@@ -119,7 +126,7 @@ export const generatePublicProfileServiceSection = (
   profileIpfsHash: string,
 ): ServiceEndpointsSection => {
   const PubProfSec = new ServiceEndpointsSection()
-  PubProfSec.id = `${did};jolocomPubProfile`
+  PubProfSec.id = `${did}#jolocomPubProfile`
   PubProfSec.serviceEndpoint = `ipfs://${profileIpfsHash}`
   PubProfSec.description = 'Verifiable Credential describing entity profile'
   PubProfSec.type = 'JolocomPublicProfile'
