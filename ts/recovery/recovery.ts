@@ -4,7 +4,7 @@ import {
   IKeyDerivationArgs,
   IVaultedKeyProvider,
 } from '../vaultedKeyProvider/types'
-import { publicKeyToDID } from '../utils/crypto'
+import { publicKeyToJoloDID } from '../utils/crypto'
 import { mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { JolocomRegistry } from '../registries/jolocomRegistry'
 import { SocialRecovery } from './socialRecovery'
@@ -49,7 +49,7 @@ async function recoverFromSeedPhrase(
   if (didPhrase) {
     did = 'did:jolo:' + mnemonicToEntropy(didPhrase)
   } else {
-    did = publicKeyToDID(vault.getPublicKey(keyMetaData))
+    did = publicKeyToJoloDID(vault.getPublicKey(keyMetaData))
   }
   return await registry.authenticate(vault, keyMetaData, did)
 }
