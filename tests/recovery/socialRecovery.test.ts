@@ -16,7 +16,6 @@ describe('Social Recovery', () => {
     const { did, secret } = SocialRecovery.combineShard(
       shards.slice(0, threshold),
     )
-    console.log(did, secret)
     expect(did).to.equal(testDID32)
     expect(secret).to.equal(testSecret32)
   })
