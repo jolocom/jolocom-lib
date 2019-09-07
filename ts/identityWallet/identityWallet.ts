@@ -30,7 +30,6 @@ import {
 import {
   keyIdToDid,
   getIssuerPublicKey,
-  handleValidationStatus,
   publicKeyToAddress,
 } from '../utils/helper'
 import { createJolocomRegistry } from '../registries/jolocomRegistry'
@@ -495,14 +494,21 @@ export class IdentityWallet {
       remoteIdentity.didDocument,
     )
 
-    handleValidationStatus(
-      await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT),
-      'sig',
-    )
-    sendJWT &&
-      handleValidationStatus(receivedJWT.audience === this.identity.did, 'aud')
-    sendJWT &&
-      handleValidationStatus(sendJWT.nonce === receivedJWT.nonce, 'nonce')
+    if (!(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT))) {
+      throw new Error('Signature on token is invalid')
+    }
+
+    if (sendJWT && receivedJWT.audience !== this.identity.did) {
+      throw new Error('You are not the intended audience of received token')
+    }
+
+    if (sendJWT && sendJWT.nonce !== receivedJWT.nonce) {
+      throw new Error('The token nonce does not match the request')
+    }
+
+    if (receivedJWT.expires < Date.now()) {
+      throw new Error('Token expired')
+    }
   }
 
   private sendTransaction = async (

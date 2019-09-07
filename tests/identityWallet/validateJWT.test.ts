@@ -29,9 +29,10 @@ describe('IdentityWallet validate JWT', () => {
   const vault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
 
   let iw: IdentityWallet
+  let clock
 
   beforeEach(() => {
-    sinon.useFakeTimers()
+    clock = sinon.useFakeTimers()
     sandbox
       .stub(JolocomRegistry.prototype, 'resolve')
       .resolves(Identity.fromDidDocument({ didDocument }))
@@ -68,6 +69,17 @@ describe('IdentityWallet validate JWT', () => {
       await iw.validateJWT(JSONWebToken.fromJSON(tokenWithInvalidSignature))
     } catch (err) {
       expect(err.message).to.eq('Signature on token is invalid')
+    }
+  })
+
+  it('Should throw error if token is expired', async () => {
+    clock.tick(validSignedCredReqJWT.payload.exp + 1)
+
+    try {
+      await iw.validateJWT(JSONWebToken.fromJSON(validSignedCredReqJWT))
+      expect(true).to.eq(false)
+    } catch (err) {
+      expect(err.message).to.eq('Token expired')
     }
   })
 

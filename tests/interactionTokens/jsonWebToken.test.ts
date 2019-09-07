@@ -107,10 +107,4 @@ describe('JSONWebToken', () => {
     const digest = await jwt.digest()
     expect(digest.toString('hex')).to.eq(hashedValidCredReqJWT)
   })
-
-  it('Should thow error on expired JWT during decode', () => {
-    expect(() => JSONWebToken.decode(expiredEncodedSimpleCredReqJWT)).to.throw(
-      'Token expired',
-    )
-  })
 })

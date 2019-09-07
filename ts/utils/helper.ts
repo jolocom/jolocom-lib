@@ -23,19 +23,6 @@ export function getIssuerPublicKey(keyId: string, ddo: DidDocument): Buffer {
   return Buffer.from(relevantKeySection.publicKeyHex, 'hex')
 }
 
-export function handleValidationStatus(success: boolean, key: string) {
-  if (!success) {
-    throw new Error(ErrorKeys[key] || 'Unknown Error key')
-  }
-}
-
-const ErrorKeys = {
-  exp: 'Token expired',
-  sig: 'Signature on token is invalid',
-  nonce: 'The token nonce deviates from request',
-  aud: 'You are not the intended audience of received token',
-}
-
 /**
  * Helper function to transfer 0.1 Ether to an address given the corresponding public key
  * The Ether is used for anchoring the identity.
