@@ -15,7 +15,7 @@ import { CredentialResponse } from './credentialResponse'
 import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
 import { CredentialsReceive } from './credentialsReceive'
-import { handleValidationStatus, keyIdToDid } from '../utils/helper'
+import { keyIdToDid } from '../utils/helper'
 import { PaymentResponse } from './paymentResponse'
 import { PaymentRequest } from './paymentRequest'
 import { CredentialOfferResponse } from './credentialOfferResponse'
@@ -194,10 +194,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
    */
 
   public static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T> {
-    const interactionToken = JSONWebToken.fromJSON(decodeToken(jwt))
-    handleValidationStatus(interactionToken.expires > Date.now(), 'exp')
-
-    return interactionToken as JSONWebToken<T>
+    return JSONWebToken.fromJSON<T>(decodeToken(jwt))
   }
 
   /*
