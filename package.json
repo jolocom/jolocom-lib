@@ -20,6 +20,11 @@
     "format": "eslint --fix --ext .ts .",
     "generate-api-docs": "typedoc ./ts"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "precise-commits"
+    }
+  },
   "nyc": {
     "include": [
       "./ts/**/*.ts"
@@ -102,6 +107,7 @@
     "istanbul": "^0.4.5",
     "mocha": "^5.0.0",
     "nyc": "^12.0.2",
+    "precise-commits": "^1.0.2",
     "prettier": "^1.18.2",
     "sinon": "^7.2.5",
     "source-map-support": "^0.5.10",
