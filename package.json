@@ -22,7 +22,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "precise-commits"
+      "pre-commit": "precise-commits",
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
     }
   },
   "nyc": {
@@ -98,6 +99,8 @@
     "@typescript-eslint/eslint-plugin": "^1.5.0",
     "@typescript-eslint/parser": "^1.5.0",
     "chai": "^4.2.0",
+    "commitizen": "^4.0.3",
+    "cz-conventional-changelog": "3.0.2",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-prettier": "^3.0.1",
@@ -115,5 +118,10 @@
     "typedoc": "^0.14.2",
     "typescript": "^3.4.1",
     "web3": "1.0.0-beta.35"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
