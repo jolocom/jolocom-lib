@@ -16,6 +16,7 @@ Want to use our library? Please refer to the following resources:
 Integration and unit tests located in the ``./tests`` folder are a good place to start too.
 
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/jolocom/SmartWallet)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 ## Requirements
 
