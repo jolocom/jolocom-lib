@@ -20,6 +20,12 @@
     "format": "eslint --fix --ext .ts .",
     "generate-api-docs": "typedoc ./ts"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "precise-commits",
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+    }
+  },
   "nyc": {
     "include": [
       "./ts/**/*.ts"
@@ -93,20 +99,29 @@
     "@typescript-eslint/eslint-plugin": "^1.5.0",
     "@typescript-eslint/parser": "^1.5.0",
     "chai": "^4.2.0",
+    "commitizen": "^4.0.3",
+    "cz-conventional-changelog": "3.0.2",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-prettier": "^3.0.1",
     "ganache-core": "^2.4.0",
+    "husky": "^3.0.5",
     "ipfsd-ctl": "^0.42.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.0.0",
     "nyc": "^12.0.2",
-    "prettier": "^1.16.4",
+    "precise-commits": "^1.0.2",
+    "prettier": "^1.18.2",
     "sinon": "^7.2.5",
     "source-map-support": "^0.5.10",
     "ts-node": "^8.0.2",
     "typedoc": "^0.14.2",
     "typescript": "^3.4.1",
     "web3": "1.0.0-beta.35"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
