@@ -66,7 +66,7 @@ interface PaymentRequestCreationArgs {
 // TODO Remove this perhaps, only used in one place
 type PublicKeyMap = { [key in keyof typeof KeyTypes]?: string }
 
-/**
+/*
  * TODO Easiest way to add a new argument to all function signatures.
  *  once the different creation functions have been simplified, this can be
  *  refactored await
@@ -506,7 +506,6 @@ export class IdentityWallet {
       jwt.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
     }
 
-    jwt.timestampAndSetExpiry()
     jwt.issuer = this.publicKeyMetadata.keyId
 
     const signature = await this.vaultedKeyProvider.signDigestable(

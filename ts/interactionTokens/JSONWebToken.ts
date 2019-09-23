@@ -21,6 +21,9 @@ import { PaymentRequest } from './paymentRequest'
 import { CredentialOfferResponse } from './credentialOfferResponse'
 import { CredentialOfferRequest } from './credentialOfferRequest'
 
+// JWTs are valid for one hour by default
+const EXPIRY_MS = 60 * 60 * 1000
+
 /* Local interfaces / types to save on typing later */
 
 export type JWTEncodable =
@@ -183,8 +186,13 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
    * @returns {void}
    */
 
-  public timestampAndSetExpiry(expiry: Date = new Date()) {
-    const EXPIRY_MS = 60 * 60 * 1000
+  public timestampAndSetExpiry(
+    expiry: Date = new Date(Date.now() + EXPIRY_MS),
+  ) {
+    if (expiry <= new Date()) {
+      throw new Error('Expiry date should be greater than current date')
+    }
+
     this.payload.iat = Date.now()
     this.payload.exp = expiry.getTime() || this.payload.iat + EXPIRY_MS
   }
