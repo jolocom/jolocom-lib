@@ -9,6 +9,8 @@ import {
   ICredentialResponseAttrs,
   ICredentialsReceiveAttrs,
   IPaymentResponseAttrs,
+  IPaymentRequestAttrs,
+  IAuthenticationAttrs,
 } from '../interactionTokens/interactionTokens.types'
 
 export interface IIdentityWalletCreateArgs {
@@ -19,12 +21,20 @@ export interface IIdentityWalletCreateArgs {
   contractsGateway: IContractsGateway
 }
 
+/**
+ * Will set all keys on an interface to Optional (?), except the provided one.
+ * @example TargetPartial<{name: string, age: number}, "name"> // {name: string, age?: number}
+ */
+
+type ExclusivePartial<T, K extends keyof T> = Partial<Omit<T, K>> &
+  Required<Pick<T, K>>
+
 export type PublicKeyMap = { [key in keyof typeof KeyTypes]?: string }
 
-export interface AuthCreationArgs {
-  callbackURL: string
-  description?: string
-}
+export type AuthCreationArgs = ExclusivePartial<
+  IAuthenticationAttrs,
+  'callbackURL'
+>
 
 export type CredentialReceiveCreationArgs = ICredentialsReceiveAttrs
 export type CredentialShareRequestCreationArgs = ICredentialRequestAttrs
@@ -37,10 +47,8 @@ export type PaymentResponseCreationArgs = IPaymentResponseAttrs
 export interface PaymentRequestCreationArgs {
   callbackURL: string
   description: string
-  transactionOptions: {
-    value: number
-    to?: string
-    gasLimit?: number
-    gasPrice?: number
-  }
+  transactionOptions: ExclusivePartial<
+    IPaymentRequestAttrs['transactionOptions'],
+    'value'
+  >
 }
