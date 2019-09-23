@@ -7,7 +7,6 @@ import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
 import {
   encodedValidCredReqJWT,
-  expiredEncodedSimpleCredReqJWT,
   validSignedCredReqJWT,
   hashedValidCredReqJWT,
 } from '../data/interactionTokens/jsonWebToken.data'
