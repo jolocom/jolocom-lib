@@ -64,7 +64,7 @@ export class IdentityWallet {
    * @example `console.log(identityWallet.did) // 'did:jolo:...'`
    */
 
-  get did(): string {
+  public get did(): string {
     return this.identity.did
   }
 
@@ -73,7 +73,7 @@ export class IdentityWallet {
    * @example `identityWallet.did = 'did:jolo:...'`
    */
 
-  set did(did: string) {
+  public set did(did: string) {
     this.identity.did = did
   }
 
@@ -82,7 +82,7 @@ export class IdentityWallet {
    * @example `console.log(identityWallet.identity) // Identity {...}`
    */
 
-  get identity() {
+  public get identity() {
     return this._identity
   }
 
@@ -91,7 +91,7 @@ export class IdentityWallet {
    * @example `identityWallet.identity = Identity.fromDidDocument(...)`
    */
 
-  set identity(identity: Identity) {
+  public set identity(identity: Identity) {
     this._identity = identity
   }
 
@@ -100,7 +100,7 @@ export class IdentityWallet {
    * @example `console.log(identityWallet.didDocument) // DidDocument {...}`
    */
 
-  get didDocument() {
+  public get didDocument() {
     return this.identity.didDocument
   }
 
@@ -109,7 +109,7 @@ export class IdentityWallet {
    * @example `identityWallet.didDocument = DidDocument.fromPublicKey(...)`
    */
 
-  set didDocument(didDocument) {
+  public set didDocument(didDocument) {
     this.identity.didDocument = didDocument
   }
 
@@ -118,7 +118,7 @@ export class IdentityWallet {
    * @example `console.log(identityWallet.publicKeyMetadata) // {derivationPath: '...', keyId: '...'}`
    */
 
-  get publicKeyMetadata(): IKeyMetadata {
+  public get publicKeyMetadata(): IKeyMetadata {
     return this._publicKeyMetadata
   }
 
@@ -127,7 +127,7 @@ export class IdentityWallet {
    * @example `identityWallet.publicKeyMetadata = {derivationPath: '...', keyId: '...'}`
    */
 
-  set publicKeyMetadata(metadata: IKeyMetadata) {
+  public set publicKeyMetadata(metadata: IKeyMetadata) {
     this._publicKeyMetadata = metadata
   }
 
@@ -159,7 +159,7 @@ export class IdentityWallet {
    * @param contractsAdapter - Instance of handler to assemble Transactions for the used smart contract chain
    */
 
-  constructor({
+  public constructor({
     identity,
     publicKeyMetadata,
     vaultedKeyProvider,
