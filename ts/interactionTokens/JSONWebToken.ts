@@ -177,14 +177,16 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     return jwt
   }
 
-  /*
+  /**
    * @description - Populates the token issued and exiry times, expiry defaults to 1 hr
+   * @param expiry - Expiration date - {@link Date} instance
    * @returns {void}
    */
 
-  public setIssueAndExpiryTime() {
+  public timestampAndSetExpiry(expiry: Date = new Date()) {
+    const EXPIRY_MS = 60 * 60 * 1000
     this.payload.iat = Date.now()
-    this.payload.exp = this.payload.iat + 3600000
+    this.payload.exp = expiry.getTime() || this.payload.iat + EXPIRY_MS
   }
 
   /*

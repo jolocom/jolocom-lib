@@ -74,7 +74,7 @@ describe('JSONWebToken', () => {
     const jwt = new JSONWebToken()
     const nonce = Math.random().toString(36)
 
-    jwt.setIssueAndExpiryTime()
+    jwt.timestampAndSetExpiry()
     jwt.signature = signature
     jwt.interactionToken = credReq
     jwt.issuer = iss
