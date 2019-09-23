@@ -11,7 +11,6 @@ import {
   IIdentityWalletCreateArgs,
   PaymentRequestCreationArgs,
   PaymentResponseCreationArgs,
-  PublicKeyMap,
 } from './types'
 import { Identity } from '../identity/identity'
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
@@ -42,6 +41,9 @@ import {
 import { IRegistry } from '../registries/types'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
+
+// TODO Remove this perhaps, only used in one place
+type PublicKeyMap = { [key in keyof typeof KeyTypes]?: string }
 
 /**
  * @class
