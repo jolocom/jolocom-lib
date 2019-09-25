@@ -312,8 +312,12 @@ export class SignedCredential implements IDigestable {
     const credential = Credential.create(credentialOptions)
     const json = credential.toJSON() as ISignedCredentialAttrs
     const signedCredential = SignedCredential.fromJSON(json)
-    signedCredential.claim
 
+    const expiry = new Date()
+    expiry.setFullYear(expiry.getFullYear() + 1)
+
+    signedCredential.expires = expiry
+    signedCredential.issued = new Date()
     signedCredential.prepareSignature(issInfo.keyId)
     signedCredential.issuer = issInfo.issuerDid
 
@@ -327,13 +331,8 @@ export class SignedCredential implements IDigestable {
    */
 
   private prepareSignature(keyId: string) {
-    const inOneYear = new Date()
-    inOneYear.setFullYear(new Date().getFullYear() + 1)
-
-    this.issued = new Date()
-    this.expires = inOneYear
-
     this.proof.creator = keyId
+    // TODO Is this needed?
     this.proof.signature = ''
     this.proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
   }
