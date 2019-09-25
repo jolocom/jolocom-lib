@@ -53,7 +53,7 @@ export declare class IdentityWallet {
     };
     create: {
         credential: typeof Credential.create;
-        signedCredential: <T extends BaseMetadata>(params: ISignedCredCreationArgs<T>, pass: string) => Promise<SignedCredential>;
+        signedCredential: <T extends BaseMetadata>({ expires, ...credentialParams }: WithExtraOptions<ISignedCredCreationArgs<T>>, pass: string) => Promise<SignedCredential>;
         interactionTokens: {
             request: {
                 auth: (authArgs: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
