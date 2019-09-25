@@ -223,20 +223,24 @@ export class IdentityWallet {
    */
 
   private createSignedCred = async <T extends BaseMetadata>(
-    params: ISignedCredCreationArgs<T>,
+    {
+      expires,
+      ...credentialParams
+    }: WithExtraOptions<ISignedCredCreationArgs<T>>,
     pass: string,
   ) => {
     const { derivationPath } = this.publicKeyMetadata
 
     const vCred = await SignedCredential.create(
       {
-        subject: params.subject || this.did,
-        ...params,
+        subject: credentialParams.subject || this.did,
+        ...credentialParams,
       },
       {
         keyId: this.publicKeyMetadata.keyId,
         issuerDid: this.did,
       },
+      expires,
     )
 
     const signature = await this.vaultedKeyProvider.signDigestable(
