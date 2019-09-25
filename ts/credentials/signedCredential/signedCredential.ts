@@ -1,20 +1,20 @@
 import 'reflect-metadata'
 import {
-  plainToClass,
   classToPlain,
-  Type,
-  Expose,
   Exclude,
+  Expose,
+  plainToClass,
   Transform,
+  Type,
 } from 'class-transformer'
 import { canonize } from 'jsonld'
 import { sha256 } from '../../utils/crypto'
-import { ISignedCredentialAttrs, ISignedCredCreationArgs } from './types'
+import { ISignedCredCreationArgs, ISignedCredentialAttrs } from './types'
 import {
-  ILinkedDataSignature,
   IDigestable,
+  ILinkedDataSignature,
 } from '../../linkedDataSignature/types'
-import { ContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
+import { BaseMetadata, ContextEntry } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { ISigner } from '../../registries/types'
@@ -301,6 +301,7 @@ export class SignedCredential implements IDigestable {
    * Instantiates a {@link SignedCredential} based on passed options
    * @param credentialOptions - Options for creating credential, and for deriving public signing key
    * @param issInfo - Public data data
+   * @param expires - Expiration date for the credential, defaults to 1 year from Date.now()
    * @example [[include:signedCredential.create.md]]
    * @internal
    */
@@ -308,15 +309,19 @@ export class SignedCredential implements IDigestable {
   public static async create<T extends BaseMetadata>(
     credentialOptions: ISignedCredCreationArgs<T>,
     issInfo: IIssInfo,
+    expires?: Date,
   ) {
     const credential = Credential.create(credentialOptions)
     const json = credential.toJSON() as ISignedCredentialAttrs
     const signedCredential = SignedCredential.fromJSON(json)
 
-    const expiry = new Date()
-    expiry.setFullYear(expiry.getFullYear() + 1)
+    /**
+     * @dev setFullYear returns an unix timestamp, not sure if there's a less
+     * convoluted way to get the current date + 1 year
+     */
+    signedCredential.expires =
+      expires || new Date(new Date().setFullYear(new Date().getFullYear() + 1))
 
-    signedCredential.expires = expiry
     signedCredential.issued = new Date()
     signedCredential.prepareSignature(issInfo.keyId)
     signedCredential.issuer = issInfo.issuerDid
