@@ -156,21 +156,22 @@ describe('IdentityWallet', () => {
 
     it('Should fail to create an interaction token with invalid expiry time', async () => {
       const customExpiry = new Date(0)
-      try {
-        await iw.create.interactionTokens.request.share(
+      return iw.create.interactionTokens.request
+        .share(
           {
             ...simpleCredRequestJSON,
             expires: customExpiry,
           },
           encryptionPass,
         )
-        // TODO Fix this, currently it's awkward to assert async code will throw.
-        expect(true).to.eq(false)
-      } catch (err) {
-        expect(err.message).to.contain(
-          'Expiry date should be greater than current date',
-        )
-      }
+        .then(() => {
+          throw new Error('Expected Failure')
+        })
+        .catch(err => {
+          expect(err.message).to.contain(
+            'Expiry date should be greater than current date',
+          )
+        })
     })
 
     it('Should create an interaction token as a response', async () => {
