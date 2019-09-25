@@ -189,11 +189,13 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
   public timestampAndSetExpiry(
     expiry: Date = new Date(Date.now() + EXPIRY_MS),
   ) {
-    if (expiry <= new Date()) {
+    const issued = new Date()
+
+    if (expiry <= issued) {
       throw new Error('Expiry date should be greater than current date')
     }
 
-    this.payload.iat = Date.now()
+    this.payload.iat = issued.getTime()
     this.payload.exp = expiry.getTime() || this.payload.iat + EXPIRY_MS
   }
 

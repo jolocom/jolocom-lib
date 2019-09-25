@@ -321,8 +321,11 @@ export class SignedCredential implements IDigestable {
      */
     signedCredential.expires =
       expires || new Date(new Date().setFullYear(new Date().getFullYear() + 1))
-
     signedCredential.issued = new Date()
+
+    if (signedCredential.expires <= signedCredential.issued) {
+      throw new Error('Expiry date should be greater than current date')
+    }
     signedCredential.prepareSignature(issInfo.keyId)
     signedCredential.issuer = issInfo.issuerDid
 
