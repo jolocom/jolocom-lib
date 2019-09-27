@@ -13,7 +13,7 @@ export interface IIdentityWalletCreateArgs {
 
 /**
  * Will set all keys on an interface to Optional (?), except the provided one.
- * @example TargetPartial<{name: string, age: number}, "name"> // {name: string, age?: number}
+ * @example ExclusivePartial<{name: string, age: number}, "name"> // {name: string, age?: number}
  */
 
 export type ExclusivePartial<T, K extends keyof T> = Partial<Omit<T, K>> &

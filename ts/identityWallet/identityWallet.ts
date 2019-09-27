@@ -69,7 +69,7 @@ type PublicKeyMap = { [key in keyof typeof KeyTypes]?: string }
 /*
  * TODO Easiest way to add a new argument to all function signatures.
  *  once the different creation functions have been simplified, this can be
- *  refactored await
+ *  refactored away
  */
 
 type WithExtraOptions<T> = T & {
@@ -253,7 +253,7 @@ export class IdentityWallet {
 
   /**
    * Creates and signs an authentication request / response
-   * @param authArgs - Authentication  creation attributes
+   * @param authArgs - Authentication creation attributes
    * @param pass - Password to decrypt the vaulted seed
    * @param receivedJWT - optional received authentication JSONWebToken Class
    */
