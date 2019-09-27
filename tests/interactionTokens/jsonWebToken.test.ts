@@ -90,6 +90,12 @@ describe('JSONWebToken', () => {
     expect(jwt.nonce).to.eq(nonce)
   })
 
+  it('Should still support setIssueAndExpiryTime', () => {
+    const jwt = new JSONWebToken()
+    expect(() => jwt.setIssueAndExpiryTime()).to.not.throw()
+    expect(jwt.expires).to.be.greaterThan(Date.now())
+  })
+
   it('Should implement static decode', () => {
     const referenceJWT = JSONWebToken.fromJSON(validSignedCredReqJWT)
     const decodedJWT = JSONWebToken.decode(encodedValidCredReqJWT)

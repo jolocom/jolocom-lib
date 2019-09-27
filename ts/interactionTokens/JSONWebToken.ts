@@ -199,6 +199,13 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     this.payload.exp = expiry.getTime() || this.payload.iat + EXPIRY_MS
   }
 
+  /**
+   * @deprecated
+   * @description - Populates the token issued and exiry times, expiry defaults to 1 hr
+   * @returns {void}
+   */
+  public setIssueAndExpiryTime = this.timestampAndSetExpiry
+
   /*
    * @description - Decodes a base64 encoded JWT and instantiates this class based on content
    * @param jwt - base64 encoded JWT string
