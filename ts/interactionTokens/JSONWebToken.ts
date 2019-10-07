@@ -196,7 +196,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     }
 
     this.payload.iat = issued.getTime()
-    this.payload.exp = expiry.getTime() || this.payload.iat + DEFAULT_EXPIRY_MS
+    this.payload.exp = expiry.getTime()
   }
 
   /**
