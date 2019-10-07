@@ -21,6 +21,10 @@ import { ISigner } from '../../registries/types'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 
+
+// Credentials are valid for a year by default
+const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
+
 /**
  * @description Data needed to prepare signature on credential
  * @see {@link https://w3c.github.io/vc-data-model/ | specification}
@@ -319,8 +323,7 @@ export class SignedCredential implements IDigestable {
      * @dev setFullYear returns an unix timestamp, not sure if there's a less
      * convoluted way to get the current date + 1 year
      */
-    signedCredential.expires =
-      expires || new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+    signedCredential.expires = expires || new Date(Date.now() + DEFAULT_EXPIRY_MS)
     signedCredential.issued = new Date()
 
     if (signedCredential.expires <= signedCredential.issued) {

@@ -22,7 +22,7 @@ import { CredentialOfferResponse } from './credentialOfferResponse'
 import { CredentialOfferRequest } from './credentialOfferRequest'
 
 // JWTs are valid for one hour by default
-const EXPIRY_MS = 60 * 60 * 1000
+const DEFAULT_EXPIRY_MS = 60 * 60 * 1000
 
 /* Local interfaces / types to save on typing later */
 
@@ -187,7 +187,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
    */
 
   public timestampAndSetExpiry(
-    expiry: Date = new Date(Date.now() + EXPIRY_MS),
+    expiry: Date = new Date(Date.now() + DEFAULT_EXPIRY_MS),
   ) {
     const issued = new Date()
 
@@ -196,7 +196,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     }
 
     this.payload.iat = issued.getTime()
-    this.payload.exp = expiry.getTime() || this.payload.iat + EXPIRY_MS
+    this.payload.exp = expiry.getTime() || this.payload.iat + DEFAULT_EXPIRY_MS
   }
 
   /**
