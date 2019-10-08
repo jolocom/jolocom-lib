@@ -313,16 +313,12 @@ export class SignedCredential implements IDigestable {
   public static async create<T extends BaseMetadata>(
     credentialOptions: ISignedCredCreationArgs<T>,
     issInfo: IIssInfo,
-    expires: Date = new Date(Date.now() + DEFAULT_EXPIRY_MS),
+    expires = new Date(Date.now() + DEFAULT_EXPIRY_MS),
   ) {
     const credential = Credential.create(credentialOptions)
     const json = credential.toJSON() as ISignedCredentialAttrs
     const signedCredential = SignedCredential.fromJSON(json)
 
-    /**
-     * @dev setFullYear returns an unix timestamp, not sure if there's a less
-     * convoluted way to get the current date + 1 year
-     */
     signedCredential.expires = expires
     signedCredential.issued = new Date()
 
