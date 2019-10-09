@@ -9,13 +9,9 @@ interface IPayload {
     [x: string]: any;
 }
 export interface IJSONWebTokenAttrs {
-    header: IJWTHeaderAttrs;
+    header: IJWTHeader;
     payload: IPayload;
     signature: string;
-}
-interface IJWTHeaderAttrs {
-    alg: string;
-    typ: string;
 }
 export declare enum InteractionType {
     CredentialRequest = "credentialRequest",

@@ -22,7 +22,6 @@ describe('Social Recovery', () => {
 
   it('should create shares correctly', () => {
     const shards = SocialRecovery.createShards(testDID32, testSecret32, 5, 3)
-    console.log(shards)
     expect(shards.length).to.equal(5)
   })
 

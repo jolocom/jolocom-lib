@@ -1,18 +1,7 @@
 import { BaseMetadata } from 'cred-types-jolocom-core'
 import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import {
-  AuthCreationArgs,
-  CredentialOfferRequestCreationArgs,
-  CredentialOfferResponseCreationArgs,
-  CredentialReceiveCreationArgs,
-  CredentialShareRequestCreationArgs,
-  CredentialShareResponseCreationArgs,
-  IIdentityWalletCreateArgs,
-  PaymentRequestCreationArgs,
-  PaymentResponseCreationArgs,
-  PublicKeyMap,
-} from './types'
+import { ExclusivePartial, IIdentityWalletCreateArgs } from './types'
 import { Identity } from '../identity/identity'
 import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
@@ -42,6 +31,50 @@ import {
 import { IRegistry } from '../registries/types'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
+import {
+  CredentialOfferRequestAttrs,
+  CredentialOfferResponseAttrs,
+  IAuthenticationAttrs,
+  ICredentialRequestAttrs,
+  ICredentialResponseAttrs,
+  ICredentialsReceiveAttrs,
+  IPaymentRequestAttrs,
+  IPaymentResponseAttrs,
+} from '../interactionTokens/interactionTokens.types'
+
+/**
+ * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
+ * identityWallet.create.interactionTokens.* calls.
+ * Because of CT we can't define constructors on the interaction token classes.
+ * The de facto constructor is the `fromJSON(json)` call. Therefore the arguments
+ * to instantiate one are often times the same as for `fromJSON`.
+ *  Some values are optional because the function instantiating the Interaction Token
+ * can sometimes set sane defaults.
+ * As a conclusion, A lot of the interfaces for creating a new interaction token using
+ * the identity wallet match the JSON interface (with some keys potentially optional)
+ */
+
+interface PaymentRequestCreationArgs {
+  callbackURL: string
+  description: string
+  transactionOptions: ExclusivePartial<
+    IPaymentRequestAttrs['transactionOptions'],
+    'value'
+  >
+}
+
+// TODO Remove this perhaps, only used in one place
+type PublicKeyMap = { [key in keyof typeof KeyTypes]?: string }
+
+/*
+ * TODO Easiest way to add a new argument to all function signatures.
+ *  once the different creation functions have been simplified, this can be
+ *  refactored away
+ */
+
+type WithExtraOptions<T> = T & {
+  expires?: Date
+}
 
 /**
  * @class
@@ -62,7 +95,7 @@ export class IdentityWallet {
    * @example `console.log(identityWallet.did) // 'did:jolo:...'`
    */
 
-  get did(): string {
+  public get did(): string {
     return this.identity.did
   }
 
@@ -71,16 +104,16 @@ export class IdentityWallet {
    * @example `identityWallet.did = 'did:jolo:...'`
    */
 
-  set did(did: string) {
+  public set did(did: string) {
     this.identity.did = did
   }
 
   /**
-   * Get the {@link Identity} associated wtith the identity wallet
+   * Get the {@link Identity} associated with the identity wallet
    * @example `console.log(identityWallet.identity) // Identity {...}`
    */
 
-  get identity() {
+  public get identity() {
     return this._identity
   }
 
@@ -89,7 +122,7 @@ export class IdentityWallet {
    * @example `identityWallet.identity = Identity.fromDidDocument(...)`
    */
 
-  set identity(identity: Identity) {
+  public set identity(identity: Identity) {
     this._identity = identity
   }
 
@@ -98,7 +131,7 @@ export class IdentityWallet {
    * @example `console.log(identityWallet.didDocument) // DidDocument {...}`
    */
 
-  get didDocument() {
+  public get didDocument() {
     return this.identity.didDocument
   }
 
@@ -107,7 +140,7 @@ export class IdentityWallet {
    * @example `identityWallet.didDocument = DidDocument.fromPublicKey(...)`
    */
 
-  set didDocument(didDocument) {
+  public set didDocument(didDocument) {
     this.identity.didDocument = didDocument
   }
 
@@ -116,7 +149,7 @@ export class IdentityWallet {
    * @example `console.log(identityWallet.publicKeyMetadata) // {derivationPath: '...', keyId: '...'}`
    */
 
-  get publicKeyMetadata(): IKeyMetadata {
+  public get publicKeyMetadata(): IKeyMetadata {
     return this._publicKeyMetadata
   }
 
@@ -125,7 +158,7 @@ export class IdentityWallet {
    * @example `identityWallet.publicKeyMetadata = {derivationPath: '...', keyId: '...'}`
    */
 
-  set publicKeyMetadata(metadata: IKeyMetadata) {
+  public set publicKeyMetadata(metadata: IKeyMetadata) {
     this._publicKeyMetadata = metadata
   }
 
@@ -157,7 +190,7 @@ export class IdentityWallet {
    * @param contractsAdapter - Instance of handler to assemble Transactions for the used smart contract chain
    */
 
-  constructor({
+  public constructor({
     identity,
     publicKeyMetadata,
     vaultedKeyProvider,
@@ -190,20 +223,24 @@ export class IdentityWallet {
    */
 
   private createSignedCred = async <T extends BaseMetadata>(
-    params: ISignedCredCreationArgs<T>,
+    {
+      expires,
+      ...credentialParams
+    }: WithExtraOptions<ISignedCredCreationArgs<T>>,
     pass: string,
   ) => {
     const { derivationPath } = this.publicKeyMetadata
 
     const vCred = await SignedCredential.create(
       {
-        subject: params.subject || this.did,
-        ...params,
+        subject: credentialParams.subject || this.did,
+        ...credentialParams,
       },
       {
         keyId: this.publicKeyMetadata.keyId,
         issuerDid: this.did,
       },
+      expires,
     )
 
     const signature = await this.vaultedKeyProvider.signDigestable(
@@ -216,13 +253,15 @@ export class IdentityWallet {
 
   /**
    * Creates and signs an authentication request / response
-   * @param authArgs - Authentication  creation attributes
+   * @param authArgs - Authentication creation attributes
    * @param pass - Password to decrypt the vaulted seed
    * @param receivedJWT - optional received authentication JSONWebToken Class
    */
 
   private createAuth = async (
-    authArgs: AuthCreationArgs,
+    authArgs: WithExtraOptions<
+      ExclusivePartial<IAuthenticationAttrs, 'callbackURL'>
+    >,
     pass: string,
     receivedJWT?: JSONWebToken<JWTEncodable>,
   ) => {
@@ -233,6 +272,8 @@ export class IdentityWallet {
 
     const jwt = JSONWebToken.fromJWTEncodable(authenticationReq)
     jwt.interactionType = InteractionType.Authentication
+    jwt.timestampAndSetExpiry(authArgs.expires)
+
     return this.initializeAndSign(
       jwt,
       this.publicKeyMetadata.derivationPath,
@@ -248,12 +289,13 @@ export class IdentityWallet {
    */
 
   private createCredOfferRequest = async (
-    credOffer: CredentialOfferRequestCreationArgs,
+    credOffer: WithExtraOptions<CredentialOfferRequestAttrs>,
     pass: string,
   ) => {
     const offer = CredentialOfferRequest.fromJSON(credOffer)
     const jwt = JSONWebToken.fromJWTEncodable(offer)
     jwt.interactionType = InteractionType.CredentialOfferRequest
+    jwt.timestampAndSetExpiry(credOffer.expires)
 
     return this.initializeAndSign(
       jwt,
@@ -270,7 +312,7 @@ export class IdentityWallet {
    */
 
   private createCredentialOfferResponse = async (
-    credentialOfferResponse: CredentialOfferResponseCreationArgs,
+    credentialOfferResponse: WithExtraOptions<CredentialOfferResponseAttrs>,
     pass: string,
     receivedJWT?: JSONWebToken<JWTEncodable>,
   ) => {
@@ -281,6 +323,7 @@ export class IdentityWallet {
       offerResponse,
     )
     jwt.interactionType = InteractionType.CredentialOfferResponse
+    jwt.timestampAndSetExpiry(credentialOfferResponse.expires)
 
     return this.initializeAndSign(
       jwt,
@@ -297,12 +340,13 @@ export class IdentityWallet {
    */
 
   private createCredReq = async (
-    credReq: CredentialShareRequestCreationArgs,
+    credReq: WithExtraOptions<ICredentialRequestAttrs>,
     pass: string,
   ) => {
     const credentialRequest = CredentialRequest.fromJSON(credReq)
     const jwt = JSONWebToken.fromJWTEncodable(credentialRequest)
     jwt.interactionType = InteractionType.CredentialRequest
+    jwt.timestampAndSetExpiry(credReq.expires)
     return this.initializeAndSign(
       jwt,
       this.publicKeyMetadata.derivationPath,
@@ -318,13 +362,15 @@ export class IdentityWallet {
    */
 
   private createCredResp = async (
-    credResp: CredentialShareResponseCreationArgs,
+    credResp: WithExtraOptions<ICredentialResponseAttrs>,
     pass: string,
     receivedJWT: JSONWebToken<JWTEncodable>,
   ) => {
     const credentialResponse = CredentialResponse.fromJSON(credResp)
     const jwt = JSONWebToken.fromJWTEncodable(credentialResponse)
     jwt.interactionType = InteractionType.CredentialResponse
+    jwt.timestampAndSetExpiry(credResp.expires)
+
     return this.initializeAndSign(
       jwt,
       this.publicKeyMetadata.derivationPath,
@@ -341,13 +387,14 @@ export class IdentityWallet {
    */
 
   private createCredReceive = async (
-    credReceive: CredentialReceiveCreationArgs,
+    credReceive: WithExtraOptions<ICredentialsReceiveAttrs>,
     pass: string,
     receivedJWT: JSONWebToken<JWTEncodable>,
   ) => {
     const credentialReceieve = CredentialsReceive.fromJSON(credReceive)
     const jwt = JSONWebToken.fromJWTEncodable(credentialReceieve)
     jwt.interactionType = InteractionType.CredentialsReceive
+    jwt.timestampAndSetExpiry(credReceive.expires)
     return this.initializeAndSign(
       jwt,
       this.publicKeyMetadata.derivationPath,
@@ -388,7 +435,7 @@ export class IdentityWallet {
    */
 
   private createPaymentReq = async (
-    paymentReq: PaymentRequestCreationArgs,
+    paymentReq: WithExtraOptions<PaymentRequestCreationArgs>,
     pass: string,
   ) => {
     const { transactionOptions } = paymentReq
@@ -425,7 +472,7 @@ export class IdentityWallet {
    */
 
   private createPaymentResp = async (
-    paymentResp: PaymentResponseCreationArgs,
+    paymentResp: WithExtraOptions<IPaymentResponseAttrs>,
     pass: string,
     receivedJWT: JSONWebToken<JWTEncodable>,
   ) => {
@@ -456,13 +503,14 @@ export class IdentityWallet {
     pass: string,
     receivedJWT?: JSONWebToken<T>,
   ) {
-    jwt.setIssueAndExpiryTime()
-    jwt.issuer = this.publicKeyMetadata.keyId
+    if (receivedJWT) {
+      jwt.audience = keyIdToDid(receivedJWT.issuer)
+      jwt.nonce = receivedJWT.nonce
+    } else {
+      jwt.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
+    }
 
-    receivedJWT ? (jwt.audience = keyIdToDid(receivedJWT.issuer)) : null
-    receivedJWT
-      ? (jwt.nonce = receivedJWT.nonce)
-      : (jwt.nonce = SoftwareKeyProvider.getRandom(8).toString('hex'))
+    jwt.issuer = this.publicKeyMetadata.keyId
 
     const signature = await this.vaultedKeyProvider.signDigestable(
       { derivationPath, encryptionPass: pass },

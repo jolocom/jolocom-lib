@@ -39,7 +39,8 @@ export declare class JSONWebToken<T extends JWTEncodable> implements IDigestable
         keyId: string;
     };
     static fromJWTEncodable<T extends JWTEncodable>(toEncode: T): JSONWebToken<T>;
-    setIssueAndExpiryTime(): void;
+    timestampAndSetExpiry(expiry?: Date): void;
+    setIssueAndExpiryTime: (expiry?: Date) => void;
     static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T>;
     encode(): string;
     digest(): Promise<Buffer>;

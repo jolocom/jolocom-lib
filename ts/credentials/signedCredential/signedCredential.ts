@@ -1,25 +1,29 @@
 import 'reflect-metadata'
 import {
-  plainToClass,
   classToPlain,
-  Type,
-  Expose,
   Exclude,
+  Expose,
+  plainToClass,
   Transform,
+  Type,
 } from 'class-transformer'
 import { canonize } from 'jsonld'
 import { sha256 } from '../../utils/crypto'
-import { ISignedCredentialAttrs, ISignedCredCreationArgs } from './types'
+import { ISignedCredCreationArgs, ISignedCredentialAttrs } from './types'
 import {
-  ILinkedDataSignature,
   IDigestable,
+  ILinkedDataSignature,
 } from '../../linkedDataSignature/types'
-import { ContextEntry, BaseMetadata } from 'cred-types-jolocom-core'
+import { BaseMetadata, ContextEntry } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { ISigner } from '../../registries/types'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
+
+
+// Credentials are valid for a year by default
+const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
 
 /**
  * @description Data needed to prepare signature on credential
@@ -301,6 +305,7 @@ export class SignedCredential implements IDigestable {
    * Instantiates a {@link SignedCredential} based on passed options
    * @param credentialOptions - Options for creating credential, and for deriving public signing key
    * @param issInfo - Public data data
+   * @param expires - Expiration date for the credential, defaults to 1 year from Date.now()
    * @example [[include:signedCredential.create.md]]
    * @internal
    */
@@ -308,12 +313,18 @@ export class SignedCredential implements IDigestable {
   public static async create<T extends BaseMetadata>(
     credentialOptions: ISignedCredCreationArgs<T>,
     issInfo: IIssInfo,
+    expires = new Date(Date.now() + DEFAULT_EXPIRY_MS),
   ) {
     const credential = Credential.create(credentialOptions)
     const json = credential.toJSON() as ISignedCredentialAttrs
     const signedCredential = SignedCredential.fromJSON(json)
-    signedCredential.claim
 
+    signedCredential.expires = expires
+    signedCredential.issued = new Date()
+
+    if (signedCredential.expires <= signedCredential.issued) {
+      throw new Error('Expiry date should be greater than current date')
+    }
     signedCredential.prepareSignature(issInfo.keyId)
     signedCredential.issuer = issInfo.issuerDid
 
@@ -327,13 +338,8 @@ export class SignedCredential implements IDigestable {
    */
 
   private prepareSignature(keyId: string) {
-    const inOneYear = new Date()
-    inOneYear.setFullYear(new Date().getFullYear() + 1)
-
-    this.issued = new Date()
-    this.expires = inOneYear
-
     this.proof.creator = keyId
+    // TODO Is this needed?
     this.proof.signature = ''
     this.proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
   }
