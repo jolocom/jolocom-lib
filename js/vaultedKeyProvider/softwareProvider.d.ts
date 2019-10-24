@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { IDigestable } from '../linkedDataSignature/types';
 import { IVaultedKeyProvider, IKeyDerivationArgs } from './types';
-export interface BackupFile {
+export interface EncryptedData {
     keys: EncryptedKey[];
     data: string;
 }
@@ -27,6 +27,8 @@ export declare class SoftwareKeyProvider implements IVaultedKeyProvider {
     private static encrypt;
     private static decrypt;
     encryptHybrid(data: object, derivationArgs: IKeyDerivationArgs): Promise<string>;
+    decryptHybrid(encryptedData: EncryptedData, derivationArg: IKeyDerivationArgs): Promise<string>;
     private stringifyEncryptedData;
+    private parseEncryptedData;
     private static normalizePassword;
 }

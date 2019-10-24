@@ -19,7 +19,7 @@ const IV_LENGTH = 16
 const MIN_ENCRYPTED_SEED_LENGTH = IV_LENGTH + MIN_SEED_LENGTH + PADDING_LENGTH
 const MAX_ENCRYPTED_SEED_LENGTH = IV_LENGTH + MAX_SEED_LENGTH + PADDING_LENGTH
 
-export interface BackupFile {
+export interface EncryptedData {
   keys: EncryptedKey[]
   data: string
 }
@@ -285,7 +285,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
       this._iv,
     )
     const encryptedKey = await eccrypto.encrypt(publicKey, Buffer.from(symKey))
-    const backupFile: BackupFile = {
+    const encryptedDataWithKeys: EncryptedData = {
       keys: [
         {
           cipher: this.stringifyEncryptedData(encryptedKey),
@@ -294,9 +294,40 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
       ],
       data: encryptedData.toString('hex'),
     }
-    return JSON.stringify(backupFile)
+    return JSON.stringify(encryptedDataWithKeys)
   }
 
+  /**
+   * decrypt data that was hybrid encrypted before
+   * @param encryptedData - Data to decrypt
+   * @param derivationArg - derivation args to derive public and private key
+   */
+  public async decryptHybrid(
+    encryptedData: EncryptedData,
+    derivationArg: IKeyDerivationArgs,
+  ): Promise<string> {
+    const publicKey = this.getPublicKey(derivationArg)
+    const privateKey = this.getPrivateKey(derivationArg)
+    // find encrypted key
+    const encryptedKey = encryptedData.keys.find(
+      key => key.pubKey === publicKey.toString('hex'),
+    )
+    if (!encryptedKey) throw new Error('Not encrypted for these keys')
+    const key = await eccrypto.decrypt(
+      privateKey,
+      this.parseEncryptedData(encryptedKey.cipher),
+    )
+    // @ts-ignore private
+    return SoftwareKeyProvider.decrypt(
+      key,
+      Buffer.from(encryptedData.data, 'hex'),
+    ).toString()
+  }
+
+  /**
+   * stringify encrypted data
+   * @param data - result of asymmetric encryption by eccrypto
+   */
   private stringifyEncryptedData(data: {
     iv: Buffer
     ephemPublicKey: Buffer
@@ -306,6 +337,19 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     let hexData = {}
     Object.keys(data).forEach(key => (hexData[key] = data[key].toString('hex')))
     return JSON.stringify(hexData)
+  }
+
+  /**
+   * parse encrypted data that was stringified before
+   * @param data - stringified encrypted data
+   */
+  private parseEncryptedData(data: string): object {
+    const hexData = JSON.parse(data)
+    let bufferData = {}
+    Object.keys(hexData).forEach(
+      key => (bufferData[key] = Buffer.from(hexData[key], 'hex')),
+    )
+    return bufferData
   }
 
   /**
