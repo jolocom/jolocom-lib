@@ -1,11 +1,11 @@
 import { fromSeed } from 'bip32'
-import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
-import { IVaultedKeyProvider, IKeyDerivationArgs, KeyTypes } from './types'
+import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
-import { keccak256 } from 'ethereumjs-util'
+import eccrypto from 'eccrypto'
 
 const ALG = 'aes-256-cbc'
 
@@ -19,6 +19,15 @@ const IV_LENGTH = 16
 const MIN_ENCRYPTED_SEED_LENGTH = IV_LENGTH + MIN_SEED_LENGTH + PADDING_LENGTH
 const MAX_ENCRYPTED_SEED_LENGTH = IV_LENGTH + MAX_SEED_LENGTH + PADDING_LENGTH
 
+export interface BackupFile {
+  keys: EncryptedKey[]
+  data: string
+}
+
+export interface EncryptedKey {
+  pubKey: string
+  cipher: string
+}
 /**
  * Ensure the encrypted seed is of the correct length (for generating BIP39 seed phrases)
  * @param encryptedSeed - aes256-cbc encrypted seed
@@ -254,6 +263,49 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   private static decrypt(key: Buffer, data: Buffer, iv: Buffer): Buffer {
     const decipher = createDecipheriv(ALG, key, iv)
     return Buffer.concat([decipher.update(data), decipher.final()])
+  }
+
+  /**
+   * Encrypts data based on the hybrid encryption scheme of PGP. This means that
+   * the data will first be encrypted with a freshly generated symmetric key and
+   * afterwards this key is encrypted with the public key in an asymmetric manner
+   * @param data - The data that should be encrypted
+   * @param derivationArgs - The derivation args to derive the public key for encryption
+   */
+  public async encryptHybrid(
+    data: object,
+    derivationArgs: IKeyDerivationArgs,
+  ): Promise<string> {
+    const publicKey = this.getPublicKey(derivationArgs)
+
+    const symKey = SoftwareKeyProvider.getRandom(128)
+    const encryptedData: Buffer = SoftwareKeyProvider.encrypt(
+      symKey,
+      Buffer.from(JSON.stringify(data)),
+      this._iv,
+    )
+    const encryptedKey = await eccrypto.encrypt(publicKey, Buffer.from(symKey))
+    const backupFile: BackupFile = {
+      keys: [
+        {
+          cipher: this.stringifyEncryptedData(encryptedKey),
+          pubKey: publicKey.toString('hex'),
+        },
+      ],
+      data: encryptedData.toString('hex'),
+    }
+    return JSON.stringify(backupFile)
+  }
+
+  private stringifyEncryptedData(data: {
+    iv: Buffer
+    ephemPublicKey: Buffer
+    ciphertext: Buffer
+    mac: Buffer
+  }): string {
+    let hexData = {}
+    Object.keys(data).forEach(key => (hexData[key] = data[key].toString('hex')))
+    return JSON.stringify(hexData)
   }
 
   /**
