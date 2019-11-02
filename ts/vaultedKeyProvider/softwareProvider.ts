@@ -2,10 +2,10 @@ import { fromSeed } from 'bip32'
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
-import { IVaultedKeyProvider, IKeyDerivationArgs } from './types'
+import { IKeyDerivationArgs, IVaultedKeyProvider } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
-import eccrypto from 'eccrypto'
+import * as eccrypto from 'eccrypto'
 
 const ALG = 'aes-256-cbc'
 
@@ -28,6 +28,7 @@ export interface EncryptedKey {
   pubKey: string
   cipher: string
 }
+
 /**
  * Ensure the encrypted seed is of the correct length (for generating BIP39 seed phrases)
  * @param encryptedSeed - aes256-cbc encrypted seed
@@ -56,9 +57,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   public constructor(encryptedSeed: Buffer) {
     if (!isEncryptedSeedLengthValid(encryptedSeed)) {
       throw new Error(
-        `Expected encrypted seed to be between ${MIN_ENCRYPTED_SEED_LENGTH} and ${MAX_ENCRYPTED_SEED_LENGTH} bytes long. Got ${
-          encryptedSeed.length
-        }.`,
+        `Expected encrypted seed to be between ${MIN_ENCRYPTED_SEED_LENGTH} and ${MAX_ENCRYPTED_SEED_LENGTH} bytes long. Got ${encryptedSeed.length}.`,
       )
     }
 
@@ -275,26 +274,30 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   public async encryptHybrid(
     data: object,
     derivationArgs: IKeyDerivationArgs,
-  ): Promise<string> {
+  ): Promise<EncryptedData> {
     const publicKey = this.getPublicKey(derivationArgs)
 
-    const symKey = SoftwareKeyProvider.getRandom(128)
-    const encryptedData: Buffer = SoftwareKeyProvider.encrypt(
+    const symKey = SoftwareKeyProvider.getRandom(PASSWORD_LENGTH)
+    const iv = SoftwareKeyProvider.getRandom(IV_LENGTH)
+
+    // Encrypt symmetrically
+    const encryptedData = SoftwareKeyProvider.encrypt(
       symKey,
       Buffer.from(JSON.stringify(data)),
-      this._iv,
+      iv,
     )
+
+    // Encrypt asymmetrically
     const encryptedKey = await eccrypto.encrypt(publicKey, Buffer.from(symKey))
-    const encryptedDataWithKeys: EncryptedData = {
+    return {
       keys: [
         {
           cipher: this.stringifyEncryptedData(encryptedKey),
           pubKey: publicKey.toString('hex'),
         },
       ],
-      data: encryptedData.toString('hex'),
+      data: Buffer.concat([iv, encryptedData]).toString('hex'),
     }
-    return JSON.stringify(encryptedDataWithKeys)
   }
 
   /**
@@ -305,7 +308,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   public async decryptHybrid(
     encryptedData: EncryptedData,
     derivationArg: IKeyDerivationArgs,
-  ): Promise<string> {
+  ): Promise<object> {
     const publicKey = this.getPublicKey(derivationArg)
     const privateKey = this.getPrivateKey(derivationArg)
     // find encrypted key
@@ -313,27 +316,28 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
       key => key.pubKey === publicKey.toString('hex'),
     )
     if (!encryptedKey) throw new Error('Not encrypted for these keys')
-    const key = await eccrypto.decrypt(
+
+    // decrypt asymmetrically
+    const symKey = await eccrypto.decrypt(
       privateKey,
       this.parseEncryptedData(encryptedKey.cipher),
     )
-    // @ts-ignore private
-    return SoftwareKeyProvider.decrypt(
-      key,
-      Buffer.from(encryptedData.data, 'hex'),
+
+    // decrypt symmetrically
+    const encryptedDataBuffer = Buffer.from(encryptedData.data, 'hex')
+    const data = SoftwareKeyProvider.decrypt(
+      symKey,
+      encryptedDataBuffer.slice(IV_LENGTH), // extract cipher text
+      encryptedDataBuffer.slice(0, IV_LENGTH), // extract IV
     ).toString()
+    return JSON.parse(data)
   }
 
   /**
    * stringify encrypted data
    * @param data - result of asymmetric encryption by eccrypto
    */
-  private stringifyEncryptedData(data: {
-    iv: Buffer
-    ephemPublicKey: Buffer
-    ciphertext: Buffer
-    mac: Buffer
-  }): string {
+  private stringifyEncryptedData(data: object): string {
     let hexData = {}
     Object.keys(data).forEach(key => (hexData[key] = data[key].toString('hex')))
     return JSON.stringify(hexData)
@@ -346,9 +350,9 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   private parseEncryptedData(data: string): object {
     const hexData = JSON.parse(data)
     let bufferData = {}
-    Object.keys(hexData).forEach(
-      key => (bufferData[key] = Buffer.from(hexData[key], 'hex')),
-    )
+    Object.keys(hexData).forEach(key => {
+      bufferData[key] = Buffer.from(hexData[key], 'hex')
+    })
     return bufferData
   }
 
@@ -366,9 +370,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     if (!passwordBuffer.length) return
     if (passwordBuffer.length !== PASSWORD_LENGTH) {
       console.warn(
-        `Provided password must have a length of ${PASSWORD_LENGTH} bytes, received ${
-          passwordBuffer.length
-        }. We will compute the sha256 hash of the provided password and use it instead`,
+        `Provided password must have a length of ${PASSWORD_LENGTH} bytes, received ${passwordBuffer.length}. We will compute the sha256 hash of the provided password and use it instead`,
       )
 
       return sha256(passwordBuffer)
