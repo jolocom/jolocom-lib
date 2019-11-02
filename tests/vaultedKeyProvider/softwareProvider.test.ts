@@ -311,9 +311,29 @@ describe('Software Vaulted Key Provider', () => {
       expect(encrypted).to.deep.eq(chipherText)
     })
 
-    it('should decrypt data with hybrig scheme', async () => {
+    it('should decrypt data with hybrid scheme', async () => {
       const decryped = await vault.decryptHybrid(chipherText, keyDerivationArgs)
       expect(decryped).to.deep.eq(clearText)
+    })
+    describe('Buffer decoding/encoding', () => {
+      const data = {
+        item: Buffer.from('546573742054657874', 'hex'),
+        otherItem: Buffer.from('536F6D652044617461', 'hex'),
+      }
+      const dataString =
+        '{"item":"546573742054657874","otherItem":"536f6d652044617461"}'
+
+      it('should stringify Buffer to hex', () => {
+        // @ts-ignore
+        const output = vault.stringifyEncryptedData(data)
+        expect(output).to.eq(dataString)
+      })
+
+      it('should convert hex data to Buffer', () => {
+        // @ts-ignore
+        const output = vault.parseEncryptedData(dataString)
+        expect(output).to.deep.eq(data)
+      })
     })
   })
 })
