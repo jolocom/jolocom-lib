@@ -62,25 +62,20 @@ export const validateDigestables = async (
  */
 
 
-const normalizeJsonLD = async (
-  { ['@context']: _, ...data },//: JsonLdObject,
-  context,
-  // contextTransformer: ContextTransformer = cachedContextTransformer,
-) => {
+const normalizeJsonLD = async ({ ['@context']: _, ...data }, context) => {
   return canonize(data, {
-    expandContext: context, //contextTransformer(context),
+    expandContext: context,
   })
 }
 
-const normalizeLdProof = (
+const normalizeLdProof = async (
   //@ts-ignore
-  { ['@context']: _, ...proof }: ILinkedDataSignatureAttrs,
+  proof: ILinkedDataSignatureAttrs,
   context,
-  // contextTransformer: ContextTransformer = cachedContextTransformer,
 ): Promise<string> => {
   const { signatureValue, id, type, ...toNormalize } = proof
   //@ts-ignore
-  return normalizeJsonLD(toNormalize, context)//, contextTransformer)
+  return normalizeJsonLD(toNormalize, context)
 }
 
 export const digestJsonLd = async (
