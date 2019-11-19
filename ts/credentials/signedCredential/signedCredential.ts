@@ -7,8 +7,7 @@ import {
   Transform,
   Type,
 } from 'class-transformer'
-import { canonize } from 'jsonld'
-import { sha256 } from '../../utils/crypto'
+import { digestJsonLd } from '../../utils/validation'
 import { ISignedCredCreationArgs, ISignedCredentialAttrs } from './types'
 import {
   IDigestable,
@@ -350,25 +349,7 @@ export class SignedCredential implements IDigestable {
    */
 
   public async digest(): Promise<Buffer> {
-    const normalized = await this.normalize()
-
-    const docSectionDigest = sha256(Buffer.from(normalized))
-    const proofSectionDigest = await this.proof.digest()
-
-    return sha256(Buffer.concat([proofSectionDigest, docSectionDigest]))
-  }
-
-  /**
-   * Converts the verifiable credential to canonical form
-   * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
-   * @internal
-   */
-
-  private async normalize(): Promise<string> {
-    const json = this.toJSON()
-    delete json.proof
-
-    return canonize(json)
+    return digestJsonLd(this.toJSON())
   }
 
   /**

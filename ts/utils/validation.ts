@@ -1,7 +1,9 @@
 import { JolocomLib } from '../index'
-import { IDigestable } from '../linkedDataSignature/types'
+import { IDigestable, ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
 import { getIssuerPublicKey } from './helper'
 import { IRegistry } from '../registries/types'
+import { sha256 } from '../utils/crypto'
+import { canonize } from 'jsonld'
 
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
@@ -47,3 +49,44 @@ export const validateDigestables = async (
       validateDigestable(digestable, customRegistry),
     ),
   )
+
+
+/**
+ * Helper function to handle JsonLD normalization.
+ * @dev The function expects the JsonLD '@context' to be passed as an argument,
+ *  the '@context' on the data will be discarded.
+ * @param data - {@link JsonLdObject} without the '@context' section
+ * @param contextTransformer - {@link ContextTransformer} function for custom context
+ *  modifications before it's used for normalization
+ * @param context - JsonLD context to use during normalization
+ */
+
+
+const normalizeJsonLD = async (
+  { ['@context']: _, ...data },//: JsonLdObject,
+  context,
+  // contextTransformer: ContextTransformer = cachedContextTransformer,
+) => {
+  return canonize(data, {
+    expandContext: context, //contextTransformer(context),
+  })
+}
+
+const normalizeLdProof = (
+  //@ts-ignore
+  { ['@context']: _, ...proof }: ILinkedDataSignatureAttrs,
+  context,
+  // contextTransformer: ContextTransformer = cachedContextTransformer,
+): Promise<string> => {
+  const { signatureValue, id, type, ...toNormalize } = proof
+  //@ts-ignore
+  return normalizeJsonLD(toNormalize, context)//, contextTransformer)
+}
+
+export const digestJsonLd = async (
+    {proof, ...data},
+): Promise<Buffer> => sha256(Buffer.concat([
+    sha256(Buffer.from(await normalizeLdProof(proof, data['@context']))),
+    //@ts-ignore
+    sha256(Buffer.from(await normalizeJsonLD(data, data['@context'])))
+]))

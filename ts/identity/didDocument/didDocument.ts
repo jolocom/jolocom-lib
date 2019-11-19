@@ -7,7 +7,6 @@ import {
   Transform,
 } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
-import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import {
   AuthenticationSection,
@@ -17,7 +16,8 @@ import {
 import { ISigner } from '../../registries/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
-import { sha256, publicKeyToDID } from '../../utils/crypto'
+import { publicKeyToDID } from '../../utils/crypto'
+import { digestJsonLd } from '../../utils/validation'
 import {
   ILinkedDataSignature,
   IDigestable,
@@ -297,24 +297,7 @@ export class DidDocument implements IDigestable {
    */
 
   public async digest(): Promise<Buffer> {
-    const normalized = await this.normalize()
-
-    const docSectionDigest = sha256(Buffer.from(normalized))
-    const proofSectionDigest = await this.proof.digest()
-
-    return sha256(Buffer.concat([proofSectionDigest, docSectionDigest]))
-  }
-
-  /**
-   * Converts the did document to canonical form
-   * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
-   * @internal
-   */
-
-  public async normalize(): Promise<string> {
-    const json = this.toJSON()
-    delete json.proof
-    return canonize(json)
+      return digestJsonLd(this.toJSON())
   }
 
   /**
