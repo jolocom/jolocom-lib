@@ -10,7 +10,7 @@ import {
   normalizedDidDocument,
 } from '../data/didDocument.data'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
-import { IDidDocumentAttrs } from '../../ts/identity/didDocument/types'
+import { normalizeJsonLd } from '../../ts/utils/validation'
 const expect = chai.expect
 
 describe('DidDocument', () => {
@@ -21,7 +21,6 @@ describe('DidDocument', () => {
 
   before(() => {
     clock = sinon.useFakeTimers()
-    sandbox.stub(jsonld, 'canonize').returns(normalizedDidDocument)
     sandbox
       .stub(crypto, 'randomBytes')
       .returns(Buffer.from('1842fb5f567dd532', 'hex'))
@@ -46,12 +45,14 @@ describe('DidDocument', () => {
   })
 
   it('Should correctly implement normalize', async () => {
-    await referenceDidDocument.digest()
+    const {proof, ...document} = referenceDidDocument.toJSON()
 
-    const excludingProof = { ...didDocumentJSON } as IDidDocumentAttrs
-    delete excludingProof.proof
+    const njld = await normalizeJsonLd(
+        document,
+        referenceDidDocument.context
+    )
 
-    sandbox.assert.calledWith(jsonld.canonize, excludingProof)
+    expect(njld).to.deep.eq(normalizedDidDocument)
   })
 
   it('implements getters', () => {
