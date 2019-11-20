@@ -57,26 +57,24 @@ export const validateDigestables = async (
  * @dev The function expects the JsonLD '@context' to be passed as an argument,
  *  the '@context' on the data will be discarded.
  * @param data - {@link JsonLdObject} without the '@context' section
- * @param contextTransformer - {@link ContextTransformer} function for custom context
- *  modifications before it's used for normalization
  * @param context - JsonLD context to use during normalization
  */
 
 
-const normalizeJsonLD = async ({ ['@context']: _, ...data }, context) => {
+export const normalizeJsonLd = async ({ ['@context']: _, ...data }, context) => {
   return canonize(data, {
     expandContext: context,
   })
 }
 
-const normalizeLdProof = async (
+export const normalizeLdProof = async (
   //@ts-ignore
   proof: ILinkedDataSignatureAttrs,
   context,
 ): Promise<string> => {
   const { signatureValue, id, type, ...toNormalize } = proof
   //@ts-ignore
-  return normalizeJsonLD(toNormalize, context)
+  return normalizeJsonLd(toNormalize, context)
 }
 
 export const digestJsonLd = async (
@@ -84,5 +82,5 @@ export const digestJsonLd = async (
 ): Promise<Buffer> => sha256(Buffer.concat([
     sha256(Buffer.from(await normalizeLdProof(proof, data['@context']))),
     //@ts-ignore
-    sha256(Buffer.from(await normalizeJsonLD(data, data['@context'])))
+    sha256(Buffer.from(await normalizeJsonLd(data, data['@context'])))
 ]))
