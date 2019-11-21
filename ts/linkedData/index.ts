@@ -1,10 +1,18 @@
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
-import { getIssuerPublicKey } from './helper'
+import {
+  getIssuerPublicKey,
+  keyIdToDid
+} from '../utils/helper'
 import { IRegistry } from '../registries/types'
 import { registries } from '../registries/index'
 import { sha256 } from '../utils/crypto'
 import { canonize } from 'jsonld'
+import {
+  JsonLdObject,
+  SignedJsonLdObject,
+  JsonLdContext,
+} from './types'
 
 /**
  * Helper function to handle JsonLD normalization.
@@ -14,50 +22,68 @@ import { canonize } from 'jsonld'
  * @param context - JsonLD context to use during normalization
  */
 
-export const normalizeJsonLd = async ({ ['@context']: _, ...data }, context) => {
-  return canonize(data, {
-    expandContext: context,
-  })
-}
+export const normalizeJsonLd = async (
+  { ['@context']: _, ...data }: JsonLdObject,
+  context: JsonLdContext,
+) => canonize(data, {
+  expandContext: context,
+})
+
+/**
+ * Helper function to handle JsonLD proof section normalization.
+ * @dev The function expects the JsonLD '@context' to be passed as an argument
+ * @param data - {@link ILinkedDataSignatures} Proof to be normalised
+ * @param context - JsonLD context to use during normalization
+ */
 
 export const normalizeLdProof = async (
-  //@ts-ignore
-  proof: ILinkedDataSignatureAttrs,
-  context,
-): Promise<string> => {
-  const { signatureValue, id, type, ...toNormalize } = proof
-  //@ts-ignore
-  return normalizeJsonLd(toNormalize, context)
-}
+  { signatureValue, id, type, ...toNormalize }: ILinkedDataSignatureAttrs,
+  context: JsonLdContext,
+): Promise<string> => normalizeJsonLd(toNormalize, context)
+
+/**
+ * Helper function to handle signed JsonLD digestions
+ * @dev The function expects the JsonLD '@context' to be passed as an argument,
+ *  the '@context' on the data will be discarded.
+ * @param data - {@link SignedJsonLdObject}
+ * @param context - JsonLD context to use during normalization
+ */
 
 export const digestJsonLd = async (
-    {proof, ...data},
-): Promise<Buffer> => sha256(Buffer.concat([
-    sha256(Buffer.from(await normalizeLdProof(proof, data['@context']))),
-    //@ts-ignore
-    sha256(Buffer.from(await normalizeJsonLd(data, data['@context'])))
-]))
+  { proof, ['@context']: _, ...body }: SignedJsonLdObject,
+  context: JsonLdContext,
+): Promise<Buffer> => sha256(
+  Buffer.concat([
+    sha256(Buffer.from(await normalizeLdProof(proof, context))),
+    sha256(Buffer.from(await normalizeJsonLd(data, context))),
+  ]),
+)
 
+/**
+ * Helper function to handle JsonLD normalization.
+ * @dev The function expects the JsonLD '@context' to be passed as an argument,
+ *  the '@context' on the data will be discarded.
+ * @param data - {@link JsonLdObject} without the '@context' section
+ * @param context - JsonLD context to use during normalization
+ */
 
 export const validateJsonLd = async (
-    json,
-    customRegistry?: IRegistry
+  json: SignedJsonLdObject,
+  customRegistry?: IRegistry,
 ): Promise<boolean> => {
-    const reg = customRegistry || registries.jolocom.create()
-    console.log(json)
-    try {
-        const issuerIdentity = await reg.resolve(json.proof.creator)
-        const issuerPublicKey = getIssuerPublicKey(
-            json.proof.id,
-            issuerIdentity.didDocument,
-        )
-        return SoftwareKeyProvider.verify(
-            await digestJsonLd(json),
-            issuerPublicKey,
-            Buffer.from(json.proof.signatureValue, 'hex')
-        )
-    } catch {
-        return false
-    }
-
+  const reg = customRegistry || registries.jolocom.create()
+  try {
+    const issuerIdentity = await reg.resolve(keyIdToDid(json.proof.creator))
+    const issuerPublicKey = getIssuerPublicKey(
+      json.proof.creator,
+      issuerIdentity.didDocument,
+    )
+    return SoftwareKeyProvider.verify(
+      await digestJsonLd(json),
+      issuerPublicKey,
+      Buffer.from(json.proof.signatureValue, 'hex'),
+    )
+  } catch {
+    return false
+  }
 }
