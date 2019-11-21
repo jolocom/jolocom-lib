@@ -17,7 +17,7 @@ import { ISigner } from '../../registries/types'
 import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
 import { publicKeyToDID } from '../../utils/crypto'
-import { digestJsonLd } from '../../utils/validation'
+import { digestJsonLd } from '../../linkedData'
 import {
   ILinkedDataSignature,
   IDigestable,

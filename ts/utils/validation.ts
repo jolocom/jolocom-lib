@@ -1,10 +1,8 @@
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
-import { IDigestable, ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
+import { IDigestable } from '../linkedDataSignature/types'
 import { getIssuerPublicKey } from './helper'
 import { IRegistry } from '../registries/types'
 import { registries } from '../registries/index'
-import { sha256 } from '../utils/crypto'
-import { canonize } from 'jsonld'
 
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
@@ -51,36 +49,3 @@ export const validateDigestables = async (
     ),
   )
 
-
-/**
- * Helper function to handle JsonLD normalization.
- * @dev The function expects the JsonLD '@context' to be passed as an argument,
- *  the '@context' on the data will be discarded.
- * @param data - {@link JsonLdObject} without the '@context' section
- * @param context - JsonLD context to use during normalization
- */
-
-
-export const normalizeJsonLd = async ({ ['@context']: _, ...data }, context) => {
-  return canonize(data, {
-    expandContext: context,
-  })
-}
-
-export const normalizeLdProof = async (
-  //@ts-ignore
-  proof: ILinkedDataSignatureAttrs,
-  context,
-): Promise<string> => {
-  const { signatureValue, id, type, ...toNormalize } = proof
-  //@ts-ignore
-  return normalizeJsonLd(toNormalize, context)
-}
-
-export const digestJsonLd = async (
-    {proof, ...data},
-): Promise<Buffer> => sha256(Buffer.concat([
-    sha256(Buffer.from(await normalizeLdProof(proof, data['@context']))),
-    //@ts-ignore
-    sha256(Buffer.from(await normalizeJsonLd(data, data['@context'])))
-]))

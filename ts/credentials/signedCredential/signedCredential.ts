@@ -7,7 +7,7 @@ import {
   Transform,
   Type,
 } from 'class-transformer'
-import { digestJsonLd } from '../../utils/validation'
+import { digestJsonLd } from '../../linkedData'
 import { ISignedCredCreationArgs, ISignedCredentialAttrs } from './types'
 import {
   IDigestable,

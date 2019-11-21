@@ -1,7 +1,6 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
 import * as crypto from 'crypto'
-import * as jsonld from 'jsonld'
 import { testPublicIdentityKey } from '../data/keys.data'
 import {
   didDocumentJSON,
@@ -10,7 +9,7 @@ import {
   normalizedDidDocument,
 } from '../data/didDocument.data'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
-import { normalizeJsonLd } from '../../ts/utils/validation'
+import { normalizeJsonLd } from '../../ts/linkedData'
 const expect = chai.expect
 
 describe('DidDocument', () => {
