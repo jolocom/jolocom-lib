@@ -14,7 +14,7 @@ import {
   ServiceEndpointsSection,
 } from './sections'
 import { ISigner } from '../../registries/types'
-import { ContextEntry } from 'cred-types-jolocom-core'
+import { JsonLdContext } from '../../linkedData/types'
 import { defaultContextIdentity } from '../../utils/contexts'
 import { publicKeyToDID } from '../../utils/crypto'
 import { digestJsonLd } from '../../linkedData'
@@ -37,7 +37,7 @@ export class DidDocument implements IDigestable {
   private _service: ServiceEndpointsSection[] = []
   private _created: Date = new Date()
   private _proof: ILinkedDataSignature
-  private '_@context': ContextEntry[] = defaultContextIdentity
+  private '_@context': JsonLdContext = defaultContextIdentity
 
   /**
    * Get the `@context` section of the JSON-ld document
@@ -46,7 +46,7 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose({ name: '@context' })
-  get context(): ContextEntry[] {
+  get context(): JsonLdContext {
     return this['_@context']
   }
 
@@ -56,7 +56,7 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.context = [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
-  set context(context: ContextEntry[]) {
+  set context(context: JsonLdContext) {
     this['_@context'] = context
   }
 
@@ -297,7 +297,7 @@ export class DidDocument implements IDigestable {
    */
 
   public async digest(): Promise<Buffer> {
-      return digestJsonLd(this.toJSON())
+      return digestJsonLd(this.toJSON(), this.context)
   }
 
   /**

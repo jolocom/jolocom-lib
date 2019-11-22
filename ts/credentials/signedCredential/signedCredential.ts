@@ -13,9 +13,10 @@ import {
   IDigestable,
   ILinkedDataSignature,
 } from '../../linkedDataSignature/types'
-import { BaseMetadata, ContextEntry } from 'cred-types-jolocom-core'
+import { BaseMetadata } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
+import { JsonLdContext } from '../../linkedData/types'
 import { ISigner } from '../../registries/types'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
@@ -42,7 +43,7 @@ interface IIssInfo {
 
 @Exclude()
 export class SignedCredential implements IDigestable {
-  private '_@context': ContextEntry[]
+  private '_@context': JsonLdContext
   private _id: string = generateClaimId(8)
   private _name: string
   private _issuer: string
@@ -69,7 +70,7 @@ export class SignedCredential implements IDigestable {
    * @example `signedCredential.context = [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
-  set context(context: ContextEntry[]) {
+  set context(context: JsonLdContext) {
     this['_@context'] = context
   }
 
@@ -315,7 +316,7 @@ export class SignedCredential implements IDigestable {
     expires = new Date(Date.now() + DEFAULT_EXPIRY_MS),
   ) {
     const credential = Credential.create(credentialOptions)
-    const json = credential.toJSON() as ISignedCredentialAttrs
+    const json = (credential.toJSON() as unknown) as ISignedCredentialAttrs
     const signedCredential = SignedCredential.fromJSON(json)
 
     signedCredential.expires = expires
@@ -349,7 +350,7 @@ export class SignedCredential implements IDigestable {
    */
 
   public async digest(): Promise<Buffer> {
-    return digestJsonLd(this.toJSON())
+    return digestJsonLd(this.toJSON(), this.context)
   }
 
   /**
