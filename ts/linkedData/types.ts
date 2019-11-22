@@ -12,6 +12,5 @@ export interface JsonLdObject {
 }
 
 export interface SignedJsonLdObject extends JsonLdObject {
-  '@context': JsonLdContext
   proof: ILinkedDataSignatureAttrs
 }

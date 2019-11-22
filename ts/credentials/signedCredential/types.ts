@@ -2,7 +2,7 @@ import { ICredentialAttrs, IClaimSection } from '../credential/types'
 import { BaseMetadata } from 'cred-types-jolocom-core'
 import { SignedJsonLdObject } from '../../linkedData/types'
 
-export interface ISignedCredentialAttrs extends Omit<ICredentialAttrs, '@context'>, SignedJsonLdObject {
+export interface ISignedCredentialAttrs extends SignedJsonLdObject, ICredentialAttrs {
   id: string
   issuer: string
   issued: string
