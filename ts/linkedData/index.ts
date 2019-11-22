@@ -50,7 +50,7 @@ export const normalizeLdProof = async (
  */
 
 export const digestJsonLd = async (
-  { proof, ['@context']: _, ...body }: SignedJsonLdObject,
+  { proof, ['@context']: _, ...data }: SignedJsonLdObject,
   context: JsonLdContext,
 ): Promise<Buffer> => sha256(
   Buffer.concat([
@@ -79,7 +79,7 @@ export const validateJsonLd = async (
       issuerIdentity.didDocument,
     )
     return SoftwareKeyProvider.verify(
-      await digestJsonLd(json),
+      await digestJsonLd(json, json['@context']),
       issuerPublicKey,
       Buffer.from(json.proof.signatureValue, 'hex'),
     )

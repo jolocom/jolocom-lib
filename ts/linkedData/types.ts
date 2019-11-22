@@ -1,4 +1,4 @@
-
+import { ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
 
 type JsonLdPrimitive = string | number | boolean | JsonLdObject | JsonLdObject[]
 
