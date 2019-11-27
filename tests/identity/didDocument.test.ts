@@ -44,13 +44,8 @@ describe('DidDocument', () => {
   })
 
   it('Should correctly implement normalize', async () => {
-    const {proof, ...document} = referenceDidDocument.toJSON()
-
-    const njld = await normalizeJsonLd(
-        document,
-        referenceDidDocument.context
-    )
-
+    const { proof, ...document } = referenceDidDocument.toJSON()
+    const njld = await normalizeJsonLd(document, referenceDidDocument.context)
     expect(njld).to.deep.eq(normalizedDidDocument)
   })
 

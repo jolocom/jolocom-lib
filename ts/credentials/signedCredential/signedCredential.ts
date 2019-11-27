@@ -21,9 +21,17 @@ import { ISigner } from '../../registries/types'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 
-
 // Credentials are valid for a year by default
 const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
+
+/**
+ * @ignore
+ * Helper function generating a random claim id
+ * @param length - The length of the random part of the identifier
+ */
+
+const generateClaimId = (length: number): string =>
+  `claimId:${SoftwareKeyProvider.getRandom(length).toString('hex')}`
 
 /**
  * @description Data needed to prepare signature on credential
@@ -372,12 +380,3 @@ export class SignedCredential implements IDigestable {
     return classToPlain(this) as ISignedCredentialAttrs
   }
 }
-
-/**
- * @ignore
- * Helper function generating a random claim id
- * @param length - The length of the random part of the identifier
- */
-
-const generateClaimId = (length: number): string =>
-  `claimId:${SoftwareKeyProvider.getRandom(length).toString('hex')}`
