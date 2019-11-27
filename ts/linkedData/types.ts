@@ -3,9 +3,7 @@ import { ContextEntry } from 'cred-types-jolocom-core'
 
 type JsonLdPrimitive = string | number | boolean | JsonLdObject | JsonLdObject[]
 
-export type JsonLdContextEntry = ContextEntry
-
-export type JsonLdContext = JsonLdContextEntry | JsonLdContextEntry[]
+export type JsonLdContext = ContextEntry | ContextEntry[]
 
 export interface JsonLdObject {
   '@context'?: JsonLdContext

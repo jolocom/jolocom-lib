@@ -1,8 +1,6 @@
-import { JsonLdContextEntry } from '../linkedData/types'
-
 /* Expanded default context for verifiable credentials, more verbose, but works in offline use cases */
 
-export const defaultContext: JsonLdContextEntry[] = [
+export const defaultContext = [
   {
     id: '@id',
     type: '@type',
@@ -29,7 +27,7 @@ export const defaultContext: JsonLdContextEntry[] = [
 
 /* Expanded default context for did documents, more verbose, but works in offline use cases */
 
-export const defaultContextIdentity: JsonLdContextEntry[] = [
+export const defaultContextIdentity = [
   {
     id: '@id',
     type: '@type',
