@@ -85,55 +85,6 @@ const DID_DOC_V0 = {
   },
 }
 
-const DID_DOC_V0_13 = {
-  specVersion: 0.13,
-  '@context': [
-    'https://www.w3.org/2019/did/v1',
-    'https://w3id.org/did/v0.11',
-    'https://w3id.org/did/v1',
-    { EcdsaKoblitzSignature2016: 'sec:EcdsaKoblitzSignature2016' },
-    {
-      xsd: 'http://www.w3.org/2001/XMLSchema#',
-      sec: 'https://w3id.org/security#',
-      schema: 'http://schema.org/',
-      didv: 'https://w3id.org/did#',
-      publicKeyHex: 'sec:publicKeyHex',
-      updated: { '@id': 'didv:updated', '@type': 'xsd:dateTime' },
-      specVersion: 'schema:version',
-      Secp256k1VerificationKey2018: 'sec:Secp256k1VerificationKey2018',
-      JolocomPublicProfile: 'https://identity.jolocom.com/terms/PublicProfile',
-    },
-  ],
-  id:
-    'did:jolo:1ff29fd63b896ca94b5efe35bd61eba809b5293a1cdf995dfa9cc7a8a8e1c348',
-  authentication: [
-    'did:jolo:1ff29fd63b896ca94b5efe35bd61eba809b5293a1cdf995dfa9cc7a8a8e1c348#keys-1',
-  ],
-  publicKey: [
-    {
-      controller:
-        'did:jolo:1ff29fd63b896ca94b5efe35bd61eba809b5293a1cdf995dfa9cc7a8a8e1c348',
-      id:
-        'did:jolo:1ff29fd63b896ca94b5efe35bd61eba809b5293a1cdf995dfa9cc7a8a8e1c348#keys-1',
-      type: 'Secp256k1VerificationKey2018',
-      publicKeyHex:
-        '031cb4105e392208c78085cb618a2695ee4e732534bc8f6b2f699f116c9607b84d',
-    },
-  ],
-  service: [],
-  created: '2019-08-10T13:56:40.240Z',
-  updated: '2019-08-10T13:56:40.934Z',
-  proof: {
-    created: '2019-08-10T13:56:40.934Z',
-    type: 'EcdsaKoblitzSignature2016',
-    nonce: '730c39662aa79d17',
-    signatureValue:
-      'edcffa601bfbe5ece45c513799e34b5a8d957ce7eb94441efc250f7ba7749d10424a0d7f54ba8837b89f804fed52992cf1ac00d874b5215068876a6345359394',
-    creator:
-      'did:jolo:1ff29fd63b896ca94b5efe35bd61eba809b5293a1cdf995dfa9cc7a8a8e1c348#keys-1',
-  },
-}
-
 describe('linkedData validation functions', () => {
   it('validateJsonLd should correctly validate', async () => {
     //@ts-ignore
@@ -152,18 +103,8 @@ describe('linkedData validation functions', () => {
       },
     }
 
-    const mallformedV013 = {
-      ...DID_DOC_V0_13,
-      proof: {
-        ...DID_DOC_V0_13.proof,
-        nonce: '0',
-      },
-    }
-
     expect(await validateJsonLd(DID_DOC_V0, mockRegistry)).to.eq(true)
-    // expect(await validateJsonLd(DID_DOC_V0_13, mockRegistry)).to.eq(true)
 
     expect(await validateJsonLd(mallformedV0, mockRegistry)).to.eq(false)
-    // expect(await validateJsonLd(mallformedV013, mockRegistry)).to.eq(false)
   })
 })
