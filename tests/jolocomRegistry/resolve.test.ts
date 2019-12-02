@@ -59,16 +59,4 @@ describe('Jolocom Registry - resolve', () => {
     expect(identity.didDocument.toJSON()).to.deep.eq(extendedDidDoc)
     expect(identity.publicProfile.toJSON()).to.deep.eq(publicProfileCredJSON)
   })
-
-  it('should implement fetchPublicProfile', async () => {
-    registry.ipfsConnector.catJSON = sinon
-      .stub()
-      .resolves(publicProfileCredJSON)
-
-    const pubProf = await registry.fetchPublicProfile(`ipfs://${mockIpfsHash}`)
-    expect(pubProf).to.deep.eq(SignedCredential.fromJSON(publicProfileCredJSON))
-    expect(registry.ipfsConnector.catJSON.getCall(0).args).to.deep.eq([
-      mockIpfsHash,
-    ])
-  })
 })

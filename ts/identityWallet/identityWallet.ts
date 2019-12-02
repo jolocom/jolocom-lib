@@ -21,14 +21,13 @@ import {
   getIssuerPublicKey,
   publicKeyToAddress,
 } from '../utils/helper'
-import { createJolocomRegistry } from '../registries/jolocomRegistry'
+import { jolocomResolver } from '../registries/jolocomRegistry'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 import {
   IContractsAdapter,
   IContractsGateway,
   ITransactionEncodable,
 } from '../contracts/types'
-import { IRegistry } from '../registries/types'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
 import {
@@ -41,6 +40,7 @@ import {
   IPaymentRequestAttrs,
   IPaymentResponseAttrs,
 } from '../interactionTokens/interactionTokens.types'
+import { DidDocument } from '../identity/didDocument/didDocument'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -525,22 +525,21 @@ export class IdentityWallet {
    * Validates interaction tokens for signature - if only received token passed - and for audience (aud) and token nonce (jti) if send token passed also
    * @param receivedJWT - received JSONWebToken Class
    * @param sendJWT - optional send JSONWebToken Class which is used to validate the token nonce and the aud field on received token
-   * @param customRegistry - optional custom registry
+   * @param additionalResolver - optional additional resolver objects for DIF DID Resolver, e.g. {ethr: (did, parsed, resolver)=>{...}}
    */
 
   public async validateJWT<T extends JWTEncodable, A extends JWTEncodable>(
     receivedJWT: JSONWebToken<T>,
     sendJWT?: JSONWebToken<A>,
-    customRegistry?: IRegistry,
+    additionalResolver?: {},
   ): Promise<void> {
-    const registry = customRegistry || createJolocomRegistry()
-    const remoteIdentity = await registry.resolve(
-      keyIdToDid(receivedJWT.issuer),
+    const resolver = jolocomResolver(additionalResolver)
+    const didDocument = DidDocument.fromJSON(
+      // @ts-ignore
+      await resolver.resolve(keyIdToDid(receivedJWT.issuer)),
     )
-    const pubKey = getIssuerPublicKey(
-      receivedJWT.issuer,
-      remoteIdentity.didDocument,
-    )
+
+    const pubKey = getIssuerPublicKey(receivedJWT.issuer, didDocument)
 
     if (!(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT))) {
       throw new Error('Signature on token is invalid')

@@ -23,6 +23,8 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
+import { Resolver } from 'did-resolver'
+import { getPublicProfile, getResolver } from 'jolo-did-resolver'
 
 /**
  * @class
@@ -34,6 +36,7 @@ export class JolocomRegistry implements IRegistry {
   public ethereumConnector: IEthereumConnector
   public contractsAdapter: IContractsAdapter
   public contractsGateway: IContractsGateway
+  public resolver: Resolver
 
   /**
    * Registers a  new Jolocom identity on Ethereum and IPFS and returns an instance of the Identity Wallet class
@@ -149,23 +152,16 @@ export class JolocomRegistry implements IRegistry {
 
   public async resolve(did): Promise<Identity> {
     try {
-      const ddoHash = await this.ethereumConnector.resolveDID(did)
-
-      if (!ddoHash) {
+      const jsonDidDoc = await this.resolver.resolve(did)
+      if (!jsonDidDoc) {
         throw new Error('No record for DID found.')
       }
 
-      const didDocument = DidDocument.fromJSON(
-        (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs,
-      )
-
-      const publicProfileSection = didDocument.service.find(
-        endpoint => endpoint.type === 'JolocomPublicProfile',
-      )
-
-      const publicProfile =
-        publicProfileSection &&
-        (await this.fetchPublicProfile(publicProfileSection.serviceEndpoint))
+      // @ts-ignore
+      const didDocument = DidDocument.fromJSON(jsonDidDoc)
+      const publicProfile = (await getPublicProfile(
+        jsonDidDoc,
+      )) as SignedCredential
 
       return Identity.fromDidDocument({
         didDocument,
@@ -210,22 +206,6 @@ export class JolocomRegistry implements IRegistry {
   }
 
   /**
-   * Fetches the public profile signed credential form ipfs
-   * @param entry - IPFS hash of public profile credential
-   * @example `const pubProf = await registry.fetchPublicProfile('ipfs://Qm...')`
-   * @internal
-   */
-
-  public async fetchPublicProfile(entry: string): Promise<SignedCredential> {
-    const hash = entry.replace('ipfs://', '')
-    const publicProfile = (await this.ipfsConnector.catJSON(
-      hash,
-    )) as ISignedCredentialAttrs
-
-    return SignedCredential.fromJSON(publicProfile)
-  }
-
-  /**
    * Proxies to this.resolve, but catches error and returns undefined
    * @param did - The jolocom did to resolve
    * @example `const serviceIdentity = await registry.resolveSafe('did:jolo:...')`
@@ -267,6 +247,12 @@ export const createJolocomRegistry = (
   jolocomRegistry.ethereumConnector = ethereumConnector
   jolocomRegistry.contractsAdapter = contracts.adapter
   jolocomRegistry.contractsGateway = contracts.gateway
+  jolocomRegistry.resolver = new Resolver(getResolver())
 
   return jolocomRegistry
+}
+
+export const jolocomResolver = (additionalResolver?: {}): Resolver => {
+  const jolo = getResolver()
+  return new Resolver({ ...additionalResolver, ...jolo })
 }
