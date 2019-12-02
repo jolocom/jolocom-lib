@@ -11,6 +11,7 @@ import { JsonLdObject, SignedJsonLdObject, JsonLdContext } from './types'
  * Helper function to handle JsonLD normalization.
  * @dev The function expects the JsonLD '@context' to be passed as an argument,
  *  the '@context' on the data will be discarded.
+ * @internal
  * @param data - {@link JsonLdObject} without the '@context' section
  * @param context - JsonLD context to use during normalization
  */
@@ -26,6 +27,7 @@ export const normalizeJsonLd = async (
 /**
  * Helper function to handle JsonLD proof section normalization.
  * @dev The function expects the JsonLD '@context' to be passed as an argument
+ * @internal
  * @param data - {@link ILinkedDataSignatureAttrs} Proof to be normalised
  * @param context - JsonLD context to use during normalization
  */
@@ -39,6 +41,7 @@ export const normalizeLdProof = async (
  * Helper function to handle signed JsonLD digestions
  * @dev The function expects the JsonLD '@context' to be passed as an argument,
  *  the '@context' on the data will be discarded.
+ * @internal
  * @param data - {@link SignedJsonLdObject}
  * @param context - JsonLD context to use during normalization
  */
@@ -66,8 +69,9 @@ export const validateJsonLd = async (
   customRegistry?: IRegistry,
 ): Promise<boolean> => {
   const reg = customRegistry || registries.jolocom.create()
+  const issuerIdentity = await reg.resolve(keyIdToDid(json.proof.creator))
+
   try {
-    const issuerIdentity = await reg.resolve(keyIdToDid(json.proof.creator))
     const issuerPublicKey = getIssuerPublicKey(
       json.proof.creator,
       issuerIdentity.didDocument,
