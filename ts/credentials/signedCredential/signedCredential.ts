@@ -7,23 +7,31 @@ import {
   Transform,
   Type,
 } from 'class-transformer'
-import { canonize } from 'jsonld'
-import { sha256 } from '../../utils/crypto'
+import { digestJsonLd } from '../../linkedData'
 import { ISignedCredCreationArgs, ISignedCredentialAttrs } from './types'
 import {
   IDigestable,
   ILinkedDataSignature,
 } from '../../linkedDataSignature/types'
-import { BaseMetadata, ContextEntry } from 'cred-types-jolocom-core'
+import { BaseMetadata } from 'cred-types-jolocom-core'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
+import { JsonLdContext } from '../../linkedData/types'
 import { ISigner } from '../../registries/types'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 
-
 // Credentials are valid for a year by default
 const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
+
+/**
+ * @ignore
+ * Helper function generating a random claim id
+ * @param length - The length of the random part of the identifier
+ */
+
+const generateClaimId = (length: number): string =>
+  `claimId:${SoftwareKeyProvider.getRandom(length).toString('hex')}`
 
 /**
  * @description Data needed to prepare signature on credential
@@ -43,7 +51,7 @@ interface IIssInfo {
 
 @Exclude()
 export class SignedCredential implements IDigestable {
-  private '_@context': ContextEntry[]
+  private '_@context': JsonLdContext
   private _id: string = generateClaimId(8)
   private _name: string
   private _issuer: string
@@ -70,7 +78,7 @@ export class SignedCredential implements IDigestable {
    * @example `signedCredential.context = [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
-  set context(context: ContextEntry[]) {
+  set context(context: JsonLdContext) {
     this['_@context'] = context
   }
 
@@ -316,7 +324,7 @@ export class SignedCredential implements IDigestable {
     expires = new Date(Date.now() + DEFAULT_EXPIRY_MS),
   ) {
     const credential = Credential.create(credentialOptions)
-    const json = credential.toJSON() as ISignedCredentialAttrs
+    const json = (credential.toJSON() as unknown) as ISignedCredentialAttrs
     const signedCredential = SignedCredential.fromJSON(json)
 
     signedCredential.expires = expires
@@ -350,25 +358,7 @@ export class SignedCredential implements IDigestable {
    */
 
   public async digest(): Promise<Buffer> {
-    const normalized = await this.normalize()
-
-    const docSectionDigest = sha256(Buffer.from(normalized))
-    const proofSectionDigest = await this.proof.digest()
-
-    return sha256(Buffer.concat([proofSectionDigest, docSectionDigest]))
-  }
-
-  /**
-   * Converts the verifiable credential to canonical form
-   * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
-   * @internal
-   */
-
-  private async normalize(): Promise<string> {
-    const json = this.toJSON()
-    delete json.proof
-
-    return canonize(json)
+    return digestJsonLd(this.toJSON(), this.context)
   }
 
   /**
@@ -390,12 +380,3 @@ export class SignedCredential implements IDigestable {
     return classToPlain(this) as ISignedCredentialAttrs
   }
 }
-
-/**
- * @ignore
- * Helper function generating a random claim id
- * @param length - The length of the random part of the identifier
- */
-
-const generateClaimId = (length: number): string =>
-  `claimId:${SoftwareKeyProvider.getRandom(length).toString('hex')}`

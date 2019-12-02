@@ -1,8 +1,6 @@
-import { ContextEntry } from 'cred-types-jolocom-core'
-
 /* Expanded default context for verifiable credentials, more verbose, but works in offline use cases */
 
-export const defaultContext: ContextEntry[] = [
+export const defaultContext = [
   {
     id: '@id',
     type: '@type',
@@ -29,7 +27,7 @@ export const defaultContext: ContextEntry[] = [
 
 /* Expanded default context for did documents, more verbose, but works in offline use cases */
 
-export const defaultContextIdentity: ContextEntry[] = [
+export const defaultContextIdentity = [
   {
     id: '@id',
     type: '@type',
