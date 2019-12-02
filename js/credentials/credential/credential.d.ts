@@ -1,6 +1,7 @@
 import { ICredentialAttrs, IClaimSection } from './types';
-import { BaseMetadata, ContextEntry } from 'cred-types-jolocom-core';
+import { BaseMetadata } from 'cred-types-jolocom-core';
 import { ISignedCredCreationArgs } from '../signedCredential/types';
+import { JsonLdContext } from '../../linkedData/types';
 export declare class Credential {
     private '_@context';
     private _id;
@@ -11,7 +12,7 @@ export declare class Credential {
     claim: IClaimSection;
     type: string[];
     name: string;
-    context: ContextEntry[];
+    context: JsonLdContext;
     static create<T extends BaseMetadata>({ metadata, claim, subject, }: ISignedCredCreationArgs<T>): Credential;
     static fromJSON(json: ICredentialAttrs): Credential;
     toJSON(): ICredentialAttrs;
