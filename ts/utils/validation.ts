@@ -1,7 +1,8 @@
-import { JolocomLib } from '../index'
+import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { IDigestable } from '../linkedDataSignature/types'
 import { getIssuerPublicKey } from './helper'
 import { IRegistry } from '../registries/types'
+import { registries } from '../registries/index'
 
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
@@ -16,14 +17,14 @@ export const validateDigestable = async (
   toValidate: IDigestable,
   customRegistry?: IRegistry,
 ): Promise<boolean> => {
-  const reg = customRegistry || JolocomLib.registries.jolocom.create()
+  const reg = customRegistry || registries.jolocom.create()
   const issuerIdentity = await reg.resolve(toValidate.signer.did)
   try {
     const issuerPublicKey = getIssuerPublicKey(
       toValidate.signer.keyId,
       issuerIdentity.didDocument,
     )
-    return JolocomLib.KeyProvider.verifyDigestable(issuerPublicKey, toValidate)
+    return SoftwareKeyProvider.verifyDigestable(issuerPublicKey, toValidate)
   } catch {
     return false
   }
@@ -47,3 +48,4 @@ export const validateDigestables = async (
       validateDigestable(digestable, customRegistry),
     ),
   )
+

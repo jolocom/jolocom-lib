@@ -61,7 +61,9 @@ describe('IdentityWallet', () => {
   })
 
   describe('create', () => {
-    const sandbox = sinon.createSandbox()
+    const sandbox = sinon.createSandbox({
+      useFakeTimers: false,
+    })
     let stubCredCreate
     let spyFromJWTEncodable
     let interactionToken
@@ -98,7 +100,6 @@ describe('IdentityWallet', () => {
     })
 
     /* A bit hacky, but deep eq for functions is tricky. Should work most of the time */
-
     it('Should attempt to create credential', () => {
       expect(iw.create.credential.toString()).to.eq(
         Credential.create.toString(),
@@ -128,6 +129,49 @@ describe('IdentityWallet', () => {
         spyFromJWTEncodable,
         CredentialRequest.fromJSON(simpleCredRequestJSON),
       )
+
+      const expectedExpiry = 60 * 60 * 1000
+      expect(interactionToken.expires - interactionToken.issued).to.eq(
+        expectedExpiry,
+      )
+    })
+
+    it('Should attempt to create an interaction token with custom expiry time', async () => {
+      const customExpiry = new Date(2030, 1, 1)
+      const interactionTokenCustomExpiry = await iw.create.interactionTokens.request.share(
+        {
+          ...simpleCredRequestJSON,
+          expires: customExpiry,
+        },
+        encryptionPass,
+      )
+
+      sandbox.assert.calledOnce(spyFromJWTEncodable)
+      sandbox.assert.calledWith(
+        spyFromJWTEncodable,
+        CredentialRequest.fromJSON(simpleCredRequestJSON),
+      )
+      expect(interactionTokenCustomExpiry.expires).to.eq(customExpiry.getTime())
+    })
+
+    it('Should fail to create an interaction token with invalid expiry time', async () => {
+      const customExpiry = new Date(0)
+      return iw.create.interactionTokens.request
+        .share(
+          {
+            ...simpleCredRequestJSON,
+            expires: customExpiry,
+          },
+          encryptionPass,
+        )
+        .then(() => {
+          throw new Error('Expected Failure')
+        })
+        .catch(err => {
+          expect(err.message).to.contain(
+            'Expiry date should be greater than current date',
+          )
+        })
     })
 
     it('Should create an interaction token as a response', async () => {

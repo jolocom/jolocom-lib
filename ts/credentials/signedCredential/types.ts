@@ -1,14 +1,13 @@
 import { ICredentialAttrs, IClaimSection } from '../credential/types'
-import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
 import { BaseMetadata } from 'cred-types-jolocom-core'
+import { SignedJsonLdObject } from '../../linkedData/types'
 
-export interface ISignedCredentialAttrs extends ICredentialAttrs {
+export interface ISignedCredentialAttrs extends SignedJsonLdObject, ICredentialAttrs {
   id: string
   issuer: string
   issued: string
   expires?: string
   claim: IClaimSection
-  proof: ILinkedDataSignatureAttrs
 }
 
 /* Allows for neat claim autocompletion based on metadata type */

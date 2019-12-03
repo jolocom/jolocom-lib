@@ -7,7 +7,6 @@ import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
 import {
   encodedValidCredReqJWT,
-  expiredEncodedSimpleCredReqJWT,
   validSignedCredReqJWT,
   hashedValidCredReqJWT,
 } from '../data/interactionTokens/jsonWebToken.data'
@@ -74,7 +73,7 @@ describe('JSONWebToken', () => {
     const jwt = new JSONWebToken()
     const nonce = Math.random().toString(36)
 
-    jwt.setIssueAndExpiryTime()
+    jwt.timestampAndSetExpiry()
     jwt.signature = signature
     jwt.interactionToken = credReq
     jwt.issuer = iss
@@ -89,6 +88,12 @@ describe('JSONWebToken', () => {
     expect(jwt.expires).to.eq(exp)
     expect(jwt.audience).to.eq(mockDid)
     expect(jwt.nonce).to.eq(nonce)
+  })
+
+  it('Should still support setIssueAndExpiryTime', () => {
+    const jwt = new JSONWebToken()
+    expect(() => jwt.setIssueAndExpiryTime()).to.not.throw()
+    expect(jwt.expires).to.be.greaterThan(Date.now())
   })
 
   it('Should implement static decode', () => {
@@ -106,11 +111,5 @@ describe('JSONWebToken', () => {
     const jwt = JSONWebToken.fromJSON(validSignedCredReqJWT)
     const digest = await jwt.digest()
     expect(digest.toString('hex')).to.eq(hashedValidCredReqJWT)
-  })
-
-  it('Should thow error on expired JWT during decode', () => {
-    expect(() => JSONWebToken.decode(expiredEncodedSimpleCredReqJWT)).to.throw(
-      'Token expired',
-    )
   })
 })

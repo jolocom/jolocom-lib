@@ -47,6 +47,27 @@ We also allow for simple constraints to be encoded as part of the credential req
     },
     password)
 
+By default the generated credential request will be valid for 1 hour. Attempting to scan or validate the requests after the expiry period
+will fail. In case you would like to specify a custom expiry date, the following is supported:
+
+.. code-block:: typescript
+
+  // You can also pass a custom expiry date for the credential, supported since v3.1.0
+  const customExpiryDate = new Date(2030, 1, 1)
+
+  // An instance of an identityWallet is required at this point
+    const credentialRequest = await identityWallet.create.interactionTokens.request.share({
+      expires: customExpiryDate
+      callbackURL: 'https://example.com/authentication/',
+      credentialRequirements: [{
+          type: ['Credential', 'ProofOfEmailCredential'],
+          constraints: []
+        }]
+    },
+    password)
+
+.. note:: The expiration date can be passed in a similar manner when creating other interaction token types as well (e.g. Authentication, Credential Offer, etc...)
+
 .. note:: For further documentation and examples explaining how to create and send
  credential requests, check the `API documentation <https://htmlpreview.github.io/?https://raw.githubusercontent.com/jolocom/jolocom-lib/master/api_docs/documentation/classes/credentialrequest.html>`_,
  the `generic backend documentation <https://github.com/jolocom/generic-backend>`_, the `integration tests <https://github.com/jolocom/jolocom-lib/tree/master/tests/integration>`_, and finally `this collection of simple snippets <https://github.com/Exulansis/jolocom_snippets>`_.
@@ -64,7 +85,7 @@ be encoded as a QR code that can be scanned by the wallet application. The ``cre
   const jwtEncoded = credentialRequest.encode()
   const QREncoded = new SSO().JWTtoQR(jwtEncoded)
 
-.. note:: The ``JWT`` encoded interaction token can also be sent to the Jolocom SmartWallet via "Deep Links". An example client application making use of this flow can be `here <https://github.com/jolocom/demo-sso-mobile>`_.
+.. note:: The ``JWT`` encoded interaction token can also be sent to the Jolocom SmartWallet via "Deep Links"..
 
 **Consume a Signed Credential Request**
 

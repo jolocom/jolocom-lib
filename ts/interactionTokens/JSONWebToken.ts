@@ -15,11 +15,14 @@ import { CredentialResponse } from './credentialResponse'
 import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
 import { CredentialsReceive } from './credentialsReceive'
-import { handleValidationStatus, keyIdToDid } from '../utils/helper'
+import { keyIdToDid } from '../utils/helper'
 import { PaymentResponse } from './paymentResponse'
 import { PaymentRequest } from './paymentRequest'
 import { CredentialOfferResponse } from './credentialOfferResponse'
 import { CredentialOfferRequest } from './credentialOfferRequest'
+
+// JWTs are valid for one hour by default
+const DEFAULT_EXPIRY_MS = 60 * 60 * 1000
 
 /* Local interfaces / types to save on typing later */
 
@@ -177,15 +180,32 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     return jwt
   }
 
-  /*
+  /**
    * @description - Populates the token issued and exiry times, expiry defaults to 1 hr
+   * @param expiry - Expiration date - {@link Date} instance
    * @returns {void}
    */
 
-  public setIssueAndExpiryTime() {
-    this.payload.iat = Date.now()
-    this.payload.exp = this.payload.iat + 3600000
+  public timestampAndSetExpiry(
+    expiry = new Date(Date.now() + DEFAULT_EXPIRY_MS),
+  ) {
+    const issued = new Date()
+
+    if (expiry <= issued) {
+      throw new Error('Expiry date should be greater than current date')
+    }
+
+    this.payload.iat = issued.getTime()
+    this.payload.exp = expiry.getTime()
   }
+
+  /**
+   * @description Populates the token issued and exiry times, expiry defaults to 1 hr
+   * @internal
+   * @deprecated Method is intended for internal usage and will be made private as part of a future release
+   * @returns {void}
+   */
+  public setIssueAndExpiryTime = this.timestampAndSetExpiry
 
   /*
    * @description - Decodes a base64 encoded JWT and instantiates this class based on content
@@ -194,10 +214,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
    */
 
   public static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T> {
-    const interactionToken = JSONWebToken.fromJSON(decodeToken(jwt))
-    handleValidationStatus(interactionToken.expires > Date.now(), 'exp')
-
-    return interactionToken as JSONWebToken<T>
+    return JSONWebToken.fromJSON<T>(decodeToken(jwt))
   }
 
   /*

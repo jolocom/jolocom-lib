@@ -11,7 +11,6 @@ import { publicKeyToAddress } from '../../ts/utils/helper'
 import { PaymentRequest } from '../../ts/interactionTokens/paymentRequest'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { PaymentResponse } from '../../ts/interactionTokens/paymentResponse'
-import { PaymentRequestCreationArgs } from '../../ts/identityWallet/types'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -23,7 +22,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
   let paymentResponseEncoded
 
   it('Should create a payment request token by service', async () => {
-    const paymentReqCreationArgs: PaymentRequestCreationArgs = {
+    const paymentReqCreationArgs = {
       callbackURL: 'https://awesomeservice.com/payment/pending',
       description: 'Payment for monthly subscription to awesome service',
       transactionOptions: {
@@ -46,7 +45,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
         ...paymentReqCreationArgs,
         transactionOptions: {
           ...paymentReqCreationArgs.transactionOptions,
-          to: '0x10ed0857fd6d752f2089a6b0d3fe7f0392e046e0', // Defaulted to service's eth addr.
+          to: '0xd63ae8085b84e157b5b558583777dc32240e6404', // Defaulted to service's eth addr.
           gasLimit: 21e3,
           gasPrice: 10e9,
         },

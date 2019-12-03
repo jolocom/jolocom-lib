@@ -73,11 +73,19 @@ To issue a credential to another entity, we simply need to specify the DID of th
 
 .. code-block:: typescript
 
-  const emailAddressSignedCredential = identityWallet.create.signedCredential({
+  // You can also pass a custom expiry date for the credential, supported since v3.1.0
+  const customExpiryDate = new Date(2030, 1, 1)
+  const emailAddressSignedCredential = identityWallet.create.signedCredential(
+  {
     metadata: claimsMetadata.emailAddress,
     claim: { email: 'example@example.com' },
     subject: 'did:jolo:6d6f636b207375626a656374206469646d6f636b207375626a65637420646964'
-  }, password)
+  },
+  password,
+  customExpiryDate
+  )
+
+.. note:: The custom expiry date is an optional argument (if not present, will default to 1 year from Date.now())
 
 Taking a look at the newly created credential, we can indeed see that the ``subject``, denoted by the ``claim.id`` key, is different:
 

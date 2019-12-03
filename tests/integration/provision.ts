@@ -1,18 +1,13 @@
 import * as ganache from 'ganache-core'
-import * as registryContract from 'jolocom-registry-contract'
 import { userEthKey, serviceEthKey, deployerEthKey } from './integration.data'
 import { ContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { ethers } from 'ethers'
-const Web3 = require('web3')
+
 const IPFSFactory = require('ipfsd-ctl')
-
+const RegistryContract = require('jolocom-registry-contract/build/contracts/Registry.json')
 const PORT = 8945
-const web3 = new Web3()
-web3.setProvider(new Web3.providers.HttpProvider(`http://localhost:${PORT}`))
-
-const balance = web3.utils.toWei('1')
-
+const balance = 1e18
 const ganacheServer = ganache.server({
   accounts: [
     { secretKey: deployerEthKey, balance },
@@ -30,11 +25,18 @@ const daemonFactory = IPFSFactory.create({ type: 'go' })
  */
 
 const deployContract = async () => {
-  const deployerAddress = (await web3.eth.getAccounts())[0]
-  return registryContract.TestDeployment.deployIdentityContract(
-    web3,
-    deployerAddress,
+  let provider = new ethers.providers.JsonRpcProvider(
+    `http://localhost:${PORT}`,
   )
+  let wallet = new ethers.Wallet(deployerEthKey, provider)
+  let factory = new ethers.ContractFactory(
+    RegistryContract.abi,
+    RegistryContract.bytecode,
+    wallet,
+  )
+  let contract = await factory.deploy()
+  await contract.deployed()
+  return contract.address
 }
 
 /**
@@ -84,7 +86,7 @@ export const init = async () =>
       await spawnIpfsNode()
 
       const testContractsGateway = new ContractsGateway(
-        new ethers.providers.Web3Provider(web3.currentProvider),
+        `http://localhost:${PORT}`,
       )
       const testContractsAdapter = new ContractsAdapter()
 

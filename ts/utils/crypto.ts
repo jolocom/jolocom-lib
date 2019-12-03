@@ -26,25 +26,3 @@ export function publicKeyToDID(publicKey: Buffer): string {
   const suffix = keccak256(publicKey)
   return prefix + suffix.toString('hex')
 }
-
-/**
- * Generates a "random" sequence of bytes
- * @param nrOfBytes - The size of the output
- * @ignore
- */
-
-/* TODO Revert to previous implementation once compatibility issues are sorted */
-export function generateRandomID(nrOfBytes: number): string {
-  return Math.random()
-    .toString(16)
-    .substr(2)
-}
-
-/*
-const result = Buffer.allocUnsafe(nrOfBytes)
-random.randomWords(nrOfBytes / 4).forEach((el, index) => {
-  result.writeInt32LE(el, index * 4)
-})
-
-return result.toString('hex')
-*/
