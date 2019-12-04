@@ -288,7 +288,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     )
 
     // Encrypt asymmetrically
-    const encryptedKey = await eccrypto.encrypt(publicKey, Buffer.from(symKey))
+    const encryptedKey = await eccrypto.encrypt(publicKey, symKey)
     return {
       keys: [
         {
