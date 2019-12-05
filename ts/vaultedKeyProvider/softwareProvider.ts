@@ -288,7 +288,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     )
 
     // Encrypt asymmetrically
-    const encryptedKey = await eccrypto.encrypt(publicKey, Buffer.from(symKey))
+    const encryptedKey = await eccrypto.encrypt(publicKey, symKey)
     return {
       keys: [
         {
@@ -318,6 +318,8 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     if (!encryptedKey) throw new Error('Not encrypted for these keys')
 
     // decrypt asymmetrically
+    // FIXME We are using a fork of eccrypto to fix a bug in eccrypto.decrypt() see https://github.com/jolocom/jolocom-lib/issues/384
+    //  change this back once this https://github.com/bitchan/eccrypto/pull/47 is released
     const symKey = await eccrypto.decrypt(
       privateKey,
       this.parseEncryptedData(encryptedKey.cipher),
