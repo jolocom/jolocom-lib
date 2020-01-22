@@ -68,5 +68,5 @@ export class ContractsGateway implements IContractsGateway {
 }
 
 export const jolocomContractsGateway = new ContractsGateway(
-  'https://rinkeby.infura.io/',
+  'https://rinkeby.infura.io/v3/64fa85ca0b28483ea90919a83630d5d8',
 )
