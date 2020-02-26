@@ -23,6 +23,8 @@ A further component of the protocol architecture calls for the integration of a 
 
   Please do not transfer any real ether to your Jolocom identity.
 
+.. note:: The Jolocom Library is currently only compatible with Node.js versions 10 and 11.
+
 The Jolocom library at a glance
 ################################
 
