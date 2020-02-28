@@ -12,4 +12,5 @@ export enum ErrorCodes {
   SKPEncryptedSeedInvalidLength = 'SKPEncryptedSeedInvalidLength',
   SKPMnemonicInvalid = 'SKPMnemonicInvalid',
   SKPDecryptionInvalidKey = 'SKPDecryptionInvalidKey',
+  PublicKeyNotFound = 'PublicKeyNotFound',
 }
