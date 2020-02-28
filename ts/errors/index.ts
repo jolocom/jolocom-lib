@@ -6,4 +6,6 @@ export enum ErrorCodes {
   JWTInvalidExpiryDate = 'JWTInvalidExpiryDate',
   JWTIncomplete = 'JWTIncomplete',
   JWTInvalidInteractionType = 'JWTInvalidInteractionType',
+  IPFSUnpinFailed = 'IPFSUnpinFailed',
+  IPFSInvalidJSONFormat = 'IPFSInvalidJSONFormat',
 }
