@@ -13,4 +13,9 @@ export enum ErrorCodes {
   SKPMnemonicInvalid = 'SKPMnemonicInvalid',
   SKPDecryptionInvalidKey = 'SKPDecryptionInvalidKey',
   PublicKeyNotFound = 'PublicKeyNotFound',
+  IDWInvalidCreationArgs = 'IDWInvalidCreationArgs',
+  IDWInvalidJWTSignature = 'IDWInvalidJWTSignature',
+  IDWNotIntendedAudience = 'IDWNotIntendedAudience',
+  IDWIncorrectJWTNonce = 'IDWIncorrectJWTNonce',
+  IDWTokenExpired = 'IDWTokenExpired',
 }
