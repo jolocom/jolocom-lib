@@ -18,4 +18,5 @@ export enum ErrorCodes {
   IDWNotIntendedAudience = 'IDWNotIntendedAudience',
   IDWIncorrectJWTNonce = 'IDWIncorrectJWTNonce',
   IDWTokenExpired = 'IDWTokenExpired',
+  VCInvalidExpiryDate = 'VCInvalidExpiryDate',
 }
