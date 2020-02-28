@@ -23,6 +23,7 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
+import { ErrorCodes } from '../errors'
 
 /**
  * @class
@@ -135,9 +136,7 @@ export class JolocomRegistry implements IRegistry {
         newHash: ipfsHash,
       })
     } catch (error) {
-      throw new Error(
-        `Error occured while persisting identity data: ${error.message}`,
-      )
+      throw new Error(ErrorCodes.RegistryCommitFailed)
     }
   }
 
@@ -152,7 +151,7 @@ export class JolocomRegistry implements IRegistry {
       const ddoHash = await this.ethereumConnector.resolveDID(did)
 
       if (!ddoHash) {
-        throw new Error('No record for DID found.')
+        throw new Error(ErrorCodes.RegistryDIDNotAnchored)
       }
 
       const didDocument = DidDocument.fromJSON(
@@ -172,7 +171,7 @@ export class JolocomRegistry implements IRegistry {
         publicProfile,
       })
     } catch (error) {
-      throw new Error(`Could not retrieve DID Document. ${error.message}`)
+      throw new Error(ErrorCodes.RegistryResolveFailed)
     }
   }
 
