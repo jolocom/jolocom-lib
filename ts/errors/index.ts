@@ -8,4 +8,8 @@ export enum ErrorCodes {
   JWTInvalidInteractionType = 'JWTInvalidInteractionType',
   IPFSUnpinFailed = 'IPFSUnpinFailed',
   IPFSInvalidJSONFormat = 'IPFSInvalidJSONFormat',
+  RecoveryInvalidSecret = 'RecoveryInvalidSecret',
+  SKPEncryptedSeedInvalidLength = 'SKPEncryptedSeedInvalidLength',
+  SKPMnemonicInvalid = 'SKPMnemonicInvalid',
+  SKPDecryptionInvalidKey = 'SKPDecryptionInvalidKey',
 }

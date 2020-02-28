@@ -6,6 +6,7 @@ import { IKeyDerivationArgs, IVaultedKeyProvider } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
 import * as eccrypto from 'eccrypto'
+import { ErrorCodes } from '../errors'
 
 const ALG = 'aes-256-cbc'
 
@@ -56,9 +57,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   public constructor(encryptedSeed: Buffer) {
     if (!isEncryptedSeedLengthValid(encryptedSeed)) {
-      throw new Error(
-        `Expected encrypted seed to be between ${MIN_ENCRYPTED_SEED_LENGTH} and ${MAX_ENCRYPTED_SEED_LENGTH} bytes long. Got ${encryptedSeed.length}.`,
-      )
+      throw new Error(ErrorCodes.SKPEncryptedSeedInvalidLength)
     }
 
     this._iv = encryptedSeed.slice(0, IV_LENGTH)
@@ -105,7 +104,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     encryptionPass: string,
   ): SoftwareKeyProvider {
     if (!validateMnemonic(mnemonic)) {
-      throw new Error('Invalid Mnemonic.')
+      throw new Error(ErrorCodes.SKPMnemonicInvalid)
     }
 
     const seed = Buffer.from(mnemonicToEntropy(mnemonic), 'hex')
@@ -315,7 +314,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     const encryptedKey = encryptedData.keys.find(
       key => key.pubKey === publicKey.toString('hex'),
     )
-    if (!encryptedKey) throw new Error('Not encrypted for these keys')
+    if (!encryptedKey) throw new Error(ErrorCodes.SKPDecryptionInvalidKey)
 
     // decrypt asymmetrically
     // FIXME We are using a fork of eccrypto to fix a bug in eccrypto.decrypt() see https://github.com/jolocom/jolocom-lib/issues/384
