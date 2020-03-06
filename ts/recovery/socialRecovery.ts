@@ -1,4 +1,5 @@
 import * as secrets from 'secrets.js-grempe'
+import { ErrorCodes } from '../errors'
 
 export class SocialRecovery {
   public static createShards(
@@ -39,7 +40,7 @@ export class SocialRecovery {
   }
   private static unpack(shard: string): { secret: string; label: string } {
     const arr = JSON.parse(secrets.hex2str(shard))
-    if (arr.length !== 2) throw new Error('Can not unpack secret')
+    if (arr.length !== 2) throw new Error(ErrorCodes.RecoveryInvalidSecret)
 
     return { secret: arr[0], label: arr[1] }
   }

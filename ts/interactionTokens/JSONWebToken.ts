@@ -20,6 +20,7 @@ import { PaymentResponse } from './paymentResponse'
 import { PaymentRequest } from './paymentRequest'
 import { CredentialOfferResponse } from './credentialOfferResponse'
 import { CredentialOfferRequest } from './credentialOfferRequest'
+import { ErrorCodes } from '../errors'
 
 // JWTs are valid for one hour by default
 const DEFAULT_EXPIRY_MS = 60 * 60 * 1000
@@ -192,7 +193,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     const issued = new Date()
 
     if (expiry <= issued) {
-      throw new Error('Expiry date should be greater than current date')
+      throw new Error(ErrorCodes.JWTInvalidExpiryDate)
     }
 
     this.payload.iat = issued.getTime()
@@ -224,9 +225,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
   public encode(): string {
     if (!this.payload || !this.header || !this.signature) {
-      throw new Error(
-        'The JWT is not complete, header / payload / signature are missing',
-      )
+      throw new Error(ErrorCodes.JWTIncomplete)
     }
 
     return [
@@ -307,5 +306,5 @@ const instantiateInteraction = <T extends JWTEncodable>(
     case InteractionType.PaymentResponse:
       return instantiator(PaymentResponse)
   }
-  throw new Error('Invalid interaction type parameter value')
+  throw new Error(ErrorCodes.JWTInvalidInteractionType)
 }

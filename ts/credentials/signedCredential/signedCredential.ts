@@ -20,6 +20,7 @@ import { JsonLdContext } from '../../linkedData/types'
 import { ISigner } from '../../registries/types'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
+import { ErrorCodes } from '../../errors'
 
 // Credentials are valid for a year by default
 const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
@@ -331,7 +332,7 @@ export class SignedCredential implements IDigestable {
     signedCredential.issued = new Date()
 
     if (signedCredential.expires <= signedCredential.issued) {
-      throw new Error('Expiry date should be greater than current date')
+      throw new Error(ErrorCodes.VCInvalidExpiryDate)
     }
     signedCredential.prepareSignature(issInfo.keyId)
     signedCredential.issuer = issInfo.issuerDid

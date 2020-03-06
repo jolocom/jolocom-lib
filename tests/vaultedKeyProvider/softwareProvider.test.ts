@@ -25,6 +25,7 @@ import { IDigestable } from '../../ts/linkedDataSignature/types'
 import { publicProfileCredJSON, emailCredential } from '../data/identity.data'
 import { keyDerivationArgs } from '../data/identityWallet.data'
 import { mockDid } from '../data/didDocument.data'
+import { ErrorCodes } from '../../ts/errors'
 
 chai.use(sinonChai)
 describe('Software Vaulted Key Provider', () => {
@@ -268,7 +269,7 @@ describe('Software Vaulted Key Provider', () => {
           'Wrong Mnemonic',
           keyDerivationArgs.encryptionPass,
         ),
-      ).to.throw(Error, 'Invalid Mnemonic.')
+      ).to.throw(Error, ErrorCodes.SKPMnemonicInvalid)
     })
   })
 

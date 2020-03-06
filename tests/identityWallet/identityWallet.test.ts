@@ -18,6 +18,7 @@ import { validSignedCredReqJWT } from '../data/interactionTokens/jsonWebToken.da
 import { keyIdToDid } from '../../ts/utils/helper'
 import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
 import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import { ErrorCodes } from '../../ts/errors'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -168,9 +169,7 @@ describe('IdentityWallet', () => {
           throw new Error('Expected Failure')
         })
         .catch(err => {
-          expect(err.message).to.contain(
-            'Expiry date should be greater than current date',
-          )
+          expect(err.message).to.contain(ErrorCodes.JWTInvalidExpiryDate)
         })
     })
 

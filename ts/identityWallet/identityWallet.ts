@@ -41,6 +41,7 @@ import {
   IPaymentRequestAttrs,
   IPaymentResponseAttrs,
 } from '../interactionTokens/interactionTokens.types'
+import { ErrorCodes } from '../errors'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -204,9 +205,7 @@ export class IdentityWallet {
       !contractsAdapter ||
       !contractsGateway
     ) {
-      throw new Error(
-        'Missing arguments! Expected identity, publicKeyMetadata, and vaulterKeyProvider',
-      )
+      throw new Error(ErrorCodes.IDWInvalidCreationArgs)
     }
 
     this.identity = identity
@@ -543,19 +542,19 @@ export class IdentityWallet {
     )
 
     if (!(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT))) {
-      throw new Error('Signature on token is invalid')
+      throw new Error(ErrorCodes.IDWInvalidJWTSignature)
     }
 
     if (sendJWT && receivedJWT.audience !== this.identity.did) {
-      throw new Error('You are not the intended audience of received token')
+      throw new Error(ErrorCodes.IDWNotIntendedAudience)
     }
 
     if (sendJWT && sendJWT.nonce !== receivedJWT.nonce) {
-      throw new Error('The token nonce does not match the request')
+      throw new Error(ErrorCodes.IDWIncorrectJWTNonce)
     }
 
     if (receivedJWT.expires < Date.now()) {
-      throw new Error('Token expired')
+      throw new Error(ErrorCodes.IDWTokenExpired)
     }
   }
 

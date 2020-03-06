@@ -10,6 +10,7 @@ import {
   mockPinUrl,
 } from '../data/ipfs.data'
 import { didDocumentJSON } from '../data/didDocument.data'
+import { ErrorCodes } from '../../ts/errors'
 
 describe('IpfsStorageAgent', () => {
   let storageAgent = new IpfsStorageAgent(mockConfig)
@@ -45,7 +46,7 @@ describe('IpfsStorageAgent', () => {
       })
       expect(true).to.be.false
     } catch (err) {
-      expect(err.message).to.contain('JSON expected')
+      expect(err.message).to.contain(ErrorCodes.IPFSInvalidJSONFormat)
     }
   })
 
@@ -69,7 +70,7 @@ describe('IpfsStorageAgent', () => {
       await storageAgent.removePinnedHash(testHash)
       expect(false).to.be.true
     } catch (err) {
-      expect(err.message).to.contain(`Removing pinned hash ${testHash} failed`)
+      expect(err.message).to.contain(ErrorCodes.IPFSUnpinFailed)
     }
   })
 })

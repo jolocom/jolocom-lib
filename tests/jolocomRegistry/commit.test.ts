@@ -20,6 +20,7 @@ import { publicProfileCredJSON } from '../data/identity.data'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
+import { ErrorCodes } from '../../ts/errors'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -271,7 +272,7 @@ describe('Jolocom registry - commit', () => {
         keyMetadata: {} as IKeyDerivationArgs,
       })
     } catch (err) {
-      expect(err.message).to.contain('Error occured while')
+      expect(err.message).to.contain(ErrorCodes.RegistryCommitFailed)
     }
   })
 })
