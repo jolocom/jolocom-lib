@@ -549,6 +549,14 @@ export class IdentityWallet {
       throw new Error(ErrorCodes.IDWNotIntendedAudience)
     }
 
+    if (
+      sendJWT &&
+      sendJWT.audience &&
+      recievedJWT.issuer !== sendJWT.audience
+    ) {
+      throw new Error(ErrorCodes.IDWNotCorrectResponder)
+    }
+
     if (sendJWT && sendJWT.nonce !== receivedJWT.nonce) {
       throw new Error(ErrorCodes.IDWIncorrectJWTNonce)
     }
