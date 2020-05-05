@@ -75,6 +75,7 @@ type PublicKeyMap = { [key in keyof typeof KeyTypes]?: string }
 
 type WithExtraOptions<T> = T & {
   expires?: Date
+  aud?: string
 }
 
 /**
@@ -273,6 +274,8 @@ export class IdentityWallet {
     jwt.interactionType = InteractionType.Authentication
     jwt.timestampAndSetExpiry(authArgs.expires)
 
+    if (!recievedJWT && authArgs.aud) jwt.audience = authArgs.aud
+
     return this.initializeAndSign(
       jwt,
       this.publicKeyMetadata.derivationPath,
@@ -295,6 +298,8 @@ export class IdentityWallet {
     const jwt = JSONWebToken.fromJWTEncodable(offer)
     jwt.interactionType = InteractionType.CredentialOfferRequest
     jwt.timestampAndSetExpiry(credOffer.expires)
+
+    if (credOffer.aud) jwt.audience = credOffer.aud
 
     return this.initializeAndSign(
       jwt,
@@ -346,6 +351,9 @@ export class IdentityWallet {
     const jwt = JSONWebToken.fromJWTEncodable(credentialRequest)
     jwt.interactionType = InteractionType.CredentialRequest
     jwt.timestampAndSetExpiry(credReq.expires)
+
+    if (credReq.aud) jwt.audience = credReq.aud
+
     return this.initializeAndSign(
       jwt,
       this.publicKeyMetadata.derivationPath,
