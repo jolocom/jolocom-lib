@@ -274,7 +274,7 @@ export class IdentityWallet {
     jwt.interactionType = InteractionType.Authentication
     jwt.timestampAndSetExpiry(authArgs.expires)
 
-    if (!recievedJWT && authArgs.aud) jwt.audience = authArgs.aud
+    if (!receivedJWT && authArgs.aud) jwt.audience = authArgs.aud
 
     return this.initializeAndSign(
       jwt,
@@ -560,7 +560,7 @@ export class IdentityWallet {
     if (
       sendJWT &&
       sendJWT.audience &&
-      recievedJWT.issuer !== sendJWT.audience
+      receivedJWT.issuer !== sendJWT.audience
     ) {
       throw new Error(ErrorCodes.IDWNotCorrectResponder)
     }
