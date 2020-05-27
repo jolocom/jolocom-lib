@@ -14,10 +14,8 @@ import { IJSONWebTokenAttrs } from '../interactionTokens/types'
 
 export interface ParseMethods {
   interactionToken: {
-    fromJWT: <T extends JWTEncodable>(jwt: string) => JSONWebToken<T>
-    fromJSON: <T extends JWTEncodable>(
-      json: IJSONWebTokenAttrs,
-    ) => JSONWebToken<T>
+    fromJWT: <T>(jwt: string) => JSONWebToken<T>
+    fromJSON: <T>(json: IJSONWebTokenAttrs) => JSONWebToken<T>
   }
   credential: (json: ICredentialAttrs) => Credential
   signedCredential: (json: ISignedCredentialAttrs) => SignedCredential
