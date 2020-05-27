@@ -101,7 +101,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
 
   it('Should correctly create a credential receive token by service', async () => {
     const decodedCredOfferResponse = JSONWebToken.decode<
-      CredentialOfferRequest
+      CredentialOfferResponse
     >(credOfferResponseEncoded)
     const signedCredForUser = await serviceIdentityWallet.create.signedCredential(
       {
