@@ -11,7 +11,11 @@ import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
-import { IVaultedKeyProvider, KeyTypes } from '../vaultedKeyProvider/types'
+import {
+  IVaultedKeyProvider,
+  KeyTypes,
+  IKeyDerivationArgs,
+} from '../vaultedKeyProvider/types'
 import {
   IKeyMetadata,
   ISignedCredCreationArgs,
@@ -557,6 +561,25 @@ export class IdentityWallet {
       throw new Error(ErrorCodes.IDWTokenExpired)
     }
   }
+
+  public asymEncrypt = async (data: Buffer, publicKey: Buffer) =>
+    this.vaultedKeyProvider.asymEncrypt(data, publicKey)
+
+  public asymEncryptToDidKey = async (
+    data: Buffer,
+    keyRef: string,
+    customRegistry?: IRegistry,
+  ) =>
+    (customRegistry || createJolocomRegistry())
+      .resolve(keyIdToDid(keyRef))
+      .then(target =>
+        this.asymEncrypt(data, getIssuerPublicKey(keyRef, target.didDocument)),
+      )
+
+  public asymDecrypt = async (
+    data: string,
+    decryptionKeyArgs: IKeyDerivationArgs,
+  ) => this.vaultedKeyProvider.asymDecrypt(data, decryptionKeyArgs)
 
   private sendTransaction = async (
     request: ITransactionEncodable,
