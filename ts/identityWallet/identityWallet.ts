@@ -573,7 +573,7 @@ export class IdentityWallet {
   /**
    * Encrypts data asymmetrically
    * @param data - The data to encrypt
-   * @param keyRef - The public key reference to encrypt to
+   * @param keyRef - The public key reference to encrypt to (e.g. 'did:jolo:12345#key-1')
    * @param customRegistry - optional registry to use for resolving the public key
    */
   public asymEncryptToDidKey = async (
@@ -581,11 +581,15 @@ export class IdentityWallet {
     keyRef: string,
     customRegistry?: IRegistry,
   ) =>
-    (customRegistry || createJolocomRegistry())
-      .resolve(keyIdToDid(keyRef))
-      .then(target =>
-        this.asymEncrypt(data, getIssuerPublicKey(keyRef, target.didDocument)),
-      )
+    this.asymEncrypt(
+      data,
+      getIssuerPublicKey(
+        keyRef,
+        await (customRegistry || createJolocomRegistry())
+          .resolve(keyIdToDid(keyRef))
+          .then(target => target.didDocument),
+      ),
+    )
 
   /**
    * Decrypts data asymmetrically
