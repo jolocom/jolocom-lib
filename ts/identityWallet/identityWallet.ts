@@ -251,6 +251,30 @@ export class IdentityWallet {
   }
 
   /**
+   * Creates and signs a message
+   * @param args - Message creation attributes
+   * @param pass - Password to decrypt the vaulted seed
+   * @param received - optional received JSONWebToken Class
+   */
+  private createMessage = async <T, R>(
+    args: { message: T; typ: string; expires?: Date; target?: string },
+    pass: string,
+    recieved?: JSONWebToken<R>,
+  ) => {
+    const jwt = JSONWebToken.fromJWTEncodable(args.message)
+    jwt.interactionType = args.typ
+    jwt.audience = args.target
+    jwt.timestampAndSetExpiry(args.expires)
+
+    return this.initializeAndSign(
+      jwt,
+      this.publicKeyMetadata.derivationPath,
+      pass,
+      recieved,
+    )
+  }
+
+  /**
    * Creates and signs an authentication request / response
    * @param authArgs - Authentication creation attributes
    * @param pass - Password to decrypt the vaulted seed
@@ -589,6 +613,7 @@ export class IdentityWallet {
   public create = {
     credential: Credential.create,
     signedCredential: this.createSignedCred,
+    message: this.createMessage,
     interactionTokens: {
       request: {
         auth: this.createAuth,
