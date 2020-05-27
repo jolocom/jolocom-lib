@@ -562,9 +562,20 @@ export class IdentityWallet {
     }
   }
 
+  /**
+   * Encrypts data asymmetrically
+   * @param data - The data to encrypt
+   * @param pubKey - The key to encrypt to
+   */
   public asymEncrypt = async (data: Buffer, publicKey: Buffer) =>
     this.vaultedKeyProvider.asymEncrypt(data, publicKey)
 
+  /**
+   * Encrypts data asymmetrically
+   * @param data - The data to encrypt
+   * @param keyRef - The public key reference to encrypt to
+   * @param customRegistry - optional registry to use for resolving the public key
+   */
   public asymEncryptToDidKey = async (
     data: Buffer,
     keyRef: string,
@@ -576,6 +587,11 @@ export class IdentityWallet {
         this.asymEncrypt(data, getIssuerPublicKey(keyRef, target.didDocument)),
       )
 
+  /**
+   * Decrypts data asymmetrically
+   * @param data - The data to decrypt
+   * @param derivationArgs - The decryption private key derivation arguments
+   */
   public asymDecrypt = async (
     data: string,
     decryptionKeyArgs: IKeyDerivationArgs,

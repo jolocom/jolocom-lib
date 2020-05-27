@@ -265,8 +265,8 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   /**
    * Encrypts data asymmetrically
-   * @param pubKey - The key to encrypt to
    * @param data - The data to encrypt
+   * @param pubKey - The key to encrypt to
    */
   public async asymEncrypt(data: Buffer, pubKey: Buffer): Promise<string> {
     return this.stringifyEncryptedData(await eccrypto.encrypt(pubKey, data))
@@ -274,8 +274,8 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   /**
    * Decrypts data asymmetrically
-   * @param derivationArgs - The decryption private key derivation arguments
    * @param data - The data to decrypt
+   * @param derivationArgs - The decryption private key derivation arguments
    */
   public async asymDecrypt(
     data: string,
