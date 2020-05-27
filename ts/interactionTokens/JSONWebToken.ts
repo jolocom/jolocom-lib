@@ -47,7 +47,7 @@ interface IPayloadSection<T> {
   jti?: string
   iss?: string
   aud?: string
-  typ?: InteractionType
+  typ?: string
   interactionToken?: T
 }
 

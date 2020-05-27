@@ -496,11 +496,11 @@ export class IdentityWallet {
    * @param receivedJWT - optional received JSONWebToken Class
    */
 
-  private async initializeAndSign<T extends JWTEncodable>(
+  private async initializeAndSign<T, R>(
     jwt: JSONWebToken<T>,
     derivationPath: string,
     pass: string,
-    receivedJWT?: JSONWebToken<T>,
+    receivedJWT?: JSONWebToken<R>,
   ) {
     if (receivedJWT) {
       jwt.audience = keyIdToDid(receivedJWT.issuer)
@@ -527,9 +527,9 @@ export class IdentityWallet {
    * @param customRegistry - optional custom registry
    */
 
-  public async validateJWT<T extends JWTEncodable, A extends JWTEncodable>(
+  public async validateJWT<T, R>(
     receivedJWT: JSONWebToken<T>,
-    sendJWT?: JSONWebToken<A>,
+    sendJWT?: JSONWebToken<R>,
     customRegistry?: IRegistry,
   ): Promise<void> {
     const registry = customRegistry || createJolocomRegistry()

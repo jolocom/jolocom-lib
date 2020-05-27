@@ -3,7 +3,7 @@ import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ICredentialAttrs } from '../credentials/credential/types'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
-import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
+import { JSONWebToken } from '../interactionTokens/JSONWebToken'
 import { IJSONWebTokenAttrs } from '../interactionTokens/types'
 
 /**
