@@ -271,7 +271,7 @@ export class IdentityWallet {
     )
   }
 
-  private make_req = <T>(type: string) => (
+  private makeReq = <T>(type: string) => (
     { expires, ...args }: WithExtraOptions<T>,
     pass: string,
   ) =>
@@ -284,7 +284,7 @@ export class IdentityWallet {
       pass,
     )
 
-  private make_res = <T, R>(type: string) => (
+  private makeRes = <T, R>(type: string) => (
     { expires, ...args }: WithExtraOptions<T>,
     pass: string,
     recieved?: JSONWebToken<R>,
@@ -418,35 +418,35 @@ export class IdentityWallet {
     message: this.createMessage,
     interactionTokens: {
       request: {
-        auth: this.make_req<
+        auth: this.makeReq<
           ExclusivePartial<IAuthenticationAttrs, 'callbackURL'>
         >(InteractionType.Authentication),
-        offer: this.make_req<CredentialOfferRequestAttrs>(
+        offer: this.makeReq<CredentialOfferRequestAttrs>(
           InteractionType.CredentialOfferRequest,
         ),
-        share: this.make_req<ICredentialRequestAttrs>(
+        share: this.makeReq<ICredentialRequestAttrs>(
           InteractionType.CredentialRequest,
         ),
-        payment: this.make_req<PaymentRequestCreationArgs>(
+        payment: this.makeReq<PaymentRequestCreationArgs>(
           InteractionType.PaymentRequest,
         ),
       },
       response: {
-        auth: this.make_res<
+        auth: this.makeRes<
           ExclusivePartial<IAuthenticationAttrs, 'callbackURL'>,
           Authentication
         >(InteractionType.Authentication),
-        offer: this.make_res<
+        offer: this.makeRes<
           CredentialOfferResponseAttrs,
           CredentialOfferRequest
         >(InteractionType.CredentialOfferResponse),
-        share: this.make_res<ICredentialResponseAttrs, CredentialRequest>(
+        share: this.makeRes<ICredentialResponseAttrs, CredentialRequest>(
           InteractionType.CredentialResponse,
         ),
-        issue: this.make_res<ICredentialsReceiveAttrs, CredentialOfferResponse>(
+        issue: this.makeRes<ICredentialsReceiveAttrs, CredentialOfferResponse>(
           InteractionType.CredentialsReceive,
         ),
-        payment: this.make_res<IPaymentResponseAttrs, PaymentRequest>(
+        payment: this.makeRes<IPaymentResponseAttrs, PaymentRequest>(
           InteractionType.PaymentResponse,
         ),
       },
