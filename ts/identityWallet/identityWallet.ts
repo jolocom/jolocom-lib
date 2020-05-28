@@ -11,7 +11,11 @@ import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
-import { IVaultedKeyProvider, KeyTypes } from '../vaultedKeyProvider/types'
+import {
+  IVaultedKeyProvider,
+  KeyTypes,
+  IKeyDerivationArgs,
+} from '../vaultedKeyProvider/types'
 import {
   IKeyMetadata,
   ISignedCredCreationArgs,
@@ -557,6 +561,45 @@ export class IdentityWallet {
       throw new Error(ErrorCodes.IDWTokenExpired)
     }
   }
+
+  /**
+   * Encrypts data asymmetrically
+   * @param data - The data to encrypt
+   * @param pubKey - The key to encrypt to
+   */
+  public asymEncrypt = async (data: Buffer, publicKey: Buffer) =>
+    this.vaultedKeyProvider.asymEncrypt(data, publicKey)
+
+  /**
+   * Encrypts data asymmetrically
+   * @param data - The data to encrypt
+   * @param keyRef - The public key reference to encrypt to (e.g. 'did:jolo:12345#key-1')
+   * @param customRegistry - optional registry to use for resolving the public key
+   */
+  public asymEncryptToDidKey = async (
+    data: Buffer,
+    keyRef: string,
+    customRegistry?: IRegistry,
+  ) =>
+    this.asymEncrypt(
+      data,
+      getIssuerPublicKey(
+        keyRef,
+        await (customRegistry || createJolocomRegistry())
+          .resolve(keyIdToDid(keyRef))
+          .then(target => target.didDocument),
+      ),
+    )
+
+  /**
+   * Decrypts data asymmetrically
+   * @param data - The data to decrypt
+   * @param derivationArgs - The decryption private key derivation arguments
+   */
+  public asymDecrypt = async (
+    data: string,
+    decryptionKeyArgs: IKeyDerivationArgs,
+  ) => this.vaultedKeyProvider.asymDecrypt(data, decryptionKeyArgs)
 
   private sendTransaction = async (
     request: ITransactionEncodable,

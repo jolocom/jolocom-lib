@@ -316,6 +316,23 @@ describe('Software Vaulted Key Provider', () => {
       const decryped = await vault.decryptHybrid(chipherText, keyDerivationArgs)
       expect(decryped).to.deep.eq(clearText)
     })
+    it('should encrypt and decrypt', async () => {
+      const data = SoftwareKeyProvider.getRandom(32)
+      console.log(`original:  ${data.toString('base64')}`)
+
+      const enc = await vault.asymEncrypt(
+        data,
+        vault.getPublicKey(keyDerivationArgs),
+      )
+      console.log(`encrypted: ${enc}`)
+
+      const dec = await vault.asymDecrypt(enc, keyDerivationArgs)
+
+      console.log(`decrypted: ${dec.toString('base64')}`)
+
+      expect(dec.toString('base64')).to.eq(data.toString('base64'))
+      expect(enc).to.not.eq(data.toString('base64'))
+    })
     describe('Buffer decoding/encoding', () => {
       const data = {
         item: Buffer.from('546573742054657874', 'hex'),
