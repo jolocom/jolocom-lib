@@ -3,13 +3,11 @@ import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ExclusivePartial, IIdentityWalletCreateArgs } from './types'
 import { Identity } from '../identity/identity'
-import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
+import { JSONWebToken } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
-import { PaymentResponse } from '../interactionTokens/paymentResponse'
 import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
-import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { IVaultedKeyProvider, KeyTypes } from '../vaultedKeyProvider/types'
 import {
@@ -22,7 +20,6 @@ import {
   publicKeyToAddress,
 } from '../utils/helper'
 import { createJolocomRegistry } from '../registries/jolocomRegistry'
-import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 import {
   IContractsAdapter,
   IContractsGateway,
