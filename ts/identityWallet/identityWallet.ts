@@ -3,15 +3,17 @@ import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ExclusivePartial, IIdentityWalletCreateArgs } from './types'
 import { Identity } from '../identity/identity'
-import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
+import { JSONWebToken } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
-import { PaymentResponse } from '../interactionTokens/paymentResponse'
 import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
-import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
-import { IVaultedKeyProvider, KeyTypes } from '../vaultedKeyProvider/types'
+import {
+  IVaultedKeyProvider,
+  KeyTypes,
+  IKeyDerivationArgs,
+} from '../vaultedKeyProvider/types'
 import {
   IKeyMetadata,
   ISignedCredCreationArgs,
@@ -22,7 +24,6 @@ import {
   publicKeyToAddress,
 } from '../utils/helper'
 import { createJolocomRegistry } from '../registries/jolocomRegistry'
-import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 import {
   IContractsAdapter,
   IContractsGateway,
@@ -252,163 +253,39 @@ export class IdentityWallet {
   }
 
   /**
-   * Creates and signs an authentication request / response
-   * @param authArgs - Authentication creation attributes
+   * Creates and signs a message
+   * @param args - Message creation attributes
    * @param pass - Password to decrypt the vaulted seed
-   * @param receivedJWT - optional received authentication JSONWebToken Class
+   * @param received - optional received JSONWebToken Class
    */
-
-  private createAuth = async (
-    authArgs: WithExtraOptions<
-      ExclusivePartial<IAuthenticationAttrs, 'callbackURL'>
-    >,
+  private createMessage = async <T, R>(
+    args: { message: T; typ: string; expires?: Date; aud?: string },
     pass: string,
-    receivedJWT?: JSONWebToken<JWTEncodable>,
+    recieved?: JSONWebToken<R>,
   ) => {
-    const authenticationReq = Authentication.fromJSON({
-      description: 'Authorize the transaction',
-      ...authArgs,
-    })
-
-    const jwt = JSONWebToken.fromJWTEncodable(authenticationReq)
-    jwt.interactionType = InteractionType.Authentication
-    jwt.timestampAndSetExpiry(authArgs.expires)
-
-    if (!receivedJWT && authArgs.aud) jwt.audience = authArgs.aud
+    const jwt = JSONWebToken.fromJWTEncodable(args.message)
+    jwt.interactionType = args.typ
+    if (args.aud) jwt.audience = args.aud
+    jwt.timestampAndSetExpiry(args.expires)
 
     return this.initializeAndSign(
       jwt,
       this.publicKeyMetadata.derivationPath,
       pass,
-      receivedJWT,
+      recieved,
     )
   }
 
-  /**
-   * Creates and signs a credential offer request
-   * @param credOffer - Credential offer creation attributes
-   * @param pass - Password to decrypt the vaulted seed
-   */
-
-  private createCredOfferRequest = async (
-    credOffer: WithExtraOptions<CredentialOfferRequestAttrs>,
+  private makeReq = <T>(typ: string) => (
+    { expires, aud, ...message }: WithExtraOptions<T>,
     pass: string,
-  ) => {
-    const offer = CredentialOfferRequest.fromJSON(credOffer)
-    const jwt = JSONWebToken.fromJWTEncodable(offer)
-    jwt.interactionType = InteractionType.CredentialOfferRequest
-    jwt.timestampAndSetExpiry(credOffer.expires)
+  ) => this.createMessage({ message, typ, expires, aud }, pass)
 
-    if (credOffer.aud) jwt.audience = credOffer.aud
-
-    return this.initializeAndSign(
-      jwt,
-      this.publicKeyMetadata.derivationPath,
-      pass,
-    )
-  }
-
-  /**
-   * Creates and signs a credential offer response
-   * @param credentialOfferResponse - Credential offer response creation arguments
-   * @param pass - Password to decrypt the vaulted seed
-   * @param receivedJWT - optional received credential offer JSONWebToken Class
-   */
-
-  private createCredentialOfferResponse = async (
-    credentialOfferResponse: WithExtraOptions<CredentialOfferResponseAttrs>,
+  private makeRes = <T, R>(typ: string) => (
+    { expires, aud, ...message }: WithExtraOptions<T>,
     pass: string,
-    receivedJWT?: JSONWebToken<JWTEncodable>,
-  ) => {
-    const offerResponse = CredentialOfferResponse.fromJSON(
-      credentialOfferResponse,
-    )
-    const jwt = JSONWebToken.fromJWTEncodable<CredentialOfferResponse>(
-      offerResponse,
-    )
-    jwt.interactionType = InteractionType.CredentialOfferResponse
-    jwt.timestampAndSetExpiry(credentialOfferResponse.expires)
-
-    return this.initializeAndSign(
-      jwt,
-      this.publicKeyMetadata.derivationPath,
-      pass,
-      receivedJWT,
-    )
-  }
-
-  /**
-   * Creates and signs a crededential request
-   * @param credReq - Credential request creation attributes
-   * @param pass - Password to decrypt the vaulted seed
-   */
-
-  private createCredReq = async (
-    credReq: WithExtraOptions<ICredentialRequestAttrs>,
-    pass: string,
-  ) => {
-    const credentialRequest = CredentialRequest.fromJSON(credReq)
-    const jwt = JSONWebToken.fromJWTEncodable(credentialRequest)
-    jwt.interactionType = InteractionType.CredentialRequest
-    jwt.timestampAndSetExpiry(credReq.expires)
-
-    if (credReq.aud) jwt.audience = credReq.aud
-
-    return this.initializeAndSign(
-      jwt,
-      this.publicKeyMetadata.derivationPath,
-      pass,
-    )
-  }
-
-  /**
-   * Creates and signs a credential response
-   * @param credResp - Credential response creation attributes
-   * @param pass - Password to decrypt the vaulted seed
-   * @param receivedJWT - received credential request JSONWebToken Class
-   */
-
-  private createCredResp = async (
-    credResp: WithExtraOptions<ICredentialResponseAttrs>,
-    pass: string,
-    receivedJWT: JSONWebToken<JWTEncodable>,
-  ) => {
-    const credentialResponse = CredentialResponse.fromJSON(credResp)
-    const jwt = JSONWebToken.fromJWTEncodable(credentialResponse)
-    jwt.interactionType = InteractionType.CredentialResponse
-    jwt.timestampAndSetExpiry(credResp.expires)
-
-    return this.initializeAndSign(
-      jwt,
-      this.publicKeyMetadata.derivationPath,
-      pass,
-      receivedJWT,
-    )
-  }
-
-  /**
-   * Creates and signs a credential receive (issue of a signed credential)
-   * @param credReceive - Credential receive creation attributes
-   * @param pass - Password to decrypt the vaulted seed
-   * @param receivedJWT - received credential offer response JSONWebToken Class
-   */
-
-  private createCredReceive = async (
-    credReceive: WithExtraOptions<ICredentialsReceiveAttrs>,
-    pass: string,
-    receivedJWT: JSONWebToken<JWTEncodable>,
-  ) => {
-    const credentialReceieve = CredentialsReceive.fromJSON(credReceive)
-    const jwt = JSONWebToken.fromJWTEncodable(credentialReceieve)
-    jwt.interactionType = InteractionType.CredentialsReceive
-    jwt.timestampAndSetExpiry(credReceive.expires)
-    return this.initializeAndSign(
-      jwt,
-      this.publicKeyMetadata.derivationPath,
-      pass,
-      receivedJWT,
-    )
-  }
+    recieved?: JSONWebToken<R>,
+  ) => this.createMessage({ message, typ, expires, aud }, pass, recieved)
 
   /**
    * Derives all public keys listed in the {@link KeyTypes} enum
@@ -435,68 +312,6 @@ export class IdentityWallet {
   }
 
   /**
-   * Creates and signs a payment request for Ethereum
-   * @param paymentReq - payment request creation args, if no receiving address is
-   * specified, will default to the wallet's ethereum key
-   * @param pass - Password to decrypt the vaulted seed
-   */
-
-  private createPaymentReq = async (
-    paymentReq: WithExtraOptions<PaymentRequestCreationArgs>,
-    pass: string,
-  ) => {
-    const { transactionOptions } = paymentReq
-
-    // Assigning default values
-    const paymentRequest = PaymentRequest.fromJSON({
-      ...paymentReq,
-      transactionOptions: {
-        gasLimit: 21000,
-        gasPrice: 10e9,
-        to: transactionOptions.to
-          ? transactionOptions.to
-          : publicKeyToAddress(
-              Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex'),
-            ),
-        ...transactionOptions,
-      },
-    })
-
-    const jwt = JSONWebToken.fromJWTEncodable(paymentRequest)
-    jwt.interactionType = InteractionType.PaymentRequest
-    return this.initializeAndSign(
-      jwt,
-      this.publicKeyMetadata.derivationPath,
-      pass,
-    )
-  }
-
-  /**
-   * Creates and signs a payment response which contains the transaction hash
-   * @param paymentResp - payment response creation args
-   * @param pass - Password to decrypt the vaulted seed
-   * @param receivedJWT - received payment request JSONWebToken Class
-   */
-
-  private createPaymentResp = async (
-    paymentResp: WithExtraOptions<IPaymentResponseAttrs>,
-    pass: string,
-    receivedJWT: JSONWebToken<JWTEncodable>,
-  ) => {
-    const paymentResponse = PaymentResponse.fromJSON(
-      paymentResp,
-    ) as PaymentResponse
-    const jwt = JSONWebToken.fromJWTEncodable(paymentResponse)
-    jwt.interactionType = InteractionType.PaymentResponse
-    return this.initializeAndSign(
-      jwt,
-      this.publicKeyMetadata.derivationPath,
-      pass,
-      receivedJWT,
-    )
-  }
-
-  /**
    * Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
    * @param jwt - JSONWebToken Class
    * @param derivationPath - Derivation Path for identity keys
@@ -504,11 +319,11 @@ export class IdentityWallet {
    * @param receivedJWT - optional received JSONWebToken Class
    */
 
-  private async initializeAndSign<T extends JWTEncodable>(
+  private async initializeAndSign<T, R>(
     jwt: JSONWebToken<T>,
     derivationPath: string,
     pass: string,
-    receivedJWT?: JSONWebToken<T>,
+    receivedJWT?: JSONWebToken<R>,
   ) {
     if (receivedJWT) {
       jwt.audience = keyIdToDid(receivedJWT.issuer)
@@ -535,9 +350,9 @@ export class IdentityWallet {
    * @param customRegistry - optional custom registry
    */
 
-  public async validateJWT<T extends JWTEncodable, A extends JWTEncodable>(
+  public async validateJWT<T, R>(
     receivedJWT: JSONWebToken<T>,
-    sendJWT?: JSONWebToken<A>,
+    sendJWT?: JSONWebToken<R>,
     customRegistry?: IRegistry,
   ): Promise<void> {
     const registry = customRegistry || createJolocomRegistry()
@@ -574,6 +389,45 @@ export class IdentityWallet {
     }
   }
 
+  /**
+   * Encrypts data asymmetrically
+   * @param data - The data to encrypt
+   * @param pubKey - The key to encrypt to
+   */
+  public asymEncrypt = async (data: Buffer, publicKey: Buffer) =>
+    this.vaultedKeyProvider.asymEncrypt(data, publicKey)
+
+  /**
+   * Encrypts data asymmetrically
+   * @param data - The data to encrypt
+   * @param keyRef - The public key reference to encrypt to (e.g. 'did:jolo:12345#key-1')
+   * @param customRegistry - optional registry to use for resolving the public key
+   */
+  public asymEncryptToDidKey = async (
+    data: Buffer,
+    keyRef: string,
+    customRegistry?: IRegistry,
+  ) =>
+    this.asymEncrypt(
+      data,
+      getIssuerPublicKey(
+        keyRef,
+        await (customRegistry || createJolocomRegistry())
+          .resolve(keyIdToDid(keyRef))
+          .then(target => target.didDocument),
+      ),
+    )
+
+  /**
+   * Decrypts data asymmetrically
+   * @param data - The data to decrypt
+   * @param derivationArgs - The decryption private key derivation arguments
+   */
+  public asymDecrypt = async (
+    data: string,
+    decryptionKeyArgs: IKeyDerivationArgs,
+  ) => this.vaultedKeyProvider.asymDecrypt(data, decryptionKeyArgs)
+
   private sendTransaction = async (
     request: ITransactionEncodable,
     pass: string,
@@ -605,19 +459,40 @@ export class IdentityWallet {
   public create = {
     credential: Credential.create,
     signedCredential: this.createSignedCred,
+    message: this.createMessage,
     interactionTokens: {
       request: {
-        auth: this.createAuth,
-        offer: this.createCredOfferRequest,
-        share: this.createCredReq,
-        payment: this.createPaymentReq,
+        auth: this.makeReq<
+          ExclusivePartial<IAuthenticationAttrs, 'callbackURL'>
+        >(InteractionType.Authentication),
+        offer: this.makeReq<CredentialOfferRequestAttrs>(
+          InteractionType.CredentialOfferRequest,
+        ),
+        share: this.makeReq<ICredentialRequestAttrs>(
+          InteractionType.CredentialRequest,
+        ),
+        payment: this.makeReq<PaymentRequestCreationArgs>(
+          InteractionType.PaymentRequest,
+        ),
       },
       response: {
-        auth: this.createAuth,
-        offer: this.createCredentialOfferResponse,
-        share: this.createCredResp,
-        issue: this.createCredReceive,
-        payment: this.createPaymentResp,
+        auth: this.makeRes<
+          ExclusivePartial<IAuthenticationAttrs, 'callbackURL'>,
+          Authentication
+        >(InteractionType.Authentication),
+        offer: this.makeRes<
+          CredentialOfferResponseAttrs,
+          CredentialOfferRequest
+        >(InteractionType.CredentialOfferResponse),
+        share: this.makeRes<ICredentialResponseAttrs, CredentialRequest>(
+          InteractionType.CredentialResponse,
+        ),
+        issue: this.makeRes<ICredentialsReceiveAttrs, CredentialOfferResponse>(
+          InteractionType.CredentialsReceive,
+        ),
+        payment: this.makeRes<IPaymentResponseAttrs, PaymentRequest>(
+          InteractionType.PaymentResponse,
+        ),
       },
     },
   }

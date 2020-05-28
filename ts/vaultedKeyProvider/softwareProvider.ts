@@ -264,6 +264,29 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   }
 
   /**
+   * Encrypts data asymmetrically
+   * @param data - The data to encrypt
+   * @param pubKey - The key to encrypt to
+   */
+  public async asymEncrypt(data: Buffer, pubKey: Buffer): Promise<string> {
+    return this.stringifyEncryptedData(await eccrypto.encrypt(pubKey, data))
+  }
+
+  /**
+   * Decrypts data asymmetrically
+   * @param data - The data to decrypt
+   * @param derivationArgs - The decryption private key derivation arguments
+   */
+  public async asymDecrypt(
+    data: string,
+    derivationArgs: IKeyDerivationArgs,
+  ): Promise<Buffer> {
+    const decKey = this.getPrivateKey(derivationArgs)
+    const dataObj = this.parseEncryptedData(data)
+    return eccrypto.decrypt(decKey, dataObj)
+  }
+
+  /**
    * Encrypts data based on the hybrid encryption scheme of PGP. This means that
    * the data will first be encrypted with a freshly generated symmetric key and
    * afterwards this key is encrypted with the public key in an asymmetric manner
@@ -287,11 +310,11 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     )
 
     // Encrypt asymmetrically
-    const encryptedKey = await eccrypto.encrypt(publicKey, symKey)
+    const encryptedKey = await this.asymEncrypt(symKey, publicKey)
     return {
       keys: [
         {
-          cipher: this.stringifyEncryptedData(encryptedKey),
+          cipher: encryptedKey,
           pubKey: publicKey.toString('hex'),
         },
       ],
@@ -309,7 +332,6 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     derivationArg: IKeyDerivationArgs,
   ): Promise<object> {
     const publicKey = this.getPublicKey(derivationArg)
-    const privateKey = this.getPrivateKey(derivationArg)
     // find encrypted key
     const encryptedKey = encryptedData.keys.find(
       key => key.pubKey === publicKey.toString('hex'),
@@ -319,10 +341,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     // decrypt asymmetrically
     // FIXME We are using a fork of eccrypto to fix a bug in eccrypto.decrypt() see https://github.com/jolocom/jolocom-lib/issues/384
     //  change this back once this https://github.com/bitchan/eccrypto/pull/47 is released
-    const symKey = await eccrypto.decrypt(
-      privateKey,
-      this.parseEncryptedData(encryptedKey.cipher),
-    )
+    const symKey = await this.asymDecrypt(encryptedKey.cipher, derivationArg)
 
     // decrypt symmetrically
     const encryptedDataBuffer = Buffer.from(encryptedData.data, 'hex')
