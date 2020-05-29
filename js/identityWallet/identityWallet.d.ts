@@ -24,6 +24,7 @@ declare type PublicKeyMap = {
 };
 declare type WithExtraOptions<T> = T & {
     expires?: Date;
+    aud?: string;
 };
 export declare class IdentityWallet {
     private _identity;

@@ -76,6 +76,7 @@ type PublicKeyMap = { [key in keyof typeof KeyTypes]?: string }
 
 type WithExtraOptions<T> = T & {
   expires?: Date
+  aud?: string
 }
 
 /**
@@ -258,13 +259,13 @@ export class IdentityWallet {
    * @param received - optional received JSONWebToken Class
    */
   private createMessage = async <T, R>(
-    args: { message: T; typ: string; expires?: Date; target?: string },
+    args: { message: T; typ: string; expires?: Date; aud?: string },
     pass: string,
     recieved?: JSONWebToken<R>,
   ) => {
     const jwt = JSONWebToken.fromJWTEncodable(args.message)
     jwt.interactionType = args.typ
-    jwt.audience = args.target
+    if (args.aud) jwt.audience = args.aud
     jwt.timestampAndSetExpiry(args.expires)
 
     return this.initializeAndSign(
@@ -275,24 +276,16 @@ export class IdentityWallet {
     )
   }
 
-  private makeReq = <T>(type: string) => (
-    { expires, ...args }: WithExtraOptions<T>,
+  private makeReq = <T>(typ: string) => (
+    { expires, aud, ...message }: WithExtraOptions<T>,
     pass: string,
-  ) =>
-    this.createMessage(
-      {
-        message: args,
-        typ: type,
-        expires,
-      },
-      pass,
-    )
+  ) => this.createMessage({ message, typ, expires, aud }, pass)
 
-  private makeRes = <T, R>(type: string) => (
-    { expires, ...args }: WithExtraOptions<T>,
+  private makeRes = <T, R>(typ: string) => (
+    { expires, aud, ...message }: WithExtraOptions<T>,
     pass: string,
     recieved?: JSONWebToken<R>,
-  ) => this.createMessage({ message: args, typ: type, expires }, pass, recieved)
+  ) => this.createMessage({ message, typ, expires, aud }, pass, recieved)
 
   /**
    * Derives all public keys listed in the {@link KeyTypes} enum
@@ -351,7 +344,7 @@ export class IdentityWallet {
   }
 
   /**
-   * Validates interaction tokens for signature - if only received token passed - and for audience (aud) and token nonce (jti) if send token passed also
+   * Validates interaction tokens for signatures, expiry, jti, and audience
    * @param receivedJWT - received JSONWebToken Class
    * @param sendJWT - optional send JSONWebToken Class which is used to validate the token nonce and the aud field on received token
    * @param customRegistry - optional custom registry
@@ -359,32 +352,47 @@ export class IdentityWallet {
 
   public async validateJWT<T, R>(
     receivedJWT: JSONWebToken<T>,
-    sendJWT?: JSONWebToken<R>,
+    sentJWT?: JSONWebToken<R>,
     customRegistry?: IRegistry,
   ): Promise<void> {
     const registry = customRegistry || createJolocomRegistry()
     const remoteIdentity = await registry.resolve(
       keyIdToDid(receivedJWT.issuer),
     )
+
     const pubKey = getIssuerPublicKey(
       receivedJWT.issuer,
       remoteIdentity.didDocument,
     )
 
+    // First we make sure the signature on the interaction token is valid
     if (!(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT))) {
       throw new Error(ErrorCodes.IDWInvalidJWTSignature)
     }
 
-    if (sendJWT && receivedJWT.audience !== this.identity.did) {
-      throw new Error(ErrorCodes.IDWNotIntendedAudience)
-    }
-
-    if (sendJWT && sendJWT.nonce !== receivedJWT.nonce) {
-      throw new Error(ErrorCodes.IDWIncorrectJWTNonce)
-    }
-
+    // TODO Should this somehow take into consideration the issuance date of the request
+    // if one is present?
     if (receivedJWT.expires < Date.now()) {
       throw new Error(ErrorCodes.IDWTokenExpired)
+    }
+
+    // In case the request object is provided (we are validating a response)
+    if (sentJWT) {
+      // We make sure the aud on the received message matches the issuer of the request
+      if (receivedJWT.audience !== sentJWT.signer.did) {
+        throw new Error(ErrorCodes.IDWNotCorrectResponder)
+      }
+
+      // We make sure the request and response share the same random nonce, i.e. part of one interaction
+      if (sentJWT.nonce !== receivedJWT.nonce) {
+        throw new Error(ErrorCodes.IDWIncorrectJWTNonce)
+      }
+    } else {
+      // No request object is provided (we are either validating a request, or a response in isolation)
+      // In which case, we make sure that if the request had a target audience, it matches our identity
+      if (receivedJWT.audience && receivedJWT.audience !== this.identity.did) {
+        throw new Error(ErrorCodes.IDWNotIntendedAudience)
+      }
     }
   }
 
