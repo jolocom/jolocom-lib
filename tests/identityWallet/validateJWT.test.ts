@@ -106,7 +106,7 @@ describe('IdentityWallet validate JWT', () => {
     }
   })
 
-  it('Should throw error if the aud is not correct', async () => {
+  it('Should throw error if the aud on response is not correct', async () => {
     const tokenWIthInvalidAud = {
       ...validSignedCredResJWT,
       payload: {
@@ -123,6 +123,44 @@ describe('IdentityWallet validate JWT', () => {
         JSONWebToken.fromJSON(tokenWIthInvalidAud),
         JSONWebToken.fromJSON(validSignedCredReqJWT),
       )
+    } catch (err) {
+      expect(err.message).to.eq(ErrorCodes.IDWNotCorrectResponder)
+    }
+  })
+
+  it('Should not throw error if the aud on a request is not defined', async () => {
+    const requestWithNoAud = {
+      ...validSignedCredReqJWT,
+      payload: {
+        ...validSignedCredReqJWT.payload,
+        aud: '',
+      },
+    }
+
+    /** @dev Restored in afterEach */
+    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+
+    return iw.validateJWT(
+      JSONWebToken.fromJSON(requestWithNoAud)
+    )
+  })
+
+  it('Should throw error if the aud on a request is defined and does not match current identity', async () => {
+    const requestWithInvalidAud = {
+      ...validSignedCredReqJWT,
+      payload: {
+        ...validSignedCredReqJWT.payload,
+        aud: 'did:jolo:ff',
+      },
+    }
+    /** @dev Restored in afterEach */
+    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+
+    try {
+      await iw.validateJWT(
+        JSONWebToken.fromJSON(requestWithInvalidAud)
+      )
+      expect(false).to.eq(true)
     } catch (err) {
       expect(err.message).to.eq(ErrorCodes.IDWNotIntendedAudience)
     }
