@@ -26,6 +26,8 @@ export declare class SoftwareKeyProvider implements IVaultedKeyProvider {
     static verifyDigestable(publicKey: Buffer, toVerify: IDigestable): Promise<boolean>;
     private static encrypt;
     private static decrypt;
+    asymEncrypt(data: Buffer, pubKey: Buffer): Promise<string>;
+    asymDecrypt(data: string, derivationArgs: IKeyDerivationArgs): Promise<Buffer>;
     encryptHybrid(data: object, derivationArgs: IKeyDerivationArgs): Promise<EncryptedData>;
     decryptHybrid(encryptedData: EncryptedData, derivationArg: IKeyDerivationArgs): Promise<object>;
     private stringifyEncryptedData;
