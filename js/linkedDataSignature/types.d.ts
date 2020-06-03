@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import { JsonLdObject } from '../linkedData/types';
 export interface ISerializable {
     toJSON: () => {};
 }
@@ -16,7 +17,7 @@ export interface IDigestable {
         keyId: string;
     };
 }
-export interface ILinkedDataSignatureAttrs {
+export interface ILinkedDataSignatureAttrs extends JsonLdObject {
     type: string;
     created: string;
     creator: string;

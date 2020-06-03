@@ -20,6 +20,7 @@ import { PaymentResponse } from './paymentResponse'
 import { PaymentRequest } from './paymentRequest'
 import { CredentialOfferResponse } from './credentialOfferResponse'
 import { CredentialOfferRequest } from './credentialOfferRequest'
+import { ErrorCodes } from '../errors'
 
 // JWTs are valid for one hour by default
 const DEFAULT_EXPIRY_MS = 60 * 60 * 1000
@@ -46,7 +47,7 @@ interface IPayloadSection<T> {
   jti?: string
   iss?: string
   aud?: string
-  typ?: InteractionType
+  typ?: string
   interactionToken?: T
 }
 
@@ -60,7 +61,7 @@ interface TransformArgs {
   aud: string
 }
 
-const convertPayload = <T extends JWTEncodable>(args: TransformArgs) => ({
+const convertPayload = <T>(args: TransformArgs) => ({
   ...args,
   interactionToken: payloadToJWT<T>(args.interactionToken, args.typ),
 })
@@ -68,7 +69,7 @@ const convertPayload = <T extends JWTEncodable>(args: TransformArgs) => ({
 /* Generic class encoding and decodes various interaction tokens as and from JSON web tokens */
 
 @Exclude()
-export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
+export class JSONWebToken<T> implements IDigestable {
   /* ES256K stands for ec signatures on secp256k1, de facto standard */
   private _header: IJWTHeader = {
     typ: 'JWT',
@@ -172,9 +173,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
    * @returns {Object} - A json web token instance
    */
 
-  public static fromJWTEncodable<T extends JWTEncodable>(
-    toEncode: T,
-  ): JSONWebToken<T> {
+  public static fromJWTEncodable<T>(toEncode: T): JSONWebToken<T> {
     const jwt = new JSONWebToken<T>()
     jwt.interactionToken = toEncode
     return jwt
@@ -192,7 +191,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     const issued = new Date()
 
     if (expiry <= issued) {
-      throw new Error('Expiry date should be greater than current date')
+      throw new Error(ErrorCodes.JWTInvalidExpiryDate)
     }
 
     this.payload.iat = issued.getTime()
@@ -213,7 +212,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
    * @returns {Object} - Instance of JSONWebToken class
    */
 
-  public static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T> {
+  public static decode<T>(jwt: string): JSONWebToken<T> {
     return JSONWebToken.fromJSON<T>(decodeToken(jwt))
   }
 
@@ -224,9 +223,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
 
   public encode(): string {
     if (!this.payload || !this.header || !this.signature) {
-      throw new Error(
-        'The JWT is not complete, header / payload / signature are missing',
-      )
+      throw new Error(ErrorCodes.JWTIncomplete)
     }
 
     return [
@@ -254,9 +251,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
     return classToPlain(this) as IJSONWebTokenAttrs
   }
 
-  public static fromJSON<T extends JWTEncodable>(
-    json: IJSONWebTokenAttrs,
-  ): JSONWebToken<T> {
+  public static fromJSON<T>(json: IJSONWebTokenAttrs): JSONWebToken<T> {
     return plainToClass<JSONWebToken<T>, IJSONWebTokenAttrs>(JSONWebToken, json)
   }
 }
@@ -268,10 +263,7 @@ export class JSONWebToken<T extends JWTEncodable> implements IDigestable {
  * @returns {Object} - Instantiated class based on the payload and the InteractionType typ
  */
 
-const payloadToJWT = <T extends JWTEncodable>(
-  payload: IJWTEncodable,
-  typ: InteractionType,
-): T => {
+const payloadToJWT = <T>(payload: IJWTEncodable, typ: InteractionType): T => {
   return instantiateInteraction(typ, c =>
     plainToClass<T, IJWTEncodable>(c, payload),
   )
@@ -285,7 +277,7 @@ const payloadToJWT = <T extends JWTEncodable>(
  * @returns {Object} - Instantiated class based on interactionType typ
  */
 
-const instantiateInteraction = <T extends JWTEncodable>(
+const instantiateInteraction = <T>(
   typ: InteractionType,
   instantiator: (t) => T,
 ) => {
@@ -307,5 +299,5 @@ const instantiateInteraction = <T extends JWTEncodable>(
     case InteractionType.PaymentResponse:
       return instantiator(PaymentResponse)
   }
-  throw new Error('Invalid interaction type parameter value')
+  throw new Error(ErrorCodes.JWTInvalidInteractionType)
 }

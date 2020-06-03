@@ -10,6 +10,7 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { publicProfileCredJSON } from '../data/identity.data'
 import { Identity } from '../../ts/identity/identity'
 import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
+import { ErrorCodes } from '../../ts/errors'
 
 describe('Jolocom Registry - resolve', () => {
   let registry: any = createJolocomRegistry()
@@ -37,9 +38,7 @@ describe('Jolocom Registry - resolve', () => {
       await registry.resolve('did:x')
       expect(true).to.be.false
     } catch (err) {
-      expect(err.message).to.eq(
-        'Could not retrieve DID Document. No record for DID found.',
-      )
+      expect(err.message).to.eq(ErrorCodes.RegistryResolveFailed)
     }
   })
 

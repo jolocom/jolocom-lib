@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { IDigestable } from '../linkedDataSignature/types';
-import { IVaultedKeyProvider, IKeyDerivationArgs } from './types';
+import { IKeyDerivationArgs, IVaultedKeyProvider } from './types';
 export interface EncryptedData {
     keys: EncryptedKey[];
     data: string;
@@ -26,8 +26,10 @@ export declare class SoftwareKeyProvider implements IVaultedKeyProvider {
     static verifyDigestable(publicKey: Buffer, toVerify: IDigestable): Promise<boolean>;
     private static encrypt;
     private static decrypt;
-    encryptHybrid(data: object, derivationArgs: IKeyDerivationArgs): Promise<string>;
-    decryptHybrid(encryptedData: EncryptedData, derivationArg: IKeyDerivationArgs): Promise<string>;
+    asymEncrypt(data: Buffer, pubKey: Buffer): Promise<string>;
+    asymDecrypt(data: string, derivationArgs: IKeyDerivationArgs): Promise<Buffer>;
+    encryptHybrid(data: object, derivationArgs: IKeyDerivationArgs): Promise<EncryptedData>;
+    decryptHybrid(encryptedData: EncryptedData, derivationArg: IKeyDerivationArgs): Promise<object>;
     private stringifyEncryptedData;
     private parseEncryptedData;
     private static normalizePassword;

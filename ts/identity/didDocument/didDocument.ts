@@ -7,7 +7,6 @@ import {
   Transform,
 } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
-import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import {
   AuthenticationSection,
@@ -15,9 +14,10 @@ import {
   ServiceEndpointsSection,
 } from './sections'
 import { ISigner } from '../../registries/types'
-import { ContextEntry } from 'cred-types-jolocom-core'
+import { JsonLdContext } from '../../linkedData/types'
 import { defaultContextIdentity } from '../../utils/contexts'
-import { sha256, publicKeyToDID } from '../../utils/crypto'
+import { publicKeyToDID } from '../../utils/crypto'
+import { digestJsonLd } from '../../linkedData'
 import {
   ILinkedDataSignature,
   IDigestable,
@@ -37,7 +37,7 @@ export class DidDocument implements IDigestable {
   private _service: ServiceEndpointsSection[] = []
   private _created: Date = new Date()
   private _proof: ILinkedDataSignature
-  private '_@context': ContextEntry[] = defaultContextIdentity
+  private '_@context': JsonLdContext = defaultContextIdentity
 
   /**
    * Get the `@context` section of the JSON-ld document
@@ -46,7 +46,7 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose({ name: '@context' })
-  get context(): ContextEntry[] {
+  get context(): JsonLdContext {
     return this['_@context']
   }
 
@@ -56,7 +56,7 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.context = [{name: 'http://schema.org/name', ...}, {...}]`
    */
 
-  set context(context: ContextEntry[]) {
+  set context(context: JsonLdContext) {
     this['_@context'] = context
   }
 
@@ -297,24 +297,7 @@ export class DidDocument implements IDigestable {
    */
 
   public async digest(): Promise<Buffer> {
-    const normalized = await this.normalize()
-
-    const docSectionDigest = sha256(Buffer.from(normalized))
-    const proofSectionDigest = await this.proof.digest()
-
-    return sha256(Buffer.concat([proofSectionDigest, docSectionDigest]))
-  }
-
-  /**
-   * Converts the did document to canonical form
-   * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
-   * @internal
-   */
-
-  public async normalize(): Promise<string> {
-    const json = this.toJSON()
-    delete json.proof
-    return canonize(json)
+      return digestJsonLd(this.toJSON(), this.context)
   }
 
   /**

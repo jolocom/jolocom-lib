@@ -25,6 +25,7 @@ import { IDigestable } from '../../ts/linkedDataSignature/types'
 import { publicProfileCredJSON, emailCredential } from '../data/identity.data'
 import { keyDerivationArgs } from '../data/identityWallet.data'
 import { mockDid } from '../data/didDocument.data'
+import { ErrorCodes } from '../../ts/errors'
 
 chai.use(sinonChai)
 describe('Software Vaulted Key Provider', () => {
@@ -268,7 +269,7 @@ describe('Software Vaulted Key Provider', () => {
           'Wrong Mnemonic',
           keyDerivationArgs.encryptionPass,
         ),
-      ).to.throw(Error, 'Invalid Mnemonic.')
+      ).to.throw(Error, ErrorCodes.SKPMnemonicInvalid)
     })
   })
 
@@ -314,6 +315,23 @@ describe('Software Vaulted Key Provider', () => {
     it('should decrypt data with hybrid scheme', async () => {
       const decryped = await vault.decryptHybrid(chipherText, keyDerivationArgs)
       expect(decryped).to.deep.eq(clearText)
+    })
+    it('should encrypt and decrypt', async () => {
+      const data = SoftwareKeyProvider.getRandom(32)
+      console.log(`original:  ${data.toString('base64')}`)
+
+      const enc = await vault.asymEncrypt(
+        data,
+        vault.getPublicKey(keyDerivationArgs),
+      )
+      console.log(`encrypted: ${enc}`)
+
+      const dec = await vault.asymDecrypt(enc, keyDerivationArgs)
+
+      console.log(`decrypted: ${dec.toString('base64')}`)
+
+      expect(dec.toString('base64')).to.eq(data.toString('base64'))
+      expect(enc).to.not.eq(data.toString('base64'))
     })
     describe('Buffer decoding/encoding', () => {
       const data = {

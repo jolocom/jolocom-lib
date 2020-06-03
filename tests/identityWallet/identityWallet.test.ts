@@ -18,6 +18,7 @@ import { validSignedCredReqJWT } from '../data/interactionTokens/jsonWebToken.da
 import { keyIdToDid } from '../../ts/utils/helper'
 import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
 import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import { ErrorCodes } from '../../ts/errors'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -84,7 +85,12 @@ describe('IdentityWallet', () => {
     })
 
     it('Should expose aggregated creation methods', () => {
-      const categories = ['credential', 'signedCredential', 'interactionTokens']
+      const categories = [
+        'credential',
+        'signedCredential',
+        'message',
+        'interactionTokens',
+      ]
       const flowTypes = ['request', 'response']
       const tokenTypesRequest = ['auth', 'offer', 'share', 'payment']
       const tokenTypesResponse = ['auth', 'offer', 'share', 'issue', 'payment']
@@ -125,10 +131,7 @@ describe('IdentityWallet', () => {
       )
 
       sandbox.assert.calledOnce(spyFromJWTEncodable)
-      sandbox.assert.calledWith(
-        spyFromJWTEncodable,
-        CredentialRequest.fromJSON(simpleCredRequestJSON),
-      )
+      sandbox.assert.calledWith(spyFromJWTEncodable, simpleCredRequestJSON)
 
       const expectedExpiry = 60 * 60 * 1000
       expect(interactionToken.expires - interactionToken.issued).to.eq(
@@ -147,10 +150,7 @@ describe('IdentityWallet', () => {
       )
 
       sandbox.assert.calledOnce(spyFromJWTEncodable)
-      sandbox.assert.calledWith(
-        spyFromJWTEncodable,
-        CredentialRequest.fromJSON(simpleCredRequestJSON),
-      )
+      sandbox.assert.calledWith(spyFromJWTEncodable, simpleCredRequestJSON)
       expect(interactionTokenCustomExpiry.expires).to.eq(customExpiry.getTime())
     })
 
@@ -168,14 +168,14 @@ describe('IdentityWallet', () => {
           throw new Error('Expected Failure')
         })
         .catch(err => {
-          expect(err.message).to.contain(
-            'Expiry date should be greater than current date',
-          )
+          expect(err.message).to.contain(ErrorCodes.JWTInvalidExpiryDate)
         })
     })
 
     it('Should create an interaction token as a response', async () => {
-      const decodedToken = JSONWebToken.decode(interactionToken.encode())
+      const decodedToken = JSONWebToken.decode<CredentialRequest>(
+        interactionToken.encode(),
+      )
       const interactionResponeToken = await iw.create.interactionTokens.response.share(
         credentialResponseJSON,
         encryptionPass,

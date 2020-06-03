@@ -18,6 +18,7 @@ import { testSeed } from '../data/keys.data'
 import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
+import { ErrorCodes } from '../../ts/errors'
 chai.use(sinonChai)
 const expect = chai.expect
 
@@ -68,7 +69,7 @@ describe('IdentityWallet validate JWT', () => {
     try {
       await iw.validateJWT(JSONWebToken.fromJSON(tokenWithInvalidSignature))
     } catch (err) {
-      expect(err.message).to.eq('Signature on token is invalid')
+      expect(err.message).to.eq(ErrorCodes.IDWInvalidJWTSignature)
     }
   })
 
@@ -79,7 +80,7 @@ describe('IdentityWallet validate JWT', () => {
       await iw.validateJWT(JSONWebToken.fromJSON(validSignedCredReqJWT))
       expect(true).to.eq(false)
     } catch (err) {
-      expect(err.message).to.eq('Token expired')
+      expect(err.message).to.eq(ErrorCodes.IDWTokenExpired)
     }
   })
 
@@ -101,11 +102,11 @@ describe('IdentityWallet validate JWT', () => {
         JSONWebToken.fromJSON(validSignedCredReqJWT),
       )
     } catch (err) {
-      expect(err.message).to.eq('The token nonce deviates from request')
+      expect(err.message).to.eq(ErrorCodes.IDWIncorrectJWTNonce)
     }
   })
 
-  it('Should throw error if the aud is not correct', async () => {
+  it('Should throw error if the aud on response is not correct', async () => {
     const tokenWIthInvalidAud = {
       ...validSignedCredResJWT,
       payload: {
@@ -123,9 +124,45 @@ describe('IdentityWallet validate JWT', () => {
         JSONWebToken.fromJSON(validSignedCredReqJWT),
       )
     } catch (err) {
-      expect(err.message).to.eq(
-        'You are not the intended audience of received token',
+      expect(err.message).to.eq(ErrorCodes.IDWNotCorrectResponder)
+    }
+  })
+
+  it('Should not throw error if the aud on a request is not defined', async () => {
+    const requestWithNoAud = {
+      ...validSignedCredReqJWT,
+      payload: {
+        ...validSignedCredReqJWT.payload,
+        aud: '',
+      },
+    }
+
+    /** @dev Restored in afterEach */
+    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+
+    return iw.validateJWT(
+      JSONWebToken.fromJSON(requestWithNoAud)
+    )
+  })
+
+  it('Should throw error if the aud on a request is defined and does not match current identity', async () => {
+    const requestWithInvalidAud = {
+      ...validSignedCredReqJWT,
+      payload: {
+        ...validSignedCredReqJWT.payload,
+        aud: 'did:jolo:ff',
+      },
+    }
+    /** @dev Restored in afterEach */
+    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+
+    try {
+      await iw.validateJWT(
+        JSONWebToken.fromJSON(requestWithInvalidAud)
       )
+      expect(false).to.eq(true)
+    } catch (err) {
+      expect(err.message).to.eq(ErrorCodes.IDWNotIntendedAudience)
     }
   })
 })

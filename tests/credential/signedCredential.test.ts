@@ -13,6 +13,7 @@ import { Credential } from '../../ts/credentials/credential/credential'
 import { mockEmailCredCreationAttrs } from '../data/credential/credential.data'
 import { expect } from 'chai'
 import * as crypto from 'crypto'
+import { ErrorCodes } from '../../ts/errors'
 
 chai.use(sinonChai)
 
@@ -84,9 +85,7 @@ describe('SignedCredential', () => {
           throw new Error('Expected failure')
         })
         .catch(err => {
-          expect(err.message).to.contain(
-            'Expiry date should be greater than current date',
-          )
+          expect(err.message).to.contain(ErrorCodes.VCInvalidExpiryDate)
         })
     })
 

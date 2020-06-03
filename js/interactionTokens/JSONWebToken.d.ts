@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { IJWTHeader } from './types';
-import { IJSONWebTokenAttrs, InteractionType } from './types';
+import { IJSONWebTokenAttrs } from './types';
 import { IDigestable } from '../linkedDataSignature/types';
 import { CredentialResponse } from './credentialResponse';
 import { CredentialRequest } from './credentialRequest';
@@ -17,10 +17,10 @@ interface IPayloadSection<T> {
     jti?: string;
     iss?: string;
     aud?: string;
-    typ?: InteractionType;
+    typ?: string;
     interactionToken?: T;
 }
-export declare class JSONWebToken<T extends JWTEncodable> implements IDigestable {
+export declare class JSONWebToken<T> implements IDigestable {
     private _header;
     private _signature;
     private _payload;
@@ -32,19 +32,19 @@ export declare class JSONWebToken<T extends JWTEncodable> implements IDigestable
     readonly expires: number;
     nonce: string;
     interactionToken: T;
-    interactionType: InteractionType;
+    interactionType: string;
     header: IJWTHeader;
     readonly signer: {
         did: string;
         keyId: string;
     };
-    static fromJWTEncodable<T extends JWTEncodable>(toEncode: T): JSONWebToken<T>;
+    static fromJWTEncodable<T>(toEncode: T): JSONWebToken<T>;
     timestampAndSetExpiry(expiry?: Date): void;
     setIssueAndExpiryTime: (expiry?: Date) => void;
-    static decode<T extends JWTEncodable>(jwt: string): JSONWebToken<T>;
+    static decode<T>(jwt: string): JSONWebToken<T>;
     encode(): string;
     digest(): Promise<Buffer>;
     toJSON(): IJSONWebTokenAttrs;
-    static fromJSON<T extends JWTEncodable>(json: IJSONWebTokenAttrs): JSONWebToken<T>;
+    static fromJSON<T>(json: IJSONWebTokenAttrs): JSONWebToken<T>;
 }
 export {};

@@ -6,6 +6,7 @@ import { IKeyDerivationArgs, IVaultedKeyProvider } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
 import * as eccrypto from 'eccrypto'
+import { ErrorCodes } from '../errors'
 
 const ALG = 'aes-256-cbc'
 
@@ -56,9 +57,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   public constructor(encryptedSeed: Buffer) {
     if (!isEncryptedSeedLengthValid(encryptedSeed)) {
-      throw new Error(
-        `Expected encrypted seed to be between ${MIN_ENCRYPTED_SEED_LENGTH} and ${MAX_ENCRYPTED_SEED_LENGTH} bytes long. Got ${encryptedSeed.length}.`,
-      )
+      throw new Error(ErrorCodes.SKPEncryptedSeedInvalidLength)
     }
 
     this._iv = encryptedSeed.slice(0, IV_LENGTH)
@@ -105,7 +104,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     encryptionPass: string,
   ): SoftwareKeyProvider {
     if (!validateMnemonic(mnemonic)) {
-      throw new Error('Invalid Mnemonic.')
+      throw new Error(ErrorCodes.SKPMnemonicInvalid)
     }
 
     const seed = Buffer.from(mnemonicToEntropy(mnemonic), 'hex')
@@ -265,6 +264,29 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   }
 
   /**
+   * Encrypts data asymmetrically
+   * @param data - The data to encrypt
+   * @param pubKey - The key to encrypt to
+   */
+  public async asymEncrypt(data: Buffer, pubKey: Buffer): Promise<string> {
+    return this.stringifyEncryptedData(await eccrypto.encrypt(pubKey, data))
+  }
+
+  /**
+   * Decrypts data asymmetrically
+   * @param data - The data to decrypt
+   * @param derivationArgs - The decryption private key derivation arguments
+   */
+  public async asymDecrypt(
+    data: string,
+    derivationArgs: IKeyDerivationArgs,
+  ): Promise<Buffer> {
+    const decKey = this.getPrivateKey(derivationArgs)
+    const dataObj = this.parseEncryptedData(data)
+    return eccrypto.decrypt(decKey, dataObj)
+  }
+
+  /**
    * Encrypts data based on the hybrid encryption scheme of PGP. This means that
    * the data will first be encrypted with a freshly generated symmetric key and
    * afterwards this key is encrypted with the public key in an asymmetric manner
@@ -288,11 +310,11 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     )
 
     // Encrypt asymmetrically
-    const encryptedKey = await eccrypto.encrypt(publicKey, Buffer.from(symKey))
+    const encryptedKey = await this.asymEncrypt(symKey, publicKey)
     return {
       keys: [
         {
-          cipher: this.stringifyEncryptedData(encryptedKey),
+          cipher: encryptedKey,
           pubKey: publicKey.toString('hex'),
         },
       ],
@@ -310,18 +332,16 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     derivationArg: IKeyDerivationArgs,
   ): Promise<object> {
     const publicKey = this.getPublicKey(derivationArg)
-    const privateKey = this.getPrivateKey(derivationArg)
     // find encrypted key
     const encryptedKey = encryptedData.keys.find(
       key => key.pubKey === publicKey.toString('hex'),
     )
-    if (!encryptedKey) throw new Error('Not encrypted for these keys')
+    if (!encryptedKey) throw new Error(ErrorCodes.SKPDecryptionInvalidKey)
 
     // decrypt asymmetrically
-    const symKey = await eccrypto.decrypt(
-      privateKey,
-      this.parseEncryptedData(encryptedKey.cipher),
-    )
+    // FIXME We are using a fork of eccrypto to fix a bug in eccrypto.decrypt() see https://github.com/jolocom/jolocom-lib/issues/384
+    //  change this back once this https://github.com/bitchan/eccrypto/pull/47 is released
+    const symKey = await this.asymDecrypt(encryptedKey.cipher, derivationArg)
 
     // decrypt symmetrically
     const encryptedDataBuffer = Buffer.from(encryptedData.data, 'hex')

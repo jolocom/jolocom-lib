@@ -2,7 +2,7 @@
 import { IDidDocumentAttrs } from './types';
 import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections';
 import { ISigner } from '../../registries/types';
-import { ContextEntry } from 'cred-types-jolocom-core';
+import { JsonLdContext } from '../../linkedData/types';
 import { ILinkedDataSignature, IDigestable } from '../../linkedDataSignature/types';
 export declare class DidDocument implements IDigestable {
     private _id;
@@ -12,7 +12,7 @@ export declare class DidDocument implements IDigestable {
     private _created;
     private _proof;
     private '_@context';
-    context: ContextEntry[];
+    context: JsonLdContext;
     did: string;
     authentication: AuthenticationSection[];
     publicKey: PublicKeySection[];
@@ -28,7 +28,6 @@ export declare class DidDocument implements IDigestable {
     static fromPublicKey(publicKey: Buffer): DidDocument;
     private prepareSignature;
     digest(): Promise<Buffer>;
-    normalize(): Promise<string>;
     toJSON(): IDidDocumentAttrs;
     static fromJSON(json: IDidDocumentAttrs): DidDocument;
 }

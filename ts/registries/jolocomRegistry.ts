@@ -25,6 +25,7 @@ import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
 import { Resolver } from 'did-resolver'
 import { getPublicProfile, getResolver } from 'jolo-did-resolver'
+import { ErrorCodes } from '../errors'
 
 /**
  * @class
@@ -138,9 +139,7 @@ export class JolocomRegistry implements IRegistry {
         newHash: ipfsHash,
       })
     } catch (error) {
-      throw new Error(
-        `Error occured while persisting identity data: ${error.message}`,
-      )
+      throw new Error(ErrorCodes.RegistryCommitFailed)
     }
   }
 
@@ -150,14 +149,15 @@ export class JolocomRegistry implements IRegistry {
    * @example `const serviceIdentity = await registry.resolve('did:jolo:...')`
    */
 
-  public async resolve(did): Promise<Identity> {
+  public async resolve(did: string): Promise<Identity> {
     try {
       const jsonDidDoc = await this.resolver.resolve(did)
+
       if (!jsonDidDoc) {
-        throw new Error('No record for DID found.')
+        throw new Error(ErrorCodes.RegistryDIDNotAnchored)
       }
 
-      // @ts-ignore
+      //@ts-ignore TODO IDidDoc vs IDidDocumentAttrs
       const didDocument = DidDocument.fromJSON(jsonDidDoc)
       const publicProfile = (await getPublicProfile(
         jsonDidDoc,
@@ -168,7 +168,7 @@ export class JolocomRegistry implements IRegistry {
         publicProfile,
       })
     } catch (error) {
-      throw new Error(`Could not retrieve DID Document. ${error.message}`)
+      throw new Error(ErrorCodes.RegistryResolveFailed)
     }
   }
 
