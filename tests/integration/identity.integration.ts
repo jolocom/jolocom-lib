@@ -19,10 +19,12 @@ import {
   serviceVault,
   servicePass,
 } from './integration.data'
+import { getResolver } from 'jolo-did-resolver'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
 import { ContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import { Resolver } from 'did-resolver'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -48,6 +50,14 @@ before(async () => {
     ethereumConnector: new EthResolver(testEthereumConfig),
     contracts: { gateway, adapter },
   })
+
+  jolocomRegistry.resolver = new Resolver(
+    getResolver(
+      testEthereumConfig.providerUrl,
+      testEthereumConfig.contractAddress,
+      testIpfsConfig.host
+    )
+  )
 
   userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
   serviceIdentityWallet = await jolocomRegistry.create(
