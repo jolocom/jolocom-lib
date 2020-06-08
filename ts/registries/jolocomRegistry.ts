@@ -2,9 +2,7 @@ import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { DidDocument } from '../identity/didDocument/didDocument'
-import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
 import {
   IRegistryCommitArgs,
@@ -37,6 +35,8 @@ export class JolocomRegistry implements IRegistry {
   public ethereumConnector: IEthereumConnector
   public contractsAdapter: IContractsAdapter
   public contractsGateway: IContractsGateway
+ 
+  // TODO private?
   public resolver: Resolver
 
   /**
@@ -131,6 +131,7 @@ export class JolocomRegistry implements IRegistry {
         data: didDocument.toJSON(),
         pin: true,
       })
+
       const privateEthKey = vaultedKeyProvider.getPrivateKey(keyMetadata)
 
       await this.ethereumConnector.updateDIDRecord({
@@ -159,13 +160,11 @@ export class JolocomRegistry implements IRegistry {
 
       //@ts-ignore TODO IDidDoc vs IDidDocumentAttrs
       const didDocument = DidDocument.fromJSON(jsonDidDoc)
-      const publicProfile = (await getPublicProfile(
-        jsonDidDoc,
-      )) as SignedCredential
+      const publicProfileJson = await getPublicProfile(jsonDidDoc)
 
       return Identity.fromDidDocument({
         didDocument,
-        publicProfile,
+        publicProfile: publicProfileJson && SignedCredential.fromJSON(publicProfileJson)
       })
     } catch (error) {
       throw new Error(ErrorCodes.RegistryResolveFailed)
@@ -247,11 +246,12 @@ export const createJolocomRegistry = (
   jolocomRegistry.ethereumConnector = ethereumConnector
   jolocomRegistry.contractsAdapter = contracts.adapter
   jolocomRegistry.contractsGateway = contracts.gateway
-  jolocomRegistry.resolver = new Resolver(getResolver())
+  jolocomRegistry.resolver = jolocomResolver()
 
   return jolocomRegistry
 }
 
+// TODO default, to not spread undefined
 export const jolocomResolver = (additionalResolver?: {}): Resolver => {
   const jolo = getResolver()
   return new Resolver({ ...additionalResolver, ...jolo })

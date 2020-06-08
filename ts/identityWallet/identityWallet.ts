@@ -24,7 +24,6 @@ import {
   publicKeyToAddress,
 } from '../utils/helper'
 import { jolocomResolver } from '../registries/jolocomRegistry'
-import { createJolocomRegistry } from '../registries/jolocomRegistry'
 import {
   IContractsAdapter,
   IContractsGateway,
@@ -44,7 +43,6 @@ import {
 } from '../interactionTokens/interactionTokens.types'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { ErrorCodes } from '../errors'
-import { IRegistry } from '../registries/types'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -358,12 +356,10 @@ export class IdentityWallet {
     additionalResolver?: {},
   ): Promise<void> {
     const resolver = jolocomResolver(additionalResolver)
-    const didDocument = DidDocument.fromJSON(
-      // @ts-ignore
-      await resolver.resolve(keyIdToDid(receivedJWT.issuer)),
-    )
+    const result = await resolver.resolve(keyIdToDid(receivedJWT.issuer))
 
-    const pubKey = getIssuerPublicKey(receivedJWT.issuer, didDocument)
+    //@ts-ignore
+    const pubKey = getIssuerPublicKey(receivedJWT.issuer, result)
 
     // First we make sure the signature on the interaction token is valid
     if (!(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT))) {
@@ -413,15 +409,14 @@ export class IdentityWallet {
   public asymEncryptToDidKey = async (
     data: Buffer,
     keyRef: string,
-    customRegistry?: IRegistry,
+    additionalResolver?: {},
   ) =>
     this.asymEncrypt(
       data,
       getIssuerPublicKey(
         keyRef,
-        await (customRegistry || createJolocomRegistry())
-          .resolve(keyIdToDid(keyRef))
-          .then(target => target.didDocument),
+        //@ts-ignore
+        DidDocument.fromJSON(await (jolocomResolver(additionalResolver).resolve(keyIdToDid(keyRef))))
       ),
     )
 

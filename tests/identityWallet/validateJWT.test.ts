@@ -3,24 +3,22 @@ import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { Identity } from '../../ts/identity/identity'
+import * as joloDidResolver from 'jolo-did-resolver'
 import { didDocumentJSON, mockKeyId } from '../data/didDocument.data'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import {
-  invalidSignature,
-  validSignedCredReqJWT,
-  invalidNonce,
-  validSignedCredResJWT,
+  validSignedCredReqJWT, invalidSignature, validSignedCredResJWT, invalidNonce,
 } from '../data/interactionTokens/jsonWebToken.data'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
-import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ErrorCodes } from '../../ts/errors'
+import { expect } from 'chai'
+
 chai.use(sinonChai)
-const expect = chai.expect
 
 describe('IdentityWallet validate JWT', () => {
   const sandbox = sinon.createSandbox()
@@ -33,11 +31,15 @@ describe('IdentityWallet validate JWT', () => {
   let clock
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers()
     sandbox
-      .stub(JolocomRegistry.prototype, 'resolve')
-      .resolves(Identity.fromDidDocument({ didDocument }))
+      .stub(joloDidResolver, 'getResolver')
+      .returns({
+        jolo: sinon.stub().resolves(didDocumentJSON)
+      })
+  })
 
+  beforeEach(() => {
+    clock = sinon.useFakeTimers()
     iw = new IdentityWallet({
       identity,
       vaultedKeyProvider: vault,
@@ -54,11 +56,8 @@ describe('IdentityWallet validate JWT', () => {
     sandbox.restore()
   })
 
-  it('Should sucessfully perform necessary validation steps on received jwt', done => {
-    iw.validateJWT(JSONWebToken.fromJSON(validSignedCredReqJWT)).then(
-      done,
-      done,
-    )
+  it('Should sucessfully perform necessary validation steps on received jwt', () => {
+    return iw.validateJWT(JSONWebToken.fromJSON(validSignedCredReqJWT))
   })
 
   it('Should throw error on invalid signature', async () => {
@@ -139,8 +138,7 @@ describe('IdentityWallet validate JWT', () => {
 
     /** @dev Restored in afterEach */
     sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
-
-    return iw.validateJWT(
+return iw.validateJWT(
       JSONWebToken.fromJSON(requestWithNoAud)
     )
   })
