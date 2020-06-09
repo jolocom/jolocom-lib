@@ -2,10 +2,12 @@ import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
 import { getIssuerPublicKey, keyIdToDid } from '../utils/helper'
 import { IRegistry } from '../registries/types'
-import { registries } from '../registries/'
 import { sha256 } from '../utils/crypto'
 import { canonize } from 'jsonld'
 import { JsonLdObject, SignedJsonLdObject, JsonLdContext } from './types'
+import { JolocomRegistry } from '../registries/jolocomRegistry'
+import { createResolver } from '../utils/validation'
+import { DidDocument } from '../identity/didDocument/didDocument'
 
 /**
  * Helper function to handle JsonLD normalization.
@@ -66,16 +68,20 @@ export const digestJsonLd = async (
 
 export const validateJsonLd = async (
   json: SignedJsonLdObject,
-  customRegistry?: IRegistry,
+  // TODO not any, rather resolver type
+  customRegistry?: IRegistry | {[key: string] : any},
 ): Promise<boolean> => {
-  const reg = customRegistry || registries.jolocom.create()
-  const issuerIdentity = await reg.resolve(keyIdToDid(json.proof.creator))
+  const resolver = createResolver(customRegistry)
+  // TODO This is an identity
+  const issuerIdentity = await resolver.resolve(keyIdToDid(json.proof.creator))
 
   try {
     const issuerPublicKey = getIssuerPublicKey(
       json.proof.creator,
-      issuerIdentity.didDocument,
+      //@ts-ignore TODO DidDocument vs IDidDocumentAttrs
+      DidDocument.fromJSON(issuerIdentity)
     )
+
     return SoftwareKeyProvider.verify(
       await digestJsonLd(json, json['@context']),
       issuerPublicKey,

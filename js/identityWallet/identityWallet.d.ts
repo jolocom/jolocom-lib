@@ -15,6 +15,7 @@ import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequ
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse';
 import { CredentialOfferRequestAttrs, CredentialOfferResponseAttrs, IAuthenticationAttrs, ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs, IPaymentRequestAttrs, IPaymentResponseAttrs } from '../interactionTokens/interactionTokens.types';
 import { DidDocument } from '../identity/didDocument/didDocument';
+import { IRegistry } from '../registries/types';
 interface PaymentRequestCreationArgs {
     callbackURL: string;
     description: string;
@@ -45,7 +46,9 @@ export declare class IdentityWallet {
     private makeRes;
     getPublicKeys: (encryptionPass: string) => PublicKeyMap;
     private initializeAndSign;
-    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, additionalResolver?: {}): Promise<void>;
+    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, additionalResolver?: IRegistry | {
+        [key: string]: any;
+    }): Promise<void>;
     asymEncrypt: (data: Buffer, publicKey: Buffer) => Promise<string>;
     asymEncryptToDidKey: (data: Buffer, keyRef: string, additionalResolver?: {}) => Promise<string>;
     asymDecrypt: (data: string, decryptionKeyArgs: IKeyDerivationArgs) => Promise<Buffer>;

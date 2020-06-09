@@ -251,8 +251,8 @@ export const createJolocomRegistry = (
   return jolocomRegistry
 }
 
-// TODO default, to not spread undefined
-export const jolocomResolver = (additionalResolver?: {}): Resolver => {
+export const jolocomResolver = (additionalResolver = {}): Resolver => {
   const jolo = getResolver()
-  return new Resolver({ ...additionalResolver, ...jolo })
+  // TODO Do we overwrite or not?
+  return new Resolver({ ...jolo, ...additionalResolver })
 }

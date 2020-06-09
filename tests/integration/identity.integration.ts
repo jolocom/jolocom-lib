@@ -1,7 +1,7 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import * as integrationHelper from './provision'
-import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
+import { IpfsStorageAgent, jolocomIpfsStorageAgent } from '../../ts/ipfs/ipfs'
 import { EthResolver } from '../../ts/ethereum/ethereum'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import {
@@ -13,7 +13,6 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { publicProfileCredJSON } from '../data/identity.data'
 import {
   testEthereumConfig,
-  testIpfsConfig,
   userVault,
   userPass,
   serviceVault,
@@ -48,18 +47,15 @@ before(async () => {
   testContractsAdapter = adapter
 
   jolocomRegistry = createJolocomRegistry({
-    ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
+    ipfsConnector: jolocomIpfsStorageAgent,
     ethereumConnector: new EthResolver(testEthereumConfig),
     contracts: { gateway, adapter },
   })
-
-  const {host, protocol, port} = testIpfsConfig
 
   testResolver = new Resolver(
     getResolver(
       testEthereumConfig.providerUrl,
       testEthereumConfig.contractAddress,
-      `${protocol}://${host}:${port}`
     )
   )
 

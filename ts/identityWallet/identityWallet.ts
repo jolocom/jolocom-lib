@@ -43,6 +43,8 @@ import {
 } from '../interactionTokens/interactionTokens.types'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { ErrorCodes } from '../errors'
+import { IRegistry } from '../registries/types'
+import { createResolver } from '../utils/validation'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -353,9 +355,10 @@ export class IdentityWallet {
   public async validateJWT<T, R>(
     receivedJWT: JSONWebToken<T>,
     sentJWT?: JSONWebToken<R>,
-    additionalResolver?: {},
+    additionalResolver?: IRegistry | {[key: string] : any},
   ): Promise<void> {
-    const resolver = jolocomResolver(additionalResolver)
+    const resolver = createResolver(additionalResolver)
+    //@ts-ignore
     const result = await resolver.resolve(keyIdToDid(receivedJWT.issuer))
 
     //@ts-ignore

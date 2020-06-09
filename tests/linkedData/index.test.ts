@@ -93,6 +93,11 @@ describe('linkedData validation functions', () => {
         Identity.fromDidDocument({
           didDocument: DidDocument.fromJSON(DID_DOC_V0),
         }),
+        
+        //@ts-ignore
+        commit: () => {},
+        //@ts-ignore
+        authenticate: () => {}
     }
 
     const mallformedV0 = {
@@ -104,7 +109,6 @@ describe('linkedData validation functions', () => {
     }
 
     expect(await validateJsonLd(DID_DOC_V0, mockRegistry)).to.eq(true)
-
     expect(await validateJsonLd(mallformedV0, mockRegistry)).to.eq(false)
   })
 })
