@@ -39,7 +39,7 @@ describe('Jolocom Registry - resolve', () => {
 
     return createJolocomRegistry().resolve(mockDid)
       .then(() => new Error('Error should have been thrown')) // TODO
-      .catch(err => expect(err.message).to.eq(ErrorCodes.RegistryResolveFailed))
+      .catch(err => expect(err.message).to.eq(ErrorCodes.RegistryDIDNotAnchored))
   })
 
   it('should resolve with public profile', async () => {
