@@ -151,13 +151,13 @@ export class JolocomRegistry implements IRegistry {
    */
 
   public async resolve(did: string): Promise<Identity> {
+    const jsonDidDoc = await this.resolver.resolve(did)
+
+    if (!jsonDidDoc) {
+      throw new Error(ErrorCodes.RegistryDIDNotAnchored)
+    }
+
     try {
-      const jsonDidDoc = await this.resolver.resolve(did)
-
-      if (!jsonDidDoc) {
-        throw new Error(ErrorCodes.RegistryDIDNotAnchored)
-      }
-
       //@ts-ignore TODO IDidDoc vs IDidDocumentAttrs
       const didDocument = DidDocument.fromJSON(jsonDidDoc)
       const publicProfileJson = await getPublicProfile(jsonDidDoc)
