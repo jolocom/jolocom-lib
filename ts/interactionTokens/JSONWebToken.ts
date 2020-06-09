@@ -263,10 +263,17 @@ export class JSONWebToken<T> implements IDigestable {
  * @returns {Object} - Instantiated class based on the payload and the InteractionType typ
  */
 
-const payloadToJWT = <T>(payload: IJWTEncodable, typ: InteractionType): T => {
-  return instantiateInteraction(typ, c =>
-    plainToClass<T, IJWTEncodable>(c, payload),
-  )
+const payloadToJWT = <T>(
+  payload: IJWTEncodable,
+  typ: InteractionType,
+): T | IJWTEncodable => {
+  try {
+    return instantiateInteraction(typ, c =>
+      plainToClass<T, IJWTEncodable>(c, payload),
+    )
+  } catch (err) {
+    return payload
+  }
 }
 
 /*
