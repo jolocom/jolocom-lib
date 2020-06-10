@@ -269,7 +269,9 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param pubKey - The key to encrypt to
    */
   public async asymEncrypt(data: Buffer, pubKey: Buffer): Promise<string> {
-    return this.stringifyEncryptedData(await eccrypto.encrypt(pubKey, data))
+    return Buffer.from(
+      this.stringifyEncryptedData(await eccrypto.encrypt(pubKey, data)),
+    ).toString('base64')
   }
 
   /**
@@ -281,9 +283,10 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     data: string,
     derivationArgs: IKeyDerivationArgs,
   ): Promise<Buffer> {
+    const d = Buffer.from(data, 'base64').toString()
     const decKey = this.getPrivateKey(derivationArgs)
-    const dataObj = this.parseEncryptedData(data)
-    return eccrypto.decrypt(decKey, dataObj)
+    const dataObj = this.parseEncryptedData(d)
+    return await eccrypto.decrypt(decKey, dataObj)
   }
 
   /**
