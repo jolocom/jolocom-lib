@@ -9,6 +9,8 @@ export interface IVaultedKeyProvider {
     getPrivateKey: (derivationArgs: IKeyDerivationArgs) => Buffer;
     sign: (derivationArgs: IKeyDerivationArgs, digest: Buffer) => Buffer;
     signDigestable: (derivationArgs: IKeyDerivationArgs, toSign: IDigestable) => Promise<Buffer>;
+    asymEncrypt: (data: Buffer, pubKey: Buffer) => Promise<string>;
+    asymDecrypt: (data: string, derivationArgs: IKeyDerivationArgs) => Promise<Buffer>;
 }
 export interface IKeyDerivationArgs {
     encryptionPass: string;
