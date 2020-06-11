@@ -282,7 +282,7 @@ describe('Software Vaulted Key Provider', () => {
       keys: [
         {
           cipher:
-            '{"iv":"38ad7bcc993ccecef1a9c69a38c15d86","ephemPublicKey":"04b93dd711c7eabc330cce4d8dc3335c0a42cf68ddfe2d8f0223660947ea16774113effccfe9db09edc1a0b2c275c195beff8cbe493f830b817bdd4adb38626985","ciphertext":"0415ca9729e52785756d076d51b1aa7f703a721258d37d0e30f236301d96a13d95147bc16926caa42d357de352d2f209","mac":"da4a28c15e1a052bba89c490a3c9392e205bb03dee64d2a857a2280cc691eb88"}',
+            'eyJpdiI6IjM4YWQ3YmNjOTkzY2NlY2VmMWE5YzY5YTM4YzE1ZDg2IiwiZXBoZW1QdWJsaWNLZXkiOiIwNGI5M2RkNzExYzdlYWJjMzMwY2NlNGQ4ZGMzMzM1YzBhNDJjZjY4ZGRmZTJkOGYwMjIzNjYwOTQ3ZWExNjc3NDExM2VmZmNjZmU5ZGIwOWVkYzFhMGIyYzI3NWMxOTViZWZmOGNiZTQ5M2Y4MzBiODE3YmRkNGFkYjM4NjI2OTg1IiwiY2lwaGVydGV4dCI6IjA0MTVjYTk3MjllNTI3ODU3NTZkMDc2ZDUxYjFhYTdmNzAzYTcyMTI1OGQzN2QwZTMwZjIzNjMwMWQ5NmExM2Q5NTE0N2JjMTY5MjZjYWE0MmQzNTdkZTM1MmQyZjIwOSIsIm1hYyI6ImRhNGEyOGMxNWUxYTA1MmJiYTg5YzQ5MGEzYzkzOTJlMjA1YmIwM2RlZTY0ZDJhODU3YTIyODBjYzY5MWViODgifQ==',
           pubKey:
             '03848af62bffceb57631780ac0e0726106ee1c23262d6fd7ef906559d68f53a551',
         },
@@ -318,17 +318,13 @@ describe('Software Vaulted Key Provider', () => {
     })
     it('should encrypt and decrypt', async () => {
       const data = SoftwareKeyProvider.getRandom(32)
-      console.log(`original:  ${data.toString('base64')}`)
 
       const enc = await vault.asymEncrypt(
         data,
         vault.getPublicKey(keyDerivationArgs),
       )
-      console.log(`encrypted: ${enc}`)
 
       const dec = await vault.asymDecrypt(enc, keyDerivationArgs)
-
-      console.log(`decrypted: ${dec.toString('base64')}`)
 
       expect(dec.toString('base64')).to.eq(data.toString('base64'))
       expect(enc).to.not.eq(data.toString('base64'))
