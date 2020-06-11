@@ -131,8 +131,10 @@ describe('IdentityWallet', () => {
       )
 
       sandbox.assert.calledOnce(spyFromJWTEncodable)
-      sandbox.assert.calledWith(spyFromJWTEncodable, simpleCredRequestJSON)
-
+      sandbox.assert.calledWith(
+        spyFromJWTEncodable,
+        CredentialRequest.fromJSON(simpleCredRequestJSON),
+      )
       const expectedExpiry = 60 * 60 * 1000
       expect(interactionToken.expires - interactionToken.issued).to.eq(
         expectedExpiry,
@@ -150,7 +152,10 @@ describe('IdentityWallet', () => {
       )
 
       sandbox.assert.calledOnce(spyFromJWTEncodable)
-      sandbox.assert.calledWith(spyFromJWTEncodable, simpleCredRequestJSON)
+      sandbox.assert.calledWith(
+        spyFromJWTEncodable,
+        CredentialRequest.fromJSON(simpleCredRequestJSON),
+      )
       expect(interactionTokenCustomExpiry.expires).to.eq(customExpiry.getTime())
     })
 
