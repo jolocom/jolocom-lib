@@ -16,6 +16,7 @@ import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ErrorCodes } from '../../ts/errors'
 import { expect } from 'chai'
+import { Resolver } from 'did-resolver'
 
 chai.use(sinonChai)
 
@@ -29,9 +30,10 @@ describe('IdentityWallet validate JWT', () => {
   let iw: IdentityWallet
   let clock
 
-  const testResolutionMap = {
+  const testResolver = new Resolver({
+    //@ts-ignore
     jolo: async () => didDocumentJSON
-  } 
+  })
 
   beforeEach(() => {
     clock = sinon.useFakeTimers()
@@ -55,7 +57,7 @@ describe('IdentityWallet validate JWT', () => {
     return iw.validateJWT(
       JSONWebToken.fromJSON(validSignedCredReqJWT), 
       undefined, 
-      testResolutionMap
+      testResolver
     )
   })
 
@@ -65,7 +67,7 @@ describe('IdentityWallet validate JWT', () => {
       signature: invalidSignature,
     }
     try {
-      await iw.validateJWT(JSONWebToken.fromJSON(tokenWithInvalidSignature), undefined, testResolutionMap)
+      await iw.validateJWT(JSONWebToken.fromJSON(tokenWithInvalidSignature), undefined, testResolver)
       expect(false).to.eq(true)
     } catch (err) {
       expect(err.message).to.eq(ErrorCodes.IDWInvalidJWTSignature)
@@ -76,7 +78,7 @@ describe('IdentityWallet validate JWT', () => {
     clock.tick(validSignedCredReqJWT.payload.exp + 1)
 
     try {
-      await iw.validateJWT(JSONWebToken.fromJSON(validSignedCredReqJWT), undefined, testResolutionMap)
+      await iw.validateJWT(JSONWebToken.fromJSON(validSignedCredReqJWT), undefined, testResolver)
       expect(true).to.eq(false)
     } catch (err) {
       expect(err.message).to.eq(ErrorCodes.IDWTokenExpired)
@@ -99,7 +101,7 @@ describe('IdentityWallet validate JWT', () => {
       await iw.validateJWT(
         JSONWebToken.fromJSON(tokenWIthInvalidNonce),
         JSONWebToken.fromJSON(validSignedCredReqJWT),
-        testResolutionMap,
+        testResolver,
       )
     } catch (err) {
       expect(err.message).to.eq(ErrorCodes.IDWIncorrectJWTNonce)
@@ -122,7 +124,7 @@ describe('IdentityWallet validate JWT', () => {
       await iw.validateJWT(
         JSONWebToken.fromJSON(tokenWIthInvalidAud),
         JSONWebToken.fromJSON(validSignedCredReqJWT),
-        testResolutionMap
+        testResolver
       )
     } catch (err) {
       expect(err.message).to.eq(ErrorCodes.IDWNotCorrectResponder)
@@ -143,7 +145,7 @@ describe('IdentityWallet validate JWT', () => {
 return iw.validateJWT(
       JSONWebToken.fromJSON(requestWithNoAud),
       undefined,
-      testResolutionMap
+      testResolver
     )
   })
 
@@ -162,7 +164,7 @@ return iw.validateJWT(
       await iw.validateJWT(
         JSONWebToken.fromJSON(requestWithInvalidAud),
         undefined,
-        testResolutionMap
+        testResolver
       )
       expect(false).to.eq(true)
     } catch (err) {
