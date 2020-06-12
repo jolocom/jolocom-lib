@@ -60,7 +60,7 @@ export class JolocomRegistry implements IRegistry {
 
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
 
-    const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
+    const didDocument = DidDocument.fromPublicKey(publicIdentityKey)
     const didDocumentSignature = await vaultedKeyProvider.signDigestable(
       derivationArgs,
       didDocument,
@@ -153,10 +153,9 @@ export class JolocomRegistry implements IRegistry {
 
   public async resolve(did: string): Promise<Identity> {
     const jsonDidDoc = await this.resolver.resolve(did)
-
-    if (!jsonDidDoc) {
-      throw new Error(ErrorCodes.RegistryDIDNotAnchored)
-    }
+      .catch(() => {
+        throw new Error(ErrorCodes.RegistryDIDNotAnchored)
+      })
 
     try {
       const didDocument = DidDocument.fromJSON(convertDidDocToIDidDocumentAttrs(jsonDidDoc))

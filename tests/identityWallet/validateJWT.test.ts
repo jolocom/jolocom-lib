@@ -55,9 +55,9 @@ describe('IdentityWallet validate JWT', () => {
 
   it('Should sucessfully perform necessary validation steps on received jwt', () => {
     return iw.validateJWT(
-      JSONWebToken.fromJSON(validSignedCredReqJWT), 
-      undefined, 
-      testResolver
+      JSONWebToken.fromJSON(validSignedCredReqJWT),
+      undefined,
+      testResolver,
     )
   })
 
@@ -67,7 +67,11 @@ describe('IdentityWallet validate JWT', () => {
       signature: invalidSignature,
     }
     try {
-      await iw.validateJWT(JSONWebToken.fromJSON(tokenWithInvalidSignature), undefined, testResolver)
+      await iw.validateJWT(
+        JSONWebToken.fromJSON(tokenWithInvalidSignature),
+        undefined,
+        testResolver,
+      )
       expect(false).to.eq(true)
     } catch (err) {
       expect(err.message).to.eq(ErrorCodes.IDWInvalidJWTSignature)
@@ -78,7 +82,11 @@ describe('IdentityWallet validate JWT', () => {
     clock.tick(validSignedCredReqJWT.payload.exp + 1)
 
     try {
-      await iw.validateJWT(JSONWebToken.fromJSON(validSignedCredReqJWT), undefined, testResolver)
+      await iw.validateJWT(
+        JSONWebToken.fromJSON(validSignedCredReqJWT),
+        undefined,
+        testResolver,
+      )
       expect(true).to.eq(false)
     } catch (err) {
       expect(err.message).to.eq(ErrorCodes.IDWTokenExpired)
@@ -124,7 +132,7 @@ describe('IdentityWallet validate JWT', () => {
       await iw.validateJWT(
         JSONWebToken.fromJSON(tokenWIthInvalidAud),
         JSONWebToken.fromJSON(validSignedCredReqJWT),
-        testResolver
+        testResolver,
       )
     } catch (err) {
       expect(err.message).to.eq(ErrorCodes.IDWNotCorrectResponder)
@@ -143,10 +151,10 @@ describe('IdentityWallet validate JWT', () => {
     /** @dev Restored in afterEach */
     sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
 return iw.validateJWT(
-      JSONWebToken.fromJSON(requestWithNoAud),
-      undefined,
-      testResolver
-    )
+  JSONWebToken.fromJSON(requestWithNoAud),
+  undefined,
+  testResolver,
+)
   })
 
   it('Should throw error if the aud on a request is defined and does not match current identity', async () => {
@@ -164,7 +172,7 @@ return iw.validateJWT(
       await iw.validateJWT(
         JSONWebToken.fromJSON(requestWithInvalidAud),
         undefined,
-        testResolver
+        testResolver,
       )
       expect(false).to.eq(true)
     } catch (err) {

@@ -87,7 +87,7 @@ describe('linkedData validation functions', () => {
   it('validateJsonLd should correctly validate', async () => {
     const testResolver = new Resolver({
       //@ts-ignore
-      jolo: () => DID_DOC_V0
+      jolo: () => DID_DOC_V0,
     })
 
     const mallformedV0 = {

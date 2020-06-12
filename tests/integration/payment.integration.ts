@@ -44,7 +44,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     expect(paymentRequestJWT).to.be.instanceOf(JSONWebToken)
     expect(paymentRequestJWT.interactionToken).to.be.instanceOf(PaymentRequest)
 
-    expect(paymentRequestJWT.interactionToken).to.deep.equal(paymentReqCreationArgs)
+    expect(paymentRequestJWT.interactionToken).to.deep.equal(PaymentRequest.fromJSON(paymentReqCreationArgs))
   })
 
   it('Should allow for consumption of valid payment request by user', async () => {
@@ -63,7 +63,6 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
         testResolver,
       )
     } catch (err) {
-      console.log(err)
       expect(true).to.be.false
     }
   })
@@ -110,7 +109,6 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
         testResolver,
       )
     } catch (err) {
-      console.log('ERROR: ', err)
       expect(true).to.be.false
     }
   })

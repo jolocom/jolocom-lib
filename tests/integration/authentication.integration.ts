@@ -25,7 +25,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     )
 
     expect(authRequestJWT.interactionToken).to.deep.eq(
-      jsonAuthentication,
+      Authentication.fromJSON(jsonAuthentication)
     )
 
     return userIdentityWallet.validateJWT(
