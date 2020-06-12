@@ -4950,13 +4950,13 @@ joi@^14.3.1:
     isemail "3.x.x"
     topo "3.x.x"
 
-jolo-did-resolver@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/jolo-did-resolver/-/jolo-did-resolver-0.2.0.tgz#bf37cb342e69e2270eafda0eb5470649751f4cc1"
-  integrity sha512-Oz6BDPy5EHxVZ80Hs1O4ZusNe+v+fs08j7BseHGz0C66sSrbNRtaL3PKbhqZIC/r+QaGdYZAroTAazJ9Pw3tNQ==
+jolo-did-resolver@0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/jolo-did-resolver/-/jolo-did-resolver-0.2.1.tgz#fe1e2518955c965fe330b64a3fc8ac77a579fe85"
+  integrity sha512-+qBh8Z6USn4VxFBmLcWPBZ02VtAN3rYRAd39HT9u/FeqgFKJ2LJu1Kpe7M2MNg+FI0RWk2I5QSNiTtGkUSknIg==
   dependencies:
     detect-node "^2.0.4"
-    did-resolver "^1.1.0"
+    did-resolver "2.0.0"
     jolocom-registry-contract "0.3.0"
     node-fetch "^2.6.0"
 

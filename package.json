@@ -21,10 +21,7 @@
     "generate-api-docs": "typedoc ./ts"
   },
   "husky": {
-    "hooks": {
-      "pre-commit": "precise-commits",
-      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
-    }
+    "hooks": {}
   },
   "nyc": {
     "include": [
@@ -82,7 +79,7 @@
     "ethereumjs-util": "^6.1.0",
     "ethers": "^4.0.27",
     "form-data": "^2.3.3",
-    "jolo-did-resolver": "^0.2.0",
+    "jolo-did-resolver": "0.2.1",
     "jolocom-registry-contract": "^0.1.7",
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.5.3",
