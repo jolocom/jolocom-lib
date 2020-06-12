@@ -1,7 +1,7 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import * as integrationHelper from './provision'
-import { jolocomIpfsStorageAgent } from '../../ts/ipfs/ipfs'
+import { jolocomIpfsStorageAgent, IpfsStorageAgent } from '../../ts/ipfs/ipfs'
 import { EthResolver } from '../../ts/ethereum/ethereum'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import {
@@ -17,6 +17,7 @@ import {
   userPass,
   serviceVault,
   servicePass,
+  testIpfsConfig
 } from './integration.data'
 import { getResolver } from 'jolo-did-resolver'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
@@ -47,7 +48,7 @@ before(async () => {
   testContractsAdapter = adapter
 
   jolocomRegistry = createJolocomRegistry({
-    ipfsConnector: jolocomIpfsStorageAgent,
+    ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
     ethereumConnector: new EthResolver(testEthereumConfig),
     contracts: { gateway, adapter },
   })

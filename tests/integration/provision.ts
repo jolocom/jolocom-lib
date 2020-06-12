@@ -39,30 +39,30 @@ const deployContract = async () => {
   return contract.address
 }
 
-// /**
-//  * @description - Helper function to spawn a in process ipfs node
-//  * @returns {void} - Once the function is executed, an ipfs endpoint
-//  *   available at localhost:5001
-//  */
-// 
-// const spawnIpfsNode = async () => {
-//   return new Promise((resolve, reject) =>
-//     daemonFactory.spawn(
-//       {
-//         exec: 'ipfs',
-//         disposable: true,
-//         defaultAddrs: true,
-//       },
-//       (spawnErr, ipfsd) => {
-//         if (spawnErr) {
-//           return reject(spawnErr)
-//         }
-// 
-//         ipfsd.api.id(apiErr => (apiErr ? reject(apiErr) : resolve()))
-//       },
-//     ),
-//   )
-// }
+/**
+ * @description - Helper function to spawn a in process ipfs node
+ * @returns {void} - Once the function is executed, an ipfs endpoint
+ *   available at localhost:5001
+ */
+
+const spawnIpfsNode = async () => {
+  return new Promise((resolve, reject) =>
+    daemonFactory.spawn(
+      {
+        exec: 'ipfs',
+        disposable: true,
+        defaultAddrs: true,
+      },
+      (spawnErr, ipfsd) => {
+        if (spawnErr) {
+          return reject(spawnErr)
+        }
+
+        ipfsd.api.id(apiErr => (apiErr ? reject(apiErr) : resolve()))
+      },
+    ),
+  )
+}
 
 /**
  * @description - Initiates a mock ethereum network using ganache, a discardable ipfs node using ipfsd, and
@@ -83,7 +83,7 @@ export const init = async () =>
       }
 
       await deployContract()
-      // await spawnIpfsNode()
+      await spawnIpfsNode()
 
       const testContractsGateway = new ContractsGateway(
         `http://localhost:${PORT}`,

@@ -82,7 +82,7 @@
     "ethereumjs-util": "^6.1.0",
     "ethers": "^4.0.27",
     "form-data": "^2.3.3",
-    "jolo-did-resolver": "../jolo-did-method/jolo-did-resolver/jolo-did-resolver-0.2.0.tgz",
+    "jolo-did-resolver": "^0.2.0",
     "jolocom-registry-contract": "^0.1.7",
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.5.3",
