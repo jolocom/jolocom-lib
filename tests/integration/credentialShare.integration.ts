@@ -43,9 +43,9 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
       credRequestEncoded,
     )
 
-    // expect(decodedCredRequest.interactionToken).to.be.instanceOf(
-    //   CredentialRequest,
-    // )
+    expect(decodedCredRequest.interactionToken).to.be.instanceOf(
+      CredentialRequest,
+    )
 
     try {
       await userIdentityWallet.validateJWT(
@@ -72,9 +72,9 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
     )
     credResponseEncoded = credResponseJWT.encode()
 
-    // expect(credResponseJWT.interactionToken).to.be.instanceOf(
-    //   CredentialResponse,
-    // )
+    expect(credResponseJWT.interactionToken).to.be.instanceOf(
+      CredentialResponse,
+    )
 
     expect(credResponseJWT.nonce).to.eq(decodedCredRequest.nonce)
     expect(credResponseJWT.audience).to.eq(

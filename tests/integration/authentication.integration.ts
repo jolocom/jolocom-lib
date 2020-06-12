@@ -40,7 +40,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
       authRequestJWT.encode(),
     )
 
-    // expect(decodedAuthRequest.interactionToken).to.be.instanceOf(Authentication)
+    expect(decodedAuthRequest.interactionToken).to.be.instanceOf(Authentication)
 
     try {
       await userIdentityWallet.validateJWT(
@@ -62,7 +62,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     )
     authResponseEncoded = authResponseJWT.encode()
 
-    // expect(authResponseJWT.interactionToken).to.be.instanceOf(Authentication)
+    expect(authResponseJWT.interactionToken).to.be.instanceOf(Authentication)
     expect(authResponseJWT.nonce).to.eq(decodedAuthRequest.nonce)
     expect(authResponseJWT.audience).to.eq(
       keyIdToDid(decodedAuthRequest.issuer),

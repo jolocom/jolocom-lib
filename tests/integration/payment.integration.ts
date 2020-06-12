@@ -41,8 +41,8 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
 
     paymentRequestEncoded = paymentRequestJWT.encode()
 
-    // expect(paymentRequestJWT).to.be.instanceOf(JSONWebToken)
-    // expect(paymentRequestJWT.interactionToken).to.be.instanceOf(PaymentRequest)
+    expect(paymentRequestJWT).to.be.instanceOf(JSONWebToken)
+    expect(paymentRequestJWT.interactionToken).to.be.instanceOf(PaymentRequest)
 
     expect(paymentRequestJWT.interactionToken).to.deep.equal(paymentReqCreationArgs)
   })
@@ -52,9 +52,9 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       paymentRequestEncoded,
     )
 
-    // expect(decodedPaymentRequest.interactionToken).to.be.instanceOf(
-    //   PaymentRequest,
-    // )
+    expect(decodedPaymentRequest.interactionToken).to.be.instanceOf(
+      PaymentRequest,
+    )
 
     try {
       await serviceIdentityWallet.validateJWT(
@@ -89,9 +89,9 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
 
     paymentResponseEncoded = paymentResponseJWT.encode()
 
-    // expect(paymentResponseJWT.interactionToken).to.be.instanceOf(
-    //   PaymentResponse,
-    // )
+    expect(paymentResponseJWT.interactionToken).to.be.instanceOf(
+      PaymentResponse,
+    )
 
     expect(paymentResponseJWT.interactionToken.txHash).to.equal(receipt)
   })
@@ -99,9 +99,9 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
   it('Should allow for consumption of valid payment response by service', async () => {
     const decodedPaymentResponse = JSONWebToken.decode<PaymentResponse>(paymentResponseEncoded)
 
-    // expect(decodedPaymentResponse.interactionToken).to.be.instanceOf(
-    //   PaymentResponse,
-    // )
+    expect(decodedPaymentResponse.interactionToken).to.be.instanceOf(
+      PaymentResponse,
+    )
 
     try {
       await serviceIdentityWallet.validateJWT(
