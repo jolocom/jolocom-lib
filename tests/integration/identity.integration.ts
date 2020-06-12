@@ -57,6 +57,7 @@ before(async () => {
     getResolver(
       testEthereumConfig.providerUrl,
       testEthereumConfig.contractAddress,
+      `${testIpfsConfig.protocol}://${testIpfsConfig.host}:${testIpfsConfig.port}`
     )
   )
 
