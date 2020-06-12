@@ -1,13 +1,12 @@
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
 import { getIssuerPublicKey, keyIdToDid } from '../utils/helper'
-import { IRegistry } from '../registries/types'
 import { sha256 } from '../utils/crypto'
 import { canonize } from 'jsonld'
 import { JsonLdObject, SignedJsonLdObject, JsonLdContext } from './types'
-import { JolocomRegistry } from '../registries/jolocomRegistry'
-import { createResolver } from '../utils/validation'
+import { convertDidDocToIDidDocumentAttrs } from '../utils/resolution'
 import { DidDocument } from '../identity/didDocument/didDocument'
+import { jolocomResolver } from '../registries/jolocomRegistry'
 
 /**
  * Helper function to handle JsonLD normalization.
@@ -68,18 +67,13 @@ export const digestJsonLd = async (
 
 export const validateJsonLd = async (
   json: SignedJsonLdObject,
-  // TODO not any, rather resolver type
-  customRegistry?: IRegistry | {[key: string] : any},
+  resolver = jolocomResolver()
 ): Promise<boolean> => {
-  const resolver = createResolver(customRegistry)
-  // TODO This is an identity
   const issuerIdentity = await resolver.resolve(keyIdToDid(json.proof.creator))
-
   try {
     const issuerPublicKey = getIssuerPublicKey(
       json.proof.creator,
-      //@ts-ignore TODO DidDocument vs IDidDocumentAttrs
-      DidDocument.fromJSON(issuerIdentity)
+      DidDocument.fromJSON(convertDidDocToIDidDocumentAttrs(issuerIdentity))
     )
 
     return SoftwareKeyProvider.verify(

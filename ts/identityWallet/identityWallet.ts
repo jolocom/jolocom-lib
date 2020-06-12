@@ -46,8 +46,7 @@ import {
 } from '../interactionTokens/interactionTokens.types'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { ErrorCodes } from '../errors'
-import { IRegistry } from '../registries/types'
-import { createResolver } from '../utils/validation'
+import { convertDidDocToIDidDocumentAttrs } from '../utils/resolution'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -401,14 +400,10 @@ export class IdentityWallet {
   public async validateJWT<T, R>(
     receivedJWT: JSONWebToken<T>,
     sentJWT?: JSONWebToken<R>,
-    additionalResolver?: IRegistry | {[key: string] : any},
+    resolver = jolocomResolver(),
   ): Promise<void> {
-    const resolver = createResolver(additionalResolver)
-    //@ts-ignore
-    const result = await resolver.resolve(keyIdToDid(receivedJWT.issuer))
-
-    //@ts-ignore
-    const pubKey = getIssuerPublicKey(receivedJWT.issuer, result)
+    const result = convertDidDocToIDidDocumentAttrs(await resolver.resolve(keyIdToDid(receivedJWT.issuer)))
+    const pubKey = getIssuerPublicKey(receivedJWT.issuer, DidDocument.fromJSON(result))
 
     // First we make sure the signature on the interaction token is valid
     if (!(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT))) {
@@ -458,15 +453,19 @@ export class IdentityWallet {
   public asymEncryptToDidKey = async (
     data: Buffer,
     keyRef: string,
-    additionalResolver?: {},
-  ) =>
-    this.asymEncrypt(
+    resolver = jolocomResolver(),
+  ) => this.asymEncrypt(
       data,
       getIssuerPublicKey(
         keyRef,
-        //@ts-ignore
-        DidDocument.fromJSON(await (jolocomResolver(additionalResolver).resolve(keyIdToDid(keyRef))))
-      ),
+        DidDocument.fromJSON(
+          convertDidDocToIDidDocumentAttrs(
+            await resolver.resolve(
+              keyIdToDid(keyRef)
+            )
+          )
+        )
+      )
     )
 
   /**

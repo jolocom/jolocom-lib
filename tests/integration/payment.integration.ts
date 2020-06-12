@@ -4,7 +4,7 @@ import { userPass, servicePass } from './integration.data'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  jolocomRegistry,
+  testResolver,
   testContractsGateway,
 } from './identity.integration'
 import { publicKeyToAddress } from '../../ts/utils/helper'
@@ -60,7 +60,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       await serviceIdentityWallet.validateJWT(
         decodedPaymentRequest,
         null,
-        jolocomRegistry,
+        testResolver,
       )
     } catch (err) {
       console.log(err)
@@ -107,7 +107,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       await serviceIdentityWallet.validateJWT(
         decodedPaymentResponse,
         paymentRequestJWT,
-        jolocomRegistry,
+        testResolver,
       )
     } catch (err) {
       console.log('ERROR: ', err)

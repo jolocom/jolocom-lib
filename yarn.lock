@@ -2422,10 +2422,10 @@ dexie@^2.0.4:
   resolved "https://registry.yarnpkg.com/dexie/-/dexie-2.0.4.tgz#6027a5e05879424e8f9979d8c14e7420f27e3a11"
   integrity sha512-aQ/s1U2wHxwBKRrt2Z/mwFNHMQWhESerFsMYzE+5P5OsIe5o1kgpFMWkzKTtkvkyyEni6mWr/T4HUJuY9xIHLA==
 
-did-resolver@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-1.1.0.tgz#27a63b6f2aa8dee3d622cd8b8b47360661e24f1e"
-  integrity sha512-Q02Sc5VuQnJzzR8fQ/DzyCHiYb31WpQdocOsxppI66wwT4XalYRDeCr3a48mL6sYPQo76AkBh0mxte9ZBuQzxA==
+did-resolver@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-2.0.0.tgz#4fa505bebf1afee8ec4f1c24f8512d83538f5cf2"
+  integrity sha512-GBnfhGIdJRHh8daEbqt3RrGRdmm0ClEmCkh7LLdOVuUjNfkZVNJ1EDr5RB6+zpVMvNqHEssSEy9aDPSPqDTgUA==
 
 diff-match-patch@^1.0.0:
   version "1.0.4"

@@ -1,9 +1,9 @@
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { IDigestable } from '../linkedDataSignature/types'
 import { getIssuerPublicKey } from './helper'
-import { IRegistry } from '../registries/types'
-import { Resolver, DIDResolver } from 'did-resolver'
 import { DidDocument } from '../identity/didDocument/didDocument'
+import { createResolver, convertDidDocToIDidDocumentAttrs } from './resolution'
+import { Resolver } from 'did-resolver'
 import { getResolver } from 'jolo-did-resolver/js'
 import { jolocomResolver } from '../registries/jolocomRegistry'
 
@@ -18,15 +18,14 @@ import { jolocomResolver } from '../registries/jolocomRegistry'
 
 export const validateDigestable = async (
   toValidate: IDigestable,
-  customRegistry?: IRegistry | {[key: string] : any},
+  customResolver = jolocomResolver(),
 ): Promise<boolean> => {
-  const reg = createResolver(customRegistry)
-  const issuerIdentity = await reg.resolve(toValidate.signer.did)
+  const issuerIdentity = await customResolver.resolve(toValidate.signer.did)
   try {
     const issuerPublicKey = getIssuerPublicKey(
       toValidate.signer.keyId,
-      //@ts-ignore TODO DidDocument vs IDidDocumentAttrs
-      DidDocument.fromJSON(issuerIdentity)
+      // TODO Use the right type internally
+      DidDocument.fromJSON(convertDidDocToIDidDocumentAttrs(issuerIdentity))
     )
     return SoftwareKeyProvider.verifyDigestable(issuerPublicKey, toValidate)
   } catch {
@@ -45,34 +44,11 @@ export const validateDigestable = async (
 
 export const validateDigestables = async (
   toValidate: IDigestable[],
-  customRegistry?: IRegistry | {[key: string] : any},
+  customResolver = jolocomResolver(),
 ): Promise<boolean[]> =>
   Promise.all(
     toValidate.map(async digestable =>
-      validateDigestable(digestable, createResolver(customRegistry)),
+      validateDigestable(digestable, customResolver),
     ),
   )
 
-// TODO
-const isLegacyIRegistry = (res?: any): res is IRegistry => res && 
-  !!res.resolve &&
-  !!res.commit &&
-  !!res.authenticate
-
-// TODO Overloaded function to create a resolver, either based on an instance of the IRegistry class (old API),
-// or a Resolver Registry, see https://github.com/decentralized-identity/did-resolver/blob/develop/src/resolver.ts#L84
-
-type ResolverMap = { [key: string] : DIDResolver }
-
-//@ts-ignore getResolver does not satisfy T
-export const createResolver = <T extends IRegistry | ResolverMap> (resolverBase: T = getResolver()): Resolver => {
-  if (isLegacyIRegistry(resolverBase)) {
-    return new Resolver({
-      //@ts-ignore
-      jolo: did => resolverBase.resolve(did).then(({ didDocument }) => didDocument)
-    })
-  } else {
-    //@ts-ignore
-    return new Resolver(resolverBase)
-  }
-}

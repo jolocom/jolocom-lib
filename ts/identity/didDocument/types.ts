@@ -12,3 +12,6 @@ export interface IDidDocumentAttrs extends SignedJsonLdObject {
   service: IServiceEndpointSectionAttrs[]
   created: string
 }
+
+// Created is present here but not in the DIDDocument interface
+// Context is a string in DIDDocument and a nested whatever here

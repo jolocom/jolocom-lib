@@ -24,6 +24,7 @@ import { jolocomContractsGateway } from '../contracts/contractsGateway'
 import { Resolver } from 'did-resolver'
 import { getPublicProfile, getResolver } from 'jolo-did-resolver'
 import { ErrorCodes } from '../errors'
+import { convertDidDocToIDidDocumentAttrs } from '../utils/resolution'
 
 /**
  * @class
@@ -158,8 +159,7 @@ export class JolocomRegistry implements IRegistry {
     }
 
     try {
-      //@ts-ignore TODO IDidDoc vs IDidDocumentAttrs
-      const didDocument = DidDocument.fromJSON(jsonDidDoc)
+      const didDocument = DidDocument.fromJSON(convertDidDocToIDidDocumentAttrs(jsonDidDoc))
       const publicProfileJson = await getPublicProfile(jsonDidDoc)
 
       return Identity.fromDidDocument({
