@@ -5,9 +5,11 @@ import { ExclusivePartial, IIdentityWalletCreateArgs } from './types'
 import { Identity } from '../identity/identity'
 import { JSONWebToken } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
+import { PaymentResponse } from '../interactionTokens/paymentResponse'
 import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
+import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import {
   IVaultedKeyProvider,
@@ -31,6 +33,7 @@ import {
 } from '../contracts/types'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
+import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
 import {
   CredentialOfferRequestAttrs,
   CredentialOfferResponseAttrs,
@@ -281,13 +284,56 @@ export class IdentityWallet {
   private makeReq = <T>(typ: string) => (
     { expires, aud, ...message }: WithExtraOptions<T>,
     pass: string,
-  ) => this.createMessage({ message, typ, expires, aud }, pass)
+  ) =>
+    this.createMessage(
+      {
+        // @ts-ignore
+        message: this.messageCannonicaliser(typ).fromJSON(message),
+        typ,
+        expires,
+        aud,
+      },
+      pass,
+    )
 
   private makeRes = <T, R>(typ: string) => (
     { expires, aud, ...message }: WithExtraOptions<T>,
     pass: string,
     recieved?: JSONWebToken<R>,
-  ) => this.createMessage({ message, typ, expires, aud }, pass, recieved)
+  ) =>
+    this.createMessage(
+      {
+        // @ts-ignore
+        message: this.messageCannonicaliser(typ).fromJSON(message),
+        typ,
+        expires,
+        aud,
+      },
+      pass,
+      recieved,
+    )
+
+  private messageCannonicaliser = (typ: string) => {
+    switch (typ) {
+      case InteractionType.CredentialsReceive:
+        return CredentialsReceive
+      case InteractionType.CredentialOfferRequest:
+        return CredentialOfferRequest
+      case InteractionType.CredentialOfferResponse:
+        return CredentialOfferResponse
+      case InteractionType.CredentialRequest:
+        return CredentialRequest
+      case InteractionType.CredentialResponse:
+        return CredentialResponse
+      case InteractionType.Authentication:
+        return Authentication
+      case InteractionType.PaymentRequest:
+        return PaymentRequest
+      case InteractionType.PaymentResponse:
+        return PaymentResponse
+    }
+    throw new Error(ErrorCodes.JWTInvalidInteractionType)
+  }
 
   /**
    * Derives all public keys listed in the {@link KeyTypes} enum
