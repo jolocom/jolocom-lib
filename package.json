@@ -21,7 +21,10 @@
     "generate-api-docs": "typedoc ./ts"
   },
   "husky": {
-    "hooks": {}
+    "hooks": {
+      "pre-commit": "precise-commits",
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+    }
   },
   "nyc": {
     "include": [

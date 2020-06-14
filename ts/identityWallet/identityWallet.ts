@@ -394,7 +394,8 @@ export class IdentityWallet {
    * Validates interaction tokens for signatures, expiry, jti, and audience
    * @param receivedJWT - received JSONWebToken Class
    * @param sendJWT - optional send JSONWebToken Class which is used to validate the token nonce and the aud field on received token
-   * @param additionalResolver - optional additional resolver objects for DIF DID Resolver, e.g. {ethr: (did, parsed, resolver)=>{...}}
+   * @param resolver - instance of a {@link Resolver} to use for retrieving the signer's keys. If none is provided, the
+   * default Jolocom contract is used for resolution.
    */
 
   public async validateJWT<T, R>(
@@ -448,7 +449,8 @@ export class IdentityWallet {
    * Encrypts data asymmetrically
    * @param data - The data to encrypt
    * @param keyRef - The public key reference to encrypt to (e.g. 'did:jolo:12345#key-1')
-   * @param customRegistry - optional registry to use for resolving the public key
+   * @param resolver - instance of a {@link Resolver} to use for retrieving the target's public keys. If none is provided, the
+   * default Jolocom contract is used for resolution.
    */
   public asymEncryptToDidKey = async (
     data: Buffer,

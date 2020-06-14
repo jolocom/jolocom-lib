@@ -61,8 +61,8 @@ export const digestJsonLd = async (
 /**
  * Helper function to handle JsonLD validation.
  * @param json - {@link SignedJsonLdObject} to be validated
- * @param customRegistry - Custom registry implementation.
- *   If null, the {@link JolocomRegistry} is used
+ * @param resolver - instance of a {@link Resolver} to use for retrieving the signer's keys. 
+ * If none is provided, the default Jolocom contract is used for resolution.
  */
 
 export const validateJsonLd = async (

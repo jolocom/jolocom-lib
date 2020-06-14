@@ -36,8 +36,6 @@ export class JolocomRegistry implements IRegistry {
   public ethereumConnector: IEthereumConnector
   public contractsAdapter: IContractsAdapter
   public contractsGateway: IContractsGateway
- 
-  // TODO private?
   public resolver: Resolver
 
   /**
