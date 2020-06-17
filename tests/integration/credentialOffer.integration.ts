@@ -12,7 +12,7 @@ import {
   serviceIdentityWallet,
   jolocomRegistry,
 } from './identity.integration'
-import { claimsMetadata } from 'cred-types-jolocom-core'
+import { claimsMetadata } from 'jolocom-protocol-ts'
 import { CredentialsReceive } from '../../ts/interactionTokens/credentialsReceive'
 import { CredentialOfferRequest } from '../../ts/interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../../ts/interactionTokens/credentialOfferResponse'

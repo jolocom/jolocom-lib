@@ -8,7 +8,7 @@ import {
   emailVerifiableCredential,
   emailVerifiableCredentialHash,
 } from '../data/credential/signedCredential.data'
-import { EmailClaimMetadata } from 'cred-types-jolocom-core/js/types'
+import { EmailClaimMetadata } from 'jolocom-protocol-ts'
 import { Credential } from '../../ts/credentials/credential/credential'
 import { mockEmailCredCreationAttrs } from '../data/credential/credential.data'
 import { expect } from 'chai'

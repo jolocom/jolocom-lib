@@ -1,4 +1,4 @@
-import { claimsMetadata } from 'cred-types-jolocom-core'
+import { claimsMetadata } from 'jolocom-protocol-ts'
 const callbackURL = 'https://test.de/external-cred'
 
 export const credentialOfferRequestCreationArgs = {
