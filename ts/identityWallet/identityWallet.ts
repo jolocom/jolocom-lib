@@ -524,9 +524,20 @@ export class IdentityWallet {
         share: this.makeReq<ICredentialRequestAttrs>(
           InteractionType.CredentialRequest,
         ),
-        payment: this.makeReq<PaymentRequestCreationArgs>(
-          InteractionType.PaymentRequest,
-        ),
+        payment: (args: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => {
+          const { transactionOptions } = args
+
+          const withDefaults = {
+            gasLimit: 21000,
+            gasPrice: 10e9,
+            to: transactionOptions.to ||
+              publicKeyToAddress(
+                Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex')
+            ),
+            ...transactionOptions
+          }
+
+          return this.makeReq<PaymentRequestCreationArgs>(InteractionType.PaymentRequest)({...args, transactionOptions: withDefaults} , pass)},
       },
       response: {
         auth: this.makeRes<
