@@ -13,7 +13,7 @@ import {
   IDigestable,
   ILinkedDataSignature,
 } from '../../linkedDataSignature/types'
-import { BaseMetadata } from 'cred-types-jolocom-core'
+import { BaseMetadata } from '@jolocom/protocol-ts'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { JsonLdContext } from '../../linkedData/types'

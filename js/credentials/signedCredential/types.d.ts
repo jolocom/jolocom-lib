@@ -1,5 +1,5 @@
 import { ICredentialAttrs, IClaimSection } from '../credential/types';
-import { BaseMetadata } from 'cred-types-jolocom-core';
+import { BaseMetadata } from 'jolocom-protocol-ts';
 import { SignedJsonLdObject } from '../../linkedData/types';
 export interface ISignedCredentialAttrs extends SignedJsonLdObject, ICredentialAttrs {
     id: string;

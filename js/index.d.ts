@@ -19,4 +19,4 @@ export declare const JolocomLib: {
     };
     KeyTypes: typeof KeyTypes;
 };
-export { claimsMetadata } from 'cred-types-jolocom-core';
+export { claimsMetadata } from 'jolocom-protocol-ts';

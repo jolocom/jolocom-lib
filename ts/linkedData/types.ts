@@ -1,5 +1,5 @@
 import { ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
-import { ContextEntry } from 'cred-types-jolocom-core'
+import { ContextEntry } from 'jolocom-protocol-ts'
 
 type JsonLdPrimitive = string | number | boolean | JsonLdObject | JsonLdObject[]
 

@@ -137,6 +137,13 @@
     resolve-from "^5.0.0"
     resolve-global "^1.0.0"
 
+"@jolocom/protocol-ts@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/protocol-ts/-/protocol-ts-0.0.1.tgz#9c81631e727f016f5ac0e24e5d99972a0cc58cd2"
+  integrity sha512-wGZahxokB08xgJSOgWCZ34ZxSuSB8kTPpXgFw8gwKPDH8umSJ/WZFJtmndQOUpOBW21o12tx7x0ISh/ZiDdf3A==
+  dependencies:
+    cred-types-jolocom-core "^0.0.11"
+
 "@sinonjs/commons@^1.0.2", "@sinonjs/commons@^1.3.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@sinonjs/commons/-/commons-1.3.0.tgz#50a2754016b6f30a994ceda6d9a0a8c36adda849"

@@ -1,4 +1,4 @@
-import { ClaimInterface } from 'cred-types-jolocom-core';
+import { ClaimInterface } from 'jolocom-protocol-ts';
 import { JsonLdObject } from '../../linkedData/types';
 declare type ClaimType = string | number | boolean | {};
 export declare type ClaimEntry = ClaimType | ClaimInterface;
