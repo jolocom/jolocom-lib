@@ -11,11 +11,11 @@ export declare const JolocomLib: {
     };
     KeyProvider: typeof SoftwareKeyProvider;
     util: {
-        constraintFunctions: import("./interactionTokens/interactionTokens.types").IExposedConstraintFunctions;
+        constraintFunctions: import("@jolocom/protocol-ts/lib/interactionTokens").IExposedConstraintFunctions;
         fuelKeyWithEther: typeof fuelKeyWithEther;
         getIssuerPublicKey: typeof getIssuerPublicKey;
-        validateDigestable: (toValidate: import("./linkedDataSignature/types").IDigestable, customRegistry?: import("./registries/types").IRegistry) => Promise<boolean>;
-        validateDigestables: (toValidate: import("./linkedDataSignature/types").IDigestable[], customRegistry?: import("./registries/types").IRegistry) => Promise<boolean[]>;
+        validateDigestable: (toValidate: import("@jolocom/protocol-ts/lib/linkedDataSignature").IDigestable, customRegistry?: import("./registries/types").IRegistry) => Promise<boolean>;
+        validateDigestables: (toValidate: import("@jolocom/protocol-ts/lib/linkedDataSignature").IDigestable[], customRegistry?: import("./registries/types").IRegistry) => Promise<boolean[]>;
     };
     KeyTypes: typeof KeyTypes;
 };
