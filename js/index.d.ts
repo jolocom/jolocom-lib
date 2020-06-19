@@ -11,12 +11,12 @@ export declare const JolocomLib: {
     };
     KeyProvider: typeof SoftwareKeyProvider;
     util: {
-        constraintFunctions: import("./interactionTokens/interactionTokens.types").IExposedConstraintFunctions;
+        constraintFunctions: import("@jolocom/protocol-ts/dist/lib/interactionTokens").IExposedConstraintFunctions;
         fuelKeyWithEther: typeof fuelKeyWithEther;
         getIssuerPublicKey: typeof getIssuerPublicKey;
-        validateDigestable: (toValidate: import("./linkedDataSignature/types").IDigestable, resolver?: import("did-resolver").Resolver) => Promise<boolean>;
-        validateDigestables: (toValidate: import("./linkedDataSignature/types").IDigestable[], resolver?: import("did-resolver").Resolver) => Promise<boolean[]>;
+        validateDigestable: (toValidate: import("@jolocom/protocol-ts/dist/lib/linkedDataSignature").IDigestable, resolver?: import("did-resolver").Resolver) => Promise<boolean>;
+        validateDigestables: (toValidate: import("@jolocom/protocol-ts/dist/lib/linkedDataSignature").IDigestable[], resolver?: import("did-resolver").Resolver) => Promise<boolean[]>;
     };
     KeyTypes: typeof KeyTypes;
 };
-export { claimsMetadata } from 'cred-types-jolocom-core';
+export { claimsMetadata } from '@jolocom/protocol-ts';
