@@ -1,1 +1,1 @@
-export * from '@jolocom/protocol-ts/lib/interactionTokens'
+export * from '@jolocom/protocol-ts/dist/lib/interactionTokens'

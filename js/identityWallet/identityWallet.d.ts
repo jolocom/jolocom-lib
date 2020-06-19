@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { BaseMetadata } from 'jolocom-protocol-ts';
+import { BaseMetadata } from '@jolocom/protocol-ts';
 import { Credential } from '../credentials/credential/credential';
 import { SignedCredential } from '../credentials/signedCredential/signedCredential';
 import { ExclusivePartial, IIdentityWalletCreateArgs } from './types';

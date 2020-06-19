@@ -1,1 +1,1 @@
-export * from '@jolocom/protocol-ts/lib/contracts';
+export * from '@jolocom/protocol-ts/dist/lib/contracts';

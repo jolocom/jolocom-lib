@@ -1,1 +1,1 @@
-export * from '@jolocom/protocol-ts/lib/credential'
+export * from '@jolocom/protocol-ts/dist/lib/credential'

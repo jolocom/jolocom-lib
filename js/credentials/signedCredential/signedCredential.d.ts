@@ -2,7 +2,7 @@
 import 'reflect-metadata';
 import { ISignedCredCreationArgs, ISignedCredentialAttrs } from './types';
 import { IDigestable, ILinkedDataSignature } from '../../linkedDataSignature/types';
-import { BaseMetadata } from 'jolocom-protocol-ts';
+import { BaseMetadata } from '@jolocom/protocol-ts';
 import { IClaimSection } from '../credential/types';
 import { JsonLdContext } from '../../linkedData/types';
 import { ISigner } from '../../registries/types';

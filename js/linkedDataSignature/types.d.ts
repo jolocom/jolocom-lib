@@ -1,1 +1,1 @@
-export * from '@jolocom/protocol-ts/lib/linkedDataSignature';
+export * from '@jolocom/protocol-ts/dist/lib/linkedDataSignature';

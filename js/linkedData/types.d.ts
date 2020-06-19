@@ -1,1 +1,1 @@
-export * from '@jolocom/protocol-ts/lib/linkedData';
+export * from '@jolocom/protocol-ts/dist/lib/linkedData';

@@ -1,1 +1,1 @@
-export * from '@jolocom/protocol-ts/lib/signedCredential';
+export * from '@jolocom/protocol-ts/dist/lib/signedCredential';

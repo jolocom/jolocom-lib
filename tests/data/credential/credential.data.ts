@@ -1,4 +1,4 @@
-import { BaseMetadata, claimsMetadata } from 'jolocom-protocol-ts'
+import { BaseMetadata, claimsMetadata } from '@jolocom/protocol-ts'
 import { defaultContext } from '../../../ts/utils/contexts'
 
 /* Defining custom metadata objects for custom credentials */

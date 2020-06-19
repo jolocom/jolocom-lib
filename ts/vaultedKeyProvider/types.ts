@@ -1,1 +1,1 @@
-export * from '@jolocom/protocol-ts/lib/vaultedKeyProvider'
+export * from '@jolocom/protocol-ts/dist/lib/vaultedKeyProvider'
