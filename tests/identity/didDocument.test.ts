@@ -19,6 +19,7 @@ import {
   PublicKeySection,
 } from '../../ts/identity/didDocument/sections'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
+import { normalizeJsonLd } from '../../ts/linkedData'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 
 const expect = chai.expect
@@ -98,9 +99,9 @@ describe('DidDocument', () => {
   })
 
   it('Should correctly implement normalize', async () => {
-    const normalized = await referenceDidDocument.normalize()
-
-    expect(normalized).to.deep.eq(normalizedDidDocument)
+    const { proof, ...document } = referenceDidDocument.toJSON()
+    const njld = await normalizeJsonLd(document, referenceDidDocument.context)
+    expect(njld).to.deep.eq(normalizedDidDocument)
   })
 
   it('should correctly sign the DID document', async () => {

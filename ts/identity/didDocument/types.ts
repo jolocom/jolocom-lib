@@ -4,8 +4,8 @@ import {
   IPublicKeySectionAttrs,
   IServiceEndpointSectionAttrs,
 } from './sections/types'
-import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
-import { ContextEntry } from 'cred-types-jolocom-core'
+import { ILinkedDataSignatureAttrs } from '@jolocom/protocol-ts/dist/lib/linkedDataSignature'
+import { ContextEntry } from '@jolocom/protocol-ts'
 
 export interface IDidDocumentAttrs {
   '@context': ContextEntry[] | string

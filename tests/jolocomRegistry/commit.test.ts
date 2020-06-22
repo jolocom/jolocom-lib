@@ -21,6 +21,7 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
 import * as crypto from 'crypto'
+import { ErrorCodes } from '../../ts/errors'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -281,7 +282,7 @@ describe('Jolocom registry - commit', () => {
         keyMetadata: {} as IKeyDerivationArgs,
       })
     } catch (err) {
-      expect(err.message).to.contain('Error occured while')
+      expect(err.message).to.contain(ErrorCodes.RegistryCommitFailed)
     }
   })
 })

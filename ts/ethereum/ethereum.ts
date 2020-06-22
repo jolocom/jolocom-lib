@@ -58,6 +58,6 @@ export class EthResolver implements IEthereumConnector {
 /* Instantiates a resolver using the default configuration */
 
 export const jolocomEthereumResolver = new EthResolver({
-  providerUrl: 'https://rinkeby.infura.io/',
+  providerUrl: 'https://rinkeby.infura.io/v3/64fa85ca0b28483ea90919a83630d5d8',
   contractAddress: '0xd4351c3f383d79ba378ed1875275b1e7b960f120',
 })

@@ -21,4 +21,4 @@ export const JolocomLib = {
   KeyTypes,
 }
 
-export { claimsMetadata } from 'cred-types-jolocom-core'
+export { claimsMetadata } from '@jolocom/protocol-ts'

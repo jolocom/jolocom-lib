@@ -1,6 +1,7 @@
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { pubToAddress, addHexPrefix } from 'ethereumjs-util'
 import fetch from 'node-fetch'
+import { ErrorCodes } from '../errors'
 
 /**
  * Helper function to convert a key identifier to the owner did
@@ -17,23 +18,10 @@ export function getIssuerPublicKey(keyId: string, ddo: DidDocument): Buffer {
   const relevantKeySection = ddo.publicKey.find(section => section.id === keyId)
 
   if (!relevantKeySection) {
-    throw new Error('No relevant key-id found')
+    throw new Error(ErrorCodes.PublicKeyNotFound)
   }
 
   return Buffer.from(relevantKeySection.publicKeyHex, 'hex')
-}
-
-export function handleValidationStatus(success: boolean, key: string) {
-  if (!success) {
-    throw new Error(ErrorKeys[key] || 'Unknown Error key')
-  }
-}
-
-const ErrorKeys = {
-  exp: 'Token expired',
-  sig: 'Signature on token is invalid',
-  nonce: 'The token nonce deviates from request',
-  aud: 'You are not the intended audience of received token',
 }
 
 /**

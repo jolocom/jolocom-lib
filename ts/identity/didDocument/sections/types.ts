@@ -1,10 +1,12 @@
-export interface IPublicKeySectionAttrs {
+import { JsonLdObject } from '../../../linkedData/types'
+
+export interface IPublicKeySectionAttrs extends JsonLdObject {
   id: string
   type: string
   publicKeyHex: string
 }
 
-export interface IServiceEndpointSectionAttrs {
+export interface IServiceEndpointSectionAttrs extends JsonLdObject {
   id: string
   type: string
   serviceEndpoint: string

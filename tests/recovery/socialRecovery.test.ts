@@ -16,13 +16,12 @@ describe('Social Recovery', () => {
     const { did, secret } = SocialRecovery.combineShard(
       shards.slice(0, threshold),
     )
-    expect(secret).to.equal(testSecret32)
     expect(did).to.equal(testDID32)
+    expect(secret).to.equal(testSecret32)
   })
 
   it('should create shares correctly', () => {
     const shards = SocialRecovery.createShards(testDID32, testSecret32, 5, 3)
-    console.log(shards)
     expect(shards.length).to.equal(5)
   })
 
@@ -41,5 +40,10 @@ describe('Social Recovery', () => {
   it('should validate a shard', () => {
     const result = SocialRecovery.validateShard(testShares[0])
     expect(result).to.be.true
+  })
+
+  it('should fail validating a wrong shard', () => {
+    const result = SocialRecovery.validateShard('not a correct shard')
+    expect(result).to.be.false
   })
 })

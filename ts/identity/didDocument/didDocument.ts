@@ -8,7 +8,6 @@ import {
   Type,
 } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
-import { canonize } from 'jsonld'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import {
   AuthenticationSection,
@@ -16,9 +15,9 @@ import {
   ServiceEndpointsSection,
 } from './sections'
 import { ISigner } from '../../registries/types'
-import { ContextEntry } from 'cred-types-jolocom-core'
 import { defaultContextIdentity } from '../../utils/contexts'
-import { publicKeyToDID, sha256 } from '../../utils/crypto'
+import { publicKeyToDID } from '../../utils/crypto'
+import { digestJsonLd } from '../../linkedData'
 import {
   IDigestable,
   ILinkedDataSignature,
@@ -28,6 +27,7 @@ import {
   IKeyDerivationArgs,
   IVaultedKeyProvider,
 } from '../../vaultedKeyProvider/types'
+import { ContextEntry } from '@jolocom/protocol-ts'
 
 /**
  * Class modelling a Did Document
@@ -70,6 +70,7 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose({ name: '@context' })
+  // TODO Is this needed?
   @Transform(
     (val, obj) => {
       if (obj.id.startsWith('did:jolo')) return defaultContextIdentity
@@ -366,24 +367,8 @@ export class DidDocument implements IDigestable {
    */
 
   public async digest(): Promise<Buffer> {
-    const normalized = await this.normalize()
-
-    const docSectionDigest = sha256(Buffer.from(normalized))
-    const proofSectionDigest = await this.proof.digest()
-
-    return sha256(Buffer.concat([proofSectionDigest, docSectionDigest]))
-  }
-
-  /**
-   * Converts the did document to canonical form
-   * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
-   * @internal
-   */
-
-  public async normalize(): Promise<string> {
-    const json = this.toJSON()
-    delete json.proof
-    return canonize(json)
+    // @ts-ignore TODO Optional proof
+    return digestJsonLd(this.toJSON(), this.context)
   }
 
   /**

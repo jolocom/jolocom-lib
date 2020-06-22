@@ -13,7 +13,7 @@ If you have already created an identity, you can obtain an identity wallet by au
 .. code-block:: typescript
 
   import { JolocomLib } from 'jolocom-lib'
-  import { claimsMetadata } from 'cred-types-jolocom-core'
+  import { claimsMetadata } from '@jolocom/protocol-ts'
 
   const password = 'correct horse battery staple'
 
@@ -63,7 +63,7 @@ The ``SignedCredential`` class provides a number of methods to easily consume th
     }
   }
 
-.. note:: All credential types the library supports by default are made available through the ``cred-types-jolocom-core`` ``npm`` package.
+.. note:: All credential types the library supports by default are made available through the ``@jolocom/protocol-ts`` ``npm`` package.
   Alternatively, you can check out the `GitHub repository <https://github.com/jolocom/cred-types-jolocom-demo>`_.
 
 It's worth noting that in the aforementioned credential, the ``issuer``, the ``subject``, and the signature ``creator`` each share the same DID.
@@ -73,11 +73,19 @@ To issue a credential to another entity, we simply need to specify the DID of th
 
 .. code-block:: typescript
 
-  const emailAddressSignedCredential = identityWallet.create.signedCredential({
+  // You can also pass a custom expiry date for the credential, supported since v3.1.0
+  const customExpiryDate = new Date(2030, 1, 1)
+  const emailAddressSignedCredential = identityWallet.create.signedCredential(
+  {
     metadata: claimsMetadata.emailAddress,
     claim: { email: 'example@example.com' },
     subject: 'did:jolo:6d6f636b207375626a656374206469646d6f636b207375626a65637420646964'
-  }, password)
+  },
+  password,
+  customExpiryDate
+  )
+
+.. note:: The custom expiry date is an optional argument (if not present, will default to 1 year from Date.now())
 
 Taking a look at the newly created credential, we can indeed see that the ``subject``, denoted by the ``claim.id`` key, is different:
 
@@ -159,7 +167,7 @@ This allows citizens to prove that they are allowed to gain entry to the bar, in
 **Defining custom metadata**
 
 So far, when creating credentials, ``metadata`` provided by the
-``cred-types-jolocom-core`` package has been used. When creating custom credentials, we have to write
+``@jolocom/protocol-ts`` package has been used. When creating custom credentials, we have to write
 our own ``metadata`` definitions.
 
 Let's take another look at the second example use case from the previous section. One of the many possible ``metadata`` definitions would be:

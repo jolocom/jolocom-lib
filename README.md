@@ -16,10 +16,11 @@ Want to use our library? Please refer to the following resources:
 Integration and unit tests located in the ``./tests`` folder are a good place to start too.
 
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/jolocom/SmartWallet)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 ## Requirements
 
-Starting with version `2.3.0`, the Jolocom Library requires `Node.js v10+` to run. Versions prior to `2.3.0` require `Node.js v8`.
+Starting with version `2.3.0`, the Jolocom Library requires `Node.js v10` or `Node.js v11` to run. Versions prior to `2.3.0` require `Node.js v8`.
 
 ## Linting and Formatting
 

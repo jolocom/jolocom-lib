@@ -8,27 +8,36 @@ import {
   emailVerifiableCredential,
   emailVerifiableCredentialHash,
 } from '../data/credential/signedCredential.data'
-import { EmailClaimMetadata } from 'cred-types-jolocom-core/js/types'
+import { EmailClaimMetadata } from '@jolocom/protocol-ts'
 import { Credential } from '../../ts/credentials/credential/credential'
 import { mockEmailCredCreationAttrs } from '../data/credential/credential.data'
 import { expect } from 'chai'
 import * as crypto from 'crypto'
+import { ErrorCodes } from '../../ts/errors'
 
 chai.use(sinonChai)
 
 describe('SignedCredential', () => {
   const sandbox = sinon.createSandbox()
-  let create
+  let credentialCreate
   let clock
   let vCred: SignedCredential
 
   before(async () => {
-    create = sandbox.spy(Credential, 'create')
+    credentialCreate = sandbox.spy(Credential, 'create')
     sandbox
       .stub(crypto, 'randomBytes')
       .returns(Buffer.from('1842fb5f567dd532', 'hex'))
 
     clock = sinon.useFakeTimers()
+  })
+
+  after(() => {
+    clock.restore()
+    sandbox.restore()
+  })
+
+  beforeEach(async () => {
     vCred = vCred = await SignedCredential.create<EmailClaimMetadata>(
       mockEmailCredCreationAttrs,
       {
@@ -38,14 +47,50 @@ describe('SignedCredential', () => {
     )
   })
 
-  after(() => {
-    clock.restore()
-    sandbox.restore()
+  afterEach(() => {
+    sandbox.resetHistory()
   })
 
   describe('static create method', () => {
+    it('Should correctly set the default expiry date', () => {
+      // Because of mock timers, Date.now() returns unix time 0
+      expect(vCred.expires.getFullYear()).to.deep.eq(1971)
+    })
+
+    it('Should correctly set custom expiry date', async () => {
+      const customExpiry = new Date(2030, 1, 1)
+      const vCredCustomExpiry = await SignedCredential.create(
+        { ...mockEmailCredCreationAttrs },
+        {
+          keyId: mockKeyId,
+          issuerDid: mockIssuerDid,
+        },
+        customExpiry,
+      )
+      expect(vCredCustomExpiry.expires).to.deep.eq(customExpiry)
+      sandbox.assert.calledWith(credentialCreate, mockEmailCredCreationAttrs)
+    })
+
+    it('Should fail to create if custom expiry date is in the past', async () => {
+      const customExpiry = new Date(1360, 1, 1)
+      return SignedCredential.create(
+        { ...mockEmailCredCreationAttrs },
+        {
+          keyId: mockKeyId,
+          issuerDid: mockIssuerDid,
+        },
+        customExpiry,
+      )
+        .then(() => {
+          throw new Error('Expected failure')
+        })
+        .catch(err => {
+          expect(err.message).to.contain(ErrorCodes.VCInvalidExpiryDate)
+        })
+    })
+
     it('Should correctly reference Credential construction', async () => {
-      sandbox.assert.calledWith(create, mockEmailCredCreationAttrs)
+      sandbox.assert.calledWith(credentialCreate, mockEmailCredCreationAttrs)
     })
 
     it('Should correctly assemble signature on create', async () => {

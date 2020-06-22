@@ -12,7 +12,7 @@ import {
   serviceIdentityWallet,
   jolocomRegistry,
 } from './identity.integration'
-import { claimsMetadata } from 'cred-types-jolocom-core'
+import { claimsMetadata } from '@jolocom/protocol-ts'
 import { CredentialsReceive } from '../../ts/interactionTokens/credentialsReceive'
 import { CredentialOfferRequest } from '../../ts/interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../../ts/interactionTokens/credentialOfferResponse'
@@ -101,7 +101,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
 
   it('Should correctly create a credential receive token by service', async () => {
     const decodedCredOfferResponse = JSONWebToken.decode<
-      CredentialOfferRequest
+      CredentialOfferResponse
     >(credOfferResponseEncoded)
     const signedCredForUser = await serviceIdentityWallet.create.signedCredential(
       {

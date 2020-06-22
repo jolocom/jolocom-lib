@@ -1,12 +1,5 @@
-import {
-  pack,
-  unpack,
-  share,
-  validateShard,
-  combine,
-} from 'dark-crystal-secrets'
-
-const darkCrystalVersion = '2.0.0'
+import * as secrets from 'secrets.js-grempe'
+import { ErrorCodes } from '../errors'
 
 export class SocialRecovery {
   public static createShards(
@@ -16,25 +9,54 @@ export class SocialRecovery {
     threshold: number,
   ): string[] {
     did = did.substring(did.lastIndexOf(':') + 1)
-    const labeledSecret = pack(secret, did)
-    return share(labeledSecret, amount, threshold)
+    const hexShards = secrets.share(
+      SocialRecovery.pack(did, secret),
+      amount,
+      threshold,
+    )
+    return hexShards.map(SocialRecovery.compress)
   }
 
-  public static validateShard(shards: string): any {
-    return validateShard(shards, darkCrystalVersion)
+  public static validateShard(shard: string): any {
+    try {
+      secrets.extractShareComponents(SocialRecovery.decompress(shard))
+    } catch (err) {
+      return false
+    }
+    return true
   }
 
   public static combineShard(
     shards: string[],
   ): { did: string; secret: string } {
-    const result = unpack(
-      combine(shards, darkCrystalVersion),
-      darkCrystalVersion,
+    const result = SocialRecovery.unpack(
+      secrets.combine(shards.map(SocialRecovery.decompress)),
     )
 
     return {
       did: 'did:jolo:' + result.label,
       secret: result.secret,
     }
+  }
+  private static unpack(shard: string): { secret: string; label: string } {
+    const arr = JSON.parse(secrets.hex2str(shard))
+    if (arr.length !== 2) throw new Error(ErrorCodes.RecoveryInvalidSecret)
+
+    return { secret: arr[0], label: arr[1] }
+  }
+  private static pack(label: string, secret: string): string {
+    return secrets.str2hex(JSON.stringify([secret, label]))
+  }
+
+  private static compress(shard) {
+    const shardData = shard.slice(3)
+    const shardDataBase64 = Buffer.from(shardData, 'hex').toString('base64')
+    return shard.slice(0, 3) + shardDataBase64
+  }
+
+  private static decompress(shard) {
+    const shardData = shard.slice(3)
+    const shardDataHex = Buffer.from(shardData, 'base64').toString('hex')
+    return shard.slice(0, 3) + shardDataHex
   }
 }

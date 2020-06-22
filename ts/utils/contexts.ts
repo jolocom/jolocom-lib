@@ -1,8 +1,8 @@
-import { ContextEntry } from 'cred-types-jolocom-core'
+import { ContextEntry } from "@jolocom/protocol-ts"
 
 /* Expanded default context for verifiable credentials, more verbose, but works in offline use cases */
 
-export const defaultContext: ContextEntry[] = [
+export const defaultContext = [
   {
     id: '@id',
     type: '@type',
@@ -30,7 +30,7 @@ export const defaultContext: ContextEntry[] = [
 /* Expanded default context for did documents, more verbose, but works in offline use cases */
 
 export const defaultContextIdentity: ContextEntry[] = [
-  // @ts-ignore number is not allowed as value of ContextEntry
+  //@ts-ignore, the verson is an int, which is not foreseen by the ContextEntry type
   {
     '@version': 1.1,
     id: '@id',

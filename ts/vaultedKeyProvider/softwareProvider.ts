@@ -1,11 +1,12 @@
 import { fromSeed } from 'bip32'
-import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
-import { IVaultedKeyProvider, IKeyDerivationArgs, KeyTypes } from './types'
+import { IKeyDerivationArgs, IVaultedKeyProvider } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
-import { keccak256 } from 'ethereumjs-util'
+import * as eccrypto from 'eccrypto'
+import { ErrorCodes } from '../errors'
 
 const ALG = 'aes-256-cbc'
 
@@ -18,6 +19,16 @@ const MAX_SEED_LENGTH = 32
 const IV_LENGTH = 16
 const MIN_ENCRYPTED_SEED_LENGTH = IV_LENGTH + MIN_SEED_LENGTH + PADDING_LENGTH
 const MAX_ENCRYPTED_SEED_LENGTH = IV_LENGTH + MAX_SEED_LENGTH + PADDING_LENGTH
+
+export interface EncryptedData {
+  keys: EncryptedKey[]
+  data: string
+}
+
+export interface EncryptedKey {
+  pubKey: string
+  cipher: string
+}
 
 /**
  * Ensure the encrypted seed is of the correct length (for generating BIP39 seed phrases)
@@ -46,11 +57,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
   public constructor(encryptedSeed: Buffer) {
     if (!isEncryptedSeedLengthValid(encryptedSeed)) {
-      throw new Error(
-        `Expected encrypted seed to be between ${MIN_ENCRYPTED_SEED_LENGTH} and ${MAX_ENCRYPTED_SEED_LENGTH} bytes long. Got ${
-          encryptedSeed.length
-        }.`,
-      )
+      throw new Error(ErrorCodes.SKPEncryptedSeedInvalidLength)
     }
 
     this._iv = encryptedSeed.slice(0, IV_LENGTH)
@@ -97,7 +104,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     encryptionPass: string,
   ): SoftwareKeyProvider {
     if (!validateMnemonic(mnemonic)) {
-      throw new Error('Invalid Mnemonic.')
+      throw new Error(ErrorCodes.SKPMnemonicInvalid)
     }
 
     const seed = Buffer.from(mnemonicToEntropy(mnemonic), 'hex')
@@ -257,6 +264,119 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   }
 
   /**
+   * Encrypts data asymmetrically
+   * @param data - The data to encrypt
+   * @param pubKey - The key to encrypt to
+   */
+  public async asymEncrypt(data: Buffer, pubKey: Buffer): Promise<string> {
+    return this.stringifyEncryptedData(await eccrypto.encrypt(pubKey, data))
+  }
+
+  /**
+   * Decrypts data asymmetrically
+   * @param data - The data to decrypt
+   * @param derivationArgs - The decryption private key derivation arguments
+   */
+  public async asymDecrypt(
+    data: string,
+    derivationArgs: IKeyDerivationArgs,
+  ): Promise<Buffer> {
+    const decKey = this.getPrivateKey(derivationArgs)
+    const dataObj = this.parseEncryptedData(data)
+    return eccrypto.decrypt(decKey, dataObj)
+  }
+
+  /**
+   * Encrypts data based on the hybrid encryption scheme of PGP. This means that
+   * the data will first be encrypted with a freshly generated symmetric key and
+   * afterwards this key is encrypted with the public key in an asymmetric manner
+   * @param data - The data that should be encrypted
+   * @param derivationArgs - The derivation args to derive the public key for encryption
+   */
+  public async encryptHybrid(
+    data: object,
+    derivationArgs: IKeyDerivationArgs,
+  ): Promise<EncryptedData> {
+    const publicKey = this.getPublicKey(derivationArgs)
+
+    const symKey = SoftwareKeyProvider.getRandom(PASSWORD_LENGTH)
+    const iv = SoftwareKeyProvider.getRandom(IV_LENGTH)
+
+    // Encrypt symmetrically
+    const encryptedData = SoftwareKeyProvider.encrypt(
+      symKey,
+      Buffer.from(JSON.stringify(data)),
+      iv,
+    )
+
+    // Encrypt asymmetrically
+    const encryptedKey = await this.asymEncrypt(symKey, publicKey)
+    return {
+      keys: [
+        {
+          cipher: encryptedKey,
+          pubKey: publicKey.toString('hex'),
+        },
+      ],
+      data: Buffer.concat([iv, encryptedData]).toString('hex'),
+    }
+  }
+
+  /**
+   * decrypt data that was hybrid encrypted before
+   * @param encryptedData - Data to decrypt
+   * @param derivationArg - derivation args to derive public and private key
+   */
+  public async decryptHybrid(
+    encryptedData: EncryptedData,
+    derivationArg: IKeyDerivationArgs,
+  ): Promise<object> {
+    const publicKey = this.getPublicKey(derivationArg)
+    // find encrypted key
+    const encryptedKey = encryptedData.keys.find(
+      key => key.pubKey === publicKey.toString('hex'),
+    )
+    if (!encryptedKey) throw new Error(ErrorCodes.SKPDecryptionInvalidKey)
+
+    // decrypt asymmetrically
+    // FIXME We are using a fork of eccrypto to fix a bug in eccrypto.decrypt() see https://github.com/jolocom/jolocom-lib/issues/384
+    //  change this back once this https://github.com/bitchan/eccrypto/pull/47 is released
+    const symKey = await this.asymDecrypt(encryptedKey.cipher, derivationArg)
+
+    // decrypt symmetrically
+    const encryptedDataBuffer = Buffer.from(encryptedData.data, 'hex')
+    const data = SoftwareKeyProvider.decrypt(
+      symKey,
+      encryptedDataBuffer.slice(IV_LENGTH), // extract cipher text
+      encryptedDataBuffer.slice(0, IV_LENGTH), // extract IV
+    ).toString()
+    return JSON.parse(data)
+  }
+
+  /**
+   * stringify encrypted data
+   * @param data - result of asymmetric encryption by eccrypto
+   */
+  private stringifyEncryptedData(data: object): string {
+    let hexData = {}
+    Object.keys(data).forEach(key => (hexData[key] = data[key].toString('hex')))
+    return JSON.stringify(hexData)
+  }
+
+  /**
+   * parse encrypted data that was stringified before
+   * @param data - stringified encrypted data
+   */
+  private parseEncryptedData(data: string): object {
+    const hexData = JSON.parse(data)
+    let bufferData = {}
+    Object.keys(hexData).forEach(key => {
+      bufferData[key] = Buffer.from(hexData[key], 'hex')
+    })
+    return bufferData
+  }
+
+  /**
    * aes 256 cbc with IV requires 32 byte encryption keys, in case the user provided
    *  password is not long enough, we digest it using sha256 and print a warning instead
    *  of throwing an error
@@ -270,9 +390,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     if (!passwordBuffer.length) return
     if (passwordBuffer.length !== PASSWORD_LENGTH) {
       console.warn(
-        `Provided password must have a length of ${PASSWORD_LENGTH} bytes, received ${
-          passwordBuffer.length
-        }. We will compute the sha256 hash of the provided password and use it instead`,
+        `Provided password must have a length of ${PASSWORD_LENGTH} bytes, received ${passwordBuffer.length}. We will compute the sha256 hash of the provided password and use it instead`,
       )
 
       return sha256(passwordBuffer)

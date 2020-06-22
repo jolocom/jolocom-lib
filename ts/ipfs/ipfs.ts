@@ -1,6 +1,7 @@
 import * as FormDataNode from 'form-data'
 const fetchNode = require('node-fetch')
 import { IIpfsConnector, IIpfsConfig } from './types'
+import { ErrorCodes } from '../errors'
 const isNode = require('detect-node')
 
 /**
@@ -97,9 +98,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
     const res = await this.getRequest(endpoint)
 
     if (!res.ok) {
-      throw new Error(
-        `Removing pinned hash ${hash} failed, status code: ${res.status}`,
-      )
+      throw new Error(ErrorCodes.IPFSUnpinFailed)
     }
   }
 
@@ -132,7 +131,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
 
   private serializeJSON(data: object) {
     if (!data || typeof data !== 'object') {
-      throw new Error(`JSON expected, received ${typeof data}`)
+      throw new Error(ErrorCodes.IPFSInvalidJSONFormat)
     }
 
     if (isNode) {
