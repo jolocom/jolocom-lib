@@ -1,3 +1,4 @@
-export { PublicKeySection } from './publicKeySection';
-export { AuthenticationSection } from './authenticationSection';
+import { PublicKeySection } from './publicKeySection';
+export { PublicKeySection };
 export { ServiceEndpointsSection } from './serviceEndpointsSection';
+export declare type AuthenticationSection = PublicKeySection | string;

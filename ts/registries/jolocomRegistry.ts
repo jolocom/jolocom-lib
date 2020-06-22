@@ -58,13 +58,8 @@ export class JolocomRegistry implements IRegistry {
 
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
 
-    const didDocument = DidDocument.fromPublicKey(publicIdentityKey)
-    const didDocumentSignature = await vaultedKeyProvider.signDigestable(
-      derivationArgs,
-      didDocument,
-    )
+    const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
 
-    didDocument.signature = didDocumentSignature.toString('hex')
     const identity = Identity.fromDidDocument({ didDocument })
 
     const identityWallet = new IdentityWallet({
@@ -126,6 +121,17 @@ export class JolocomRegistry implements IRegistry {
         didDocument.resetServiceEndpoints()
       }
 
+      didDocument.hasBeenUpdated()
+
+      await didDocument.sign(
+        vaultedKeyProvider,
+        {
+          derivationPath: KeyTypes.jolocomIdentityKey,
+          encryptionPass: keyMetadata.encryptionPass,
+        },
+        didDocument.publicKey[0].id,
+      )
+
       const ipfsHash = await this.ipfsConnector.storeJSON({
         data: didDocument.toJSON(),
         pin: true,
@@ -161,7 +167,8 @@ export class JolocomRegistry implements IRegistry {
 
       return Identity.fromDidDocument({
         didDocument,
-        publicProfile: publicProfileJson && SignedCredential.fromJSON(publicProfileJson)
+        publicProfile: publicProfileJson &&
+          SignedCredential.fromJSON(publicProfileJson)
       })
     } catch (error) {
       throw new Error(ErrorCodes.RegistryResolveFailed)

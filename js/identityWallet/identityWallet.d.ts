@@ -68,7 +68,7 @@ export declare class IdentityWallet {
                 auth: ({ expires, aud, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string) => Promise<JSONWebToken<any>>;
                 offer: ({ expires, aud, ...message }: WithExtraOptions<CredentialOfferRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
                 share: ({ expires, aud, ...message }: WithExtraOptions<ICredentialRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
-                payment: ({ expires, aud, ...message }: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => Promise<JSONWebToken<any>>;
+                payment: (args: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => Promise<JSONWebToken<any>>;
             };
             response: {
                 auth: ({ expires, aud, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, recieved?: JSONWebToken<Authentication>) => Promise<JSONWebToken<any>>;

@@ -18,15 +18,20 @@ describe('Jolocom Registry - resolve', () => {
   })
 
   it('should resolve with no public profile', async () => {
+    const didDocWithoutService = {
+      ...didDocumentJSON,
+      service: []
+    }
+
     sandbox
       .stub(joloDidResolver, 'getResolver')
       .returns({
-        jolo: sinon.stub().resolves(didDocumentJSON)
-    })
+        jolo: sinon.stub().resolves(didDocWithoutService)
+      })
 
     const { didDocument, publicProfile } = await createJolocomRegistry().resolve(mockDid)
 
-    expect(didDocument).to.deep.eq(DidDocument.fromJSON(didDocumentJSON))
+    expect(didDocument).to.deep.eq(DidDocument.fromJSON(didDocWithoutService))
     expect(publicProfile).to.be.undefined
   })
 
@@ -34,7 +39,7 @@ describe('Jolocom Registry - resolve', () => {
     sandbox
       .stub(joloDidResolver, 'getResolver')
       .returns({
-        jolo: () => ""
+        jolo: sinon.stub().resolves(null)
     })
 
     return createJolocomRegistry().resolve(mockDid)
