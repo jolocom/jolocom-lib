@@ -1,18 +1,22 @@
 import * as sinon from 'sinon'
 import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
-import {
-} from '../data/didDocument.data'
 import { expect } from 'chai'
 import * as joloDidResolver from 'jolo-did-resolver'
 import { didDocumentJSON, mockDid } from '../data/didDocument.data'
-import { ErrorCodes } from '../../ts/errors'
-import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
+
 import { publicProfileCredJSON } from '../data/identity.data'
+import { Identity } from '../../ts/identity/identity'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
+import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
+import { ErrorCodes } from '../../ts/errors'
+import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 
 const sandbox = sinon.createSandbox()
 
 describe('Jolocom Registry - resolve', () => {
+  beforeEach(() => {
+  })
+
   afterEach(() => {
     sandbox.restore()
   })
@@ -28,6 +32,8 @@ describe('Jolocom Registry - resolve', () => {
       .returns({
         jolo: sinon.stub().resolves(didDocWithoutService)
       })
+
+    sandbox.stub(SoftwareKeyProvider, 'verify').returns(true)
 
     const { didDocument, publicProfile } = await createJolocomRegistry().resolve(mockDid)
 
@@ -54,17 +60,17 @@ describe('Jolocom Registry - resolve', () => {
     }
 
     sandbox
-      .stub(joloDidResolver, 'getPublicProfile')
-      .returns(publicProfileCredJSON)
-
-    sandbox
       .stub(joloDidResolver, 'getResolver')
       .returns({
-        jolo: () => didDocWithPublicProfile
+        jolo: sinon.stub().resolves(didDocWithPublicProfile)
     })
 
-    const identity = await createJolocomRegistry().resolve(mockDid)
-    sandbox.assert.calledWith(joloDidResolver.getPublicProfile, didDocWithPublicProfile)
+    sandbox
+      .stub(joloDidResolver, 'getPublicProfile')
+      .resolves(publicProfileCredJSON)
+
+    const identity: Identity = await createJolocomRegistry().resolve(mockDid)
+    expect(identity.didDocument.toJSON()).to.deep.eq(didDocWithPublicProfile)
     expect(identity.publicProfile.toJSON()).to.deep.eq(publicProfileCredJSON)
   })
 })

@@ -25,6 +25,9 @@ import { Resolver } from 'did-resolver'
 import { getPublicProfile, getResolver } from 'jolo-did-resolver'
 import { ErrorCodes } from '../errors'
 import { convertDidDocToIDidDocumentAttrs } from '../utils/resolution'
+import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
+import { digestJsonLd } from '../linkedData'
+import { getIssuerPublicKey } from '../utils/helper'
 
 /**
  * @class
@@ -57,9 +60,7 @@ export class JolocomRegistry implements IRegistry {
     }
 
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
-
     const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
-
     const identity = Identity.fromDidDocument({ didDocument })
 
     const identityWallet = new IdentityWallet({
@@ -162,7 +163,21 @@ export class JolocomRegistry implements IRegistry {
       })
 
     try {
-      const didDocument = DidDocument.fromJSON(convertDidDocToIDidDocumentAttrs(jsonDidDoc))
+      const didDocument = DidDocument.fromJSON(
+        convertDidDocToIDidDocumentAttrs(jsonDidDoc)
+      )
+
+      const signatureValid = SoftwareKeyProvider.verify(
+        //@ts-ignore
+        await digestJsonLd(jsonDidDoc, jsonDidDoc['@context']),
+        getIssuerPublicKey(didDocument.signer.keyId, didDocument),
+        Buffer.from(didDocument.proof.signature, 'hex')
+      )
+
+      if (!signatureValid) {
+        throw new Error(ErrorCodes.InvalidSignature)
+      }
+
       const publicProfileJson = await getPublicProfile(jsonDidDoc)
 
       return Identity.fromDidDocument({

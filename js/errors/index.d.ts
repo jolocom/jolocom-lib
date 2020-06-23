@@ -19,5 +19,6 @@ export declare enum ErrorCodes {
     IDWNotCorrectResponder = "IDWNotCorrectResponder",
     IDWIncorrectJWTNonce = "IDWIncorrectJWTNonce",
     IDWTokenExpired = "IDWTokenExpired",
-    VCInvalidExpiryDate = "VCInvalidExpiryDate"
+    VCInvalidExpiryDate = "VCInvalidExpiryDate",
+    InvalidSignature = "InvalidSignature"
 }
