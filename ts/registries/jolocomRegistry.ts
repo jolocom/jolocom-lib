@@ -2,7 +2,6 @@ import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { DidDocument } from '../identity/didDocument/didDocument'
-import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
@@ -24,6 +23,9 @@ import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
 import { ErrorCodes } from '../errors'
+import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
+import { digestJsonLd } from '../linkedData'
+import { getIssuerPublicKey } from '../utils/helper'
 
 /**
  * @class
@@ -55,9 +57,7 @@ export class JolocomRegistry implements IRegistry {
     }
 
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
-
     const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
-
     const identity = Identity.fromDidDocument({ didDocument })
 
     const identityWallet = new IdentityWallet({
@@ -159,13 +159,26 @@ export class JolocomRegistry implements IRegistry {
       if (!ddoHash) {
         throw new Error(ErrorCodes.RegistryDIDNotAnchored)
       }
-      const didDocument = DidDocument.fromJSON(
-        (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs,
+
+      const didDocJson = await this.ipfsConnector.catJSON(ddoHash)
+
+      //@ts-ignore
+      const didDocument = DidDocument.fromJSON(didDocJson)
+      const signatureValid = SoftwareKeyProvider.verify(
+        //@ts-ignore
+        await digestJsonLd(didDocJson, didDocJson['@context']),
+        getIssuerPublicKey(didDocument.signer.keyId, didDocument),
+        Buffer.from(didDocument.proof.signature, 'hex')
       )
+
+      if (!signatureValid) {
+        throw new Error(ErrorCodes.InvalidSignature)
+      }
 
       const publicProfileSection = didDocument.service.find(
         endpoint => endpoint.type === 'JolocomPublicProfile',
       )
+
       const publicProfile =
         publicProfileSection &&
         (await this.fetchPublicProfile(publicProfileSection.serviceEndpoint))
