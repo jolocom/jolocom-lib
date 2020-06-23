@@ -481,6 +481,20 @@ export class IdentityWallet {
     decryptionKeyArgs: IKeyDerivationArgs,
   ) => this.vaultedKeyProvider.asymDecrypt(data, decryptionKeyArgs)
 
+  /**
+   * Signs the data with the identity key
+   * @param data - The data to sign
+   * @param pass - the password
+   */
+  public sign = (data: Buffer, pass: string) =>
+    this.vaultedKeyProvider.sign(
+      {
+        derivationPath: KeyTypes.jolocomIdentityKey,
+        encryptionPass: pass,
+      },
+      data,
+    )
+
   private sendTransaction = async (
     request: ITransactionEncodable,
     pass: string,
