@@ -7,6 +7,8 @@ import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
 import * as eccrypto from 'eccrypto'
 import { ErrorCodes } from '../errors'
+import { box } from 'tweetnacl'
+import * as sealedbox from 'tweetnacl-sealedbox-js'
 
 const ALG = 'aes-256-cbc'
 
@@ -284,6 +286,26 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     const decKey = this.getPrivateKey(derivationArgs)
     const dataObj = this.parseEncryptedData(data)
     return eccrypto.decrypt(decKey, dataObj)
+  }
+
+  /**
+   * Encrypts data asymmetrically in a Libsodium Sealed Box
+   * @param data - The data to encrypt
+   * @param pubKey - The X25519 key to encrypt to
+   */
+  public static sealBox(data: Buffer, target: Buffer): string {
+    return sealedbox.seal(data, target)
+  }
+
+  /**
+   * Decrypts a Libsodium Sealed Box
+   * @param data - The base64 encoded box to unseal
+   * @param derivationArgs - The decryption private key derivation arguments
+   */
+  public unsealBox(box: string, derivationArgs: IKeyDerivationArgs): Buffer {
+    // note, this maps the Ed25519 keys to the BIP39 derivation process
+    const kp = box.keyPair.fromSeed(this.getPrivateKey(derivationArgs))
+    return sealedbox.open(box, kp.publicKey, kp.privateKey)
   }
 
   /**
