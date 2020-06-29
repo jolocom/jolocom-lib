@@ -18,7 +18,7 @@ import {
   IVaultedKeyProvider,
   IKeyDerivationArgs,
 } from '../vaultedKeyProvider/types'
-import { KeyTypes } from '../vaultedKeyProvider/types'
+import { KeyTypes, SchemeTypes } from '../vaultedKeyProvider/types'
 import { generatePublicProfileServiceSection } from '../identity/didDocument/sections/serviceEndpointsSection'
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
@@ -57,6 +57,11 @@ export class JolocomRegistry implements IRegistry {
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
 
     const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
+    didDocument.addPublicKeySection(
+      PublicKeySection.fromX25519(
+        vaultedKeyProvider.getPublicKey(derivationArgs, SchemeTypes.x25519),
+      ),
+    )
     const didDocumentSignature = await vaultedKeyProvider.signDigestable(
       derivationArgs,
       didDocument,
