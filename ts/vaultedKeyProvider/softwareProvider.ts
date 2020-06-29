@@ -2,7 +2,7 @@ import { fromSeed } from 'bip32'
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
-import { IKeyDerivationArgs, IVaultedKeyProvider } from './types'
+import { IKeyDerivationArgs, IVaultedKeyProvider, SchemeTypes } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
 import * as eccrypto from 'eccrypto'
@@ -119,7 +119,10 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `vault.getPublicKey({derivationPath: ..., decryptionPass: ...}) // Buffer <...>`
    */
 
-  public getPublicKey(derivationArgs: IKeyDerivationArgs): Buffer {
+  public getPublicKey(
+    derivationArgs: IKeyDerivationArgs,
+    scheme = SchemeTypes.secp256k1,
+  ): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
 
     const seed = SoftwareKeyProvider.decrypt(
@@ -127,7 +130,14 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
       this._encryptedSeed,
       this._iv,
     )
-    return fromSeed(seed).derivePath(derivationPath).publicKey
+    switch (scheme) {
+      case SchemeTypes.secp256k1:
+        return fromSeed(seed).derivePath(derivationPath).publicKey
+      case SchemeTypes.x25519:
+        return box.keyPair.fromSecretKey(
+          this.getPrivateKey(derivationArgs, SchemeTypes.x25519),
+        ).publicKey
+    }
   }
 
   /**
@@ -182,7 +192,10 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `vault.getPrivateKey({derivationPath: ..., decryptionPass: ...}) // Buffer <...>`
    */
 
-  public getPrivateKey(derivationArgs: IKeyDerivationArgs): Buffer {
+  public getPrivateKey(
+    derivationArgs: IKeyDerivationArgs,
+    scheme = SchemeTypes.secp256k1,
+  ): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
     const seed = SoftwareKeyProvider.decrypt(
       SoftwareKeyProvider.normalizePassword(encryptionPass),
@@ -191,7 +204,15 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     )
 
     console.warn('METHOD WILL BE DEPRECATED SOON, ANTIPATTERN')
-    return fromSeed(seed).derivePath(derivationPath).privateKey
+
+    switch (scheme) {
+      case SchemeTypes.secp256k1:
+        return fromSeed(seed).derivePath(derivationPath).privateKey
+      case SchemeTypes.x25519:
+        return Buffer.from(
+          box.keyPair.fromSeed(this.getPrivateKey(derivationArgs)).privateKey,
+        )
+    }
   }
 
   /**
