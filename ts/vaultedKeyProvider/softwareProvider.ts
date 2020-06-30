@@ -319,7 +319,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param pubKey - The X25519 key to encrypt to
    */
   public sealBox(data: Buffer, target: Buffer): string {
-    return sealedbox.seal(data, target)
+    return Buffer.from(sealedbox.seal(data, target)).toString('base64')
   }
 
   /**
@@ -327,12 +327,21 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param data - The base64 encoded box to unseal
    * @param derivationArgs - The decryption private key derivation arguments
    */
-  public unsealBox(box: string, derivationArgs: IKeyDerivationArgs): Buffer {
+  public unsealBox(
+    sealedBox: string,
+    derivationArgs: IKeyDerivationArgs,
+  ): Buffer {
     // note, this maps the Ed25519 keys to the BIP39 derivation process
-    const kp = sealedbox.keyPair.fromSecretKey(
+    const kp = box.keyPair.fromSecretKey(
       this.getPrivateKey(derivationArgs, SchemeTypes.x25519),
     )
-    return sealedbox.open(box, kp.publicKey, kp.privateKey)
+    return Buffer.from(
+      sealedbox.open(
+        Buffer.from(sealedBox, 'base64'),
+        kp.publicKey,
+        kp.secretKey,
+      ),
+    )
   }
 
   /**
