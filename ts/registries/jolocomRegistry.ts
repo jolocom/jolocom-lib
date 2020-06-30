@@ -58,13 +58,15 @@ export class JolocomRegistry implements IRegistry {
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
 
     const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
+
     didDocument.addPublicKeySection(
       PublicKeySection.fromX25519(
         vaultedKeyProvider.getPublicKey(derivationArgs, SchemeTypes.x25519),
-        'enc-1',
+        `${didDocument.did}#enc-1`,
         didDocument.did,
       ),
     )
+
     const didDocumentSignature = await vaultedKeyProvider.signDigestable(
       derivationArgs,
       didDocument,

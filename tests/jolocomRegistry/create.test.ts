@@ -5,7 +5,10 @@ import {
 } from '../../ts/registries/jolocomRegistry'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { Identity } from '../../ts/identity/identity'
-import { didDocumentJSON } from '../data/didDocument.data'
+import {
+  didDocumentJSON,
+  didDocumentWithEncKeyJSON,
+} from '../data/didDocument.data'
 import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import {
@@ -42,7 +45,8 @@ describe('Jolocom Registry - create', () => {
   it('should create new identity', async () => {
     const jolocomRegistry = createJolocomRegistry()
 
-    const expectedDidDoc = Object.assign({}, didDocumentJSON)
+    const pkDidDoc = Object.assign({}, didDocumentJSON)
+    const expectedDidDoc = Object.assign({}, didDocumentWithEncKeyJSON)
     expectedDidDoc.proof.signatureValue = msgSignature.toString('hex')
 
     identityWallet = await jolocomRegistry.create(mockVault, encryptionPass)

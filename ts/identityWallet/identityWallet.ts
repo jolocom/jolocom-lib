@@ -453,7 +453,7 @@ export class IdentityWallet {
   /**
    * Encrypts data asymmetrically
    * @param data - The data to encrypt
-   * @param keyRef - The public key reference to encrypt to (e.g. 'did:jolo:12345#key-1') (MUST BE AN X25519 KEY)
+   * @param keyRef - The public key reference to encrypt to (e.g. 'did:jolo:12345#enc-1') (MUST BE AN X25519 KEY)
    * @param customRegistry - optional registry to use for resolving the public key
    */
   public asymEncryptToDidKey = async (
@@ -476,10 +476,11 @@ export class IdentityWallet {
    * @param data - The data to decrypt
    * @param derivationArgs - The decryption private key derivation arguments
    */
-  public asymDecrypt = async (
-    data: string,
-    decryptionKeyArgs: IKeyDerivationArgs,
-  ) => this.vaultedKeyProvider.unsealBox(data, decryptionKeyArgs)
+  public asymDecrypt = async (data: string, pass: string) =>
+    this.vaultedKeyProvider.unsealBox(data, {
+      derivationPath: KeyTypes.jolocomIdentityKey,
+      encryptionPass: pass,
+    })
 
   private sendTransaction = async (
     request: ITransactionEncodable,
