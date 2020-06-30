@@ -132,11 +132,13 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     )
     switch (scheme) {
       case SchemeTypes.secp256k1:
-        return fromSeed(seed).derivePath(derivationPath).publicKey
+        return Buffer.from(fromSeed(seed).derivePath(derivationPath).publicKey)
       case SchemeTypes.x25519:
-        return box.keyPair.fromSecretKey(
-          this.getPrivateKey(derivationArgs, SchemeTypes.x25519),
-        ).publicKey
+        return Buffer.from(
+          box.keyPair.fromSecretKey(
+            this.getPrivateKey(derivationArgs, SchemeTypes.x25519),
+          ).publicKey,
+        )
     }
   }
 
@@ -210,7 +212,9 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
         return fromSeed(seed).derivePath(derivationPath).privateKey
       case SchemeTypes.x25519:
         return Buffer.from(
-          box.keyPair.fromSeed(this.getPrivateKey(derivationArgs)).privateKey,
+          box.keyPair.fromSecretKey(
+            normalizeX25519PrivKey(this.getPrivateKey(derivationArgs)),
+          ).secretKey,
         )
     }
   }
@@ -314,7 +318,7 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @param data - The data to encrypt
    * @param pubKey - The X25519 key to encrypt to
    */
-  public static sealBox(data: Buffer, target: Buffer): string {
+  public sealBox(data: Buffer, target: Buffer): string {
     return sealedbox.seal(data, target)
   }
 
@@ -325,7 +329,9 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    */
   public unsealBox(box: string, derivationArgs: IKeyDerivationArgs): Buffer {
     // note, this maps the Ed25519 keys to the BIP39 derivation process
-    const kp = box.keyPair.fromSeed(this.getPrivateKey(derivationArgs))
+    const kp = sealedbox.keyPair.fromSecretKey(
+      this.getPrivateKey(derivationArgs, SchemeTypes.x25519),
+    )
     return sealedbox.open(box, kp.publicKey, kp.privateKey)
   }
 
@@ -441,4 +447,18 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
     return passwordBuffer
   }
+}
+
+// Clamps a Curve25519 private key to prevent a few key attacks
+const normalizeX25519PrivKey = (key: Buffer): Buffer => {
+  // clamp the lower bits, ensuring the key is a multiple of the cofactor, preventing small subgroup attacks
+  key[0] &= 248
+
+  // clamp the second most upper bit (something to do with montgomery ladder implementations)
+  key[31] &= 127
+
+  // clamp the upper bit to prevent timing attacks
+  key[31] |= 64
+
+  return key
 }

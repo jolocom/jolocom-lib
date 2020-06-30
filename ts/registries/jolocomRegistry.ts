@@ -2,6 +2,7 @@ import { IIpfsConnector } from '../ipfs/types'
 import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { DidDocument } from '../identity/didDocument/didDocument'
+import { PublicKeySection } from '../identity/didDocument/sections'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
@@ -60,6 +61,8 @@ export class JolocomRegistry implements IRegistry {
     didDocument.addPublicKeySection(
       PublicKeySection.fromX25519(
         vaultedKeyProvider.getPublicKey(derivationArgs, SchemeTypes.x25519),
+        'enc-1',
+        didDocument.did,
       ),
     )
     const didDocumentSignature = await vaultedKeyProvider.signDigestable(

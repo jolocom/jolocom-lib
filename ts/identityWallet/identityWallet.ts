@@ -479,7 +479,7 @@ export class IdentityWallet {
   public asymDecrypt = async (
     data: string,
     decryptionKeyArgs: IKeyDerivationArgs,
-  ) => this.vaultedKeyProvider.openBox(data, decryptionKeyArgs)
+  ) => this.vaultedKeyProvider.unsealBox(data, decryptionKeyArgs)
 
   private sendTransaction = async (
     request: ITransactionEncodable,

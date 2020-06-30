@@ -69,7 +69,7 @@
   "license": "MIT",
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
-    "@jolocom/protocol-ts": "^0.2.0",
+    "@jolocom/protocol-ts": "^0.3.0",
     "base64url": "^3.0.1",
     "bip32": "^1.0.2",
     "bip39": "^3.0.1",
