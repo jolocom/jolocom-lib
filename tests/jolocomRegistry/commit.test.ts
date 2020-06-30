@@ -5,7 +5,6 @@ import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { Identity } from '../../ts/identity/identity'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
-import { IKeyDerivationArgs } from '../../ts/vaultedKeyProvider/types'
 import { testPrivateEthereumKey, testSeed } from '../data/keys.data'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import {
@@ -22,6 +21,7 @@ import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
 import * as crypto from 'crypto'
 import { ErrorCodes } from '../../ts/errors'
+import * as joloDidResolver from 'jolo-did-resolver'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -60,7 +60,12 @@ describe('Jolocom registry - commit', () => {
   })
 
   it('should commit without public profile', async () => {
-    const testRegistry: any = createJolocomRegistry()
+    sandbox
+      .stub(joloDidResolver, 'getResolver')
+      .returns({
+        jolo: sinon.stub().resolves(didDocumentJSON)
+    })
+    const testRegistry = createJolocomRegistry()
 
     sandbox.stub(testRegistry, 'resolve').resolves()
     sandbox.stub(testRegistry.ethereumConnector, 'updateDIDRecord')
@@ -86,6 +91,7 @@ describe('Jolocom registry - commit', () => {
     sandbox.assert.calledOnce(testRegistry.ipfsConnector.storeJSON)
     sandbox.assert.calledWith(testRegistry.resolve, mockDid)
     expect(
+      //@ts-ignore, this is the stub api
       testRegistry.ethereumConnector.updateDIDRecord.getCall(0).args,
     ).to.deep.eq([
       {
@@ -272,17 +278,21 @@ describe('Jolocom registry - commit', () => {
       contractsGateway: jolocomContractsGateway,
     })
 
-    testRegistry.ipfsConnector.storeJSON = sinon
-      .stub()
-      .throws(new Error('Mock'))
-    try {
-      await testRegistry.commit({
+    sandbox.stub(testRegistry, 'resolve').resolves()
+    sandbox.stub(testRegistry.ethereumConnector, 'updateDIDRecord')
+    sandbox.stub(testRegistry.ipfsConnector, 'storeJSON').throws(ErrorCodes.Unknown)
+
+    return testRegistry.commit({
         vaultedKeyProvider: vault,
         identityWallet,
-        keyMetadata: {} as IKeyDerivationArgs,
+        keyMetadata: {
+          derivationPath: KeyTypes.jolocomIdentityKey,
+          encryptionPass
+        }
       })
-    } catch (err) {
-      expect(err.message).to.contain(ErrorCodes.RegistryCommitFailed)
-    }
+      .then(() => { throw new Error("Was supposed to throw")} )
+      .catch((err) => {
+        expect(err.message).to.contain(ErrorCodes.RegistryCommitFailed)
+      })
   })
 })

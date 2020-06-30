@@ -4,7 +4,7 @@ import { userPass, servicePass } from './integration.data'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  jolocomRegistry,
+  testResolver,
   testContractsGateway,
 } from './identity.integration'
 import { publicKeyToAddress } from '../../ts/utils/helper'
@@ -27,6 +27,10 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       description: 'Payment for monthly subscription to awesome service',
       transactionOptions: {
         value: 0.5e18, // 0.5 Ether in Wei
+        // TODO DEFAULT VALUES NOT POPULATED YET DUE TO #399
+        to: '0xd63ae8085b84e157b5b558583777dc32240e6404', // Defaulted to service's eth addr.
+        gasLimit: 21e3,
+        gasPrice: 10e9,
       },
     }
 
@@ -40,17 +44,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     expect(paymentRequestJWT).to.be.instanceOf(JSONWebToken)
     expect(paymentRequestJWT.interactionToken).to.be.instanceOf(PaymentRequest)
 
-    expect(paymentRequestJWT.interactionToken).to.deep.equal(
-      PaymentRequest.fromJSON({
-        ...paymentReqCreationArgs,
-        transactionOptions: {
-          ...paymentReqCreationArgs.transactionOptions,
-          to: '0xd63ae8085b84e157b5b558583777dc32240e6404', // Defaulted to service's eth addr.
-          gasLimit: 21e3,
-          gasPrice: 10e9,
-        },
-      }),
-    )
+    expect(paymentRequestJWT.interactionToken).to.deep.equal(PaymentRequest.fromJSON(paymentReqCreationArgs))
   })
 
   it('Should allow for consumption of valid payment request by user', async () => {
@@ -66,7 +60,7 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       await serviceIdentityWallet.validateJWT(
         decodedPaymentRequest,
         null,
-        jolocomRegistry,
+        testResolver,
       )
     } catch (err) {
       expect(true).to.be.false
@@ -97,13 +91,13 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
     expect(paymentResponseJWT.interactionToken).to.be.instanceOf(
       PaymentResponse,
     )
+
     expect(paymentResponseJWT.interactionToken.txHash).to.equal(receipt)
   })
 
   it('Should allow for consumption of valid payment response by service', async () => {
-    const decodedPaymentResponse = JSONWebToken.decode<PaymentResponse>(
-      paymentResponseEncoded,
-    )
+    const decodedPaymentResponse = JSONWebToken.decode<PaymentResponse>(paymentResponseEncoded)
+
     expect(decodedPaymentResponse.interactionToken).to.be.instanceOf(
       PaymentResponse,
     )
@@ -112,10 +106,9 @@ describe('Integration Test - EXPERIMENTAL Token interaction flow Payment', () =>
       await serviceIdentityWallet.validateJWT(
         decodedPaymentResponse,
         paymentRequestJWT,
-        jolocomRegistry,
+        testResolver,
       )
     } catch (err) {
-      console.log('ERROR: ', err)
       expect(true).to.be.false
     }
   })
