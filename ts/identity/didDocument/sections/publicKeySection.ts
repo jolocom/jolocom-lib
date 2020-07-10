@@ -107,6 +107,27 @@ export class PublicKeySection {
   }
 
   /**
+   * Instantiates a boilerplate {@link PublicKeySection} based on the passed public key data
+   * @param publicKey - A X25519 public key to be listed in the "publicKey" section of the did document
+   * @param id - An identifier for the public key, normally #keys-X
+   * @param did - The did listed in the did document, used to compute the full key id
+   */
+
+  public static fromX25519(
+    publicKey: Buffer,
+    id: string,
+    did: string,
+  ): PublicKeySection {
+    const publicKeySecion = new PublicKeySection()
+    publicKeySecion.owner = did
+    publicKeySecion.id = id
+    publicKeySecion.type = 'X25519KeyAgreementKey2019'
+    publicKeySecion.publicKeyHex = publicKey.toString('hex')
+
+    return publicKeySecion
+  }
+
+  /**
    * Serializes the {@link PublicKeySection} as JSON
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
    */
