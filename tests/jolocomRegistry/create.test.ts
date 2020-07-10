@@ -45,7 +45,6 @@ describe('Jolocom Registry - create', () => {
   it('should create new identity', async () => {
     const jolocomRegistry = createJolocomRegistry()
 
-    const pkDidDoc = Object.assign({}, didDocumentJSON)
     const expectedDidDoc = Object.assign({}, didDocumentWithEncKeyJSON)
     expectedDidDoc.proof.signatureValue = msgSignature.toString('hex')
 
