@@ -126,7 +126,7 @@ export class PublicKeySection {
     did: string,
   ): PublicKeySection {
     const publicKeySecion = new PublicKeySection()
-    publicKeySecion.owner = did
+    publicKeySecion.controller = did
     publicKeySecion.id = id
     publicKeySecion.type = 'X25519KeyAgreementKey2019'
     publicKeySecion.publicKeyHex = publicKey.toString('hex')
