@@ -5,7 +5,11 @@ import {
   Type,
   Exclude,
 } from 'class-transformer'
-import { ICredentialResponseAttrs } from './interactionTokens.types'
+import {
+  ICredentialResponseAttrs,
+  InteractionType,
+  IInteractionToken,
+} from './interactionTokens.types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { CredentialRequest } from './credentialRequest'
 
@@ -14,7 +18,10 @@ import { CredentialRequest } from './credentialRequest'
  * Class representing a credential response. encodable as a JWT
  */
 @Exclude()
-export class CredentialResponse {
+export class CredentialResponse implements IInteractionToken {
+  @Expose({ toPlainOnly: true })
+  readonly type = InteractionType.CredentialResponse
+
   private _callbackURL: string
   private _suppliedCredentials: SignedCredential[]
 

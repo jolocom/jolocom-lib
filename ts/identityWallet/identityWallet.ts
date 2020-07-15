@@ -4,7 +4,7 @@ import { SignedCredential } from '../credentials/signedCredential/signedCredenti
 import { ExclusivePartial, IIdentityWalletCreateArgs } from './types'
 import { Identity } from '../identity/identity'
 import { JSONWebToken } from '../interactionTokens/JSONWebToken'
-import { InteractionType } from '../interactionTokens/types'
+import { InteractionType, IInteractionToken } from '../interactionTokens/types'
 import { PaymentResponse } from '../interactionTokens/paymentResponse'
 import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
@@ -261,7 +261,7 @@ export class IdentityWallet {
    * @param pass - Password to decrypt the vaulted seed
    * @param received - optional received JSONWebToken Class
    */
-  private createMessage = async <T, R>(
+  private createMessage = async <T extends IInteractionToken, R extends IInteractionToken>(
     args: { message: T; typ: string; expires?: Date; aud?: string },
     pass: string,
     recieved?: JSONWebToken<R>,
@@ -294,7 +294,7 @@ export class IdentityWallet {
       pass,
     )
 
-  private makeRes = <T, R>(typ: string) => (
+  private makeRes = <T, R extends IInteractionToken>(typ: string) => (
     { expires, aud, ...message }: WithExtraOptions<T>,
     pass: string,
     recieved?: JSONWebToken<R>,
@@ -365,7 +365,7 @@ export class IdentityWallet {
    * @param receivedJWT - optional received JSONWebToken Class
    */
 
-  private async initializeAndSign<T, R>(
+  private async initializeAndSign<T extends IInteractionToken, R extends IInteractionToken>(
     jwt: JSONWebToken<T>,
     derivationPath: string,
     pass: string,
@@ -396,7 +396,7 @@ export class IdentityWallet {
    * @param customRegistry - optional custom registry
    */
 
-  public async validateJWT<T, R>(
+  public async validateJWT<T extends IInteractionToken, R extends IInteractionToken>(
     receivedJWT: JSONWebToken<T>,
     sentJWT?: JSONWebToken<R>,
     customRegistry?: IRegistry,

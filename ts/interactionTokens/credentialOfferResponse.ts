@@ -2,6 +2,8 @@ import { classToPlain, plainToClass, Expose, Exclude } from 'class-transformer'
 import {
   CredentialOfferResponseAttrs,
   CredentialOfferResponseSelection,
+  IInteractionToken,
+  InteractionType,
 } from './interactionTokens.types'
 import { CredentialOfferRequest } from './credentialOfferRequest'
 
@@ -11,7 +13,10 @@ import { CredentialOfferRequest } from './credentialOfferRequest'
  */
 
 @Exclude()
-export class CredentialOfferResponse {
+export class CredentialOfferResponse implements IInteractionToken {
+  @Expose({ toPlainOnly: true })
+  readonly type = InteractionType.CredentialOfferResponse
+
   private _callbackURL: string
   private _selectedCredentials: CredentialOfferResponseSelection[]
 

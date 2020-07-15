@@ -7,6 +7,8 @@ import {
   ICredentialRequest,
   IConstraint,
   Operator,
+  IInteractionToken,
+  InteractionType,
 } from './interactionTokens.types'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
@@ -16,7 +18,10 @@ import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
  */
 
 @Exclude()
-export class CredentialRequest {
+export class CredentialRequest implements IInteractionToken {
+  @Expose({ toPlainOnly: true })
+  readonly type = InteractionType.CredentialRequest
+
   private _callbackURL: string
   private _credentialRequirements: ICredentialRequest[] = []
 

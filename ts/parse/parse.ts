@@ -4,7 +4,10 @@ import { SignedCredential } from '../credentials/signedCredential/signedCredenti
 import { ICredentialAttrs } from '../credentials/credential/types'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { JSONWebToken } from '../interactionTokens/JSONWebToken'
-import { IJSONWebTokenAttrs } from '../interactionTokens/types'
+import {
+  IJSONWebTokenAttrs,
+  IInteractionToken,
+} from '../interactionTokens/types'
 
 /**
  * Aggregates parsing methods for easier access
@@ -14,8 +17,10 @@ import { IJSONWebTokenAttrs } from '../interactionTokens/types'
 
 export interface ParseMethods {
   interactionToken: {
-    fromJWT: <T>(jwt: string) => JSONWebToken<T>
-    fromJSON: <T>(json: IJSONWebTokenAttrs) => JSONWebToken<T>
+    fromJWT: <T extends IInteractionToken>(jwt: string) => JSONWebToken<T>
+    fromJSON: <T extends IInteractionToken>(
+      json: IJSONWebTokenAttrs,
+    ) => JSONWebToken<T>
   }
   credential: (json: ICredentialAttrs) => Credential
   signedCredential: (json: ISignedCredentialAttrs) => SignedCredential

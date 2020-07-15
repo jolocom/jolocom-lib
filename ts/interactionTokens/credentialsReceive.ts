@@ -6,7 +6,11 @@ import {
   Exclude,
 } from 'class-transformer'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { ICredentialsReceiveAttrs } from './interactionTokens.types'
+import {
+  ICredentialsReceiveAttrs,
+  IInteractionToken,
+  InteractionType,
+} from './interactionTokens.types'
 
 /**
  * @class
@@ -16,7 +20,10 @@ import { ICredentialsReceiveAttrs } from './interactionTokens.types'
  */
 
 @Exclude()
-export class CredentialsReceive {
+export class CredentialsReceive implements IInteractionToken {
+  @Expose({ toPlainOnly: true })
+  readonly type = InteractionType.CredentialsReceive
+
   private _signedCredentials: SignedCredential[]
 
   /**

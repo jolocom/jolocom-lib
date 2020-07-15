@@ -7,7 +7,7 @@ import {
   Transform,
   Exclude,
 } from 'class-transformer'
-import { IJWTHeader } from './types'
+import { IJWTHeader, IInteractionToken } from './types'
 import { IJSONWebTokenAttrs, InteractionType } from './types'
 import { sha256 } from '../utils/crypto'
 import { IDigestable } from '../linkedDataSignature/types'
@@ -69,7 +69,7 @@ const convertPayload = <T>(args: TransformArgs) => ({
 /* Generic class encoding and decodes various interaction tokens as and from JSON web tokens */
 
 @Exclude()
-export class JSONWebToken<T> implements IDigestable {
+export class JSONWebToken<T extends IInteractionToken> implements IDigestable {
   /* ES256K stands for ec signatures on secp256k1, de facto standard */
   private _header: IJWTHeader = {
     typ: 'JWT',
@@ -173,7 +173,7 @@ export class JSONWebToken<T> implements IDigestable {
    * @returns {Object} - A json web token instance
    */
 
-  public static fromJWTEncodable<T>(toEncode: T): JSONWebToken<T> {
+  public static fromJWTEncodable<T extends IInteractionToken>(toEncode: T): JSONWebToken<T> {
     const jwt = new JSONWebToken<T>()
     jwt.interactionToken = toEncode
     return jwt
@@ -212,7 +212,7 @@ export class JSONWebToken<T> implements IDigestable {
    * @returns {Object} - Instance of JSONWebToken class
    */
 
-  public static decode<T>(jwt: string): JSONWebToken<T> {
+  public static decode<T extends IInteractionToken>(jwt: string): JSONWebToken<T> {
     return JSONWebToken.fromJSON<T>(decodeToken(jwt))
   }
 
@@ -251,7 +251,7 @@ export class JSONWebToken<T> implements IDigestable {
     return classToPlain(this) as IJSONWebTokenAttrs
   }
 
-  public static fromJSON<T>(json: IJSONWebTokenAttrs): JSONWebToken<T> {
+  public static fromJSON<T extends IInteractionToken>(json: IJSONWebTokenAttrs): JSONWebToken<T> {
     return plainToClass<JSONWebToken<T>, IJSONWebTokenAttrs>(JSONWebToken, json)
   }
 }

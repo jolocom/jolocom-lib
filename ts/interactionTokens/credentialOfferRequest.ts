@@ -5,6 +5,8 @@ import {
   CredentialOfferMetadata,
   CredentialOfferRenderInfo,
   CredentialOfferRequestAttrs,
+  InteractionType,
+  IInteractionToken,
 } from './interactionTokens.types'
 
 /**
@@ -13,7 +15,10 @@ import {
  */
 
 @Exclude()
-export class CredentialOfferRequest {
+export class CredentialOfferRequest implements IInteractionToken {
+  @Expose({ toPlainOnly: true })
+  readonly type = InteractionType.CredentialOfferRequest
+
   private _callbackURL: string
   private _offeredCredentials: CredentialOffer[]
 

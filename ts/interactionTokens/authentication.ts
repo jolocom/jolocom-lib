@@ -1,5 +1,9 @@
 import { plainToClass, classToPlain, Expose, Exclude } from 'class-transformer'
-import { IAuthenticationAttrs } from './interactionTokens.types'
+import {
+  IAuthenticationAttrs,
+  IInteractionToken,
+  InteractionType,
+} from './interactionTokens.types'
 
 /**
  * @class
@@ -9,7 +13,10 @@ import { IAuthenticationAttrs } from './interactionTokens.types'
  */
 
 @Exclude()
-export class Authentication {
+export class Authentication implements IInteractionToken {
+  @Expose({ toPlainOnly: true })
+  readonly type = InteractionType.Authentication
+
   private _callbackURL: string
   private _description: string
 

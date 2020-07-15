@@ -1,5 +1,9 @@
 import { classToPlain, plainToClass, Expose, Exclude } from 'class-transformer'
-import { IPaymentResponseAttrs } from './interactionTokens.types'
+import {
+  IPaymentResponseAttrs,
+  IInteractionToken,
+  InteractionType,
+} from './interactionTokens.types'
 
 /**
  * @class
@@ -7,7 +11,10 @@ import { IPaymentResponseAttrs } from './interactionTokens.types'
  */
 
 @Exclude()
-export class PaymentResponse {
+export class PaymentResponse implements IInteractionToken {
+  @Expose({ toPlainOnly: true })
+  readonly type = InteractionType.PaymentResponse
+
   private _txHash: string
 
   @Expose()

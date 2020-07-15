@@ -1,5 +1,9 @@
 import { classToPlain, plainToClass, Expose, Exclude } from 'class-transformer'
-import { IPaymentRequestAttrs } from './interactionTokens.types'
+import {
+  IPaymentRequestAttrs,
+  InteractionType,
+  IInteractionToken,
+} from './interactionTokens.types'
 import { ITransactionEncodable, TransactionOptions } from '../contracts/types'
 
 /**
@@ -8,7 +12,11 @@ import { ITransactionEncodable, TransactionOptions } from '../contracts/types'
  */
 
 @Exclude()
-export class PaymentRequest implements ITransactionEncodable {
+export class PaymentRequest
+  implements ITransactionEncodable, IInteractionToken {
+  @Expose({ toPlainOnly: true })
+  readonly type = InteractionType.PaymentRequest
+
   private _callbackURL: string
   private _transactionOptions: TransactionOptions
   private _description: string
