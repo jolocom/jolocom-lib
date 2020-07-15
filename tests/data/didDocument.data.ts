@@ -5,8 +5,10 @@ export const mockDid =
 export const mockIpfsHash = 'QmZCEmfiKZhRPB88cEqmcHzQu6siSmVpieG6HTQse4e4Js'
 export const mockKeyId = `${mockDid}#keys-1`
 export const mockKeyId2 = `${mockDid}#keys-2`
+export const mockEncKeyId = `${mockDid}#enc-1`
 export const mockPublicKeyHex =
   '03848af62bffceb57631780ac0e0726106ee1c23262d6fd7ef906559d68f53a551'
+export const mockEncKeyHex = mockPublicKeyHex
 
 /* JSON form to ensure toJSON and fromJSON work as intended */
 
@@ -81,6 +83,40 @@ export const didDocumentJSON = {
     nonce: '1842fb5f567dd532',
     signatureValue:
       '3e4bca6a08643c4a67c02abd109accd19f2f9ad1c93cd9f39d3f23edc122de7a72d1de44420b456c20b1875ed254417efdf8dd16fb8ded818d830dac475ec55a',
+    created: '1970-01-01T00:00:00.000Z',
+  },
+  '@context': defaultContextIdentity,
+  id: mockDid,
+}
+
+export const didDocumentWithEncKeyJSON = {
+  authentication: [
+    {
+      publicKey: mockKeyId,
+      type: 'Secp256k1SignatureAuthentication2018',
+    },
+  ],
+  publicKey: [
+    {
+      id: mockKeyId,
+      type: 'Secp256k1VerificationKey2018',
+      owner: mockDid,
+      publicKeyHex: mockPublicKeyHex,
+    },
+    {
+      id: mockEncKeyId,
+      type: 'X25519KeyAgreementKey2019',
+      owner: mockDid,
+      publicKeyHex: mockEncKeyHex,
+    },
+  ],
+  service: [],
+  created: '1970-01-01T00:00:00.000Z',
+  proof: {
+    type: 'EcdsaKoblitzSignature2016',
+    creator: mockKeyId,
+    nonce: '1842fb5f567dd532',
+    signatureValue: '',
     created: '1970-01-01T00:00:00.000Z',
   },
   '@context': defaultContextIdentity,

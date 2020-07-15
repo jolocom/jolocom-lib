@@ -2,11 +2,13 @@ import { fromSeed } from 'bip32'
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
 import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
-import { IKeyDerivationArgs, IVaultedKeyProvider } from './types'
+import { IKeyDerivationArgs, IVaultedKeyProvider, SchemeTypes } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { sha256 } from '../utils/crypto'
 import * as eccrypto from 'eccrypto'
 import { ErrorCodes } from '../errors'
+import { box } from 'tweetnacl'
+import * as sealedbox from 'tweetnacl-sealedbox-js'
 
 const ALG = 'aes-256-cbc'
 
@@ -117,7 +119,10 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `vault.getPublicKey({derivationPath: ..., decryptionPass: ...}) // Buffer <...>`
    */
 
-  public getPublicKey(derivationArgs: IKeyDerivationArgs): Buffer {
+  public getPublicKey(
+    derivationArgs: IKeyDerivationArgs,
+    scheme = SchemeTypes.secp256k1,
+  ): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
 
     const seed = SoftwareKeyProvider.decrypt(
@@ -125,7 +130,16 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
       this._encryptedSeed,
       this._iv,
     )
-    return fromSeed(seed).derivePath(derivationPath).publicKey
+    switch (scheme) {
+      case SchemeTypes.secp256k1:
+        return Buffer.from(fromSeed(seed).derivePath(derivationPath).publicKey)
+      case SchemeTypes.x25519:
+        return Buffer.from(
+          box.keyPair.fromSecretKey(
+            this.getPrivateKey(derivationArgs, SchemeTypes.x25519),
+          ).publicKey,
+        )
+    }
   }
 
   /**
@@ -180,7 +194,10 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
    * @example `vault.getPrivateKey({derivationPath: ..., decryptionPass: ...}) // Buffer <...>`
    */
 
-  public getPrivateKey(derivationArgs: IKeyDerivationArgs): Buffer {
+  public getPrivateKey(
+    derivationArgs: IKeyDerivationArgs,
+    scheme = SchemeTypes.secp256k1,
+  ): Buffer {
     const { encryptionPass, derivationPath } = derivationArgs
     const seed = SoftwareKeyProvider.decrypt(
       SoftwareKeyProvider.normalizePassword(encryptionPass),
@@ -189,7 +206,17 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     )
 
     console.warn('METHOD WILL BE DEPRECATED SOON, ANTIPATTERN')
-    return fromSeed(seed).derivePath(derivationPath).privateKey
+
+    switch (scheme) {
+      case SchemeTypes.secp256k1:
+        return fromSeed(seed).derivePath(derivationPath).privateKey
+      case SchemeTypes.x25519:
+        return Buffer.from(
+          box.keyPair.fromSecretKey(
+            normalizeX25519PrivKey(this.getPrivateKey(derivationArgs)),
+          ).secretKey,
+        )
+    }
   }
 
   /**
@@ -284,6 +311,37 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     const decKey = this.getPrivateKey(derivationArgs)
     const dataObj = this.parseEncryptedData(data)
     return eccrypto.decrypt(decKey, dataObj)
+  }
+
+  /**
+   * Encrypts data asymmetrically in a Libsodium Sealed Box
+   * @param data - The data to encrypt
+   * @param pubKey - The X25519 key to encrypt to
+   */
+  public sealBox(data: Buffer, target: Buffer): string {
+    return Buffer.from(sealedbox.seal(data, target)).toString('base64')
+  }
+
+  /**
+   * Decrypts a Libsodium Sealed Box
+   * @param data - The base64 encoded box to unseal
+   * @param derivationArgs - The decryption private key derivation arguments
+   */
+  public unsealBox(
+    sealedBox: string,
+    derivationArgs: IKeyDerivationArgs,
+  ): Buffer {
+    // note, this maps the Ed25519 keys to the BIP39 derivation process
+    const kp = box.keyPair.fromSecretKey(
+      this.getPrivateKey(derivationArgs, SchemeTypes.x25519),
+    )
+    return Buffer.from(
+      sealedbox.open(
+        Buffer.from(sealedBox, 'base64'),
+        kp.publicKey,
+        kp.secretKey,
+      ),
+    )
   }
 
   /**
@@ -398,4 +456,18 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
 
     return passwordBuffer
   }
+}
+
+// Clamps a Curve25519 private key to prevent a few key attacks
+const normalizeX25519PrivKey = (key: Buffer): Buffer => {
+  // clamp the lower bits, ensuring the key is a multiple of the cofactor, preventing small subgroup attacks
+  key[0] &= 248
+
+  // clamp the second most upper bit (something to do with montgomery ladder implementations)
+  key[31] &= 127
+
+  // clamp the upper bit to prevent timing attacks
+  key[31] |= 64
+
+  return key
 }

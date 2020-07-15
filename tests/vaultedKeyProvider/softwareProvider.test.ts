@@ -3,6 +3,7 @@ import * as crypto from 'crypto'
 import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
+import { SchemeTypes } from '../../ts/vaultedKeyProvider/types'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import {
   testSeed,
@@ -318,17 +319,13 @@ describe('Software Vaulted Key Provider', () => {
     })
     it('should encrypt and decrypt', async () => {
       const data = SoftwareKeyProvider.getRandom(32)
-      console.log(`original:  ${data.toString('base64')}`)
 
-      const enc = await vault.asymEncrypt(
+      const enc = await vault.sealBox(
         data,
-        vault.getPublicKey(keyDerivationArgs),
+        vault.getPublicKey(keyDerivationArgs, SchemeTypes.x25519),
       )
-      console.log(`encrypted: ${enc}`)
 
-      const dec = await vault.asymDecrypt(enc, keyDerivationArgs)
-
-      console.log(`decrypted: ${dec.toString('base64')}`)
+      const dec = await vault.unsealBox(enc, keyDerivationArgs)
 
       expect(dec.toString('base64')).to.eq(data.toString('base64'))
       expect(enc).to.not.eq(data.toString('base64'))

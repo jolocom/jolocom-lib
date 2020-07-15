@@ -443,7 +443,7 @@ export class IdentityWallet {
    * @param pubKey - The key to encrypt to
    */
   public asymEncrypt = async (data: Buffer, publicKey: Buffer) =>
-    this.vaultedKeyProvider.asymEncrypt(data, publicKey)
+    this.vaultedKeyProvider.sealBox(data, publicKey)
 
   /**
    * Encrypts data asymmetrically
@@ -475,10 +475,11 @@ export class IdentityWallet {
    * @param data - The data to decrypt
    * @param derivationArgs - The decryption private key derivation arguments
    */
-  public asymDecrypt = async (
-    data: string,
-    decryptionKeyArgs: IKeyDerivationArgs,
-  ) => this.vaultedKeyProvider.asymDecrypt(data, decryptionKeyArgs)
+  public asymDecrypt = async (data: string, pass: string) =>
+    this.vaultedKeyProvider.unsealBox(data, {
+      derivationPath: KeyTypes.jolocomIdentityKey,
+      encryptionPass: pass,
+    })
 
   private sendTransaction = async (
     request: ITransactionEncodable,
@@ -523,20 +524,27 @@ export class IdentityWallet {
         share: this.makeReq<ICredentialRequestAttrs>(
           InteractionType.CredentialRequest,
         ),
-        payment: (args: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => {
+        payment: (
+          args: WithExtraOptions<PaymentRequestCreationArgs>,
+          pass: string,
+        ) => {
           const { transactionOptions } = args
 
           const withDefaults = {
             gasLimit: 21000,
             gasPrice: 10e9,
-            to: transactionOptions.to ||
+            to:
+              transactionOptions.to ||
               publicKeyToAddress(
-                Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex')
-            ),
-            ...transactionOptions
+                Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex'),
+              ),
+            ...transactionOptions,
           }
 
-          return this.makeReq<PaymentRequestCreationArgs>(InteractionType.PaymentRequest)({...args, transactionOptions: withDefaults} , pass)},
+          return this.makeReq<PaymentRequestCreationArgs>(
+            InteractionType.PaymentRequest,
+          )({ ...args, transactionOptions: withDefaults }, pass)
+        },
       },
       response: {
         auth: this.makeRes<
