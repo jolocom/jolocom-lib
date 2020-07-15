@@ -11,6 +11,7 @@ export declare class PublicKeySection {
     type: string;
     publicKeyHex: string;
     static fromEcdsa(publicKey: Buffer, id: string, did: string): PublicKeySection;
+    static fromX25519(publicKey: Buffer, id: string, did: string): PublicKeySection;
     toJSON(): IPublicKeySectionAttrs;
     fromJSON(json: IPublicKeySectionAttrs): PublicKeySection;
 }

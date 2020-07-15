@@ -8,7 +8,7 @@ import { JSONWebToken } from '../interactionTokens/JSONWebToken';
 import { PaymentRequest } from '../interactionTokens/paymentRequest';
 import { Authentication } from '../interactionTokens/authentication';
 import { CredentialRequest } from '../interactionTokens/credentialRequest';
-import { KeyTypes, IKeyDerivationArgs } from '../vaultedKeyProvider/types';
+import { KeyTypes } from '../vaultedKeyProvider/types';
 import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types';
 import { ITransactionEncodable } from '../contracts/types';
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest';
@@ -49,7 +49,7 @@ export declare class IdentityWallet {
     validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: import("did-resolver").Resolver): Promise<void>;
     asymEncrypt: (data: Buffer, publicKey: Buffer) => Promise<string>;
     asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: import("did-resolver").Resolver) => Promise<string>;
-    asymDecrypt: (data: string, decryptionKeyArgs: IKeyDerivationArgs) => Promise<Buffer>;
+    asymDecrypt: (data: string, pass: string) => Promise<Buffer>;
     private sendTransaction;
     transactions: {
         sendTransaction: (request: ITransactionEncodable, pass: string) => Promise<string>;
