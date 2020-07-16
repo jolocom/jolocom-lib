@@ -137,10 +137,10 @@
     resolve-from "^5.0.0"
     resolve-global "^1.0.0"
 
-"@jolocom/protocol-ts@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/protocol-ts/-/protocol-ts-0.3.0.tgz#28334bf65fdedda0f6ea90b54be4fa0a02234495"
-  integrity sha512-uEFDU0CnIBq/0AEmXQVJmwq3cdRrvWOdNQPz/WkODO9IG0MathZ6rEZX8f1gt4QMuCJ0uBcGRY5u3YoJx+gq6g==
+"@jolocom/protocol-ts@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@jolocom/protocol-ts/-/protocol-ts-0.4.0.tgz#152c4b23b9802a78bd98fbe18847d764f51a91f0"
+  integrity sha512-meKpwdHgWgkc2sgvbFYViIJN94+HKDsSqK1Xf7TBoiHGWHoMO95AbGNwOg/bE5+FnyJAQACa0wJmSC0GOK8ECA==
   dependencies:
     cred-types-jolocom-core "^0.0.11"
 
