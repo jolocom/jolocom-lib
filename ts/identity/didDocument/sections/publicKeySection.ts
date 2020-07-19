@@ -1,5 +1,11 @@
 import 'reflect-metadata'
-import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
+import {
+  classToPlain,
+  plainToClass,
+  Exclude,
+  Expose,
+  Transform,
+} from 'class-transformer'
 import { IPublicKeySectionAttrs } from './types'
 
 /**
@@ -14,7 +20,7 @@ import { IPublicKeySectionAttrs } from './types'
 export class PublicKeySection {
   private _id: string
   private _type: string
-  private _owner: string
+  private _controller: string
   private _publicKeyHex: string
 
   /**
@@ -22,16 +28,17 @@ export class PublicKeySection {
    */
 
   @Expose()
-  get owner(): string {
-    return this._owner
+  @Transform((val, obj) => obj.owner, { toClassOnly: true, until: 0.13 })
+  public get controller(): string {
+    return this._controller
   }
 
   /**
    * Set the did of the public key owner
    */
 
-  set owner(owner: string) {
-    this._owner = owner
+  public set controller(controller: string) {
+    this._controller = controller
   }
 
   /**
@@ -39,7 +46,7 @@ export class PublicKeySection {
    */
 
   @Expose()
-  get id(): string {
+  public get id(): string {
     return this._id
   }
 
@@ -47,7 +54,7 @@ export class PublicKeySection {
    * Set the public key identifier
    */
 
-  set id(id: string) {
+  public set id(id: string) {
     this._id = id
   }
 
@@ -56,7 +63,7 @@ export class PublicKeySection {
    */
 
   @Expose()
-  get type(): string {
+  public get type(): string {
     return this._type
   }
 
@@ -64,7 +71,7 @@ export class PublicKeySection {
    * Set the public key type
    */
 
-  set type(type: string) {
+  public set type(type: string) {
     this._type = type
   }
 
@@ -73,7 +80,7 @@ export class PublicKeySection {
    */
 
   @Expose()
-  get publicKeyHex(): string {
+  public get publicKeyHex(): string {
     return this._publicKeyHex
   }
 
@@ -81,7 +88,7 @@ export class PublicKeySection {
    * Set the public key
    */
 
-  set publicKeyHex(keyHex: string) {
+  public set publicKeyHex(keyHex: string) {
     this._publicKeyHex = keyHex
   }
 
@@ -98,7 +105,7 @@ export class PublicKeySection {
     did: string,
   ): PublicKeySection {
     const publicKeySecion = new PublicKeySection()
-    publicKeySecion.owner = did
+    publicKeySecion.controller = did
     publicKeySecion.id = id
     publicKeySecion.type = 'Secp256k1VerificationKey2018'
     publicKeySecion.publicKeyHex = publicKey.toString('hex')

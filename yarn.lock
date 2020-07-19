@@ -1806,10 +1806,10 @@ class-is@^1.1.0:
   resolved "https://registry.yarnpkg.com/class-is/-/class-is-1.1.0.tgz#9d3c0fba0440d211d843cec3dedfa48055005825"
   integrity sha512-rhjH9AG1fvabIDoGRVH587413LPjTZgmDF9fOFCbFJQV4yuocX1mHxxvXI4g3cGwbVY9wAYIoKlg1N79frJKQw==
 
-class-transformer@^0.1.10:
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/class-transformer/-/class-transformer-0.1.10.tgz#350f168ebb4c1f87edb18b98dd973681fc20fff7"
-  integrity sha512-QiNdUxEvTBiUtc0KiapGVHhgaqGQVEhOfL9UEBnb9xRfcwmDJT5ijIDwcwJUTwXaT/kGvZZB4JCGsiuR5adX6g==
+class-transformer@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/class-transformer/-/class-transformer-0.2.3.tgz#598c92ca71dcca73f91ccb875d74a3847ccfa32d"
+  integrity sha512-qsP+0xoavpOlJHuYsQJsN58HXSl8Jvveo+T37rEvCEeRfMWoytAyR0Ua/YsFgpM6AZYZ/og2PJwArwzJl1aXtQ==
 
 class-utils@^0.3.5:
   version "0.3.6"
@@ -2429,6 +2429,11 @@ dexie@^2.0.4:
   resolved "https://registry.yarnpkg.com/dexie/-/dexie-2.0.4.tgz#6027a5e05879424e8f9979d8c14e7420f27e3a11"
   integrity sha512-aQ/s1U2wHxwBKRrt2Z/mwFNHMQWhESerFsMYzE+5P5OsIe5o1kgpFMWkzKTtkvkyyEni6mWr/T4HUJuY9xIHLA==
 
+did-resolver@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-2.0.0.tgz#4fa505bebf1afee8ec4f1c24f8512d83538f5cf2"
+  integrity sha512-GBnfhGIdJRHh8daEbqt3RrGRdmm0ClEmCkh7LLdOVuUjNfkZVNJ1EDr5RB6+zpVMvNqHEssSEy9aDPSPqDTgUA==
+
 diff-match-patch@^1.0.0:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/diff-match-patch/-/diff-match-patch-1.0.4.tgz#6ac4b55237463761c4daf0dc603eb869124744b1"
@@ -2522,6 +2527,19 @@ elliptic@6.5.1:
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.1.tgz#c380f5f909bf1b9b4428d028cd18d3b0efd6b52b"
   integrity sha512-xvJINNLbTeWQjrl6X+7eQCrIy/YPv5XCpKW6kB5mKvtnGILoLDcySuwomfdzt0BMdLNVnuRNTuzKNHj0bva1Cg==
+  dependencies:
+    bn.js "^4.4.0"
+    brorand "^1.0.1"
+    hash.js "^1.0.0"
+    hmac-drbg "^1.0.0"
+    inherits "^2.0.1"
+    minimalistic-assert "^1.0.0"
+    minimalistic-crypto-utils "^1.0.0"
+
+elliptic@6.5.2:
+  version "6.5.2"
+  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.2.tgz#05c5678d7173c049d8ca433552224a495d0e3762"
+  integrity sha512-f4x70okzZbIQl/NSRLkI/+tteV/9WqL98zx+SQ69KbXxmVrmjwsNUPn/gYJJ0sHvEak24cZgHIPegRePAtA/xw==
   dependencies:
     bn.js "^4.4.0"
     brorand "^1.0.1"
@@ -3104,6 +3122,21 @@ ethers@^4.0.27:
     aes-js "3.0.0"
     bn.js "^4.4.0"
     elliptic "6.3.3"
+    hash.js "1.1.3"
+    js-sha3 "0.5.7"
+    scrypt-js "2.0.4"
+    setimmediate "1.0.4"
+    uuid "2.0.1"
+    xmlhttprequest "1.8.0"
+
+ethers@^4.0.40:
+  version "4.0.47"
+  resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.47.tgz#91b9cd80473b1136dd547095ff9171bd1fc68c85"
+  integrity sha512-hssRYhngV4hiDNeZmVU/k5/E8xmLG8UpcNUzg6mb7lqhgpFPH/t7nuv20RjRrEf0gblzvi2XwR5Te+V3ZFc9pQ==
+  dependencies:
+    aes-js "3.0.0"
+    bn.js "^4.4.0"
+    elliptic "6.5.2"
     hash.js "1.1.3"
     js-sha3 "0.5.7"
     scrypt-js "2.0.4"
@@ -4924,6 +4957,23 @@ joi@^14.3.1:
     isemail "3.x.x"
     topo "3.x.x"
 
+jolo-did-resolver@0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/jolo-did-resolver/-/jolo-did-resolver-0.2.1.tgz#fe1e2518955c965fe330b64a3fc8ac77a579fe85"
+  integrity sha512-+qBh8Z6USn4VxFBmLcWPBZ02VtAN3rYRAd39HT9u/FeqgFKJ2LJu1Kpe7M2MNg+FI0RWk2I5QSNiTtGkUSknIg==
+  dependencies:
+    detect-node "^2.0.4"
+    did-resolver "2.0.0"
+    jolocom-registry-contract "0.3.0"
+    node-fetch "^2.6.0"
+
+jolocom-registry-contract@0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/jolocom-registry-contract/-/jolocom-registry-contract-0.3.0.tgz#43056703b5b7839a9ad9f7a9edec81342504587a"
+  integrity sha512-5n/c+xeLUuzYyHEmeHyz3DNWM/8qklQYLNCQV6BBdc2OwwSsP2Q+a+bGsSxcxp/QlP7UEBqnUbkBBubRzq7v/A==
+  dependencies:
+    ethers "^4.0.40"
+
 jolocom-registry-contract@^0.1.7:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/jolocom-registry-contract/-/jolocom-registry-contract-0.1.7.tgz#838bfb85feab5ac05b59dedd1c08935d516c3610"
@@ -5083,10 +5133,10 @@ jsonify@~0.0.0:
   resolved "https://registry.yarnpkg.com/jsonify/-/jsonify-0.0.0.tgz#2c74b6ee41d93ca51b7b5aaee8f503631d252a73"
   integrity sha1-LHS27kHZPKUbe1qu6PUDYx0lKnM=
 
-jsonld@^1.5.3:
-  version "1.5.3"
-  resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-1.5.3.tgz#5814e8040adc075349057b56b2d5e80de23a25ec"
-  integrity sha512-fbgty6qs1UNmzHePUa+4wqZBbjdQN+XNs7bZ1kbp2e/ILIFTDHIuaUH9xrovTcrTfeBc/qbJ0aYpXvYOSRJZxg==
+jsonld@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-1.6.1.tgz#9db5d2a38ac26a118dbc5fae5dbefc3f22780ce2"
+  integrity sha512-4J5ilGTk+rAvAChbADruqFLcZ52b0aoMLL7xtyCVEmoIbyaPtwO4rOlQ/VczqhcrDvzxHflpDBdVi37LpALpXg==
   dependencies:
     rdf-canonize "^1.0.2"
     request "^2.88.0"
@@ -6055,6 +6105,11 @@ node-fetch@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.3.0.tgz#1a1d940bbfb916a1d3e0219f037e89e71f8c5fa5"
   integrity sha512-MOd8pV3fxENbryESLgVIeaGKrdl+uaYhCSSVkjeOb/31/njTpcis5aWfdqgNlHIrKOLRbMnfPINPOML2CIFeXA==
+
+node-fetch@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
+  integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
 node-forge@^0.7.6, node-forge@~0.7.6:
   version "0.7.6"

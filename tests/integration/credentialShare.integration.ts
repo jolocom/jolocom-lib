@@ -13,7 +13,7 @@ import { keyIdToDid } from '../../ts/utils/helper'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  jolocomRegistry,
+  testResolver
 } from './identity.integration'
 
 chai.use(sinonChai)
@@ -42,6 +42,7 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
     const decodedCredRequest = JSONWebToken.decode<CredentialRequest>(
       credRequestEncoded,
     )
+
     expect(decodedCredRequest.interactionToken).to.be.instanceOf(
       CredentialRequest,
     )
@@ -50,7 +51,7 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
       await userIdentityWallet.validateJWT(
         decodedCredRequest,
         null,
-        jolocomRegistry,
+        testResolver
       )
     } catch (err) {
       return expect(true).to.be.false
@@ -74,6 +75,7 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
     expect(credResponseJWT.interactionToken).to.be.instanceOf(
       CredentialResponse,
     )
+
     expect(credResponseJWT.nonce).to.eq(decodedCredRequest.nonce)
     expect(credResponseJWT.audience).to.eq(
       keyIdToDid(decodedCredRequest.issuer),
@@ -92,7 +94,7 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
       await serviceIdentityWallet.validateJWT(
         decodedCredResponse,
         credRequestJWT,
-        jolocomRegistry,
+        testResolver,
       )
     } catch (err) {
       return expect(true).to.be.false

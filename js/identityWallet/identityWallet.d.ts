@@ -11,10 +11,10 @@ import { CredentialRequest } from '../interactionTokens/credentialRequest';
 import { KeyTypes, IKeyDerivationArgs } from '../vaultedKeyProvider/types';
 import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types';
 import { ITransactionEncodable } from '../contracts/types';
-import { IRegistry } from '../registries/types';
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest';
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse';
 import { CredentialOfferRequestAttrs, CredentialOfferResponseAttrs, IAuthenticationAttrs, ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs, IPaymentRequestAttrs, IPaymentResponseAttrs } from '../interactionTokens/interactionTokens.types';
+import { DidDocument } from '../identity/didDocument/didDocument';
 interface PaymentRequestCreationArgs {
     callbackURL: string;
     description: string;
@@ -35,7 +35,7 @@ export declare class IdentityWallet {
     private _contractsGateway;
     did: string;
     identity: Identity;
-    didDocument: import("../identity/didDocument/didDocument").DidDocument;
+    didDocument: DidDocument;
     publicKeyMetadata: IKeyMetadata;
     private vaultedKeyProvider;
     constructor({ identity, publicKeyMetadata, vaultedKeyProvider, contractsGateway, contractsAdapter, }: IIdentityWalletCreateArgs);
@@ -46,9 +46,9 @@ export declare class IdentityWallet {
     private messageCannonicaliser;
     getPublicKeys: (encryptionPass: string) => PublicKeyMap;
     private initializeAndSign;
-    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, customRegistry?: IRegistry): Promise<void>;
+    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: import("did-resolver").Resolver): Promise<void>;
     asymEncrypt: (data: Buffer, publicKey: Buffer) => Promise<string>;
-    asymEncryptToDidKey: (data: Buffer, keyRef: string, customRegistry?: IRegistry) => Promise<string>;
+    asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: import("did-resolver").Resolver) => Promise<string>;
     asymDecrypt: (data: string, decryptionKeyArgs: IKeyDerivationArgs) => Promise<Buffer>;
     private sendTransaction;
     transactions: {
@@ -68,7 +68,7 @@ export declare class IdentityWallet {
                 auth: ({ expires, aud, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string) => Promise<JSONWebToken<any>>;
                 offer: ({ expires, aud, ...message }: WithExtraOptions<CredentialOfferRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
                 share: ({ expires, aud, ...message }: WithExtraOptions<ICredentialRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
-                payment: ({ expires, aud, ...message }: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => Promise<JSONWebToken<any>>;
+                payment: (args: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => Promise<JSONWebToken<any>>;
             };
             response: {
                 auth: ({ expires, aud, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, recieved?: JSONWebToken<Authentication>) => Promise<JSONWebToken<any>>;

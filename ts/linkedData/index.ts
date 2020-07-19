@@ -1,11 +1,12 @@
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
 import { getIssuerPublicKey, keyIdToDid } from '../utils/helper'
-import { IRegistry } from '../registries/types'
-import { registries } from '../registries/'
 import { sha256 } from '../utils/crypto'
 import { canonize } from 'jsonld'
 import { JsonLdObject, SignedJsonLdObject, JsonLdContext } from './types'
+import { convertDidDocToIDidDocumentAttrs } from '../utils/resolution'
+import { DidDocument } from '../identity/didDocument/didDocument'
+import { jolocomResolver } from '../registries/jolocomRegistry'
 
 /**
  * Helper function to handle JsonLD normalization.
@@ -60,22 +61,21 @@ export const digestJsonLd = async (
 /**
  * Helper function to handle JsonLD validation.
  * @param json - {@link SignedJsonLdObject} to be validated
- * @param customRegistry - Custom registry implementation.
- *   If null, the {@link JolocomRegistry} is used
+ * @param resolver - instance of a {@link Resolver} to use for retrieving the signer's keys. 
+ * If none is provided, the default Jolocom contract is used for resolution.
  */
 
 export const validateJsonLd = async (
   json: SignedJsonLdObject,
-  customRegistry?: IRegistry,
+  resolver = jolocomResolver()
 ): Promise<boolean> => {
-  const reg = customRegistry || registries.jolocom.create()
-  const issuerIdentity = await reg.resolve(keyIdToDid(json.proof.creator))
-
+  const issuerIdentity = await resolver.resolve(keyIdToDid(json.proof.creator))
   try {
     const issuerPublicKey = getIssuerPublicKey(
       json.proof.creator,
-      issuerIdentity.didDocument,
+      DidDocument.fromJSON(convertDidDocToIDidDocumentAttrs(issuerIdentity))
     )
+
     return SoftwareKeyProvider.verify(
       await digestJsonLd(json, json['@context']),
       issuerPublicKey,

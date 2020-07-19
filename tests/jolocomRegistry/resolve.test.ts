@@ -1,73 +1,76 @@
 import * as sinon from 'sinon'
 import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
-import {
-  mockDid,
-  didDocumentJSON,
-  mockIpfsHash,
-} from '../data/didDocument.data'
 import { expect } from 'chai'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import * as joloDidResolver from 'jolo-did-resolver'
+import { didDocumentJSON, mockDid } from '../data/didDocument.data'
+
 import { publicProfileCredJSON } from '../data/identity.data'
 import { Identity } from '../../ts/identity/identity'
+import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
 import { ErrorCodes } from '../../ts/errors'
+import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
+
+const sandbox = sinon.createSandbox()
 
 describe('Jolocom Registry - resolve', () => {
-  let registry: any = createJolocomRegistry()
-
-  before(() => {
-    registry.ethereumConnector.resolveDID = sinon.stub().returns(mockIpfsHash)
-    registry.ipfsConnector.catJSON = sinon.stub().returns(didDocumentJSON)
+  beforeEach(() => {
   })
 
   afterEach(() => {
-    registry = createJolocomRegistry()
+    sandbox.restore()
   })
 
   it('should resolve with no public profile', async () => {
-    const identity: Identity = await registry.resolve(mockDid)
-    expect(registry.ethereumConnector.resolveDID.getCall(0).args).to.deep.eq([
-      mockDid,
-    ])
-    expect(identity.publicProfile).to.be.undefined
+    const didDocWithoutService = {
+      ...didDocumentJSON,
+      service: []
+    }
+
+    sandbox
+      .stub(joloDidResolver, 'getResolver')
+      .returns({
+        jolo: sinon.stub().resolves(didDocWithoutService)
+      })
+
+    sandbox.stub(SoftwareKeyProvider, 'verify').returns(true)
+
+    const { didDocument, publicProfile } = await createJolocomRegistry().resolve(mockDid)
+
+    expect(didDocument).to.deep.eq(DidDocument.fromJSON(didDocWithoutService))
+    expect(publicProfile).to.be.undefined
   })
 
   it('should throw if resolution fails', async () => {
-    registry.ethereumConnector.resolveDID = sinon.stub().returns('')
-    try {
-      await registry.resolve('did:x')
-      expect(true).to.be.false
-    } catch (err) {
-      expect(err.message).to.eq(ErrorCodes.RegistryResolveFailed)
-    }
+    sandbox
+      .stub(joloDidResolver, 'getResolver')
+      .returns({
+        jolo: sinon.stub().resolves(null)
+    })
+
+    return createJolocomRegistry().resolve(mockDid)
+      .then(() => new Error('Error should have been thrown')) // TODO
+      .catch(err => expect(err.message).to.eq(ErrorCodes.RegistryDIDNotAnchored))
   })
 
   it('should resolve with public profile', async () => {
-    const extendedDidDoc = {
+     const didDocWithPublicProfile = {
       ...didDocumentJSON,
       service: [mockPubProfServiceEndpointJSON],
     }
 
-    registry.ethereumConnector.resolveDID = sinon.stub().returns(mockIpfsHash)
-    registry.ipfsConnector.catJSON = sinon.stub().resolves(extendedDidDoc)
-    registry.fetchPublicProfile = sinon
-      .stub()
-      .resolves(SignedCredential.fromJSON(publicProfileCredJSON))
+    sandbox
+      .stub(joloDidResolver, 'getResolver')
+      .returns({
+        jolo: sinon.stub().resolves(didDocWithPublicProfile)
+    })
 
-    const identity: Identity = await registry.resolve(mockDid)
-    expect(identity.didDocument.toJSON()).to.deep.eq(extendedDidDoc)
-    expect(identity.publicProfile.toJSON()).to.deep.eq(publicProfileCredJSON)
-  })
-
-  it('should implement fetchPublicProfile', async () => {
-    registry.ipfsConnector.catJSON = sinon
-      .stub()
+    sandbox
+      .stub(joloDidResolver, 'getPublicProfile')
       .resolves(publicProfileCredJSON)
 
-    const pubProf = await registry.fetchPublicProfile(`ipfs://${mockIpfsHash}`)
-    expect(pubProf).to.deep.eq(SignedCredential.fromJSON(publicProfileCredJSON))
-    expect(registry.ipfsConnector.catJSON.getCall(0).args).to.deep.eq([
-      mockIpfsHash,
-    ])
+    const identity: Identity = await createJolocomRegistry().resolve(mockDid)
+    expect(identity.didDocument.toJSON()).to.deep.eq(didDocWithPublicProfile)
+    expect(identity.publicProfile.toJSON()).to.deep.eq(publicProfileCredJSON)
   })
 })

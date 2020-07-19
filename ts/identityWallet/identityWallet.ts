@@ -25,13 +25,12 @@ import {
   getIssuerPublicKey,
   publicKeyToAddress,
 } from '../utils/helper'
-import { createJolocomRegistry } from '../registries/jolocomRegistry'
+import { jolocomResolver } from '../registries/jolocomRegistry'
 import {
   IContractsAdapter,
   IContractsGateway,
   ITransactionEncodable,
 } from '../contracts/types'
-import { IRegistry } from '../registries/types'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
@@ -45,7 +44,9 @@ import {
   IPaymentRequestAttrs,
   IPaymentResponseAttrs,
 } from '../interactionTokens/interactionTokens.types'
+import { DidDocument } from '../identity/didDocument/didDocument'
 import { ErrorCodes } from '../errors'
+import { convertDidDocToIDidDocumentAttrs } from '../utils/resolution'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -393,23 +394,17 @@ export class IdentityWallet {
    * Validates interaction tokens for signatures, expiry, jti, and audience
    * @param receivedJWT - received JSONWebToken Class
    * @param sendJWT - optional send JSONWebToken Class which is used to validate the token nonce and the aud field on received token
-   * @param customRegistry - optional custom registry
+   * @param resolver - instance of a {@link Resolver} to use for retrieving the signer's keys. If none is provided, the
+   * default Jolocom contract is used for resolution.
    */
 
   public async validateJWT<T, R>(
     receivedJWT: JSONWebToken<T>,
     sentJWT?: JSONWebToken<R>,
-    customRegistry?: IRegistry,
+    resolver = jolocomResolver(),
   ): Promise<void> {
-    const registry = customRegistry || createJolocomRegistry()
-    const remoteIdentity = await registry.resolve(
-      keyIdToDid(receivedJWT.issuer),
-    )
-
-    const pubKey = getIssuerPublicKey(
-      receivedJWT.issuer,
-      remoteIdentity.didDocument,
-    )
+    const result = convertDidDocToIDidDocumentAttrs(await resolver.resolve(keyIdToDid(receivedJWT.issuer)))
+    const pubKey = getIssuerPublicKey(receivedJWT.issuer, DidDocument.fromJSON(result))
 
     // First we make sure the signature on the interaction token is valid
     if (!(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT))) {
@@ -454,21 +449,25 @@ export class IdentityWallet {
    * Encrypts data asymmetrically
    * @param data - The data to encrypt
    * @param keyRef - The public key reference to encrypt to (e.g. 'did:jolo:12345#enc-1') (MUST BE AN X25519 KEY)
-   * @param customRegistry - optional registry to use for resolving the public key
+   * @param resolver - instance of a {@link Resolver} to use for retrieving the target's public keys. If none is provided, the
+   * default Jolocom contract is used for resolution.
    */
   public asymEncryptToDidKey = async (
     data: Buffer,
     keyRef: string,
-    customRegistry?: IRegistry,
-  ) =>
-    this.asymEncrypt(
+    resolver = jolocomResolver(),
+  ) => this.asymEncrypt(
       data,
       getIssuerPublicKey(
         keyRef,
-        await (customRegistry || createJolocomRegistry())
-          .resolve(keyIdToDid(keyRef))
-          .then(target => target.didDocument),
-      ),
+        DidDocument.fromJSON(
+          convertDidDocToIDidDocumentAttrs(
+            await resolver.resolve(
+              keyIdToDid(keyRef)
+            )
+          )
+        )
+      )
     )
 
   /**

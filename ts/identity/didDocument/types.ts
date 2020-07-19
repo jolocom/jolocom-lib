@@ -1,14 +1,21 @@
 import {
-  IPublicKeySectionAttrs,
+  IAuthenticationSectionAttrsv0,
   IAuthenticationSectionAttrs,
+  IPublicKeySectionAttrs,
   IServiceEndpointSectionAttrs,
 } from './sections/types'
-import { SignedJsonLdObject } from '../../linkedData/types'
+import { ILinkedDataSignatureAttrs } from '@jolocom/protocol-ts/dist/lib/linkedDataSignature'
+import { ContextEntry } from '@jolocom/protocol-ts'
 
-export interface IDidDocumentAttrs extends SignedJsonLdObject {
+export interface IDidDocumentAttrs {
+  '@context': ContextEntry[] | string
+  specVersion?: number
   id: string
-  authentication: IAuthenticationSectionAttrs[]
-  publicKey: IPublicKeySectionAttrs[]
-  service: IServiceEndpointSectionAttrs[]
-  created: string
+  authentication?:
+    | IAuthenticationSectionAttrsv0[]
+    | IAuthenticationSectionAttrs[]
+  publicKey?: IPublicKeySectionAttrs[]
+  service?: IServiceEndpointSectionAttrs[]
+  created?: string
+  proof?: ILinkedDataSignatureAttrs
 }

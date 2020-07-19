@@ -28,7 +28,6 @@ describe('Jolocom Registry - create', () => {
 
   before(async () => {
     sandbox.stub(mockVault, 'getPublicKey').returns(testPublicIdentityKey)
-    sandbox.stub(mockVault, 'signDigestable').returns(msgSignature)
     sandbox.stub(mockVault, 'getPrivateKey').returns(testPrivateIdentityKey)
 
     sandbox.stub(JolocomRegistry.prototype, 'commit').resolves()

@@ -13,16 +13,19 @@ import { SignedCredential } from '../../ts/credentials/signedCredential/signedCr
 import { publicProfileCredJSON } from '../data/identity.data'
 import {
   testEthereumConfig,
-  testIpfsConfig,
   userVault,
   userPass,
   serviceVault,
   servicePass,
+  testIpfsConfig
 } from './integration.data'
+import { getResolver } from 'jolo-did-resolver'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
 import { ContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import { Resolver } from 'did-resolver'
+import { ErrorCodes } from '../../ts/errors'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -33,6 +36,7 @@ export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
 export let testContractsGateway: ContractsGateway
 export let testContractsAdapter: ContractsAdapter
+export let testResolver: Resolver
 
 before(async () => {
   const {
@@ -48,6 +52,16 @@ before(async () => {
     ethereumConnector: new EthResolver(testEthereumConfig),
     contracts: { gateway, adapter },
   })
+
+  testResolver = new Resolver(
+    getResolver(
+      testEthereumConfig.providerUrl,
+      testEthereumConfig.contractAddress,
+      `${testIpfsConfig.protocol}://${testIpfsConfig.host}:${testIpfsConfig.port}`
+    )
+  )
+
+  jolocomRegistry.resolver = testResolver
 
   userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
   serviceIdentityWallet = await jolocomRegistry.create(
@@ -65,6 +79,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
     const remoteUserIdentity = await jolocomRegistry.resolve(
       userIdentityWallet.did,
     )
+
     const remoteServiceIdentity = await jolocomRegistry.resolve(
       serviceIdentityWallet.did,
     )
@@ -141,8 +156,8 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
         encryptionPass: 'pass',
       })
     } catch (err) {
-      expect(err.message).to.eq(
-        'Could not retrieve DID Document. No record for DID found.',
+      expect(err.message).to.contain(
+        ErrorCodes.RegistryDIDNotAnchored
       )
     }
   })

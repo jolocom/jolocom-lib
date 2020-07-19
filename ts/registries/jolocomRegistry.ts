@@ -5,7 +5,6 @@ import { DidDocument } from '../identity/didDocument/didDocument'
 import { PublicKeySection } from '../identity/didDocument/sections'
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 import { Identity } from '../identity/identity'
 import {
   IRegistryCommitArgs,
@@ -24,7 +23,13 @@ import { generatePublicProfileServiceSection } from '../identity/didDocument/sec
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
+import { Resolver } from 'did-resolver'
+import { getPublicProfile, getResolver } from 'jolo-did-resolver'
 import { ErrorCodes } from '../errors'
+import { convertDidDocToIDidDocumentAttrs } from '../utils/resolution'
+import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
+import { digestJsonLd } from '../linkedData'
+import { getIssuerPublicKey } from '../utils/helper'
 
 /**
  * @class
@@ -36,6 +41,7 @@ export class JolocomRegistry implements IRegistry {
   public ethereumConnector: IEthereumConnector
   public contractsAdapter: IContractsAdapter
   public contractsGateway: IContractsGateway
+  public resolver: Resolver
 
   /**
    * Registers a  new Jolocom identity on Ethereum and IPFS and returns an instance of the Identity Wallet class
@@ -56,9 +62,7 @@ export class JolocomRegistry implements IRegistry {
     }
 
     const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
-
     const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
-
     didDocument.addPublicKeySection(
       PublicKeySection.fromX25519(
         vaultedKeyProvider.getPublicKey(derivationArgs, SchemeTypes.x25519),
@@ -134,10 +138,22 @@ export class JolocomRegistry implements IRegistry {
         didDocument.resetServiceEndpoints()
       }
 
+      didDocument.hasBeenUpdated()
+
+      await didDocument.sign(
+        vaultedKeyProvider,
+        {
+          derivationPath: KeyTypes.jolocomIdentityKey,
+          encryptionPass: keyMetadata.encryptionPass,
+        },
+        didDocument.publicKey[0].id,
+      )
+
       const ipfsHash = await this.ipfsConnector.storeJSON({
         data: didDocument.toJSON(),
         pin: true,
       })
+
       const privateEthKey = vaultedKeyProvider.getPrivateKey(keyMetadata)
 
       await this.ethereumConnector.updateDIDRecord({
@@ -156,29 +172,34 @@ export class JolocomRegistry implements IRegistry {
    * @example `const serviceIdentity = await registry.resolve('did:jolo:...')`
    */
 
-  public async resolve(did): Promise<Identity> {
-    try {
-      const ddoHash = await this.ethereumConnector.resolveDID(did)
-
-      if (!ddoHash) {
+  public async resolve(did: string): Promise<Identity> {
+    const jsonDidDoc = await this.resolver.resolve(did)
+      .catch(() => {
         throw new Error(ErrorCodes.RegistryDIDNotAnchored)
+      })
+
+    try {
+      const didDocument = DidDocument.fromJSON(
+        convertDidDocToIDidDocumentAttrs(jsonDidDoc)
+      )
+
+      const signatureValid = SoftwareKeyProvider.verify(
+        //@ts-ignore
+        await digestJsonLd(jsonDidDoc, jsonDidDoc['@context']),
+        getIssuerPublicKey(didDocument.signer.keyId, didDocument),
+        Buffer.from(didDocument.proof.signature, 'hex')
+      )
+
+      if (!signatureValid) {
+        throw new Error(ErrorCodes.InvalidSignature)
       }
 
-      const didDocument = DidDocument.fromJSON(
-        (await this.ipfsConnector.catJSON(ddoHash)) as IDidDocumentAttrs,
-      )
-
-      const publicProfileSection = didDocument.service.find(
-        endpoint => endpoint.type === 'JolocomPublicProfile',
-      )
-
-      const publicProfile =
-        publicProfileSection &&
-        (await this.fetchPublicProfile(publicProfileSection.serviceEndpoint))
+      const publicProfileJson = await getPublicProfile(jsonDidDoc)
 
       return Identity.fromDidDocument({
         didDocument,
-        publicProfile,
+        publicProfile: publicProfileJson &&
+          SignedCredential.fromJSON(publicProfileJson)
       })
     } catch (error) {
       throw new Error(ErrorCodes.RegistryResolveFailed)
@@ -216,22 +237,6 @@ export class JolocomRegistry implements IRegistry {
       contractsGateway: this.contractsGateway,
       contractsAdapter: this.contractsAdapter,
     })
-  }
-
-  /**
-   * Fetches the public profile signed credential form ipfs
-   * @param entry - IPFS hash of public profile credential
-   * @example `const pubProf = await registry.fetchPublicProfile('ipfs://Qm...')`
-   * @internal
-   */
-
-  public async fetchPublicProfile(entry: string): Promise<SignedCredential> {
-    const hash = entry.replace('ipfs://', '')
-    const publicProfile = (await this.ipfsConnector.catJSON(
-      hash,
-    )) as ISignedCredentialAttrs
-
-    return SignedCredential.fromJSON(publicProfile)
   }
 
   /**
@@ -276,6 +281,13 @@ export const createJolocomRegistry = (
   jolocomRegistry.ethereumConnector = ethereumConnector
   jolocomRegistry.contractsAdapter = contracts.adapter
   jolocomRegistry.contractsGateway = contracts.gateway
+  jolocomRegistry.resolver = jolocomResolver()
 
   return jolocomRegistry
+}
+
+export const jolocomResolver = (additionalResolver = {}): Resolver => {
+  const jolo = getResolver()
+  // TODO Do we overwrite or not?
+  return new Resolver({ ...jolo, ...additionalResolver })
 }

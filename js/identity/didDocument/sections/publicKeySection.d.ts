@@ -4,9 +4,9 @@ import { IPublicKeySectionAttrs } from './types';
 export declare class PublicKeySection {
     private _id;
     private _type;
-    private _owner;
+    private _controller;
     private _publicKeyHex;
-    owner: string;
+    controller: string;
     id: string;
     type: string;
     publicKeyHex: string;
