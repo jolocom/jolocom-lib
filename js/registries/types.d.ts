@@ -4,6 +4,7 @@ import { IdentityWallet } from '../identityWallet/identityWallet';
 import { IVaultedKeyProvider, IKeyDerivationArgs } from '../vaultedKeyProvider/types';
 import { Identity } from '../identity/identity';
 import { IContractsAdapter, IContractsGateway } from '../contracts/types';
+import { Resolver } from 'did-resolver';
 export interface IRegistryStaticCreationArgs {
     contracts: {
         adapter: IContractsAdapter;
@@ -11,6 +12,7 @@ export interface IRegistryStaticCreationArgs {
     };
     ipfsConnector: IIpfsConnector;
     ethereumConnector: IEthereumConnector;
+    resolver: Resolver;
 }
 export interface IRegistryCommitArgs {
     vaultedKeyProvider: IVaultedKeyProvider;

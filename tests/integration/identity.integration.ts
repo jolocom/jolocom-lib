@@ -51,6 +51,7 @@ before(async () => {
     ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
     ethereumConnector: new EthResolver(testEthereumConfig),
     contracts: { gateway, adapter },
+    resolver: testResolver
   })
 
   testResolver = new Resolver(
@@ -60,8 +61,6 @@ before(async () => {
       `${testIpfsConfig.protocol}://${testIpfsConfig.host}:${testIpfsConfig.port}`
     )
   )
-
-  jolocomRegistry.resolver = testResolver
 
   userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
   serviceIdentityWallet = await jolocomRegistry.create(

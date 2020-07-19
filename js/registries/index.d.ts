@@ -1,5 +1,5 @@
 export declare const registries: {
     jolocom: {
-        create: (configuration?: import("./types").IRegistryStaticCreationArgs) => import("./jolocomRegistry").JolocomRegistry;
+        create: (configuration?: Partial<import("./types").IRegistryStaticCreationArgs>) => import("./jolocomRegistry").JolocomRegistry;
     };
 };

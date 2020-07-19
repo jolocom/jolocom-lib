@@ -18,5 +18,5 @@ export declare class JolocomRegistry implements IRegistry {
     authenticate(vaultedKeyProvider: IVaultedKeyProvider, derivationArgs: IKeyDerivationArgs, did?: string): Promise<IdentityWallet>;
     private resolveSafe;
 }
-export declare const createJolocomRegistry: (configuration?: IRegistryStaticCreationArgs) => JolocomRegistry;
-export declare const jolocomResolver: (additionalResolver?: {}) => Resolver;
+export declare const jolocomResolver: () => Resolver;
+export declare const createJolocomRegistry: (configuration?: Partial<IRegistryStaticCreationArgs>) => JolocomRegistry;

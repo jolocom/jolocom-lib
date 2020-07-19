@@ -239,26 +239,40 @@ export class JolocomRegistry implements IRegistry {
   }
 }
 
+export const jolocomResolver = () => new Resolver(getResolver())
+
+const defaultJolocomRegistryConfig = {
+  ipfsConnector: jolocomIpfsStorageAgent,
+  ethereumConnector: jolocomEthereumResolver,
+  contracts: {
+    adapter: jolocomContractsAdapter,
+    gateway: jolocomContractsGateway,
+  },
+  resolver: jolocomResolver()
+}
+
 /**
  * Returns a instance of the Jolocom registry given connector, defaults to Jolocom defined connectors.
  * @param configuration - Connectors required for smart contract, storage, and anchoring interactions
  * @param configuration.ipfsConnector - Instance of class implementing the {@link IIpfsConnector} interface
  * @param configuration.ethereumConnector - Instance of class implementing the {@link IEthereumConnector} interface
  * @param configuration.contracts - Classes for interacting with Smart ContractsAdapter, implementing {@link IContractsGateway} and {@link IContractsAdapter}
+ * @param configuration.resolver - Classes for resolving did documents
  * @example `const registry = createJolocomRegistry()`
  */
 
 export const createJolocomRegistry = (
-  configuration: IRegistryStaticCreationArgs = {
-    ipfsConnector: jolocomIpfsStorageAgent,
-    ethereumConnector: jolocomEthereumResolver,
-    contracts: {
-      adapter: jolocomContractsAdapter,
-      gateway: jolocomContractsGateway,
-    },
-  },
+  configuration: Partial<IRegistryStaticCreationArgs> = {}
 ): JolocomRegistry => {
-  const { ipfsConnector, contracts, ethereumConnector } = configuration
+  const withDefaults = {
+    ...defaultJolocomRegistryConfig,
+    ...configuration,
+    contracts: {
+      ...defaultJolocomRegistryConfig.contracts,
+      ...(configuration.contracts || {})
+    }
+  }
+  const { ipfsConnector, contracts, ethereumConnector } = withDefaults
   const jolocomRegistry = new JolocomRegistry()
 
   jolocomRegistry.ipfsConnector = ipfsConnector
@@ -270,8 +284,3 @@ export const createJolocomRegistry = (
   return jolocomRegistry
 }
 
-export const jolocomResolver = (additionalResolver = {}): Resolver => {
-  const jolo = getResolver()
-  // TODO Do we overwrite or not?
-  return new Resolver({ ...jolo, ...additionalResolver })
-}

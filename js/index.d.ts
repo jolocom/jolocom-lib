@@ -6,7 +6,7 @@ export declare const JolocomLib: {
     parse: import("./parse/parse").ParseMethods;
     registries: {
         jolocom: {
-            create: (configuration?: import("./registries/types").IRegistryStaticCreationArgs) => import("./registries/jolocomRegistry").JolocomRegistry;
+            create: (configuration?: Partial<import("./registries/types").IRegistryStaticCreationArgs>) => import("./registries/jolocomRegistry").JolocomRegistry;
         };
     };
     KeyProvider: typeof SoftwareKeyProvider;
