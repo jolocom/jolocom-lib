@@ -69,10 +69,6 @@ before(async () => {
   )
 })
 
-after(() => {
-  process.exit(0)
-})
-
 describe('Integration Test - Create, Resolve, Public Profile', () => {
   it('should correctly create user and service identities', async () => {
     const remoteUserIdentity = await jolocomRegistry.resolve(
