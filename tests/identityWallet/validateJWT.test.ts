@@ -28,9 +28,37 @@ describe('IdentityWallet validate JWT', () => {
   const didDocument = DidDocument.fromJSON(didDocumentJSON)
   const identity = Identity.fromDidDocument({ didDocument })
   const vault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
-
   let iw: IdentityWallet
   let clock
+
+  async function checkJWTSignature(label, jwt) {
+    try {
+      await iw.validateJWT(jwt)
+    } catch (err) {
+      console.error('checkJWTSignature error', err)
+      if (err.message === ErrorCodes.IDWInvalidJWTSignature) {
+        const newJWT = JSONWebToken.fromJSON(jwt.toJSON())
+        const sigBuf = await vault.signDigestable(
+          {
+            derivationPath: KeyTypes.jolocomIdentityKey,
+            encryptionPass,
+          },
+          newJWT,
+        )
+        const sig = sigBuf.toString('hex')
+        newJWT.signature = sig
+        console.error(
+          'signature for ' + label + ' has changed!',
+          '\nold value:',
+          jwt.signature,
+          '\nnew value:',
+          sig,
+          '\nencodes to\n',
+          newJWT.encode(),
+        )
+      }
+    }
+  }
 
   beforeEach(() => {
     clock = sinon.useFakeTimers()
@@ -54,11 +82,10 @@ describe('IdentityWallet validate JWT', () => {
     sandbox.restore()
   })
 
-  it('Should sucessfully perform necessary validation steps on received jwt', done => {
-    iw.validateJWT(JSONWebToken.fromJSON(validSignedCredReqJWT)).then(
-      done,
-      done,
-    )
+  it('Should sucessfully perform necessary validation steps on received jwt', async () => {
+    const jwt = JSONWebToken.fromJSON(validSignedCredReqJWT)
+    await checkJWTSignature('jsonWebToken.data.ts:validSignedCredReqJWT', jwt)
+    await iw.validateJWT(jwt)
   })
 
   it('Should throw error on invalid signature', async () => {
