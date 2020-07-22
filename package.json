@@ -16,7 +16,7 @@
     "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
     "test:debug": "mocha --opts ./mocha.opts --inspect -w ./tests/**/*.test.ts",
     "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
-    "test:integration": "mocha --opts ./mocha.opts ./tests/**/*.integration.ts",
+    "test:integration": "mocha --opts ./mocha.opts ./tests/**/*.integration.ts --exit",
     "format": "eslint --fix --ext .ts .",
     "generate-api-docs": "typedoc ./ts"
   },
@@ -69,6 +69,7 @@
   "license": "MIT",
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
+    "@decentralized-identity/did-common-typescript": "^0.1.19",
     "@jolocom/protocol-ts": "^0.2.0",
     "base64url": "^3.0.1",
     "bip32": "^1.0.2",
@@ -82,6 +83,7 @@
     "ethereumjs-util": "^6.1.0",
     "ethers": "^4.0.27",
     "form-data": "^2.3.3",
+    "jolo-did-registry": "1.0.1",
     "jolo-did-resolver": "0.2.1",
     "jolocom-registry-contract": "^0.1.7",
     "json-logic-js": "^1.2.2",

@@ -1,45 +1,35 @@
-import { IIpfsConnector } from '../ipfs/types'
-import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { Identity } from '../identity/identity'
 import {
-  IRegistryCommitArgs,
-  IRegistryStaticCreationArgs,
   IRegistry,
 } from './types'
-import { jolocomIpfsStorageAgent } from '../ipfs/ipfs'
-import { jolocomEthereumResolver } from '../ethereum/ethereum'
 import { publicKeyToDID } from '../utils/crypto'
 import {
   IVaultedKeyProvider,
-  IKeyDerivationArgs,
 } from '../vaultedKeyProvider/types'
 import { KeyTypes } from '../vaultedKeyProvider/types'
-import { generatePublicProfileServiceSection } from '../identity/didDocument/sections/serviceEndpointsSection'
 import { jolocomContractsAdapter } from '../contracts/contractsAdapter'
-import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { jolocomContractsGateway } from '../contracts/contractsGateway'
 import { Resolver } from 'did-resolver'
 import { getPublicProfile, getResolver } from 'jolo-did-resolver'
 import { ErrorCodes } from '../errors'
 import { convertDidDocToIDidDocumentAttrs } from '../utils/resolution'
-import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { digestJsonLd } from '../linkedData'
 import { getIssuerPublicKey } from '../utils/helper'
-
-/**
- * @class
- * Jolocom specific Registry. Uses IPFS and Ethereum for anchoring indentities and the resolution mechanism.
- */
+import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
+import { JolocomRegistrar } from '../registrars/jolocomRegistrar'
+import { Registrar } from '../registrars/types'
 
 export class JolocomRegistry implements IRegistry {
-  public ipfsConnector: IIpfsConnector
-  public ethereumConnector: IEthereumConnector
-  public contractsAdapter: IContractsAdapter
-  public contractsGateway: IContractsGateway
   public resolver: Resolver
+  public registrar: Registrar<Identity, {}> // TODO Are these generics useful?
+
+  constructor(providerUrl?: string, contractAddress?: string, ipfsHost?: string) {
+    this.resolver = new Resolver(getResolver(providerUrl, contractAddress, ipfsHost))
+    this.registrar = new JolocomRegistrar(providerUrl, contractAddress, ipfsHost)
+  }
 
   /**
    * Registers a  new Jolocom identity on Ethereum and IPFS and returns an instance of the Identity Wallet class
@@ -52,102 +42,21 @@ export class JolocomRegistry implements IRegistry {
     vaultedKeyProvider: IVaultedKeyProvider,
     decryptionPassword: string,
   ): Promise<IdentityWallet> {
-    const { jolocomIdentityKey, ethereumKey } = KeyTypes
+    const identity = await this.registrar.create(
+      vaultedKeyProvider,
+      decryptionPassword
+    )
 
-    const derivationArgs = {
-      derivationPath: jolocomIdentityKey,
-      encryptionPass: decryptionPassword,
-    }
-
-    const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
-    const didDocument = await DidDocument.fromPublicKey(publicIdentityKey)
-    const identity = Identity.fromDidDocument({ didDocument })
-
-    const identityWallet = new IdentityWallet({
+    return new IdentityWallet({
       identity,
       vaultedKeyProvider,
       publicKeyMetadata: {
-        derivationPath: jolocomIdentityKey,
-        keyId: didDocument.publicKey[0].id,
+        derivationPath: KeyTypes.jolocomIdentityKey,
+        keyId: identity.didDocument.signer.keyId,
       },
-      contractsAdapter: this.contractsAdapter,
-      contractsGateway: this.contractsGateway,
+      contractsAdapter: jolocomContractsAdapter,
+      contractsGateway: jolocomContractsGateway,
     })
-
-    await this.commit({
-      identityWallet,
-      vaultedKeyProvider,
-      keyMetadata: {
-        encryptionPass: decryptionPassword,
-        derivationPath: ethereumKey,
-      },
-    })
-
-    return identityWallet
-  }
-
-  /**
-   * Stores the passed didDocument / public profile on IPFS and updates the mapping in the smart contract.
-   * @param commitArgs - Data to be committed and vault to get private keys
-   * @param commitArgs.vaultedKeyProvider - Vaulted key store
-   * @param commitArgs.keyMetadata - Derivation path and decryption pass
-   * @param commitArgs.identityWallet - Wallet containing did document and public profile
-   * @deprecated Will be modified in next major release to not require access to the vault
-   * @example `await registry.commit({ vaultedKeyProvider, keyMetadata, identityWallet })`
-   */
-
-  public async commit(commitArgs: IRegistryCommitArgs) {
-    const { identityWallet, keyMetadata, vaultedKeyProvider } = commitArgs
-
-    const didDocument = identityWallet.didDocument
-    const publicProfile = identityWallet.identity.publicProfile
-
-    const remote = await this.resolveSafe(didDocument.did)
-    const remotePubProf = remote && remote.publicProfile
-
-    try {
-      if (publicProfile) {
-        const publicProfileHash = await this.ipfsConnector.storeJSON({
-          data: publicProfile.toJSON(),
-          pin: true,
-        })
-        const publicProfileSection = generatePublicProfileServiceSection(
-          didDocument.did,
-          publicProfileHash,
-        )
-        didDocument.addServiceEndpoint(publicProfileSection)
-      }
-
-      if (remotePubProf && !publicProfile) {
-        didDocument.resetServiceEndpoints()
-      }
-
-      didDocument.hasBeenUpdated()
-
-      await didDocument.sign(
-        vaultedKeyProvider,
-        {
-          derivationPath: KeyTypes.jolocomIdentityKey,
-          encryptionPass: keyMetadata.encryptionPass,
-        },
-        didDocument.publicKey[0].id,
-      )
-
-      const ipfsHash = await this.ipfsConnector.storeJSON({
-        data: didDocument.toJSON(),
-        pin: true,
-      })
-
-      const privateEthKey = vaultedKeyProvider.getPrivateKey(keyMetadata)
-
-      await this.ethereumConnector.updateDIDRecord({
-        ethereumKey: privateEthKey,
-        did: didDocument.did,
-        newHash: ipfsHash,
-      })
-    } catch (error) {
-      throw new Error(ErrorCodes.RegistryCommitFailed)
-    }
   }
 
   /**
@@ -158,36 +67,34 @@ export class JolocomRegistry implements IRegistry {
 
   public async resolve(did: string): Promise<Identity> {
     const jsonDidDoc = await this.resolver.resolve(did)
-      .catch(() => {
+      .catch(_ => {
         throw new Error(ErrorCodes.RegistryDIDNotAnchored)
       })
 
-    try {
-      const didDocument = DidDocument.fromJSON(
-        convertDidDocToIDidDocumentAttrs(jsonDidDoc)
-      )
+    const publicProfileJson = await getPublicProfile(jsonDidDoc)
 
-      const signatureValid = SoftwareKeyProvider.verify(
-        //@ts-ignore
-        await digestJsonLd(jsonDidDoc, jsonDidDoc['@context']),
-        getIssuerPublicKey(didDocument.signer.keyId, didDocument),
-        Buffer.from(didDocument.proof.signature, 'hex')
-      )
+    const didDocument = DidDocument.fromJSON(
+      convertDidDocToIDidDocumentAttrs(jsonDidDoc)
+    )
 
-      if (!signatureValid) {
-        throw new Error(ErrorCodes.InvalidSignature)
-      }
+    const signatureValid = SoftwareKeyProvider.verify(
+      //@ts-ignore TODO Handle this
+      await digestJsonLd(jsonDidDoc, jsonDidDoc['@context']),
+      getIssuerPublicKey(didDocument.signer.keyId, didDocument),
+      Buffer.from(didDocument.proof.signature, 'hex')
+    )
 
-      const publicProfileJson = await getPublicProfile(jsonDidDoc)
-
-      return Identity.fromDidDocument({
-        didDocument,
-        publicProfile: publicProfileJson &&
-          SignedCredential.fromJSON(publicProfileJson)
-      })
-    } catch (error) {
-      throw new Error(ErrorCodes.RegistryResolveFailed)
+    if (!signatureValid) {
+      throw new Error(ErrorCodes.InvalidSignature)
     }
+
+    // TODO Verify signature on public profile
+
+    return Identity.fromDidDocument({
+      didDocument,
+      publicProfile: publicProfileJson &&
+        SignedCredential.fromJSON(publicProfileJson)
+    })
   }
 
   /**
@@ -202,54 +109,33 @@ export class JolocomRegistry implements IRegistry {
 
   public async authenticate(
     vaultedKeyProvider: IVaultedKeyProvider,
-    derivationArgs: IKeyDerivationArgs,
-    did?: string,
+    password: string,
   ): Promise<IdentityWallet> {
-    const publicIdentityKey = vaultedKeyProvider.getPublicKey(derivationArgs)
-    did = did ? did : publicKeyToDID(publicIdentityKey)
-    const identity = await this.resolve(did)
+    const publicIdentityKey = vaultedKeyProvider.getPublicKey({
+      derivationPath: KeyTypes.jolocomIdentityKey,
+      encryptionPass: password
+    })
+
+    const identity = await this.resolve(
+      publicKeyToDID(publicIdentityKey)
+    )
 
     const publicKeyMetadata = {
-      derivationPath: derivationArgs.derivationPath,
-      keyId: identity.publicKeySection[0].id,
+      derivationPath: KeyTypes.jolocomIdentityKey,
+      keyId: identity.didDocument.signer.keyId,
     }
 
     return new IdentityWallet({
       vaultedKeyProvider,
       identity,
       publicKeyMetadata,
-      contractsGateway: this.contractsGateway,
-      contractsAdapter: this.contractsAdapter,
+      contractsGateway: jolocomContractsGateway,
+      contractsAdapter: jolocomContractsAdapter,
     })
-  }
-
-  /**
-   * Proxies to this.resolve, but catches error and returns undefined
-   * @param did - The jolocom did to resolve
-   * @example `const serviceIdentity = await registry.resolveSafe('did:jolo:...')`
-   * @internal
-   */
-
-  private async resolveSafe(did: string): Promise<Identity> {
-    try {
-      return await this.resolve(did)
-    } catch {
-      return
-    }
   }
 }
 
 export const jolocomResolver = () => new Resolver(getResolver())
-
-const defaultJolocomRegistryConfig = {
-  ipfsConnector: jolocomIpfsStorageAgent,
-  ethereumConnector: jolocomEthereumResolver,
-  contracts: {
-    adapter: jolocomContractsAdapter,
-    gateway: jolocomContractsGateway,
-  },
-  resolver: jolocomResolver()
-}
 
 /**
  * Returns a instance of the Jolocom registry given connector, defaults to Jolocom defined connectors.
@@ -261,26 +147,4 @@ const defaultJolocomRegistryConfig = {
  * @example `const registry = createJolocomRegistry()`
  */
 
-export const createJolocomRegistry = (
-  configuration: Partial<IRegistryStaticCreationArgs> = {}
-): JolocomRegistry => {
-  const withDefaults = {
-    ...defaultJolocomRegistryConfig,
-    ...configuration,
-    contracts: {
-      ...defaultJolocomRegistryConfig.contracts,
-      ...(configuration.contracts || {})
-    }
-  }
-  const { ipfsConnector, contracts, ethereumConnector } = withDefaults
-  const jolocomRegistry = new JolocomRegistry()
-
-  jolocomRegistry.ipfsConnector = ipfsConnector
-  jolocomRegistry.ethereumConnector = ethereumConnector
-  jolocomRegistry.contractsAdapter = contracts.adapter
-  jolocomRegistry.contractsGateway = contracts.gateway
-  jolocomRegistry.resolver = jolocomResolver()
-
-  return jolocomRegistry
-}
-
+export const jolocomRegistry = new JolocomRegistry()

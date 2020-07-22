@@ -229,7 +229,7 @@ export class DidDocument implements IDigestable {
   public get signer(): ISigner {
     return {
       did: this._id,
-      keyId: this._proof.creator,
+      keyId: (this._proof && this._proof.creator) || this._publicKey[0].id,
     }
   }
 
@@ -347,10 +347,9 @@ export class DidDocument implements IDigestable {
   public async sign(
     vaultedKeyProvider: IVaultedKeyProvider,
     derivationArgs: IKeyDerivationArgs,
-    keyId: string,
   ): Promise<void> {
     this._proof = new EcdsaLinkedDataSignature()
-    this._proof.creator = keyId
+    this._proof.creator = this.signer.keyId
     this._proof.signature = ''
     this._proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
 

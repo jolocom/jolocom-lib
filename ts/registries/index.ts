@@ -1,9 +1,7 @@
-import { createJolocomRegistry } from './jolocomRegistry'
+import { JolocomRegistry } from './jolocomRegistry'
 
 /** Aggregates all registries supported by the library */
 
 export const registries = {
-  jolocom: {
-    create: createJolocomRegistry,
-  },
+  jolocom: JolocomRegistry,
 }

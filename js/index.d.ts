@@ -5,9 +5,7 @@ import { fuelKeyWithEther, getIssuerPublicKey } from './utils/helper';
 export declare const JolocomLib: {
     parse: import("./parse/parse").ParseMethods;
     registries: {
-        jolocom: {
-            create: (configuration?: Partial<import("./registries/types").IRegistryStaticCreationArgs>) => import("./registries/jolocomRegistry").JolocomRegistry;
-        };
+        jolocom: typeof import("./registries/jolocomRegistry").JolocomRegistry;
     };
     KeyProvider: typeof SoftwareKeyProvider;
     util: {

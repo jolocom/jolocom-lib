@@ -13,22 +13,22 @@ import { keyIdToDid } from '../../ts/utils/helper'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  testResolver
+  jolocomRegistry
 } from './identity.integration'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
 describe('Integration Test - Token interaction flow Credential Request and Response', () => {
-  let credRequestJWT
-  let credRequestEncoded
-  let credResponseEncoded
+  let credRequestJWT: JSONWebToken<CredentialRequest>
+  let credRequestEncoded: string
+  let credResponseEncoded: string
 
   it('Should correctly create a credential request token by service', async () => {
     credRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.share(
       integrationCredRequestJSON,
       servicePass,
-    )
+    ) as JSONWebToken<CredentialRequest>
     credRequestEncoded = credRequestJWT.encode()
 
     expect(credRequestJWT.interactionToken).to.deep.eq(
@@ -51,7 +51,7 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
       await userIdentityWallet.validateJWT(
         decodedCredRequest,
         null,
-        testResolver
+        jolocomRegistry.resolver
       )
     } catch (err) {
       return expect(true).to.be.false
@@ -94,7 +94,7 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
       await serviceIdentityWallet.validateJWT(
         decodedCredResponse,
         credRequestJWT,
-        testResolver,
+        jolocomRegistry.resolver
       )
     } catch (err) {
       return expect(true).to.be.false

@@ -10,7 +10,7 @@ import {
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  testResolver
+  jolocomRegistry
 } from './identity.integration'
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { CredentialsReceive } from '../../ts/interactionTokens/credentialsReceive'
@@ -21,17 +21,18 @@ chai.use(sinonChai)
 const expect = chai.expect
 
 describe('Integration Test - Token interaction flow Credential Offer', () => {
-  let credOfferRequestJWT
-  let credOfferRequestEncoded
-  let credOfferResponseJWT
-  let credOfferResponseEncoded
-  let credReceiveEncoded
+  let credOfferRequestJWT: JSONWebToken<CredentialOfferRequest>
+  let credOfferRequestEncoded: string
+  let credOfferResponseJWT: JSONWebToken<CredentialOfferResponse>
+  let credOfferResponseEncoded: string
+  let credReceiveEncoded: string
 
   it('Should correctly create a credential offer request token by service', async () => {
     credOfferRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.offer(
       credentialOfferRequestCreationArgs,
       servicePass,
-    )
+    ) as JSONWebToken<CredentialOfferRequest>
+
     credOfferRequestEncoded = credOfferRequestJWT.encode()
 
     expect(credOfferRequestJWT.interactionToken).to.deep.eq(
@@ -56,7 +57,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       await userIdentityWallet.validateJWT(
         decodedCredOfferRequest,
         null,
-        testResolver
+        jolocomRegistry.resolver
       )
     } catch (err) {
       return expect(true).to.be.false
@@ -66,7 +67,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       credentialOfferResponseCreationArgs,
       userPass,
       decodedCredOfferRequest,
-    )
+    ) as JSONWebToken<CredentialOfferResponse>
 
     credOfferResponseEncoded = credOfferResponseJWT.encode()
     expect(credOfferResponseJWT.interactionToken).to.be.instanceOf(
@@ -92,7 +93,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       await serviceIdentityWallet.validateJWT(
         decodedCredOfferResponse,
         credOfferRequestJWT,
-        testResolver,
+        jolocomRegistry.resolver
       )
     } catch (err) {
       return expect(true).to.be.false
@@ -140,7 +141,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       await userIdentityWallet.validateJWT(
         decodedCredReceive,
         credOfferResponseJWT,
-        testResolver
+        jolocomRegistry.resolver
       )
     } catch (err) {
       return expect(true).to.be.false

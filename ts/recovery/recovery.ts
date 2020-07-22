@@ -51,7 +51,7 @@ async function recoverFromSeedPhrase(
   } else {
     did = publicKeyToDID(vault.getPublicKey(keyMetaData))
   }
-  return await registry.authenticate(vault, keyMetaData, did)
+  return await registry.authenticate(vault, did)
 }
 
 async function recoverFromShards(
@@ -64,7 +64,7 @@ async function recoverFromShards(
     Buffer.from(secret, 'hex'),
     keyMetaData.encryptionPass,
   )
-  return await registry.authenticate(vault, keyMetaData, did)
+  return await registry.authenticate(vault, did)
 }
 
 export { recoverFromSeedPhrase, recoverFromShards }

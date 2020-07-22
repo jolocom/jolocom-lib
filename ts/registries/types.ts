@@ -1,23 +1,11 @@
-import { IIpfsConnector } from '../ipfs/types'
-import { IEthereumConnector } from '../ethereum/types'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import {
   IVaultedKeyProvider,
   IKeyDerivationArgs,
 } from '../vaultedKeyProvider/types'
 import { Identity } from '../identity/identity'
-import { IContractsAdapter, IContractsGateway } from '../contracts/types'
 import { Resolver } from 'did-resolver'
-
-export interface IRegistryStaticCreationArgs {
-  contracts: {
-    adapter: IContractsAdapter
-    gateway: IContractsGateway
-  }
-  ipfsConnector: IIpfsConnector
-  ethereumConnector: IEthereumConnector
-  resolver: Resolver
-}
+import { Registrar } from '../registrars/types'
 
 export interface IRegistryCommitArgs {
   vaultedKeyProvider: IVaultedKeyProvider
@@ -30,15 +18,20 @@ export interface ISigner {
   keyId: string
 }
 
+export interface DidMethodImplementation<T, U> {
+  prefix: string
+  resolver: Resolver,
+  registrar: Registrar<T, U>
+}
+
 export interface IRegistry {
   create: (
     vaultedKeyProvider: IVaultedKeyProvider,
     decryptionPassword: string,
   ) => Promise<IdentityWallet>
-  commit: (commitArgs: IRegistryCommitArgs) => Promise<void>
-  resolve: (did) => Promise<Identity>
+  resolve: (did: string) => Promise<Identity>
   authenticate: (
     vaultedKeyProvider: IVaultedKeyProvider,
-    derivationArgs: IKeyDerivationArgs,
+    password: string,
   ) => Promise<IdentityWallet>
 }
