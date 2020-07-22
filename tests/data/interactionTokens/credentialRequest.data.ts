@@ -26,6 +26,7 @@ export const simpleCredRequestJSON = {
       constraints: [{ '==': [{ var: 'issuer' }, mockIssuerDid] }],
     },
   ],
+  type: 'credentialRequest',
 }
 
 /* Fixture to test if validating against an empty constraint set returns true */

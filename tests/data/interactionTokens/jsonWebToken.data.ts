@@ -3,6 +3,8 @@ import { credentialSet } from './credentialRequest.data'
 
 /* Credential request wrapped in signed JWT*/
 
+/**/
+
 export const validSignedCredReqJWT = {
   header: { typ: 'JWT', alg: 'ES256K' },
   payload: {
@@ -15,7 +17,7 @@ export const validSignedCredReqJWT = {
     jti: '2a97b35fe74b5',
   },
   signature:
-    'd904b6ca775f555121012ed7ec55be5958703411f5e9af0d93f17994d5e3bb3b3afdbb49216ffc0b005562d928690e4c94803e9f17ac811480dc0fff46b28623',
+    '754a6e0607d2ad510dbfc014cc7d0596592bfc9f4d85ab399f88351085971b3a4dd7a1d15c945b3acf4ed7fc5a9bcee166ab0767749323d6441ea7b261910232',
 }
 
 export const invalidSignature =
@@ -46,15 +48,7 @@ export const invalidNonce = 'h'.repeat(16)
 /* Same credential request in base64 encoded form */
 
 export const encodedValidCredReqJWT =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.\
-eyJpbnRlcmFjdGlvblRva2VuIjp7ImNyZWRlbnRpYWxSZXF1aXJlbWVudHMiOlt7InR5cGUiOlsiQ3Jl\
-ZGVudGlhbCIsIlByb29mT2ZFbWFpbENyZWRlbnRpYWwiXSwiY29uc3RyYWludHMiOlt7Ij09IjpbeyJ2Y\
-XIiOiJpc3N1ZXIifSwiZGlkOmpvbG86YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWF\
-hYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSJdfV19XSwiY2FsbGJhY2tVUkwiOiJodHRwOi8vdGVzdC5jb\
-20ifSwiaWF0IjowLCJleHAiOjM2MDAwMDAsImlzcyI6ImRpZDpqb2xvOmIyZDVkOGQ2Y2MxNDAwMzM0MTl\
-iNTRhMjM3YTVkYjUxNzEwNDM5ZjlmNDYyZDFmYzk4ZjY5OGVjYTdjZTk3Nzcja2V5cy0xIiwidHlwIjoiY3\
-JlZGVudGlhbFJlcXVlc3QiLCJqdGkiOiIyYTk3YjM1ZmU3NGI1In0.d904b6ca775f555121012ed7ec55b\
-e5958703411f5e9af0d93f17994d5e3bb3b3afdbb49216ffc0b005562d928690e4c94803e9f17ac811480dc0fff46b28623'
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJpbnRlcmFjdGlvblRva2VuIjp7InR5cGUiOiJjcmVkZW50aWFsUmVxdWVzdCIsImNyZWRlbnRpYWxSZXF1aXJlbWVudHMiOlt7InR5cGUiOlsiQ3JlZGVudGlhbCIsIlByb29mT2ZFbWFpbENyZWRlbnRpYWwiXSwiY29uc3RyYWludHMiOlt7Ij09IjpbeyJ2YXIiOiJpc3N1ZXIifSwiZGlkOmpvbG86YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSJdfV19XSwiY2FsbGJhY2tVUkwiOiJodHRwOi8vdGVzdC5jb20ifSwiaWF0IjowLCJleHAiOjM2MDAwMDAsImlzcyI6ImRpZDpqb2xvOmIyZDVkOGQ2Y2MxNDAwMzM0MTliNTRhMjM3YTVkYjUxNzEwNDM5ZjlmNDYyZDFmYzk4ZjY5OGVjYTdjZTk3Nzcja2V5cy0xIiwidHlwIjoiY3JlZGVudGlhbFJlcXVlc3QiLCJqdGkiOiIyYTk3YjM1ZmU3NGI1In0.754a6e0607d2ad510dbfc014cc7d0596592bfc9f4d85ab399f88351085971b3a4dd7a1d15c945b3acf4ed7fc5a9bcee166ab0767749323d6441ea7b261910232'
 
 export const expiredEncodedSimpleCredReqJWT =
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.\
@@ -68,4 +62,4 @@ Y3JlZGVudGlhbFJlcXVlc3QifQ.4fe903a33015a63a6d6e8a1054584e54b9f6e7ffea5ab196f940c
 29b7ffa14ef18a19af87c4d848db5dfa6d70e3a4d9b194da83e7eeaa3db0602e9d2d65c53d6'
 
 export const hashedValidCredReqJWT =
-  '96f55602967b22a28c6bc5a85dbba80aea67248623a9b8df8c118b6df84679da'
+  '6dd9a107b253968931e96b267e9a9315ee3ce38f5ccf05e6f954a0db8270d99e'

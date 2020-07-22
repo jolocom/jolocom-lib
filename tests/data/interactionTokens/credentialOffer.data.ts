@@ -17,6 +17,7 @@ export const credentialOfferRequestCreationArgs = {
       },
     },
   ],
+  type: 'credentialOfferRequest',
 }
 export const credentialOfferResponseCreationArgs = {
   callbackURL,
@@ -25,4 +26,5 @@ export const credentialOfferResponseCreationArgs = {
       type: claimsMetadata.emailAddress.type[1],
     },
   ],
+  type: 'credentialOfferResponse',
 }
