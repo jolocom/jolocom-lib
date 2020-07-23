@@ -1,5 +1,5 @@
 import * as sinon from 'sinon'
-import { createJolocomRegistry } from '../../ts/registries/jolocomRegistry'
+import { JolocomRegistry } from '../../ts/registries/jolocomRegistry'
 import { expect } from 'chai'
 import * as joloDidResolver from 'jolo-did-resolver'
 import { didDocumentJSON, mockDid } from '../data/didDocument.data'
@@ -35,7 +35,7 @@ describe('Jolocom Registry - resolve', () => {
 
     sandbox.stub(SoftwareKeyProvider, 'verify').returns(true)
 
-    const { didDocument, publicProfile } = await createJolocomRegistry().resolve(mockDid)
+    const { didDocument, publicProfile } = await new JolocomRegistry().resolve(mockDid)
 
     expect(didDocument).to.deep.eq(DidDocument.fromJSON(didDocWithoutService))
     expect(publicProfile).to.be.undefined
@@ -48,7 +48,7 @@ describe('Jolocom Registry - resolve', () => {
         jolo: sinon.stub().resolves(null)
     })
 
-    return createJolocomRegistry().resolve(mockDid)
+    return new JolocomRegistry().resolve(mockDid)
       .then(() => new Error('Error should have been thrown')) // TODO
       .catch(err => expect(err.message).to.eq(ErrorCodes.RegistryDIDNotAnchored))
   })
@@ -69,7 +69,7 @@ describe('Jolocom Registry - resolve', () => {
       .stub(joloDidResolver, 'getPublicProfile')
       .resolves(publicProfileCredJSON)
 
-    const identity: Identity = await createJolocomRegistry().resolve(mockDid)
+    const identity: Identity = await new JolocomRegistry().resolve(mockDid)
     expect(identity.didDocument.toJSON()).to.deep.eq(didDocWithPublicProfile)
     expect(identity.publicProfile.toJSON()).to.deep.eq(publicProfileCredJSON)
   })

@@ -1,7 +1,6 @@
 import * as sinon from 'sinon'
 import {
   JolocomRegistry,
-  createJolocomRegistry,
 } from '../../ts/registries/jolocomRegistry'
 import { Identity } from '../../ts/identity/identity'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
@@ -16,7 +15,7 @@ describe('Jolocom Registry - authenticate', () => {
 
   const mockDidDoc = DidDocument.fromJSON(didDocumentJSON)
   const mockVault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
-  const registry = createJolocomRegistry()
+  const registry = new JolocomRegistry()
 
   before(async () => {
     sandbox.stub(mockVault, 'getPublicKey').returns(testPublicIdentityKey)
@@ -36,7 +35,7 @@ describe('Jolocom Registry - authenticate', () => {
 
   it('should correctly authenticate', async () => {
     const iw = await registry.authenticate(mockVault, keyMetadata.encryptionPass)
-    sandbox.assert.calledWith(mockVault.getPublicKey, keyMetadata.encryptionPass)
+    sandbox.assert.calledWith(mockVault.getPublicKey, keyMetadata)
     sandbox.assert.calledWith(JolocomRegistry.prototype.resolve, mockDid)
     expect(iw.didDocument.toJSON()).to.deep.eq(didDocumentJSON)
   })

@@ -3,7 +3,6 @@ import {
   recoverFromShards,
 } from '../../ts/recovery/recovery'
 import {
-  createJolocomRegistry,
   JolocomRegistry,
 } from '../../ts/registries/jolocomRegistry'
 import { expect } from 'chai'
@@ -27,7 +26,7 @@ import {
 
 describe('Recovery', () => {
   const sandbox = sinon.createSandbox()
-  const registry = createJolocomRegistry()
+  const registry = new JolocomRegistry()
   const mockDidDoc = DidDocument.fromJSON(didDocumentJSON)
 
   let referenceVault32, referenceVault16
@@ -35,13 +34,16 @@ describe('Recovery', () => {
     sandbox
       .stub(JolocomRegistry.prototype, 'resolve')
       .resolves(Identity.fromDidDocument({ didDocument: mockDidDoc }))
+
     sandbox
       .stub(SoftwareKeyProvider, 'getRandom')
       .returns(Buffer.from('12345678123456781234567812345678', 'hex'))
+
     referenceVault32 = SoftwareKeyProvider.fromSeed(
       Buffer.from(testSecret32, 'hex'),
       keyDerivationArgs.encryptionPass,
     )
+
     referenceVault16 = SoftwareKeyProvider.fromSeed(
       Buffer.from(testSecret16, 'hex'),
       keyDerivationArgs.encryptionPass,
@@ -58,6 +60,7 @@ describe('Recovery', () => {
       testSeedPhrase16,
       keyDerivationArgs,
     )
+
     sandbox.assert.calledWith(JolocomRegistry.prototype.resolve, testDID16)
     expect(identityWallet['_vaultedKeyProvider']).to.deep.eq(referenceVault16)
   })
