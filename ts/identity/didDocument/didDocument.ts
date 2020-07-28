@@ -14,7 +14,6 @@ import {
   PublicKeySection,
   ServiceEndpointsSection,
 } from './sections'
-import { ISigner } from '../../registries/types'
 import { defaultContextIdentity } from '../../utils/contexts'
 import { publicKeyToDID } from '../../utils/crypto'
 import { digestJsonLd } from '../../linkedData'
@@ -28,6 +27,7 @@ import {
   IVaultedKeyProvider,
 } from '../../vaultedKeyProvider/types'
 import { ContextEntry } from '@jolocom/protocol-ts'
+import { ISigner } from '../../credentials/signedCredential/types'
 
 /**
  * Class modelling a Did Document

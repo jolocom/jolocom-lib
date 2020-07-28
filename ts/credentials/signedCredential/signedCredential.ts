@@ -8,7 +8,7 @@ import {
   Type,
 } from 'class-transformer'
 import { digestJsonLd } from '../../linkedData'
-import { ISignedCredCreationArgs, ISignedCredentialAttrs } from './types'
+import { ISignedCredCreationArgs, ISignedCredentialAttrs, ISigner } from './types'
 import {
   IDigestable,
   ILinkedDataSignature,
@@ -17,7 +17,6 @@ import { BaseMetadata } from '@jolocom/protocol-ts'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { JsonLdContext } from '../../linkedData/types'
-import { ISigner } from '../../registries/types'
 import { Credential } from '../credential/credential'
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 import { ErrorCodes } from '../../errors'

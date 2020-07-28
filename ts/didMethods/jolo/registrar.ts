@@ -1,17 +1,22 @@
-import { Identity } from "../identity/identity"
-import { getRegistry, infura, jolocomIpfsHost, jolocomContract } from 'jolo-did-registry'
+import { Identity } from "../../identity/identity"
+import { getRegistry } from 'jolo-did-registry'
 import { IVaultedKeyProvider, KeyTypes } from "@jolocom/protocol-ts/dist/lib/vaultedKeyProvider"
-import { DidDocument } from "../identity/didDocument/didDocument"
-import { ServiceEndpointsSection } from "../identity/didDocument/sections"
-import { fuelKeyWithEther } from "../utils/helper"
-import { Registrar } from "./types"
-import { SignedCredential } from "../credentials/signedCredential/signedCredential"
+import { DidDocument } from "../../identity/didDocument/didDocument"
+import { ServiceEndpointsSection } from "../../identity/didDocument/sections"
+import { fuelKeyWithEther } from "../../utils/helper"
+import { SignedCredential } from "../../credentials/signedCredential/signedCredential"
+import { Registrar } from "../types"
+import { claimsMetadata } from '@jolocom/protocol-ts'
 
-export class JolocomRegistrar implements Registrar<Identity, {}> {
+export class JolocomRegistrar implements Registrar {
   public prefix = 'jolo'
   public registry: ReturnType<typeof getRegistry> 
 
-  constructor(providerUrl = infura, contractAddress = jolocomContract, ipfsHost= jolocomIpfsHost) {
+  constructor(
+    providerUrl: string,
+    contractAddress: string,
+    ipfsHost: string
+  ) {
     this.registry = getRegistry(providerUrl, contractAddress, ipfsHost)
   }
 
@@ -41,15 +46,16 @@ export class JolocomRegistrar implements Registrar<Identity, {}> {
   }
 
   // TODO Verify signature on the public profile? Or just assume it's correct
-  async updatePublicProfile(keyProvider: IVaultedKeyProvider, password: string, identity: Identity, credential: SignedCredential) {
+  // TODO Public profile should perhaps be JSON / any, so that the registrars can be used without having to typecheck / guard / use generics
+  async updatePublicProfile(keyProvider: IVaultedKeyProvider, password: string, identity: Identity, publicProfile: SignedCredential) {
     const { didDocument } = identity
 
     const publicProfileEntry = ServiceEndpointsSection.fromJSON(
-      await this.registry.publishPublicProfile(identity.did, credential)
+      await this.registry.publishPublicProfile(identity.did, publicProfile.toJSON())
     )
 
     const oldPublicProfileEntry = didDocument.service.findIndex(
-      ({type}) => type === 'JolocomPublicProfile'
+      ({type}) => type === claimsMetadata.publicProfile.type[claimsMetadata.publicProfile.type.length - 1]
     )
 
     if (oldPublicProfileEntry !== -1) {
@@ -58,7 +64,7 @@ export class JolocomRegistrar implements Registrar<Identity, {}> {
       didDocument.addServiceEndpoint(publicProfileEntry)
     }
 
-    identity.publicProfile = credential
+    identity.publicProfile = publicProfile
 
     await this.signDidDocument(
       didDocument,
@@ -101,9 +107,10 @@ export class JolocomRegistrar implements Registrar<Identity, {}> {
 
     return this.registry.commitDidDoc(
       ethSecretKey,
-      //@ts-ignore TODO
+      // @ts-ignore TODO The DID Document related types need to be harmonized
       didDocument.toJSON(),
     )
   }
 }
+
 

@@ -6,8 +6,9 @@ import {
 } from '../vaultedKeyProvider/types'
 import { publicKeyToDID } from '../utils/crypto'
 import { mnemonicToEntropy, validateMnemonic } from 'bip39'
-import { JolocomRegistry } from '../registries/jolocomRegistry'
+import { JoloDidMethod } from '../didMethods/jolo'
 import { SocialRecovery } from './socialRecovery'
+import { authJoloIdentity } from '../didMethods/jolo/utils'
 
 /**
  * List of possible seed phrase lengths referring to the BIP39 spec (https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
@@ -23,11 +24,13 @@ function sliceSeedPhrase(
   seedPhrase: string,
 ): { seedPhrase: string; didPhrase: string } {
   const seedPhraseArray = seedPhrase.split(' ')
-  let currentSeedLength
+  let currentSeedLength: number
+
   SEED_PHRASE_LENGTH_LIST.forEach(seedPhraseLength => {
     if (validateMnemonic(seedPhraseArray.slice(0, seedPhraseLength).join(' ')))
       currentSeedLength = seedPhraseLength
   })
+
   return {
     seedPhrase: seedPhraseArray.slice(0, currentSeedLength).join(' '),
     didPhrase: seedPhraseArray.slice(currentSeedLength).join(' '),
@@ -35,7 +38,7 @@ function sliceSeedPhrase(
 }
 
 async function recoverFromSeedPhrase(
-  registry: JolocomRegistry,
+  resolver = new JoloDidMethod().resolver,
   mnemonicPhrase: string,
   keyMetaData: IKeyDerivationArgs,
 ): Promise<IdentityWallet> {
@@ -51,11 +54,11 @@ async function recoverFromSeedPhrase(
   } else {
     did = publicKeyToDID(vault.getPublicKey(keyMetaData))
   }
-  return await registry.authenticate(vault, keyMetaData.encryptionPass)
+  return authJoloIdentity(vault, keyMetaData.encryptionPass, resolver)
 }
 
 async function recoverFromShards(
-  registry: JolocomRegistry,
+  resolver = new JoloDidMethod().resolver,
   shards: string[],
   keyMetaData: IKeyDerivationArgs,
 ): Promise<IdentityWallet> {
@@ -64,7 +67,8 @@ async function recoverFromShards(
     Buffer.from(secret, 'hex'),
     keyMetaData.encryptionPass,
   )
-  return await registry.authenticate(vault, keyMetaData.encryptionPass)
+
+  return authJoloIdentity(vault, keyMetaData.encryptionPass, resolver)
 }
 
 export { recoverFromSeedPhrase, recoverFromShards }

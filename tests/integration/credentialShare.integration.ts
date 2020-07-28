@@ -13,7 +13,7 @@ import { keyIdToDid } from '../../ts/utils/helper'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  jolocomRegistry
+  joloDidMethod
 } from './identity.integration'
 
 chai.use(sinonChai)
@@ -51,7 +51,7 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
       await userIdentityWallet.validateJWT(
         decodedCredRequest,
         null,
-        jolocomRegistry.resolver
+        joloDidMethod.resolver
       )
     } catch (err) {
       return expect(true).to.be.false
@@ -94,7 +94,7 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
       await serviceIdentityWallet.validateJWT(
         decodedCredResponse,
         credRequestJWT,
-        jolocomRegistry.resolver
+        joloDidMethod.resolver
       )
     } catch (err) {
       return expect(true).to.be.false

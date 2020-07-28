@@ -3,9 +3,6 @@ import * as sinonChai from 'sinon-chai'
 import * as integrationHelper from './provision'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import {
-  JolocomRegistry,
-} from '../../ts/registries/jolocomRegistry'
-import {
   testEthereumConfig,
   userVault,
   userPass,
@@ -19,12 +16,16 @@ import { publicProfileCredJSON } from '../data/identity.data'
 import { ContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { ErrorCodes } from '../../ts/errors'
+import { IDidMethod } from '../../ts/didMethods/types'
+import { JoloDidMethod } from '../../ts/didMethods/jolo'
+import { createJoloIdentity, authJoloIdentity } from '../../ts/didMethods/jolo/utils'
+import { claimsMetadata } from '@jolocom/protocol-ts'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
 /* global before and after hook for integration tests & shared variables */
-export let jolocomRegistry: JolocomRegistry
+export let joloDidMethod: IDidMethod
 export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
 export let testContractsGateway: ContractsGateway
@@ -40,19 +41,26 @@ before(async () => {
   testContractsAdapter = adapter
 
   const ipfsHost = `${testIpfsConfig.protocol}://${testIpfsConfig.host}:${testIpfsConfig.port}`
-  jolocomRegistry = new JolocomRegistry(testEthereumConfig.providerUrl, testEthereumConfig.contractAddress, ipfsHost)
+  joloDidMethod = new JoloDidMethod(testEthereumConfig.providerUrl, testEthereumConfig.contractAddress)
 
-  userIdentityWallet = await jolocomRegistry.create(userVault, userPass, )
-  serviceIdentityWallet = await jolocomRegistry.create(serviceVault, servicePass)
+  userIdentityWallet = await createJoloIdentity(userVault, userPass, joloDidMethod.registrar)
+  serviceIdentityWallet = await createJoloIdentity(serviceVault, servicePass, joloDidMethod.registrar)
 })
 
 describe('Integration Test - Create, Resolve, Public Profile', () => {
+  const publicProfileContent = {
+     name: 'Test Service',
+     description: 'Integration test service',
+     url: 'https://test.com',
+     image: 'https://images.com'
+  }
+
   it('should correctly create user and service identities', async () => {
-    const remoteUserIdentity = await jolocomRegistry.resolve(
+    const remoteUserIdentity = await joloDidMethod.resolver.resolve(
       userIdentityWallet.did,
     )
 
-    const remoteServiceIdentity = await jolocomRegistry.resolve(
+    const remoteServiceIdentity = await joloDidMethod.resolver.resolve(
       serviceIdentityWallet.did,
     )
 
@@ -65,26 +73,30 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
   })
 
   it('should correctly add and commit public profile', async () => {
-    await jolocomRegistry.registrar.updatePublicProfile(
+    await joloDidMethod.registrar.updatePublicProfile(
        serviceVault,
        servicePass,
        serviceIdentityWallet.identity,
-       publicProfileCredJSON
+       await serviceIdentityWallet.create.signedCredential({
+         metadata: claimsMetadata.publicProfile,
+         claim: publicProfileContent,
+         subject: serviceIdentityWallet.did
+       }, servicePass)
     )
 
 
-    const remoteServiceIdentity = await jolocomRegistry.resolve(
+    const remoteServiceIdentity = await joloDidMethod.resolver.resolve(
       serviceIdentityWallet.did,
     )
 
-    expect(remoteServiceIdentity.publicProfile.toJSON()).to.deep.eq(publicProfileCredJSON)
+    expect(remoteServiceIdentity.publicProfile.claim).to.deep.eq({...publicProfileContent, id: remoteServiceIdentity.did})
     expect(remoteServiceIdentity.didDocument).to.deep.eq(
       remoteServiceIdentity.didDocument,
     )
   })
 
   it('should correctly implement authenticate with no public profile', async () => {
-    const wallet = await jolocomRegistry.authenticate(userVault, userPass)
+    const wallet = await authJoloIdentity(userVault, userPass, joloDidMethod.resolver)
 
     expect(wallet.identity.didDocument).to.deep.eq(
       userIdentityWallet.identity.didDocument,
@@ -95,15 +107,16 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
   })
 
   it('should correctly implement authenticate with public profile', async () => {
-    const serviceIdentity = await jolocomRegistry.authenticate(serviceVault, servicePass)
-    expect(serviceIdentity.identity.publicProfile.toJSON()).to.deep.eq(publicProfileCredJSON)
+    const serviceIdentity = await authJoloIdentity(serviceVault, servicePass, joloDidMethod.resolver)
+    expect(serviceIdentity.identity.publicProfile.subject).to.deep.eq(serviceIdentity.did)
+    expect(serviceIdentity.identity.publicProfile.claim).to.deep.eq({...publicProfileContent, id: serviceIdentity.did})
   })
 
   it('should correctly fail to authenticate as non existing did', async () => {
     const mockVault = SoftwareKeyProvider.fromSeed(testSeed, 'pass')
 
     try {
-      await jolocomRegistry.authenticate(mockVault, 'pass')
+      await authJoloIdentity(mockVault, 'pass', joloDidMethod.resolver)
     } catch (err) {
       expect(err.message).to.contain(
         ErrorCodes.RegistryDIDNotAnchored

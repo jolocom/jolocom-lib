@@ -1,10 +1,10 @@
 /// <reference types="node" />
 import { IDidDocumentAttrs } from './types';
 import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections';
-import { ISigner } from '../../registries/types';
 import { IDigestable, ILinkedDataSignature } from '../../linkedDataSignature/types';
 import { IKeyDerivationArgs, IVaultedKeyProvider } from '../../vaultedKeyProvider/types';
 import { ContextEntry } from '@jolocom/protocol-ts';
+import { ISigner } from '../../credentials/signedCredential/types';
 export declare class DidDocument implements IDigestable {
     private _id;
     private _specVersion;
