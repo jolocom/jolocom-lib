@@ -41,7 +41,7 @@ before(async () => {
   testContractsAdapter = adapter
 
   const ipfsHost = `${testIpfsConfig.protocol}://${testIpfsConfig.host}:${testIpfsConfig.port}`
-  joloDidMethod = new JoloDidMethod(testEthereumConfig.providerUrl, testEthereumConfig.contractAddress)
+  joloDidMethod = new JoloDidMethod(testEthereumConfig.providerUrl, testEthereumConfig.contractAddress, ipfsHost)
 
   userIdentityWallet = await createJoloIdentity(userVault, userPass, joloDidMethod.registrar)
   serviceIdentityWallet = await createJoloIdentity(serviceVault, servicePass, joloDidMethod.registrar)
