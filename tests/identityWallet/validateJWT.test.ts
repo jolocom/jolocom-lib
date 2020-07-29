@@ -16,7 +16,7 @@ import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ErrorCodes } from '../../ts/errors'
 import { expect } from 'chai'
-import { Resolver } from 'did-resolver'
+import { JolocomResolver } from '../../ts/didMethods/jolo/resolver'
 
 chai.use(sinonChai)
 
@@ -30,9 +30,9 @@ describe('IdentityWallet validate JWT', () => {
   let iw: IdentityWallet
   let clock
 
-  const testResolver = new Resolver({
-    //@ts-ignore
-    jolo: async () => didDocumentJSON
+  const testResolver = new JolocomResolver('','','')
+  testResolver.resolve = async (_) => Identity.fromDidDocument({
+    didDocument: DidDocument.fromJSON(didDocumentJSON)
   })
 
   beforeEach(() => {
