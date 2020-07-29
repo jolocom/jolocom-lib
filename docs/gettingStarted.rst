@@ -115,7 +115,7 @@ We need to derive a key for signing the Ethereum transaction, which anchors the 
 .. code-block:: typescript
 
   const publicEthKey = vaultedKeyProvider.getPublicKey({
-    encryptionPass: secret
+    encryptionPass: secret,
     derivationPath: JolocomLib.KeyTypes.ethereumKey // "m/44'/60'/0'/0/0"
   })
 
