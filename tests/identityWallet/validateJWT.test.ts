@@ -30,10 +30,11 @@ describe('IdentityWallet validate JWT', () => {
   let iw: IdentityWallet
   let clock
 
-  const testResolver = new JolocomResolver('','','')
-  testResolver.resolve = async (_) => Identity.fromDidDocument({
-    didDocument: DidDocument.fromJSON(didDocumentJSON)
-  })
+  const testResolver = new JolocomResolver('', '', '')
+  testResolver.resolve = async _ =>
+    Identity.fromDidDocument({
+      didDocument: DidDocument.fromJSON(didDocumentJSON),
+    })
 
   beforeEach(() => {
     clock = sinon.useFakeTimers()

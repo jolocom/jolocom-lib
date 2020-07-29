@@ -6,6 +6,7 @@ import { publicKeyToDID } from "../../utils/crypto"
 import { Resolver, Registrar } from "../types"
 
 // TODO Figure out how to fit this into the DidMethod
+// The function will be replaced by a more generic alternative once the new VKP is integrated
 export const createJoloIdentity = async (vaultedKeyProvider: IVaultedKeyProvider, decryptionPassword: string, registrar: Registrar) => {
   const identity = await registrar.create(
     vaultedKeyProvider,

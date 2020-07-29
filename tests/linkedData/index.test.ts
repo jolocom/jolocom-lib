@@ -89,7 +89,10 @@ describe('linkedData validation functions', () => {
   it('validateJsonLd should correctly validate', async () => {
     const testResolver: Resolver = {
       prefix: 'test',
-      resolve: async () => Identity.fromDidDocument({didDocument: DidDocument.fromJSON(DID_DOC_V0)})
+      resolve: async () =>
+        Identity.fromDidDocument({
+          didDocument: DidDocument.fromJSON(DID_DOC_V0),
+        }),
     }
 
     const mallformedV0 = {

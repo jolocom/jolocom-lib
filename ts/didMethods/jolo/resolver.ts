@@ -16,6 +16,7 @@ export class JolocomResolver implements Resolver {
     getPublicProfile: undefined
   }
 
+  // TODO Should this constructor default as well? Or do we only default on the DidMethod layer.
   constructor(providerUrl: string, contractAddress: string, ipfsHost: string) {
     this.resolutionFunctions.getPublicProfile = (didDoc: DIDDocument) => getPublicProfile(didDoc, ipfsHost)
     this.resolutionFunctions.resolve = getResolver(providerUrl, contractAddress, ipfsHost).jolo
