@@ -24,46 +24,53 @@ describe('Jolo Did method - resolve', () => {
   it('should resolve with no public profile', async () => {
     const didDocWithoutPubProfilie = {
       ...didDocumentJSON,
-      service: []
+      service: [],
     }
 
-    const testResolver = new JolocomResolver('','','')
+    const testResolver = new JolocomResolver()
 
     //@ts-ignore resolutionFunctions is private
-    testResolver.resolutionFunctions.resolve = async () => didDocWithoutPubProfilie
+    testResolver.resolutionFunctions.resolve = async () =>
+      didDocWithoutPubProfilie
 
     //@ts-ignore resolutionFunctions is private
-    testResolver.resolutionFunctions.getPublicProfile = async (didDoc) => {
+    testResolver.resolutionFunctions.getPublicProfile = async didDoc => {
       return null
     }
 
     const { didDocument, publicProfile } = await testResolver.resolve(mockDid)
 
-    expect(didDocument).to.deep.eq(DidDocument.fromJSON(didDocWithoutPubProfilie))
+    expect(didDocument).to.deep.eq(
+      DidDocument.fromJSON(didDocWithoutPubProfilie),
+    )
     expect(publicProfile).to.be.undefined
   })
 
   it('should throw if resolution fails', async () => {
-    const testResolver = new JolocomResolver('','','')
+    const testResolver = new JolocomResolver()
     //@ts-ignore resolutionFunctions is private
     testResolver.resolutionFunctions.resolve = async () => null
 
-    return testResolver.resolve(mockDid)
+    return testResolver
+      .resolve(mockDid)
       .then(() => new Error('Error should have been thrown')) // TODO
-      .catch(err => expect(err.message).to.eq(ErrorCodes.RegistryDIDNotAnchored))
+      .catch(err =>
+        expect(err.message).to.eq(ErrorCodes.RegistryDIDNotAnchored),
+      )
   })
 
   it('should resolve with public profile', async () => {
-    const testResolver = new JolocomResolver('','','')
+    const testResolver = new JolocomResolver()
 
     //@ts-ignore resolutionFunctions is private
     testResolver.resolutionFunctions.resolve = async () => ({
       ...didDocumentJSON,
-      service: [mockPubProfServiceEndpointJSON]
+      service: [mockPubProfServiceEndpointJSON],
     })
 
     //@ts-ignore resolutionFunctions is private
-    testResolver.resolutionFunctions.getPublicProfile = async () => publicProfileCredJSON
+    testResolver.resolutionFunctions.getPublicProfile = async () =>
+      publicProfileCredJSON
 
     const identity: Identity = await testResolver.resolve(mockDid)
     expect(identity.didDocument.toJSON()).to.deep.eq({

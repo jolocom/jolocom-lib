@@ -6,7 +6,7 @@ import { Registrar } from "../types";
 export declare class JolocomRegistrar implements Registrar {
     prefix: string;
     registry: ReturnType<typeof getRegistry>;
-    constructor(providerUrl: string, contractAddress: string, ipfsHost: string);
+    constructor(providerUrl?: string, contractAddress?: string, ipfsHost?: string);
     create(keyProvider: IVaultedKeyProvider, password: string): Promise<Identity>;
     updatePublicProfile(keyProvider: IVaultedKeyProvider, password: string, identity: Identity, publicProfile: SignedCredential): Promise<boolean>;
     encounter(): Promise<boolean>;

@@ -7,15 +7,16 @@ import { fuelKeyWithEther } from "../../utils/helper"
 import { SignedCredential } from "../../credentials/signedCredential/signedCredential"
 import { Registrar } from "../types"
 import { claimsMetadata } from '@jolocom/protocol-ts'
+import { PROVIDER_URL, CONTRACT_ADDRESS, IPFS_ENDPOINT } from "./constants"
 
 export class JolocomRegistrar implements Registrar {
   public prefix = 'jolo'
   public registry: ReturnType<typeof getRegistry> 
 
   constructor(
-    providerUrl: string,
-    contractAddress: string,
-    ipfsHost: string
+    providerUrl = PROVIDER_URL,
+    contractAddress = CONTRACT_ADDRESS,
+    ipfsHost = IPFS_ENDPOINT
   ) {
     this.registry = getRegistry(providerUrl, contractAddress, ipfsHost)
   }

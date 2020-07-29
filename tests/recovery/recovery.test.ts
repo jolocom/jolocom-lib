@@ -24,7 +24,7 @@ import { JolocomResolver } from '../../ts/didMethods/jolo/resolver'
 
 describe('Recovery', () => {
   const sandbox = sinon.createSandbox()
-  const resolver = new JolocomResolver('', '', '')
+  const resolver = new JolocomResolver()
   const mockDidDoc = DidDocument.fromJSON(didDocumentJSON)
 
   let referenceVault32, referenceVault16

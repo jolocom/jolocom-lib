@@ -30,7 +30,7 @@ describe('IdentityWallet validate JWT', () => {
   let iw: IdentityWallet
   let clock
 
-  const testResolver = new JolocomResolver('', '', '')
+  const testResolver = new JolocomResolver()
   testResolver.resolve = async _ =>
     Identity.fromDidDocument({
       didDocument: DidDocument.fromJSON(didDocumentJSON),

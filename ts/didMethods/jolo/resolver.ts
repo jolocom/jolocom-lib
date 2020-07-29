@@ -8,18 +8,27 @@ import { getIssuerPublicKey } from "../../utils/helper";
 import { Identity } from "../../identity/identity";
 import { SignedCredential } from "../../credentials/signedCredential/signedCredential";
 import { digestJsonLd } from "../../linkedData";
+import { IPFS_ENDPOINT, PROVIDER_URL, CONTRACT_ADDRESS } from "./constants";
 
 export class JolocomResolver implements Resolver {
   prefix: 'jolo'
   private resolutionFunctions = {
     resolve: undefined,
-    getPublicProfile: undefined
+    getPublicProfile: undefined,
   }
 
-  // TODO Should this constructor default as well? Or do we only default on the DidMethod layer.
-  constructor(providerUrl: string, contractAddress: string, ipfsHost: string) {
-    this.resolutionFunctions.getPublicProfile = (didDoc: DIDDocument) => getPublicProfile(didDoc, ipfsHost)
-    this.resolutionFunctions.resolve = getResolver(providerUrl, contractAddress, ipfsHost).jolo
+  constructor(
+    providerUrl = PROVIDER_URL,
+    contractAddress = CONTRACT_ADDRESS,
+    ipfsHost = IPFS_ENDPOINT,
+  ) {
+    this.resolutionFunctions.getPublicProfile = (didDoc: DIDDocument) =>
+      getPublicProfile(didDoc, ipfsHost)
+    this.resolutionFunctions.resolve = getResolver(
+      providerUrl,
+      contractAddress,
+      ipfsHost,
+    ).jolo
   }
 
   async resolve(did: string) {
@@ -30,14 +39,16 @@ export class JolocomResolver implements Resolver {
       throw new Error(ErrorCodes.RegistryDIDNotAnchored)
     }
 
-    const publicProfileJson = await this.resolutionFunctions.getPublicProfile(jsonDidDoc)
+    const publicProfileJson = await this.resolutionFunctions.getPublicProfile(
+      jsonDidDoc,
+    )
 
     const didDocument = DidDocument.fromJSON(jsonDidDoc)
 
     const signatureValid = SoftwareKeyProvider.verify(
       await digestJsonLd(jsonDidDoc, jsonDidDoc['@context']),
       getIssuerPublicKey(didDocument.signer.keyId, didDocument),
-      Buffer.from(didDocument.proof.signature, 'hex')
+      Buffer.from(didDocument.proof.signature, 'hex'),
     )
 
     if (!signatureValid) {
@@ -47,21 +58,23 @@ export class JolocomResolver implements Resolver {
     let publicProfile: undefined | SignedCredential
 
     if (publicProfileJson) {
-      const publicProfileCred = SignedCredential.fromJSON(publicProfileJson)
+      const publicProfileCred = SignedCredential.fromJSON(
+        publicProfileJson,
+      )
 
       const isValid = await SoftwareKeyProvider.verifyDigestable(
         getIssuerPublicKey(didDocument.signer.keyId, didDocument),
-        publicProfileCred
+        publicProfileCred,
       )
 
-      if(isValid) {
+      if (isValid) {
         publicProfile = publicProfileCred
       }
     }
 
     return Identity.fromDidDocument({
       didDocument,
-      publicProfile: publicProfile
+      publicProfile: publicProfile,
     })
   }
 }
