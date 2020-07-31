@@ -1,7 +1,7 @@
-import { Resolver } from "../types";
+import { IResolver } from "../types";
 import { getResolver, getPublicProfile } from 'jolo-did-resolver'
 import { ErrorCodes } from "../../errors";
-import { DIDDocument } from "did-resolver";
+import { DIDDocument, Resolver } from "did-resolver";
 import { DidDocument } from "../../identity/didDocument/didDocument";
 import { SoftwareKeyProvider } from "../../vaultedKeyProvider/softwareProvider";
 import { getIssuerPublicKey } from "../../utils/helper";
@@ -10,11 +10,16 @@ import { SignedCredential } from "../../credentials/signedCredential/signedCrede
 import { digestJsonLd } from "../../linkedData";
 import { IPFS_ENDPOINT, PROVIDER_URL, CONTRACT_ADDRESS } from "./constants";
 
-export class JolocomResolver implements Resolver {
+type Resolve = (did: string) => Promise<DIDDocument>
+
+export class JolocomResolver implements IResolver {
   prefix: 'jolo'
-  private resolutionFunctions = {
+  private resolutionFunctions: {
+    resolve: Resolve,
+    getPublicProfile: (didDoc: DIDDocument) => any
+  } = {
     resolve: undefined,
-    getPublicProfile: undefined,
+    getPublicProfile: undefined
   }
 
   constructor(
@@ -24,28 +29,32 @@ export class JolocomResolver implements Resolver {
   ) {
     this.resolutionFunctions.getPublicProfile = (didDoc: DIDDocument) =>
       getPublicProfile(didDoc, ipfsHost)
-    this.resolutionFunctions.resolve = getResolver(
+
+    this.resolutionFunctions.resolve = (did: string) => new Resolver(getResolver(
       providerUrl,
       contractAddress,
       ipfsHost,
-    ).jolo
+    )).resolve(did)
   }
 
   async resolve(did: string) {
-    // TODO Catch or let through?
     const jsonDidDoc = await this.resolutionFunctions.resolve(did)
+      // TODO Don't discard reason
+      .catch(e => {
+        console.error(e)
+        throw new Error(ErrorCodes.RegistryDIDNotAnchored)
+      })
 
-    if (jsonDidDoc === null) {
-      throw new Error(ErrorCodes.RegistryDIDNotAnchored)
-    }
 
     const publicProfileJson = await this.resolutionFunctions.getPublicProfile(
       jsonDidDoc,
     )
 
+    //@ts-ignore
     const didDocument = DidDocument.fromJSON(jsonDidDoc)
 
     const signatureValid = SoftwareKeyProvider.verify(
+      //@ts-ignore
       await digestJsonLd(jsonDidDoc, jsonDidDoc['@context']),
       getIssuerPublicKey(didDocument.signer.keyId, didDocument),
       Buffer.from(didDocument.proof.signature, 'hex'),

@@ -9,6 +9,7 @@ import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data
 import { ErrorCodes } from '../../ts/errors'
 import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { JolocomResolver } from '../../ts/didMethods/jolo/resolver'
+import { Resolver } from 'did-resolver'
 
 const sandbox = sinon.createSandbox()
 
@@ -31,6 +32,7 @@ describe('Jolo Did method - resolve', () => {
 
     //@ts-ignore resolutionFunctions is private
     testResolver.resolutionFunctions.resolve = async () =>
+      //@ts-ignore
       didDocWithoutPubProfilie
 
     //@ts-ignore resolutionFunctions is private
@@ -48,8 +50,11 @@ describe('Jolo Did method - resolve', () => {
 
   it('should throw if resolution fails', async () => {
     const testResolver = new JolocomResolver()
-    //@ts-ignore resolutionFunctions is private
-    testResolver.resolutionFunctions.resolve = async () => null
+
+    //@ts-ignore
+    testResolver.resolutionFunctions.resolve = new Resolver({
+      jolo: async (did: string) => null
+    }).resolve
 
     return testResolver
       .resolve(mockDid)

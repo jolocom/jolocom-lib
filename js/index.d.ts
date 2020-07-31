@@ -12,8 +12,8 @@ export declare const JolocomLib: {
         constraintFunctions: import("@jolocom/protocol-ts/dist/lib/interactionTokens").IExposedConstraintFunctions;
         fuelKeyWithEther: typeof fuelKeyWithEther;
         getIssuerPublicKey: typeof getIssuerPublicKey;
-        validateDigestable: (toValidate: import("@jolocom/protocol-ts/dist/lib/linkedDataSignature").IDigestable, resolver?: import("./didMethods/types").Resolver) => Promise<boolean>;
-        validateDigestables: (toValidate: import("@jolocom/protocol-ts/dist/lib/linkedDataSignature").IDigestable[], resolver?: import("./didMethods/types").Resolver) => Promise<boolean[]>;
+        validateDigestable: (toValidate: import("@jolocom/protocol-ts/dist/lib/linkedDataSignature").IDigestable, resolver?: import("./didMethods/types").IResolver) => Promise<boolean>;
+        validateDigestables: (toValidate: import("@jolocom/protocol-ts/dist/lib/linkedDataSignature").IDigestable[], resolver?: import("./didMethods/types").IResolver) => Promise<boolean[]>;
     };
     KeyTypes: typeof KeyTypes;
 };

@@ -2,8 +2,8 @@ import { Identity } from "../../identity/identity";
 import { getRegistry } from 'jolo-did-registry';
 import { IVaultedKeyProvider } from "@jolocom/protocol-ts/dist/lib/vaultedKeyProvider";
 import { SignedCredential } from "../../credentials/signedCredential/signedCredential";
-import { Registrar } from "../types";
-export declare class JolocomRegistrar implements Registrar {
+import { IRegistrar } from "../types";
+export declare class JolocomRegistrar implements IRegistrar {
     prefix: string;
     registry: ReturnType<typeof getRegistry>;
     constructor(providerUrl?: string, contractAddress?: string, ipfsHost?: string);

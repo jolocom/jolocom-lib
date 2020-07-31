@@ -45,9 +45,9 @@ export declare class IdentityWallet {
     private messageCannonicaliser;
     getPublicKeys: (encryptionPass: string) => PublicKeyMap;
     private initializeAndSign;
-    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: import("../didMethods/types").Resolver): Promise<void>;
+    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: import("../didMethods/types").IResolver): Promise<void>;
     asymEncrypt: (data: Buffer, publicKey: Buffer) => Promise<string>;
-    asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: import("../didMethods/types").Resolver) => Promise<string>;
+    asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: import("../didMethods/types").IResolver) => Promise<string>;
     asymDecrypt: (data: string, decryptionKeyArgs: IKeyDerivationArgs) => Promise<Buffer>;
     private sendTransaction;
     transactions: {

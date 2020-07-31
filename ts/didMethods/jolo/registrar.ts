@@ -5,11 +5,11 @@ import { DidDocument } from "../../identity/didDocument/didDocument"
 import { ServiceEndpointsSection } from "../../identity/didDocument/sections"
 import { fuelKeyWithEther } from "../../utils/helper"
 import { SignedCredential } from "../../credentials/signedCredential/signedCredential"
-import { Registrar } from "../types"
+import { IRegistrar } from "../types"
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { PROVIDER_URL, CONTRACT_ADDRESS, IPFS_ENDPOINT } from "./constants"
 
-export class JolocomRegistrar implements Registrar {
+export class JolocomRegistrar implements IRegistrar {
   public prefix = 'jolo'
   public registry: ReturnType<typeof getRegistry> 
 
