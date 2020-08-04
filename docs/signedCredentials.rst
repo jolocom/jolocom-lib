@@ -107,6 +107,9 @@ Taking a look at the newly created credential, we can indeed see that the ``subj
       creator: 'did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777#keys-1'
       ...
   }
+  
+.. note:: Most likely, this credential will be generated locally and will be passed to the other party to validate the credential. In order to pass the credential in a JSON format, we can convert the local credential using `emailAddressSignedCredential.toJSON()`.
+
 
 Validate a signature on a signed credential
 #############################################
