@@ -57,7 +57,7 @@ will fail. In case you would like to specify a custom expiry date, the following
 
   // An instance of an identityWallet is required at this point
     const credentialRequest = await identityWallet.create.interactionTokens.request.share({
-      expires: customExpiryDate
+      expires: customExpiryDate,
       callbackURL: 'https://example.com/authentication/',
       credentialRequirements: [{
           type: ['Credential', 'ProofOfEmailCredential'],
@@ -110,7 +110,7 @@ Once the request has been decoded, we can create the response:
    * will be populated autmoatically based on the request starting from next major release
    */
 
-  const credentialResponse = awaitidentityWallet.create.interactionTokens.response.share({
+  const credentialResponse = await identityWallet.create.interactionTokens.response.share({
       callbackURL: credentialRequest.payload.interactionToken.callbackURL,
       suppliedCredentials: [signedEmailCredential.toJSON()] // Provide signed credentials of requested type
     },
@@ -163,7 +163,6 @@ After decoding the credential response, verify that the user passed the credenti
    */
 
   const validResponse = credentialResponse.satisfiesRequest(credentialRequest)
-  const registry = JolocomLib.registries.jolocom.create()
 
   if (!validResponse) {
     throw new Error('Incorrect response received')
