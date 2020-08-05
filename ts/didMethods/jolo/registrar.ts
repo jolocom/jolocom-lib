@@ -1,6 +1,5 @@
 import { Identity } from "../../identity/identity"
 import { getRegistry } from 'jolo-did-registry'
-import { IVaultedKeyProvider, KeyTypes } from "@jolocom/protocol-ts/dist/lib/vaultedKeyProvider"
 import { DidDocument } from "../../identity/didDocument/didDocument"
 import { ServiceEndpointsSection } from "../../identity/didDocument/sections"
 import { fuelKeyWithEther } from "../../utils/helper"
@@ -8,6 +7,12 @@ import { SignedCredential } from "../../credentials/signedCredential/signedCrede
 import { IRegistrar } from "../types"
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { PROVIDER_URL, CONTRACT_ADDRESS, IPFS_ENDPOINT } from "./constants"
+import { IVaultedKeyProvider, KeyTypes, SoftwareKeyProvider } from "@jolocom/vaulted-key-provider"
+import * as eccrypto from 'eccrypto'
+import { publicKeyToDID } from "../../utils/crypto"
+
+const SIGNING_KEY_REF = `keys-1`
+const ANCHOR_KEY_REF = `keys-2`
 
 export class JolocomRegistrar implements IRegistrar {
   public prefix = 'jolo'
@@ -21,16 +26,37 @@ export class JolocomRegistrar implements IRegistrar {
     this.registry = getRegistry(providerUrl, contractAddress, ipfsHost)
   }
 
-  async create(keyProvider: IVaultedKeyProvider, password: string) {
-    const identityKey = keyProvider.getPublicKey({
-      derivationPath: KeyTypes.jolocomIdentityKey,
-      encryptionPass: password
-    })
+  async create(keyProvider: SoftwareKeyProvider, password: string) {
+    // generate a new key, add it to the vkp with the expected id, use that, then move the api to the vkp
+
+    // TODO Does this matter?
+    if(keyProvider.id) {
+      throw new Error('I SHOULD BE SETTING THIS FOR NOW')
+    }
+
+    await keyProvider.newKeyPair(
+      password,
+      KeyTypes.ecdsaSecp256k1VerificationKey2019,
+      ANCHOR_KEY_REF
+    )
+
+    const signingKey = await keyProvider.newKeyPair(
+      password,
+      KeyTypes.ecdsaSecp256k1VerificationKey2019,
+      SIGNING_KEY_REF
+    )
+
+    const did = publicKeyToDID(Buffer.from(signingKey.publicKeyHex, 'hex'))
+
+    keyProvider.changeId(password, did)
 
     const identity = Identity.fromDidDocument({
-      didDocument: await DidDocument.fromPublicKey(identityKey)
+      didDocument: await DidDocument.fromPublicKey(
+        Buffer.from(signingKey.publicKeyHex, 'hex')
+      )
     })
 
+    // TODO
     await this.signDidDocument(
       identity.didDocument,
       keyProvider,
@@ -48,7 +74,7 @@ export class JolocomRegistrar implements IRegistrar {
 
   // TODO Verify signature on the public profile? Or just assume it's correct
   // TODO Public profile should perhaps be JSON / any, so that the registrars can be used without having to typecheck / guard / use generics
-  async updatePublicProfile(keyProvider: IVaultedKeyProvider, password: string, identity: Identity, publicProfile: SignedCredential) {
+  async updatePublicProfile(keyProvider: SoftwareKeyProvider, password: string, identity: Identity, publicProfile: SignedCredential) {
     const { didDocument } = identity
 
     const publicProfileEntry = ServiceEndpointsSection.fromJSON(
@@ -86,26 +112,27 @@ export class JolocomRegistrar implements IRegistrar {
     return didDocument.sign(
       keyProvider,
       {
-        derivationPath: KeyTypes.jolocomIdentityKey,
+        keyRef: SIGNING_KEY_REF,
         encryptionPass: password
       }
     )
   }
 
-  private async update(keyProvider: IVaultedKeyProvider, password: string, didDocument: DidDocument) {
+  // TODO Won't work because we can't do eth tx signing in the VKP
+  private async update(keyProvider: SoftwareKeyProvider, password: string, didDocument: DidDocument) {
     // Essentialy sign_raw with the encoded TX kinda, not really, this is Recoverable signature
-    const ethSecretKey = keyProvider.getPrivateKey({
-      derivationPath: KeyTypes.ethereumKey,
-      encryptionPass: password
+    const anchoringKey = await keyProvider.getPubKey({
+      encryptionPass: password,
+      keyRef: ANCHOR_KEY_REF
     })
 
-    const ethPublicKey = keyProvider.getPublicKey({
-      derivationPath: KeyTypes.ethereumKey,
-      encryptionPass: password
-    })
+    if (!anchoringKey) {
+      throw new Error('CAN NOT ANCHOR, NO KEY')
+    }
 
-    await fuelKeyWithEther(ethPublicKey)
+    await fuelKeyWithEther(Buffer.from(anchoringKey.publicKeyHex, 'hex'))
 
+    // TODO The TX needs to be assembled here
     return this.registry.commitDidDoc(
       ethSecretKey,
       // @ts-ignore TODO The DID Document related types need to be harmonized

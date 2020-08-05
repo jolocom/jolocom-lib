@@ -1,10 +1,10 @@
 import { Identity } from '../identity/identity'
-import { IVaultedKeyProvider } from '../vaultedKeyProvider/types'
 import { IKeyMetadata } from '../credentials/signedCredential/types'
 import { IContractsAdapter, IContractsGateway } from '../contracts/types'
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
 export interface IIdentityWalletCreateArgs {
-  vaultedKeyProvider: IVaultedKeyProvider
+  vaultedKeyProvider: SoftwareKeyProvider
   identity: Identity
   publicKeyMetadata: IKeyMetadata
   contractsAdapter: IContractsAdapter

@@ -1,5 +1,4 @@
 import { IdentityWallet } from '../identityWallet/identityWallet'
-import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import {
   IKeyDerivationArgs,
   IVaultedKeyProvider,
@@ -9,6 +8,7 @@ import { mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { JoloDidMethod } from '../didMethods/jolo'
 import { SocialRecovery } from './socialRecovery'
 import { authJoloIdentity } from '../didMethods/jolo/utils'
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
 /**
  * List of possible seed phrase lengths referring to the BIP39 spec (https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
@@ -41,34 +41,36 @@ async function recoverFromSeedPhrase(
   resolver = new JoloDidMethod().resolver,
   mnemonicPhrase: string,
   keyMetaData: IKeyDerivationArgs,
+//@ts-ignore - REIMPLEMENT
 ): Promise<IdentityWallet> {
-  let did: string
-  let vault: IVaultedKeyProvider
-  const { seedPhrase, didPhrase } = sliceSeedPhrase(mnemonicPhrase)
-  vault = SoftwareKeyProvider.recoverKeyPair(
-    seedPhrase,
-    keyMetaData.encryptionPass,
-  )
-  if (didPhrase) {
-    did = 'did:jolo:' + mnemonicToEntropy(didPhrase)
-  } else {
-    did = publicKeyToDID(vault.getPublicKey(keyMetaData))
-  }
-  return authJoloIdentity(vault, keyMetaData.encryptionPass, resolver)
+  // let did: string
+  // let vault: SoftwareKeyProvider
+  // const { seedPhrase, didPhrase } = sliceSeedPhrase(mnemonicPhrase)
+  // vault = SoftwareKeyProvider.recoverKeyPair(
+  //   seedPhrase,
+  //   keyMetaData.encryptionPass,
+  // )
+  // if (didPhrase) {
+  //   did = 'did:jolo:' + mnemonicToEntropy(didPhrase)
+  // } else {
+  //   did = publicKeyToDID(vault.getPublicKey(keyMetaData))
+  // }
+  // return authJoloIdentity(await SoftwareKeyProvider.newEmptyWallet(cryptoUtils, '', 'hello'), keyMetaData.encryptionPass, resolver)
 }
 
 async function recoverFromShards(
   resolver = new JoloDidMethod().resolver,
   shards: string[],
   keyMetaData: IKeyDerivationArgs,
+//@ts-ignore - REIMPLEMENT
 ): Promise<IdentityWallet> {
-  const { did, secret } = SocialRecovery.combineShard(shards)
-  const vault = SoftwareKeyProvider.fromSeed(
-    Buffer.from(secret, 'hex'),
-    keyMetaData.encryptionPass,
-  )
+  // const { did, secret } = SocialRecovery.combineShard(shards)
+  // const vault = SoftwareKeyProvider.fromSeed(
+  //   Buffer.from(secret, 'hex'),
+  //   keyMetaData.encryptionPass,
+  // )
 
-  return authJoloIdentity(vault, keyMetaData.encryptionPass, resolver)
+  // return authJoloIdentity(vault, keyMetaData.encryptionPass, resolver)
 }
 
 export { recoverFromSeedPhrase, recoverFromShards }

@@ -24,10 +24,10 @@ import {
 import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 import {
   IKeyDerivationArgs,
-  IVaultedKeyProvider,
 } from '../../vaultedKeyProvider/types'
 import { ContextEntry } from '@jolocom/protocol-ts'
 import { ISigner } from '../../credentials/signedCredential/types'
+import { IVaultedKeyProvider, IKeyRefArgs } from '@jolocom/vaulted-key-provider'
 
 /**
  * Class modelling a Did Document
@@ -346,18 +346,19 @@ export class DidDocument implements IDigestable {
 
   public async sign(
     vaultedKeyProvider: IVaultedKeyProvider,
-    derivationArgs: IKeyDerivationArgs,
+    signConfig: IKeyRefArgs,
   ): Promise<void> {
     this._proof = new EcdsaLinkedDataSignature()
     this._proof.creator = this.signer.keyId
     this._proof.signature = ''
     this._proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
 
-    const didDocumentSignature = await vaultedKeyProvider.signDigestable(
-      derivationArgs,
-      this,
-    )
-    this._proof.signature = didDocumentSignature.toString('hex')
+    // TODO Fix this up, should not do the final sha256 round here.
+    const digest = await this.digest()
+
+    const signature = await vaultedKeyProvider.sign(signConfig, digest)
+
+    this._proof.signature = signature.toString('hex')
   }
 
   /**

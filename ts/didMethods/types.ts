@@ -1,5 +1,5 @@
-import { IVaultedKeyProvider } from "@jolocom/protocol-ts/dist/lib/vaultedKeyProvider";
 import { Identity } from "../identity/identity";
+import { SoftwareKeyProvider } from "@jolocom/vaulted-key-provider";
 
 /*
  * TODO - is the prefix required on all components, or just the DID Method?
@@ -12,8 +12,8 @@ import { Identity } from "../identity/identity";
 export interface IRegistrar {
   prefix: string
   encounter: (change: string) => Promise<boolean>
-  create: <T>(keyProvider: IVaultedKeyProvider, password: string, creationConfig?: T) => Promise<Identity>
-  updatePublicProfile: (keyProvider: IVaultedKeyProvider, password: string, identity: Identity, publicProfile: any) => Promise<boolean> 
+  create: <T>(keyProvider: SoftwareKeyProvider, password: string, creationConfig?: T) => Promise<Identity>
+  updatePublicProfile: (keyProvider: SoftwareKeyProvider, password: string, identity: Identity, publicProfile: any) => Promise<boolean> 
 }
 
 export interface IResolver {

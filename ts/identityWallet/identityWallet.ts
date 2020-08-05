@@ -10,11 +10,8 @@ import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
-import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import {
-  IVaultedKeyProvider,
   KeyTypes,
-  IKeyDerivationArgs,
 } from '../vaultedKeyProvider/types'
 import {
   IKeyMetadata,
@@ -22,13 +19,10 @@ import {
 } from '../credentials/signedCredential/types'
 import {
   keyIdToDid,
-  getIssuerPublicKey,
-  publicKeyToAddress,
 } from '../utils/helper'
 import {
   IContractsAdapter,
   IContractsGateway,
-  ITransactionEncodable,
 } from '../contracts/types'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
@@ -45,6 +39,11 @@ import {
 } from '../interactionTokens/interactionTokens.types'
 import { ErrorCodes } from '../errors'
 import { JoloDidMethod } from '../didMethods/jolo'
+import { SoftwareKeyProvider, IKeyRefArgs, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
+import { getCryptoProvider } from '@jolocom/vaulted-key-provider/js/cryptoProvider'
+import { getRandomBytes } from '../utils/crypto'
+import { cryptoUtils } from '@jolocom/native-utils-node'
+import { validateDigestable } from '../utils/validation'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -91,7 +90,7 @@ type WithExtraOptions<T> = T & {
 export class IdentityWallet {
   private _identity: Identity
   private _publicKeyMetadata: IKeyMetadata
-  private _vaultedKeyProvider: IVaultedKeyProvider
+  private _vaultedKeyProvider: SoftwareKeyProvider
   private _contractsAdapter: IContractsAdapter
   private _contractsGateway: IContractsGateway
 
@@ -181,7 +180,7 @@ export class IdentityWallet {
    * @example `identityWallet.vaultedKeyProvider = new SoftwareKeyProvider(...)`
    */
 
-  private set vaultedKeyProvider(keyProvider: IVaultedKeyProvider) {
+  private set vaultedKeyProvider(keyProvider: SoftwareKeyProvider) {
     this._vaultedKeyProvider = keyProvider
   }
 
@@ -246,10 +245,13 @@ export class IdentityWallet {
       expires,
     )
 
-    const signature = await this.vaultedKeyProvider.signDigestable(
-      { derivationPath, encryptionPass: pass },
-      vCred,
-    )
+    const digest = await vCred.digest()
+
+    const signature = await this.vaultedKeyProvider.sign({
+      encryptionPass: pass,
+      keyRef: '' // TODO
+    }, digest)
+
     vCred.signature = signature.toString('hex')
     return vCred
   }
@@ -338,22 +340,9 @@ export class IdentityWallet {
    * @example `iw.getPublicKeys('secret')` // { jolocomIdentityKey: '0xabc...ff', ethereumKey: '0xabc...ff'}
    */
 
-  public getPublicKeys = (encryptionPass: string): PublicKeyMap => {
-    const supportedKeys = Object.entries(KeyTypes)
-
-    return supportedKeys.reduce<PublicKeyMap>((acc, currentEntry) => {
-      const [keyType, derivationPath] = currentEntry
-
-      return {
-        ...acc,
-        [keyType]: this.vaultedKeyProvider
-          .getPublicKey({
-            derivationPath,
-            encryptionPass,
-          })
-          .toString('hex'),
-      }
-    }, {})
+  // TODO Don't just delegate to the vkp, postprocess to make easier to consume
+  public getPublicKeys = (encryptionPass: string) => {
+    return this.vaultedKeyProvider.getPubKeys(encryptionPass)
   }
 
   /**
@@ -374,15 +363,21 @@ export class IdentityWallet {
       jwt.audience = keyIdToDid(receivedJWT.issuer)
       jwt.nonce = receivedJWT.nonce
     } else {
-      jwt.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
+      jwt.nonce = getRandomBytes(8).toString('hex')
     }
 
     jwt.issuer = this.publicKeyMetadata.keyId
 
-    const signature = await this.vaultedKeyProvider.signDigestable(
-      { derivationPath, encryptionPass: pass },
-      jwt,
-    )
+    const digest = await jwt.digest()
+    
+    const signature = await this.vaultedKeyProvider.sign(
+      { // TODO
+        encryptionPass: pass,
+        keyRef: ''
+      },
+      digest,
+    ) // TODO Also, are the signatures hex or b64?
+
     jwt.signature = signature.toString('hex')
 
     return jwt
@@ -402,11 +397,7 @@ export class IdentityWallet {
     sentJWT?: JSONWebToken<R>,
     resolver = new JoloDidMethod().resolver,
   ): Promise<void> {
-    const issuer = await resolver.resolve(keyIdToDid(receivedJWT.issuer))
-    const pubKey = getIssuerPublicKey(receivedJWT.issuer, issuer.didDocument)
-
-    // First we make sure the signature on the interaction token is valid
-    if (!(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT))) {
+    if (!(await validateDigestable(receivedJWT))) {
       throw new Error(ErrorCodes.IDWInvalidJWTSignature)
     }
 
@@ -441,8 +432,7 @@ export class IdentityWallet {
    * @param data - The data to encrypt
    * @param pubKey - The key to encrypt to
    */
-  public asymEncrypt = async (data: Buffer, publicKey: Buffer) =>
-    this.vaultedKeyProvider.asymEncrypt(data, publicKey)
+  public asymEncrypt = async (data: Buffer, publicKey: PublicKeyInfo) => getCryptoProvider(cryptoUtils).encrypt(publicKey, data)
 
   /**
    * Encrypts data asymmetrically
@@ -451,55 +441,54 @@ export class IdentityWallet {
    * @param resolver - instance of a {@link Resolver} to use for retrieving the target's public keys. If none is provided, the
    * default Jolocom contract is used for resolution.
    */
+
   public asymEncryptToDidKey = async (
     data: Buffer,
     keyRef: string,
     resolver = new JoloDidMethod().resolver,
   ) => this.asymEncrypt(
       data,
-      getIssuerPublicKey(
-        keyRef,
-        (await resolver.resolve(
-          keyIdToDid(keyRef)
-        )).didDocument
-      )
+      //@ts-ignore, type: string in our .ts files vs type: KeyTypes in PublicKeyInfo
+      (await resolver.resolve(
+        keyIdToDid(keyRef)
+      )).didDocument.publicKey[0]
     )
 
   /**
    * Decrypts data asymmetrically
-   * @param data - The data to decrypt
+   * @param data - The data to decrypt 
    * @param derivationArgs - The decryption private key derivation arguments
    */
   public asymDecrypt = async (
-    data: string,
-    decryptionKeyArgs: IKeyDerivationArgs,
-  ) => this.vaultedKeyProvider.asymDecrypt(data, decryptionKeyArgs)
+    data: string, // TODO double check what encoding is being used
+    keyRefArgs: IKeyRefArgs,
+  ) => this.vaultedKeyProvider.decrypt(keyRefArgs, Buffer.from(data, 'base64')) // TODO
 
-  private sendTransaction = async (
-    request: ITransactionEncodable,
-    pass: string,
-  ) => {
-    const publicKey = this._vaultedKeyProvider.getPublicKey({
-      derivationPath: KeyTypes.ethereumKey,
-      encryptionPass: pass,
-    })
+  // private sendTransaction = async (
+  //   request: ITransactionEncodable,
+  //   pass: string,
+  // ) => {
+  //   const publicKey = this._vaultedKeyProvider.getPublicKey({
+  //     derivationPath: KeyTypes.ethereumKey,
+  //     encryptionPass: pass,
+  //   })
 
-    const address = publicKeyToAddress(publicKey)
-    const { nonce } = await this._contractsGateway.getAddressInfo(address)
+  //   const address = publicKeyToAddress(publicKey)
+  //   const { nonce } = await this._contractsGateway.getAddressInfo(address)
 
-    const tx = this._contractsAdapter.assembleTxFromInteractionToken(
-      request,
-      address,
-      nonce,
-      this.vaultedKeyProvider,
-      pass,
-    )
-    return this._contractsGateway.broadcastTransaction(tx)
-  }
+  //   const tx = this._contractsAdapter.assembleTxFromInteractionToken(
+  //     request,
+  //     address,
+  //     nonce,
+  //     this.vaultedKeyProvider,
+  //     pass,
+  //   )
+  //   return this._contractsGateway.broadcastTransaction(tx)
+  // }
 
-  public transactions = {
-    sendTransaction: this.sendTransaction,
-  }
+  // public transactions = {
+  //   sendTransaction: this.sendTransaction,
+  // }
 
   /* Gathering creation methods in an easier to use public interface */
 
@@ -518,20 +507,20 @@ export class IdentityWallet {
         share: this.makeReq<ICredentialRequestAttrs>(
           InteractionType.CredentialRequest,
         ),
-        payment: (args: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => {
-          const { transactionOptions } = args
-
-          const withDefaults = {
-            gasLimit: 21000,
-            gasPrice: 10e9,
-            to: transactionOptions.to ||
-              publicKeyToAddress(
-                Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex')
-            ),
-            ...transactionOptions
-          }
-
-          return this.makeReq<PaymentRequestCreationArgs>(InteractionType.PaymentRequest)({...args, transactionOptions: withDefaults} , pass)},
+//        payment: (args: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => {
+//          const { transactionOptions } = args
+//
+//          const withDefaults = {
+//            gasLimit: 21000,
+//            gasPrice: 10e9,
+//            to: transactionOptions.to ||
+//              publicKeyToAddress(
+//                Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex')
+//            ),
+//            ...transactionOptions
+//          }
+//
+//          return this.makeReq<PaymentRequestCreationArgs>(InteractionType.PaymentRequest)({...args, transactionOptions: withDefaults} , pass)},
       },
       response: {
         auth: this.makeRes<

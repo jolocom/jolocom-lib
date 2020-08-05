@@ -1,5 +1,6 @@
 import * as createHash from 'create-hash'
 import { keccak256 } from 'ethereumjs-util'
+import { randomBytes } from 'crypto'
 
 /**
  * Computes the sha256 hash of the provided input
@@ -25,4 +26,10 @@ export function publicKeyToDID(publicKey: Buffer): string {
   const prefix = 'did:jolo:'
   const suffix = keccak256(publicKey)
   return prefix + suffix.toString('hex')
+}
+
+// TODO This needs to be used everywhere where rng is needed.
+// SWAP THE IMPLEMENTATION FOR SOMETHING BETTER
+export function getRandomBytes(nr: number): Buffer {
+  return randomBytes(nr)
 }
