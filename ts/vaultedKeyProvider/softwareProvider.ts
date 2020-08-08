@@ -1,6 +1,5 @@
 import { fromSeed } from 'bip32'
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
-import { verify as eccVerify } from 'tiny-secp256k1'
 import { IDigestable } from '../linkedDataSignature/types'
 import { IKeyDerivationArgs, IVaultedKeyProvider } from './types'
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from 'bip39'
@@ -158,22 +157,6 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   }
 
   /**
-   * Verifies secp256k1 signature
-   * @param digest - The digest of the data
-   * @param signature - The signature to verify
-   * @param publicKey - The signer's public key
-   * @example `SoftwareKeyProvider.verify(digest, publicKey, signature) // true`
-   */
-
-  public static verify(
-    digest: Buffer,
-    publicKey: Buffer,
-    signature: Buffer,
-  ): boolean {
-    return eccVerify(digest, publicKey, signature)
-  }
-
-  /**
    * Derives and returns the child private key at specified path
    * @deprecated Will be removed in next major release, currently used for signing Ethereum transactions
    * @param derivationArgs - Password for seed decryption and derivation path
@@ -221,22 +204,6 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
   ): Promise<Buffer> {
     const digest = await toSign.digest()
     return this.sign(derivationArgs, digest)
-  }
-
-  /**
-   * Digest the passed object, and validate the signature using a provided public key
-   * @param toVerify - Instance of class that implements IDigestable
-   * @param publicKey - Public key used to generate the signature
-   * @example `await SoftwareKeyProvider.verifyDigestable(publicKey, publicProfileSignedCredential) // true`
-   */
-
-  public static async verifyDigestable(
-    publicKey: Buffer,
-    toVerify: IDigestable,
-  ): Promise<boolean> {
-    const digest = await toVerify.digest()
-    const signature = Buffer.from(toVerify.signature, 'hex')
-    return SoftwareKeyProvider.verify(digest, publicKey, signature)
   }
 
   /**
@@ -399,3 +366,5 @@ export class SoftwareKeyProvider implements IVaultedKeyProvider {
     return passwordBuffer
   }
 }
+
+

@@ -1,7 +1,6 @@
 import 'reflect-metadata';
-import { SoftwareKeyProvider } from './vaultedKeyProvider/softwareProvider';
-import { KeyTypes } from './vaultedKeyProvider/types';
-import { fuelKeyWithEther, getIssuerPublicKey } from './utils/helper';
+import { fuelKeyWithEther } from './utils/helper';
+import { SoftwareKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider';
 export declare const JolocomLib: {
     parse: import("./parse/parse").ParseMethods;
     didMethods: {
@@ -11,7 +10,6 @@ export declare const JolocomLib: {
     util: {
         constraintFunctions: import("@jolocom/protocol-ts/dist/lib/interactionTokens").IExposedConstraintFunctions;
         fuelKeyWithEther: typeof fuelKeyWithEther;
-        getIssuerPublicKey: typeof getIssuerPublicKey;
         validateDigestable: (toValidate: import("@jolocom/protocol-ts/dist/lib/linkedDataSignature").IDigestable, resolver?: import("./didMethods/types").IResolver) => Promise<boolean>;
         validateDigestables: (toValidate: import("@jolocom/protocol-ts/dist/lib/linkedDataSignature").IDigestable[], resolver?: import("./didMethods/types").IResolver) => Promise<boolean[]>;
     };

@@ -1,12 +1,11 @@
 import { IDidMethod, IResolver, IRegistrar } from "../types"
-import { IVaultedKeyProvider } from "@jolocom/protocol-ts/dist/lib/vaultedKeyProvider"
 import { IdentityWallet } from "../../identityWallet/identityWallet"
-import { createJoloIdentity, authJoloIdentity } from "./utils"
 import { LocalRegistrar } from "./registrar"
 import { LocalResolver } from "./resolver"
 import { InternalDb, createDb } from "local-did-resolver/js/db"
 import { validateEvents } from "@jolocom/native-utils-node"
-
+import { SoftwareKeyProvider } from "@jolocom/vaulted-key-provider"
+import { createIdentityFromKeyProvider, authAsIdentityFromKeyProvider } from "../utils"
 
 export class LocalDidMethod implements IDidMethod {
   public prefix: 'un'
@@ -18,7 +17,7 @@ export class LocalDidMethod implements IDidMethod {
     db = createDb() // TODO Don't rely on the test db
   ) {
     this.resolver = new LocalResolver(db, validateEvents)
-    this.registrar = new LocalRegistrar()
+    this.registrar = new LocalRegistrar(db)
   }
 
   /**
@@ -29,10 +28,10 @@ export class LocalDidMethod implements IDidMethod {
    */
 
   public async create(
-    vaultedKeyProvider: IVaultedKeyProvider,
+    vaultedKeyProvider: SoftwareKeyProvider,
     decryptionPassword: string,
   ): Promise<IdentityWallet> {
-    return createJoloIdentity(vaultedKeyProvider, decryptionPassword, this.registrar)
+    return createIdentityFromKeyProvider(vaultedKeyProvider, decryptionPassword, this.registrar)
   }
 
   /**
@@ -51,10 +50,9 @@ export class LocalDidMethod implements IDidMethod {
    */
 
   public async authenticate(
-    vaultedKeyProvider: IVaultedKeyProvider,
-    password: string,
+    vaultedKeyProvider: SoftwareKeyProvider,
   ): Promise<IdentityWallet> {
-    return authJoloIdentity(vaultedKeyProvider, password, this.resolver)
+    return authAsIdentityFromKeyProvider(vaultedKeyProvider, this.resolver)
   }
 }
 

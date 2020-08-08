@@ -1,6 +1,7 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
-import * as crypto from 'crypto'
+import *  as crypto from '../../ts/utils/crypto'
+import *  as nodeCrypto from 'crypto'
 import { testPublicIdentityKey, testSeed } from '../data/keys.data'
 import {
   didDocumentJSONv0,
@@ -37,9 +38,16 @@ describe('DidDocument', () => {
 
   before(() => {
     clock = sinon.useFakeTimers()
+    // This sets the nonce on the proof
     sandbox
-      .stub(crypto, 'randomBytes')
+      .stub(crypto, 'getRandomBytes')
+      .resolves(Buffer.from('1842fb5f567dd532', 'hex'))
+
+    // This sets the claimId
+    sandbox
+      .stub(nodeCrypto, 'randomBytes')
       .returns(Buffer.from('1842fb5f567dd532', 'hex'))
+
   })
 
   beforeEach(async () => {

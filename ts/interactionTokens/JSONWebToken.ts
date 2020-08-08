@@ -233,18 +233,21 @@ export class JSONWebToken<T> implements IDigestable {
     ].join('.')
   }
 
+  public async asBytes() {
+    const { encode } = base64url
+    return Buffer.from([
+      encode(JSON.stringify(this.header)),
+      encode(JSON.stringify(this.payload)),
+    ].join('.'))
+  }
+
   /*
    * @description - Serializes the class and computes the sha256 hash
    * @returns {Buffer} - sha256 hash of the serialized class
    */
 
   public async digest() {
-    const { encode } = base64url
-    const toSign = [
-      encode(JSON.stringify(this.header)),
-      encode(JSON.stringify(this.payload)),
-    ].join('.')
-    return sha256(Buffer.from(toSign))
+    return sha256(await this.asBytes())
   }
 
   public toJSON(): IJSONWebTokenAttrs {

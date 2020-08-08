@@ -4,22 +4,20 @@ import * as integrationHelper from './provision'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import {
   testEthereumConfig,
-  userVault,
   userPass,
-  serviceVault,
+  getNewVault,
   servicePass,
   testIpfsConfig
 } from './integration.data'
-import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
-import { testSeed } from '../data/keys.data'
-import { publicProfileCredJSON } from '../data/identity.data'
 import { ContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { ErrorCodes } from '../../ts/errors'
 import { IDidMethod } from '../../ts/didMethods/types'
 import { JoloDidMethod } from '../../ts/didMethods/jolo'
-import { createJoloIdentity, authJoloIdentity } from '../../ts/didMethods/jolo/utils'
+import { createIdentityFromKeyProvider, authAsIdentityFromKeyProvider } from '../../ts/didMethods/utils'
 import { claimsMetadata } from '@jolocom/protocol-ts'
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
+import { walletUtils } from '@jolocom/native-utils-node'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -30,6 +28,8 @@ export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
 export let testContractsGateway: ContractsGateway
 export let testContractsAdapter: ContractsAdapter
+export let userVault: SoftwareKeyProvider
+export let serviceVault: SoftwareKeyProvider
 
 before(async () => {
   const {
@@ -46,9 +46,11 @@ before(async () => {
     testEthereumConfig.contractAddress,
     ipfsHost,
   )
+  userVault = await getNewVault('id', userPass)
+  serviceVault = await getNewVault('id', servicePass)
 
-  userIdentityWallet = await createJoloIdentity(userVault, userPass, joloDidMethod.registrar)
-  serviceIdentityWallet = await createJoloIdentity(serviceVault, servicePass, joloDidMethod.registrar)
+  userIdentityWallet = await createIdentityFromKeyProvider(userVault, userPass, joloDidMethod.registrar)
+  serviceIdentityWallet = await createIdentityFromKeyProvider(serviceVault, servicePass, joloDidMethod.registrar)
 })
 
 describe('Integration Test - Create, Resolve, Public Profile', () => {
@@ -100,7 +102,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
   })
 
   it('should correctly implement authenticate with no public profile', async () => {
-    const wallet = await authJoloIdentity(userVault, userPass, joloDidMethod.resolver)
+    const wallet = await authAsIdentityFromKeyProvider(userVault, joloDidMethod.resolver)
 
     expect(wallet.identity.didDocument).to.deep.eq(
       userIdentityWallet.identity.didDocument,
@@ -111,16 +113,16 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
   })
 
   it('should correctly implement authenticate with public profile', async () => {
-    const serviceIdentity = await authJoloIdentity(serviceVault, servicePass, joloDidMethod.resolver)
+    const serviceIdentity = await authAsIdentityFromKeyProvider(serviceVault, joloDidMethod.resolver)
     expect(serviceIdentity.identity.publicProfile.subject).to.deep.eq(serviceIdentity.did)
     expect(serviceIdentity.identity.publicProfile.claim).to.deep.eq({...publicProfileContent, id: serviceIdentity.did})
   })
 
   it('should correctly fail to authenticate as non existing did', async () => {
-    const mockVault = SoftwareKeyProvider.fromSeed(testSeed, 'pass')
+    const mockVault = await SoftwareKeyProvider.newEmptyWallet(walletUtils, '', 'pass')
 
     try {
-      await authJoloIdentity(mockVault, 'pass', joloDidMethod.resolver)
+      await authAsIdentityFromKeyProvider(mockVault, joloDidMethod.resolver)
     } catch (err) {
       expect(err.message).to.contain(
         ErrorCodes.RegistryDIDNotAnchored

@@ -43,6 +43,7 @@ export declare class JSONWebToken<T> implements IDigestable {
     setIssueAndExpiryTime: (expiry?: Date) => void;
     static decode<T>(jwt: string): JSONWebToken<T>;
     encode(): string;
+    asBytes(): Promise<Buffer>;
     digest(): Promise<Buffer>;
     toJSON(): IJSONWebTokenAttrs;
     static fromJSON<T>(json: IJSONWebTokenAttrs): JSONWebToken<T>;

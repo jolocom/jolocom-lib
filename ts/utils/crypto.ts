@@ -1,6 +1,8 @@
 import * as createHash from 'create-hash'
 import { keccak256 } from 'ethereumjs-util'
 import { randomBytes } from 'crypto'
+import { getCryptoProvider } from '@jolocom/vaulted-key-provider'
+import { cryptoUtils } from '@jolocom/native-utils-node'
 
 /**
  * Computes the sha256 hash of the provided input
@@ -29,7 +31,6 @@ export function publicKeyToDID(publicKey: Buffer): string {
 }
 
 // TODO This needs to be used everywhere where rng is needed.
-// SWAP THE IMPLEMENTATION FOR SOMETHING BETTER
-export function getRandomBytes(nr: number): Buffer {
-  return randomBytes(nr)
+export async function getRandomBytes(nr: number): Promise<Buffer> {
+  return await getCryptoProvider(cryptoUtils).getRandom(nr)
 }

@@ -1,14 +1,9 @@
 import { IdentityWallet } from '../identityWallet/identityWallet'
-import {
-  IKeyDerivationArgs,
-  IVaultedKeyProvider,
-} from '../vaultedKeyProvider/types'
 import { publicKeyToDID } from '../utils/crypto'
 import { mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { JoloDidMethod } from '../didMethods/jolo'
 import { SocialRecovery } from './socialRecovery'
-import { authJoloIdentity } from '../didMethods/jolo/utils'
-import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
+import { IKeyRefArgs } from '@jolocom/vaulted-key-provider'
 
 /**
  * List of possible seed phrase lengths referring to the BIP39 spec (https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
@@ -40,7 +35,7 @@ function sliceSeedPhrase(
 async function recoverFromSeedPhrase(
   resolver = new JoloDidMethod().resolver,
   mnemonicPhrase: string,
-  keyMetaData: IKeyDerivationArgs,
+  keyMetaData: IKeyRefArgs,
 //@ts-ignore - REIMPLEMENT
 ): Promise<IdentityWallet> {
   // let did: string
@@ -61,7 +56,7 @@ async function recoverFromSeedPhrase(
 async function recoverFromShards(
   resolver = new JoloDidMethod().resolver,
   shards: string[],
-  keyMetaData: IKeyDerivationArgs,
+  keyMetaData: IKeyRefArgs,
 //@ts-ignore - REIMPLEMENT
 ): Promise<IdentityWallet> {
   // const { did, secret } = SocialRecovery.combineShard(shards)

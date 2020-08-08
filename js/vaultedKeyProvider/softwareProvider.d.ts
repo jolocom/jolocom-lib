@@ -19,11 +19,9 @@ export declare class SoftwareKeyProvider implements IVaultedKeyProvider {
     getPublicKey(derivationArgs: IKeyDerivationArgs): Buffer;
     static getRandom(nr: number): Buffer;
     sign(derivationArgs: IKeyDerivationArgs, digest: Buffer): Buffer;
-    static verify(digest: Buffer, publicKey: Buffer, signature: Buffer): boolean;
     getPrivateKey(derivationArgs: IKeyDerivationArgs): Buffer;
     getMnemonic(encryptionPass: string, did?: string): string;
     signDigestable(derivationArgs: IKeyDerivationArgs, toSign: IDigestable): Promise<Buffer>;
-    static verifyDigestable(publicKey: Buffer, toVerify: IDigestable): Promise<boolean>;
     private static encrypt;
     private static decrypt;
     asymEncrypt(data: Buffer, pubKey: Buffer): Promise<string>;

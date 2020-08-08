@@ -11,19 +11,12 @@ import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
 import {
-  KeyTypes,
-} from '../vaultedKeyProvider/types'
-import {
   IKeyMetadata,
   ISignedCredCreationArgs,
 } from '../credentials/signedCredential/types'
 import {
   keyIdToDid,
 } from '../utils/helper'
-import {
-  IContractsAdapter,
-  IContractsGateway,
-} from '../contracts/types'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'
@@ -34,12 +27,10 @@ import {
   ICredentialRequestAttrs,
   ICredentialResponseAttrs,
   ICredentialsReceiveAttrs,
-  IPaymentRequestAttrs,
-  IPaymentResponseAttrs,
 } from '../interactionTokens/interactionTokens.types'
 import { ErrorCodes } from '../errors'
 import { JoloDidMethod } from '../didMethods/jolo'
-import { SoftwareKeyProvider, IKeyRefArgs, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
+import { IVaultedKeyProvider, IKeyRefArgs, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
 import { getCryptoProvider } from '@jolocom/vaulted-key-provider/js/cryptoProvider'
 import { getRandomBytes } from '../utils/crypto'
 import { cryptoUtils } from '@jolocom/native-utils-node'
@@ -56,18 +47,6 @@ import { validateDigestable } from '../utils/validation'
  * As a conclusion, A lot of the interfaces for creating a new interaction token using
  * the identity wallet match the JSON interface (with some keys potentially optional)
  */
-
-interface PaymentRequestCreationArgs {
-  callbackURL: string
-  description: string
-  transactionOptions: ExclusivePartial<
-    IPaymentRequestAttrs['transactionOptions'],
-    'value'
-  >
-}
-
-// TODO Remove this perhaps, only used in one place
-type PublicKeyMap = { [key in keyof typeof KeyTypes]?: string }
 
 /*
  * TODO Easiest way to add a new argument to all function signatures.
@@ -90,9 +69,7 @@ type WithExtraOptions<T> = T & {
 export class IdentityWallet {
   private _identity: Identity
   private _publicKeyMetadata: IKeyMetadata
-  private _vaultedKeyProvider: SoftwareKeyProvider
-  private _contractsAdapter: IContractsAdapter
-  private _contractsGateway: IContractsGateway
+  private _keyProvider: IVaultedKeyProvider
 
   /**
    * Get the did associated with the identity wallet
@@ -167,24 +144,6 @@ export class IdentityWallet {
   }
 
   /**
-   * Get the vaulted key provider instance associated wtith the identity wallet
-   * @example `console.log(identityWallet.vaultedKeyProvider) // SoftwareKeyProvider {...}`
-   */
-
-  private get vaultedKeyProvider() {
-    return this._vaultedKeyProvider
-  }
-
-  /**
-   * Get the vaulted key provider instance associated wtith the identity wallet
-   * @example `identityWallet.vaultedKeyProvider = new SoftwareKeyProvider(...)`
-   */
-
-  private set vaultedKeyProvider(keyProvider: SoftwareKeyProvider) {
-    this._vaultedKeyProvider = keyProvider
-  }
-
-  /**
    * @constructor
    * @param identity - Instance of {@link Identity} class, containing a {@link DidDocument}
    *   and optionally a public profile {@link SignedCredential}
@@ -198,24 +157,18 @@ export class IdentityWallet {
     identity,
     publicKeyMetadata,
     vaultedKeyProvider,
-    contractsGateway,
-    contractsAdapter,
   }: IIdentityWalletCreateArgs) {
     if (
       !identity ||
       !publicKeyMetadata ||
-      !vaultedKeyProvider ||
-      !contractsAdapter ||
-      !contractsGateway
+      !vaultedKeyProvider
     ) {
       throw new Error(ErrorCodes.IDWInvalidCreationArgs)
     }
 
     this.identity = identity
     this.publicKeyMetadata = publicKeyMetadata
-    this.vaultedKeyProvider = vaultedKeyProvider
-    this._contractsGateway = contractsGateway
-    this._contractsAdapter = contractsAdapter
+    this._keyProvider = vaultedKeyProvider
   }
 
   /**
@@ -231,7 +184,6 @@ export class IdentityWallet {
     }: WithExtraOptions<ISignedCredCreationArgs<T>>,
     pass: string,
   ) => {
-    const { derivationPath } = this.publicKeyMetadata
 
     const vCred = await SignedCredential.create(
       {
@@ -239,7 +191,7 @@ export class IdentityWallet {
         ...credentialParams,
       },
       {
-        keyId: this.publicKeyMetadata.keyId,
+        keyId: this.publicKeyMetadata.signingKeyId,
         issuerDid: this.did,
       },
       expires,
@@ -247,9 +199,9 @@ export class IdentityWallet {
 
     const digest = await vCred.digest()
 
-    const signature = await this.vaultedKeyProvider.sign({
+    const signature = await this._keyProvider.sign({
       encryptionPass: pass,
-      keyRef: '' // TODO
+      keyRef: this._publicKeyMetadata.signingKeyId // TODO Is this reliable? Or rather, where is this set?
     }, digest)
 
     vCred.signature = signature.toString('hex')
@@ -274,7 +226,6 @@ export class IdentityWallet {
 
     return this.initializeAndSign(
       jwt,
-      this.publicKeyMetadata.derivationPath,
       pass,
       recieved,
     )
@@ -341,21 +292,17 @@ export class IdentityWallet {
    */
 
   // TODO Don't just delegate to the vkp, postprocess to make easier to consume
-  public getPublicKeys = (encryptionPass: string) => {
-    return this.vaultedKeyProvider.getPubKeys(encryptionPass)
-  }
+  public getPublicKeys = (encryptionPass: string) => this._keyProvider.getPubKeys(encryptionPass)
 
   /**
    * Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
    * @param jwt - JSONWebToken Class
-   * @param derivationPath - Derivation Path for identity keys
    * @param pass - Password to decrypt the vaulted seed
    * @param receivedJWT - optional received JSONWebToken Class
    */
 
   private async initializeAndSign<T, R>(
     jwt: JSONWebToken<T>,
-    derivationPath: string,
     pass: string,
     receivedJWT?: JSONWebToken<R>,
   ) {
@@ -363,17 +310,17 @@ export class IdentityWallet {
       jwt.audience = keyIdToDid(receivedJWT.issuer)
       jwt.nonce = receivedJWT.nonce
     } else {
-      jwt.nonce = getRandomBytes(8).toString('hex')
+      jwt.nonce = (await getRandomBytes(8)).toString('hex')
     }
 
-    jwt.issuer = this.publicKeyMetadata.keyId
+    jwt.issuer = this.publicKeyMetadata.signingKeyId
 
     const digest = await jwt.digest()
     
-    const signature = await this.vaultedKeyProvider.sign(
+    const signature = await this._keyProvider.sign(
       { // TODO
         encryptionPass: pass,
-        keyRef: ''
+        keyRef: this._publicKeyMetadata.signingKeyId
       },
       digest,
     ) // TODO Also, are the signatures hex or b64?
@@ -397,7 +344,7 @@ export class IdentityWallet {
     sentJWT?: JSONWebToken<R>,
     resolver = new JoloDidMethod().resolver,
   ): Promise<void> {
-    if (!(await validateDigestable(receivedJWT))) {
+    if (!(await validateDigestable(receivedJWT, resolver))) {
       throw new Error(ErrorCodes.IDWInvalidJWTSignature)
     }
 
@@ -462,7 +409,7 @@ export class IdentityWallet {
   public asymDecrypt = async (
     data: string, // TODO double check what encoding is being used
     keyRefArgs: IKeyRefArgs,
-  ) => this.vaultedKeyProvider.decrypt(keyRefArgs, Buffer.from(data, 'base64')) // TODO
+  ) => this._keyProvider.decrypt(keyRefArgs, Buffer.from(data, 'base64')) // TODO
 
   // private sendTransaction = async (
   //   request: ITransactionEncodable,
@@ -506,21 +453,7 @@ export class IdentityWallet {
         ),
         share: this.makeReq<ICredentialRequestAttrs>(
           InteractionType.CredentialRequest,
-        ),
-//        payment: (args: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => {
-//          const { transactionOptions } = args
-//
-//          const withDefaults = {
-//            gasLimit: 21000,
-//            gasPrice: 10e9,
-//            to: transactionOptions.to ||
-//              publicKeyToAddress(
-//                Buffer.from(this.getPublicKeys(pass).ethereumKey, 'hex')
-//            ),
-//            ...transactionOptions
-//          }
-//
-//          return this.makeReq<PaymentRequestCreationArgs>(InteractionType.PaymentRequest)({...args, transactionOptions: withDefaults} , pass)},
+        )
       },
       response: {
         auth: this.makeRes<
@@ -537,9 +470,9 @@ export class IdentityWallet {
         issue: this.makeRes<ICredentialsReceiveAttrs, CredentialOfferResponse>(
           InteractionType.CredentialsReceive,
         ),
-        payment: this.makeRes<IPaymentResponseAttrs, PaymentRequest>(
-          InteractionType.PaymentResponse,
-        ),
+       // payment: this.makeRes<IPaymentResponseAttrs, PaymentRequest>(
+       //    InteractionType.PaymentResponse,
+       //  ),
       },
     },
   }

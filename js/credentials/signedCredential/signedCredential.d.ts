@@ -33,6 +33,7 @@ export declare class SignedCredential implements IDigestable {
     name: string;
     static create<T extends BaseMetadata>(credentialOptions: ISignedCredCreationArgs<T>, issInfo: IIssInfo, expires?: Date): Promise<SignedCredential>;
     private prepareSignature;
+    asBytes(): Promise<Buffer>;
     digest(): Promise<Buffer>;
     static fromJSON(json: ISignedCredentialAttrs): SignedCredential;
     toJSON(): ISignedCredentialAttrs;

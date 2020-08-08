@@ -140,35 +140,36 @@ describe('Software Vaulted Key Provider', () => {
   })
 
   describe('verify', () => {
-    const pubKey = vault.getPublicKey(keyDerivationArgs)
+    // const pubKey = vault.getPublicKey(keyDerivationArgs)
+    // TODO This should be handled by the cryptoutils, verification is no longer the responsibility of the vault
 
-    it('Should correctly validate signature given digest signature, and public key', () => {
-      expect(SoftwareKeyProvider.verify(msgToSign, pubKey, msgSignature)).to.eq(
-        true,
-      )
-    })
+    // it('Should correctly validate signature given digest signature, and public key', () => {
+    //   expect(verifySignature(msgToSign, pubKey, msgSignature)).to.eq(
+    //     true,
+    //   )
+    // })
 
-    it('Should correctly detect invalid signature', () => {
-      expect(
-        SoftwareKeyProvider.verify(msgToSign, pubKey, incorrectSignature),
-      ).to.eq(false)
-    })
+    // it('Should correctly detect invalid signature', () => {
+    //   expect(
+    //     SoftwareKeyProvider.verify(msgToSign, pubKey, incorrectSignature),
+    //   ).to.eq(false)
+    // })
 
-    it('Should throw given invalid input', () => {
-      expect(() =>
-        SoftwareKeyProvider.verify(invalidMsgToSign, pubKey, msgSignature),
-      ).to.throw(Error, 'Expected Hash')
-      expect(() =>
-        SoftwareKeyProvider.verify(msgToSign, pubKey, invalidtSignature),
-      ).to.throw(Error, 'Expected Signature')
-      expect(() =>
-        SoftwareKeyProvider.verify(
-          msgToSign,
-          testIncorrectPublicIdentityKey,
-          msgSignature,
-        ),
-      ).to.throw(Error, 'Expected Point')
-    })
+    // it('Should throw given invalid input', () => {
+    //   expect(() =>
+    //     SoftwareKeyProvider.verify(invalidMsgToSign, pubKey, msgSignature),
+    //   ).to.throw(Error, 'Expected Hash')
+    //   expect(() =>
+    //     SoftwareKeyProvider.verify(msgToSign, pubKey, invalidtSignature),
+    //   ).to.throw(Error, 'Expected Signature')
+    //   expect(() =>
+    //     SoftwareKeyProvider.verify(
+    //       msgToSign,
+    //       testIncorrectPublicIdentityKey,
+    //       msgSignature,
+    //     ),
+    //   ).to.throw(Error, 'Expected Point')
+    // })
   })
 
   /* Testing for invalid inputs is covered in the getPublicKey block */
@@ -215,24 +216,25 @@ describe('Software Vaulted Key Provider', () => {
 
   /* Invalid input is covered in vault.signDigestable and vault.verify blocks */
 
+  // TODO This should be handled by the cryptoutils
   describe('validateDigestable', () => {
-    const credentialToSign = SignedCredential.fromJSON(emailCredential)
-    const pubKey = vault.getPublicKey(keyDerivationArgs)
+  //  const credentialToSign = SignedCredential.fromJSON(emailCredential)
+  //  const pubKey = vault.getPublicKey(keyDerivationArgs)
 
-    it('Should correctly digest passed object and validate the signature', async () => {
-      expect(
-        await SoftwareKeyProvider.verifyDigestable(pubKey, credentialToSign),
-      ).to.eq(true)
-    })
+  //  it('Should correctly digest passed object and validate the signature', async () => {
+  //    expect(
+  //      await SoftwareKeyProvider.verifyDigestable(pubKey, credentialToSign),
+  //    ).to.eq(true)
+  //  })
 
-    it('Should correctly detect incorrect signature', async () => {
-      const corruptedCredential = SignedCredential.fromJSON(
-        corruptedSignedCredentialJSON,
-      )
-      expect(
-        await SoftwareKeyProvider.verifyDigestable(pubKey, corruptedCredential),
-      ).to.eq(false)
-    })
+  //  it('Should correctly detect incorrect signature', async () => {
+  //    const corruptedCredential = SignedCredential.fromJSON(
+  //      corruptedSignedCredentialJSON,
+  //    )
+  //    expect(
+  //      await SoftwareKeyProvider.verifyDigestable(pubKey, corruptedCredential),
+  //    ).to.eq(false)
+  //  })
   })
 
   describe('getMnemonic', () => {

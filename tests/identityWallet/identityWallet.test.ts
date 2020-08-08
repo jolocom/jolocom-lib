@@ -6,19 +6,16 @@ import { Credential } from '../../ts/credentials/credential/credential'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
 import { didDocumentJSON, mockKeyId, mockDid } from '../data/didDocument.data'
-import { IVaultedKeyProvider } from '../../ts/vaultedKeyProvider/types'
-import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { mockNameCredCreationAttrs } from '../data/credential/credential.data'
 import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
 import { credentialResponseJSON } from '../data/interactionTokens/credentialResponse.data'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
-import { validSignedCredReqJWT } from '../data/interactionTokens/jsonWebToken.data'
 import { keyIdToDid } from '../../ts/utils/helper'
-import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
-import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { ErrorCodes } from '../../ts/errors'
+import { IVaultedKeyProvider } from '@jolocom/vaulted-key-provider'
+import { emailVerifiableCredential } from '../data/credential/signedCredential.data'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -26,16 +23,9 @@ const expect = chai.expect
 /* Saves some space during stubbing, helper functions */
 
 const stubbedKeyProvider = {
-  signDigestable: sinon
-    .stub()
-    .returns(Buffer.from(validSignedCredReqJWT.signature, 'hex')),
+  sign: sinon.stub().resolves(Buffer.from('aaaa', 'hex'))
 } as IVaultedKeyProvider
 
-const stubbedCredential = {
-  setSignatureValue: value => {
-    expect(value).to.eq(validSignedCredReqJWT.signature)
-  },
-}
 
 describe('IdentityWallet', () => {
   const encryptionPass = 'secret'
@@ -50,11 +40,8 @@ describe('IdentityWallet', () => {
         identity,
         vaultedKeyProvider: stubbedKeyProvider,
         publicKeyMetadata: {
-          derivationPath: KeyTypes.jolocomIdentityKey,
-          keyId: mockKeyId,
+          signingKeyId: mockKeyId,
         },
-        contractsAdapter: jolocomContractsAdapter,
-        contractsGateway: jolocomContractsGateway,
       })
 
       expect(iw.did).to.eq(mockDid)
@@ -65,6 +52,7 @@ describe('IdentityWallet', () => {
     const sandbox = sinon.createSandbox({
       useFakeTimers: false,
     })
+
     let stubCredCreate
     let spyFromJWTEncodable
     let interactionToken
@@ -72,7 +60,8 @@ describe('IdentityWallet', () => {
     before(() => {
       stubCredCreate = sandbox
         .stub(SignedCredential, 'create')
-        .callsFake(() => stubbedCredential)
+        .returns(SignedCredential.fromJSON(emailVerifiableCredential))
+
       spyFromJWTEncodable = sandbox.spy(JSONWebToken, 'fromJWTEncodable')
     })
 
@@ -92,8 +81,8 @@ describe('IdentityWallet', () => {
         'interactionTokens',
       ]
       const flowTypes = ['request', 'response']
-      const tokenTypesRequest = ['auth', 'offer', 'share', 'payment']
-      const tokenTypesResponse = ['auth', 'offer', 'share', 'issue', 'payment']
+      const tokenTypesRequest = ['auth', 'offer', 'share', ]
+      const tokenTypesResponse = ['auth', 'offer', 'share', 'issue']
 
       expect(Object.keys(iw.create)).to.deep.eq(categories)
       expect(Object.keys(iw.create.interactionTokens)).to.deep.eq(flowTypes)
@@ -106,14 +95,14 @@ describe('IdentityWallet', () => {
     })
 
     /* A bit hacky, but deep eq for functions is tricky. Should work most of the time */
-    it('Should attempt to create credential', () => {
+    it('Should call Credential.create on wi.create.credential', () => {
       expect(iw.create.credential.toString()).to.eq(
         Credential.create.toString(),
       )
     })
 
     it('Should attempt to create signedCredential', async () => {
-      await iw.create.signedCredential(
+      const cred = await iw.create.signedCredential(
         mockNameCredCreationAttrs,
         encryptionPass,
       )

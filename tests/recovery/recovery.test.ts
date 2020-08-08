@@ -57,7 +57,10 @@ describe('Recovery', () => {
     const identityWallet = await recoverFromSeedPhrase(
       resolver,
       testSeedPhrase16,
-      keyDerivationArgs,
+      {
+        keyRef: '',
+        encryptionPass: keyDerivationArgs.encryptionPass
+      },
     )
 
     sandbox.assert.calledWith(JolocomResolver.prototype.resolve, testDID16)
@@ -68,7 +71,10 @@ describe('Recovery', () => {
     const identityWallet = await recoverFromSeedPhrase(
       resolver,
       testSeedPhrase32,
-      keyDerivationArgs,
+      {
+        keyRef: '',
+        encryptionPass: keyDerivationArgs.encryptionPass
+      },
     )
     sandbox.assert.calledWith(JolocomResolver.prototype.resolve, testDID32)
     expect(identityWallet['_vaultedKeyProvider']).to.deep.eq(referenceVault32)
@@ -78,7 +84,10 @@ describe('Recovery', () => {
     const identityWallet = await recoverFromSeedPhrase(
       resolver,
       testSeedPhraseWithDid32,
-      keyDerivationArgs,
+      {
+        keyRef: '',
+        encryptionPass: keyDerivationArgs.encryptionPass
+      },
     )
     sandbox.assert.calledWith(JolocomResolver.prototype.resolve, testDID32)
     expect(identityWallet['_vaultedKeyProvider']).to.deep.eq(referenceVault32)
@@ -87,7 +96,10 @@ describe('Recovery', () => {
     const identityWallet = await recoverFromSeedPhrase(
       resolver,
       testSeedPhraseWithDid16,
-      keyDerivationArgs,
+      {
+        keyRef: '',
+        encryptionPass: keyDerivationArgs.encryptionPass
+      },
     )
     sandbox.assert.calledWith(JolocomResolver.prototype.resolve, testDID16)
     expect(identityWallet['_vaultedKeyProvider']).to.deep.eq(referenceVault16)
@@ -97,7 +109,10 @@ describe('Recovery', () => {
     const identityWallet = await recoverFromShards(
       resolver,
       testShares,
-      keyDerivationArgs,
+      {
+        keyRef: '',
+        encryptionPass: keyDerivationArgs.encryptionPass
+      },
     )
     sandbox.assert.calledWith(JolocomResolver.prototype.resolve, testDID32)
     expect(identityWallet['_vaultedKeyProvider']).to.deep.eq(referenceVault32)

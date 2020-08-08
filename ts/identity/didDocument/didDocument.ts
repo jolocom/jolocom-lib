@@ -15,16 +15,12 @@ import {
   ServiceEndpointsSection,
 } from './sections'
 import { defaultContextIdentity } from '../../utils/contexts'
-import { publicKeyToDID } from '../../utils/crypto'
-import { digestJsonLd } from '../../linkedData'
+import { publicKeyToDID, getRandomBytes } from '../../utils/crypto'
+import { digestJsonLd, normalizeSignedLdObject } from '../../linkedData'
 import {
   IDigestable,
   ILinkedDataSignature,
 } from '../../linkedDataSignature/types'
-import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
-import {
-  IKeyDerivationArgs,
-} from '../../vaultedKeyProvider/types'
 import { ContextEntry } from '@jolocom/protocol-ts'
 import { ISigner } from '../../credentials/signedCredential/types'
 import { IVaultedKeyProvider, IKeyRefArgs } from '@jolocom/vaulted-key-provider'
@@ -152,6 +148,15 @@ export class DidDocument implements IDigestable {
 
   public set publicKey(value: PublicKeySection[]) {
     this._publicKey = value
+  }
+
+  /**
+   * Helper function, which when given a keyId, will
+   * try find the appropriate publicKeySection on the Did Document and return it
+   */
+
+  public findPublicKeySectionById(keyId: string) {
+    return this._publicKey.find(({id}) => id === keyId)
   }
 
   /**
@@ -351,7 +356,7 @@ export class DidDocument implements IDigestable {
     this._proof = new EcdsaLinkedDataSignature()
     this._proof.creator = this.signer.keyId
     this._proof.signature = ''
-    this._proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
+    this._proof.nonce = (await getRandomBytes(8)).toString('hex')
 
     // TODO Fix this up, should not do the final sha256 round here.
     const digest = await this.digest()
@@ -359,6 +364,11 @@ export class DidDocument implements IDigestable {
     const signature = await vaultedKeyProvider.sign(signConfig, digest)
 
     this._proof.signature = signature.toString('hex')
+  }
+
+  public async asBytes(): Promise<Buffer> {
+    //@ts-ignore optional proof causing issues
+    return normalizeSignedLdObject(this.toJSON(), this.context)
   }
 
   /**

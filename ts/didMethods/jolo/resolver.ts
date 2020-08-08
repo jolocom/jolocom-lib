@@ -3,12 +3,11 @@ import { getResolver, getPublicProfile } from 'jolo-did-resolver'
 import { ErrorCodes } from "../../errors";
 import { DIDDocument, Resolver } from "did-resolver";
 import { DidDocument } from "../../identity/didDocument/didDocument";
-import { SoftwareKeyProvider } from "../../vaultedKeyProvider/softwareProvider";
-import { getIssuerPublicKey } from "../../utils/helper";
 import { Identity } from "../../identity/identity";
 import { SignedCredential } from "../../credentials/signedCredential/signedCredential";
 import { digestJsonLd } from "../../linkedData";
 import { IPFS_ENDPOINT, PROVIDER_URL, CONTRACT_ADDRESS } from "./constants";
+import { verifySignature } from "../../utils/validation";
 
 type Resolve = (did: string) => Promise<DIDDocument>
 
@@ -53,11 +52,19 @@ export class JolocomResolver implements IResolver {
     //@ts-ignore
     const didDocument = DidDocument.fromJSON(jsonDidDoc)
 
-    const signatureValid = SoftwareKeyProvider.verify(
+    const { publicKeyHex, type } = didDocument.findPublicKeySectionById(
+      didDocument.signer.keyId
+    )
+
+    const signatureValid = verifySignature(
       //@ts-ignore
       await digestJsonLd(jsonDidDoc, jsonDidDoc['@context']),
-      getIssuerPublicKey(didDocument.signer.keyId, didDocument),
       Buffer.from(didDocument.proof.signature, 'hex'),
+      {
+        //@ts-ignore TODO
+        type,
+        publicKey: Buffer.from(publicKeyHex, 'hex')
+      }
     )
 
     if (!signatureValid) {
@@ -71,9 +78,18 @@ export class JolocomResolver implements IResolver {
         publicProfileJson,
       )
 
-      const isValid = await SoftwareKeyProvider.verifyDigestable(
-        getIssuerPublicKey(didDocument.signer.keyId, didDocument),
-        publicProfileCred,
+    const { publicKeyHex, type } = didDocument.findPublicKeySectionById(
+      didDocument.signer.keyId
+    )
+
+      const isValid = await verifySignature(
+        Buffer.from(didDocument.signature, 'hex'),
+        await publicProfileCred.digest(), // TODO
+        {
+          // @ts-ignore TODO
+          type, 
+          publicKey: Buffer.from(publicKeyHex, 'hex')
+        },
       )
 
       if (isValid) {

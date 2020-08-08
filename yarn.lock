@@ -145,12 +145,23 @@
     base64url "^3.0.1"
     clone "^2.1.2"
 
+"@jolocom/native-utils-node@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-utils-node/-/native-utils-node-0.2.3.tgz#21d6c5d05956f6423edae29d0308cc500233d15f"
+  integrity sha512-qKsbn6Gt+Rm61HFX8IOyzmdgY0WQPOz7KSS6Vintbm1luXch4FBYTu8nWncr+WO04S+PT+XlbmcxJ87+HGygqA==
+
 "@jolocom/protocol-ts@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@jolocom/protocol-ts/-/protocol-ts-0.2.0.tgz#a10b4a6636e266293a591afbd0a063075b24e9b9"
   integrity sha512-ALDlzBXLcnsKxymeIIlzvC0tMpReVivMSa3rTNUSciFjva9irOn54etqi+hx2q3nkO8eIIepcbw0OkHr3qRCsw==
   dependencies:
     cred-types-jolocom-core "^0.0.11"
+
+"@jolocom/vaulted-key-provider@/home/eg/Documents/work/vaulted-key-provider/jolocom-vaulted-key-provider-0.2.1.tgz":
+  version "0.2.1"
+  resolved "/home/eg/Documents/work/vaulted-key-provider/jolocom-vaulted-key-provider-0.2.1.tgz#a1216135243ebd7e24069a298bb192e808f9e545"
+  dependencies:
+    base64url "^3.0.1"
 
 "@sinonjs/commons@^1.0.2", "@sinonjs/commons@^1.3.0":
   version "1.3.0"
@@ -5467,6 +5478,10 @@ load-json-file@^1.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
     strip-bom "^2.0.0"
+
+"local-did-resolver@file:../jolo-did-method/local-did-resolver/local-did-resolver-0.1.1.tgz":
+  version "0.1.1"
+  resolved "file:../jolo-did-method/local-did-resolver/local-did-resolver-0.1.1.tgz#50c7ac41efdafce3588d1e2ba060ddea25b6ded7"
 
 locate-path@^2.0.0:
   version "2.0.0"

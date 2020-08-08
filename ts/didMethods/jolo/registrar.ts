@@ -134,7 +134,7 @@ export class JolocomRegistrar implements IRegistrar {
 
     // TODO The TX needs to be assembled here
     return this.registry.commitDidDoc(
-      ethSecretKey,
+      Buffer.from('', 'hex'),
       // @ts-ignore TODO The DID Document related types need to be harmonized
       didDocument.toJSON(),
     )

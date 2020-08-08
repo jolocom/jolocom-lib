@@ -63,6 +63,14 @@ export class PublicKeySection {
    */
 
   @Expose()
+  @Transform(val => val === 'Secp256k1VerificationKey2018'
+    ? 'EcdsaSecp256k1VerificationKey2019'
+    : val,
+    {
+      toClassOnly: true,
+      until: 0.13
+    })
+
   public get type(): string {
     return this._type
   }
