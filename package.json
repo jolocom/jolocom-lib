@@ -69,8 +69,8 @@
   "license": "MIT",
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
-    "@decentralized-identity/did-common-typescript": "^0.1.19",
     "@jolocom/protocol-ts": "^0.2.0",
+    "@jolocom/vaulted-key-provider": "^0.3.2",
     "base64url": "^3.0.1",
     "bip32": "^1.0.2",
     "bip39": "^3.0.1",
@@ -89,6 +89,7 @@
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.6.1",
     "jsontokens": "^1.0.0",
+    "local-did-resolver": "^0.2.0",
     "node-fetch": "^2.3.0",
     "qrcode": "^1.3.3",
     "reflect-metadata": "^0.1.13",
@@ -97,6 +98,8 @@
     "tiny-secp256k1": "^1.0.1"
   },
   "devDependencies": {
+    "@decentralized-identity/did-common-typescript": "^0.1.19",
+    "@jolocom/native-utils-node": "^0.4.1",
     "@types/bip39": "^2.4.2",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
