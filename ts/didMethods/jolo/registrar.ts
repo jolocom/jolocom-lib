@@ -13,8 +13,7 @@ import {
   SoftwareKeyProvider,
   EncryptedWalletUtils,
 } from '@jolocom/vaulted-key-provider'
-import * as eccrypto from 'eccrypto'
-import { publicKeyToDID, getRandomBytes } from '../../utils/crypto'
+import { publicKeyToDID } from '../../utils/crypto'
 import { fromSeed } from 'bip32'
 
 const SIGNING_KEY_REF = `keys-1`
@@ -29,20 +28,20 @@ export const joloSeedToEncryptedWallet = async (
 ): Promise<SoftwareKeyProvider> => {
   const joloKeys = fromSeed(seed).derivePath(JOLO_DERIVATION_PATH)
   const ethKeys = fromSeed(seed).derivePath(ETH_DERIVATION_PATH)
-  const did = publicKeyToDid(joloKeys.publicKey)
+  const did = publicKeyToDID(joloKeys.publicKey)
 
   const skp = await SoftwareKeyProvider.newEmptyWallet(impl, did, newPassword)
-  await skp.addContent({
+  await skp.addContent(newPassword, {
     type: ['BIP32JolocomIdentitySeedv0'],
     value: seed.toString('hex'),
   })
-  await skp.addContent({
+  await skp.addContent(newPassword, {
     controller: [`${did}#${SIGNING_KEY_REF}`],
     type: KeyTypes.ecdsaSecp256k1VerificationKey2019,
     publicKeyHex: joloKeys.publicKey.toString('hex'),
     private_key: joloKeys.privateKey.toString('hex'),
   })
-  await skp.addContent({
+  await skp.addContent(newPassword, {
     controller: [`${did}#${ANCHOR_KEY_REF}`],
     type: KeyTypes.ecdsaSecp256k1RecoveryMethod2020,
     publicKeyHex: ethKeys.publicKey.toString('hex'),

@@ -1,7 +1,11 @@
 import { BaseMetadata } from '@jolocom/protocol-ts'
 import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
-import { ExclusivePartial, IIdentityWalletCreateArgs } from './types'
+import {
+  ExclusivePartial,
+  IKeyMetadata,
+  IIdentityWalletCreateArgs,
+} from './types'
 import { Identity } from '../identity/identity'
 import { JSONWebToken } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'

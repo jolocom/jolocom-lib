@@ -1,11 +1,14 @@
-import { IDidMethod, IResolver, IRegistrar } from "../types"
-import { IdentityWallet } from "../../identityWallet/identityWallet"
-import { LocalRegistrar } from "./registrar"
-import { LocalResolver } from "./resolver"
-import { InternalDb, createDb } from "local-did-resolver/js/db"
-import { validateEvents } from "@jolocom/native-utils-node"
-import { SoftwareKeyProvider } from "@jolocom/vaulted-key-provider"
-import { createIdentityFromKeyProvider, authAsIdentityFromKeyProvider } from "../utils"
+import { IDidMethod, IResolver, IRegistrar } from '../types'
+import { IdentityWallet } from '../../identityWallet/identityWallet'
+import { LocalRegistrar } from './registrar'
+import { LocalResolver } from './resolver'
+import { InternalDb, createDb } from 'local-did-resolver/js/db'
+import { validateEvents } from '@jolocom/native-utils-node'
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
+import {
+  createIdentityFromKeyProvider,
+  authAsIdentityFromKeyProvider,
+} from '../utils'
 
 export class LocalDidMethod implements IDidMethod {
   public prefix: 'un'
@@ -14,7 +17,7 @@ export class LocalDidMethod implements IDidMethod {
   private db: InternalDb // TODO Better type, InternalDb doesn't make a lot of sense
 
   constructor(
-    db = createDb() // TODO Don't rely on the test db
+    db = createDb(), // TODO Don't rely on the test db
   ) {
     this.resolver = new LocalResolver(db, validateEvents)
     this.registrar = new LocalRegistrar(db)
@@ -31,7 +34,11 @@ export class LocalDidMethod implements IDidMethod {
     vaultedKeyProvider: SoftwareKeyProvider,
     decryptionPassword: string,
   ): Promise<IdentityWallet> {
-    return createIdentityFromKeyProvider(vaultedKeyProvider, decryptionPassword, this.registrar)
+    return createIdentityFromKeyProvider(
+      vaultedKeyProvider,
+      decryptionPassword,
+      this.registrar,
+    )
   }
 
   /**
@@ -51,8 +58,12 @@ export class LocalDidMethod implements IDidMethod {
 
   public async authenticate(
     vaultedKeyProvider: SoftwareKeyProvider,
+    decryptionPassword: string,
   ): Promise<IdentityWallet> {
-    return authAsIdentityFromKeyProvider(vaultedKeyProvider, this.resolver)
+    return authAsIdentityFromKeyProvider(
+      vaultedKeyProvider,
+      this.resolver,
+      decryptionPassword,
+    )
   }
 }
-

@@ -17,6 +17,11 @@ type CreationReturn = {
   inceptionEvent: string
 }
 
+type CreationParams = { id: string; encryptedWallet: string; pass: string }
+
+const createFromIcp = async (p: CreationParams): Promise<CreationReturn> =>
+  JSON.parse(await getIcp(p.encryptedWallet, p.id, p.pass)) as CreationReturn
+
 export class LocalRegistrar implements IRegistrar {
   public prefix = 'jolo'
   private registrar: ReturnType<typeof getRegistrar>
@@ -24,7 +29,7 @@ export class LocalRegistrar implements IRegistrar {
   constructor(db = createDb()) {
     this.registrar = getRegistrar({
       dbInstance: db,
-      create: getIcp,
+      create: createFromIcp,
       getIdFromEvent: getIdFromEvent,
       validateEvents: validateEvents,
     })
@@ -42,14 +47,13 @@ export class LocalRegistrar implements IRegistrar {
      */
 
     // TODO currently contains keys as well.
-    const ret = JSON.parse(
-      await this.registrar.create(
-        keyProvider.encryptedWallet,
-        keyProvider.id,
-        password,
-      ),
-    ) as CreationReturn
+    const ret = (await this.registrar.create({
+      encryptedWallet: keyProvider.encryptedWallet,
+      id: keyProvider.id,
+      pass: password,
+    })) as CreationReturn
 
+    // @ts-ignore
     keyProvider._encryptedWallet = Buffer.from(ret.encryptedWallet, 'base64')
 
     const identity = Identity.fromDidDocument({
