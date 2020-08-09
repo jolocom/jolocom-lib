@@ -52,7 +52,7 @@ export const didDocumentJSON = {
     mockKeyId,
     {
       id: mockKeyId2,
-      type: 'EcdsaSecp256k1VerificationKey2019',
+      type: 'Secp256k1VerificationKey2018',
       controller: mockDid,
       publicKeyHex: mockPublicKeyHex,
     },
@@ -60,7 +60,7 @@ export const didDocumentJSON = {
   publicKey: [
     {
       id: mockKeyId,
-      type: 'EcdsaSecp256k1VerificationKey2019',
+      type: 'Secp256k1VerificationKey2018',
       controller: mockDid,
       publicKeyHex: mockPublicKeyHex,
     },

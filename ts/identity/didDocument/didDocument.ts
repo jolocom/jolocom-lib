@@ -112,11 +112,23 @@ export class DidDocument implements IDigestable {
    * @example `console.log(didDocument.authentication) // [AuthenticationSection {...}, ...]`
    */
 
-  @Expose({ name: 'authentication' })
-  @Transform(auths => auths.map(a => a.publicKey), {
-    toClassOnly: true,
-    until: 0.13,
-  })
+  @Expose()
+  @Transform(
+    auths => auths.map(el => typeof el === 'string'
+      ? el
+      : PublicKeySection.fromJSON(el)
+    ), 
+    { toClassOnly: true }
+  )
+
+  @Transform(auths => auths.map(val => {
+    const { type, publicKey } = val
+
+    return type === 'Secp256k1SignatureAuthentication2018' && !!publicKey
+      ? publicKey
+      : val
+    }), { toClassOnly: true, until: 0.13 }
+  )
   public get authentication(): AuthenticationSection[] {
     return this._authentication
   }
@@ -285,7 +297,7 @@ export class DidDocument implements IDigestable {
    */
 
   public addAuthKeyId(authenticationKeyId: string): void {
-    this.authentication.push(authenticationKeyId)
+    this._authentication.push(authenticationKeyId)
   }
 
   /**
@@ -294,7 +306,7 @@ export class DidDocument implements IDigestable {
    */
 
   public addAuthKey(authenticationKey: PublicKeySection): void {
-    this.authentication.push(authenticationKey)
+    this._authentication.push(authenticationKey)
   }
 
   /**
@@ -303,7 +315,7 @@ export class DidDocument implements IDigestable {
    */
 
   public addPublicKeySection(section: PublicKeySection): void {
-    this.publicKey.push(section)
+    this._publicKey.push(section)
   }
 
   /**
@@ -358,10 +370,7 @@ export class DidDocument implements IDigestable {
     this._proof.signature = ''
     this._proof.nonce = (await getRandomBytes(8)).toString('hex')
 
-    // TODO Fix this up, should not do the final sha256 round here.
-    const digest = await this.digest()
-
-    const signature = await vaultedKeyProvider.sign(signConfig, digest)
+    const signature = await vaultedKeyProvider.sign(signConfig, await this.asBytes())
 
     this._proof.signature = signature.toString('hex')
   }

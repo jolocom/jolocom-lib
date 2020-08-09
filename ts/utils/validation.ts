@@ -23,7 +23,14 @@ interface PubKeyForVerification {
 
 // TODO The api on cryptoProvider.verify should only need a pub key and a key type
 export const verifySignature = (data: Buffer, signature: Buffer, pKey: PublicKeyInfo) => {
-  return getCryptoProvider(cryptoUtils).verify(pKey, data, signature)
+  const compatibilityMap = {
+    'Secp256k1VerificationKey2018': 'EcdsaSecp256k1VerificationKey2019'
+  }
+
+  return getCryptoProvider(cryptoUtils).verify({
+    ...pKey,
+    type: compatibilityMap[pKey.type] || pKey.type
+  }, data, signature)
 }
 
 /**

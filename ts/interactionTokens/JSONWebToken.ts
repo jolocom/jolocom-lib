@@ -236,8 +236,8 @@ export class JSONWebToken<T> implements IDigestable {
   public async asBytes() {
     const { encode } = base64url
     return Buffer.from([
-      encode(JSON.stringify(this.header)),
-      encode(JSON.stringify(this.payload)),
+      encode(JSON.stringify(this._header)),
+      encode(JSON.stringify(this._payload)),
     ].join('.'))
   }
 

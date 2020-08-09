@@ -28,7 +28,7 @@ export class PublicKeySection {
    */
 
   @Expose()
-  @Transform((val, obj) => obj.owner, { toClassOnly: true, until: 0.13 })
+  @Transform((val, obj) => obj.owner || val, { toClassOnly: true, until: 0.13 })
   public get controller(): string {
     return this._controller
   }
@@ -63,14 +63,6 @@ export class PublicKeySection {
    */
 
   @Expose()
-  @Transform(val => val === 'Secp256k1VerificationKey2018'
-    ? 'EcdsaSecp256k1VerificationKey2019'
-    : val,
-    {
-      toClassOnly: true,
-      until: 0.13
-    })
-
   public get type(): string {
     return this._type
   }
@@ -136,7 +128,7 @@ export class PublicKeySection {
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
    */
 
-  public fromJSON(json: IPublicKeySectionAttrs): PublicKeySection {
+  public static fromJSON(json: IPublicKeySectionAttrs): PublicKeySection {
     return plainToClass(PublicKeySection, json)
   }
 }

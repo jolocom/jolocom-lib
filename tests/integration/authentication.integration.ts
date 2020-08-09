@@ -70,7 +70,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
 
     return serviceIdentityWallet.validateJWT(
       authResponseJWT,
-      authRequestJWT, 
+      authRequestJWT,
       joloDidMethod.resolver
     )
   })

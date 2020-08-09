@@ -2,12 +2,10 @@ import { IResolver } from "../types";
 import { getResolver, getPublicProfile } from 'jolo-did-resolver'
 import { ErrorCodes } from "../../errors";
 import { DIDDocument, Resolver } from "did-resolver";
-import { DidDocument } from "../../identity/didDocument/didDocument";
 import { Identity } from "../../identity/identity";
 import { SignedCredential } from "../../credentials/signedCredential/signedCredential";
-import { digestJsonLd } from "../../linkedData";
 import { IPFS_ENDPOINT, PROVIDER_URL, CONTRACT_ADDRESS } from "./constants";
-import { verifySignature } from "../../utils/validation";
+import { parseAndValidate } from '../../parse/parseAndValidate'
 
 type Resolve = (did: string) => Promise<DIDDocument>
 
@@ -50,51 +48,15 @@ export class JolocomResolver implements IResolver {
     )
 
     //@ts-ignore
-    const didDocument = DidDocument.fromJSON(jsonDidDoc)
-
-    const { publicKeyHex, type } = didDocument.findPublicKeySectionById(
-      didDocument.signer.keyId
-    )
-
-    const signatureValid = verifySignature(
-      //@ts-ignore
-      await digestJsonLd(jsonDidDoc, jsonDidDoc['@context']),
-      Buffer.from(didDocument.proof.signature, 'hex'),
-      {
-        //@ts-ignore TODO
-        type,
-        publicKey: Buffer.from(publicKeyHex, 'hex')
-      }
-    )
-
-    if (!signatureValid) {
-      throw new Error(ErrorCodes.InvalidSignature)
-    }
+    const didDocument = await parseAndValidate.didDocument(jsonDidDoc)
 
     let publicProfile: undefined | SignedCredential
 
     if (publicProfileJson) {
-      const publicProfileCred = SignedCredential.fromJSON(
+      publicProfile = await parseAndValidate.signedCredential(
         publicProfileJson,
+        Identity.fromDidDocument({ didDocument })
       )
-
-    const { publicKeyHex, type } = didDocument.findPublicKeySectionById(
-      didDocument.signer.keyId
-    )
-
-      const isValid = await verifySignature(
-        Buffer.from(didDocument.signature, 'hex'),
-        await publicProfileCred.digest(), // TODO
-        {
-          // @ts-ignore TODO
-          type, 
-          publicKey: Buffer.from(publicKeyHex, 'hex')
-        },
-      )
-
-      if (isValid) {
-        publicProfile = publicProfileCred
-      }
     }
 
     return Identity.fromDidDocument({
