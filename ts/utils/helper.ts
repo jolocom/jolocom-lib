@@ -1,5 +1,9 @@
 import { pubToAddress, addHexPrefix } from 'ethereumjs-util'
 import fetch from 'node-fetch'
+import { Identity } from '../identity/identity'
+import { IVaultedKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
+import { IKeyMetadata } from '../identityWallet/types'
+import { ErrorCodes } from '../errors'
 
 /**
  * Helper function to convert a key identifier to the owner did
@@ -38,3 +42,31 @@ export function fuelKeyWithEther(publicKey: Buffer) {
 
 export const publicKeyToAddress = (publicKey: Buffer): string =>
   addHexPrefix(pubToAddress(publicKey, true).toString('hex'))
+
+/**
+ * Helper function to map DID Document key references to vkp key URNs
+ * @param identity - Identity to map keys to
+ * @param vkp - store of key material to be mapped
+ * @param pass - password for vaulted key provider
+ */
+export const mapPublicKeys = async (
+  identity: Identity,
+  vkp: IVaultedKeyProvider,
+  pass: string,
+): Promise<IKeyMetadata> => {
+  const vkpKeys = await vkp.getPubKeys(pass)
+  const sigKey = vkpKeys.find(k =>
+    k.controller.find(c => c.endsWith(identity.didDocument.signer.keyId)),
+  )
+  const encKey = vkpKeys.find(
+    k => k.type === KeyTypes.x25519KeyAgreementKey2019,
+  )
+  if (!sigKey || !encKey) {
+    throw new Error(ErrorCodes.PublicKeyNotFound)
+  }
+
+  return {
+    signingKeyId: sigKey.id,
+    encryptionKeyId: encKey.id,
+  }
+}
