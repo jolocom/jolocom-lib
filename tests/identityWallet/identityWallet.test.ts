@@ -41,6 +41,7 @@ describe('IdentityWallet', () => {
         vaultedKeyProvider: stubbedKeyProvider,
         publicKeyMetadata: {
           signingKeyId: mockKeyId,
+          encryptionKeyId: mockKeyId,
         },
       })
 

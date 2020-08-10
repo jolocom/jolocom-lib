@@ -102,7 +102,11 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
   })
 
   it('should correctly implement authenticate with no public profile', async () => {
-    const wallet = await authAsIdentityFromKeyProvider(userVault, joloDidMethod.resolver)
+    const wallet = await authAsIdentityFromKeyProvider(
+      userVault,
+      userPass,
+      joloDidMethod.resolver,
+    )
 
     expect(wallet.identity.didDocument).to.deep.eq(
       userIdentityWallet.identity.didDocument,
@@ -113,20 +117,31 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
   })
 
   it('should correctly implement authenticate with public profile', async () => {
-    const serviceIdentity = await authAsIdentityFromKeyProvider(serviceVault, joloDidMethod.resolver)
-    expect(serviceIdentity.identity.publicProfile.subject).to.deep.eq(serviceIdentity.did)
-    expect(serviceIdentity.identity.publicProfile.claim).to.deep.eq({...publicProfileContent, id: serviceIdentity.did})
+    const serviceIdentity = await authAsIdentityFromKeyProvider(
+      serviceVault,
+      servicePass,
+      joloDidMethod.resolver,
+    )
+    expect(serviceIdentity.identity.publicProfile.subject).to.deep.eq(
+      serviceIdentity.did,
+    )
+    expect(serviceIdentity.identity.publicProfile.claim).to.deep.eq({
+      ...publicProfileContent,
+      id: serviceIdentity.did,
+    })
   })
 
   it('should correctly fail to authenticate as non existing did', async () => {
     const mockVault = await SoftwareKeyProvider.newEmptyWallet(walletUtils, '', 'pass')
 
     try {
-      await authAsIdentityFromKeyProvider(mockVault, joloDidMethod.resolver)
-    } catch (err) {
-      expect(err.message).to.contain(
-        ErrorCodes.RegistryDIDNotAnchored
+      await authAsIdentityFromKeyProvider(
+        mockVault,
+        'pass',
+        joloDidMethod.resolver,
       )
+    } catch (err) {
+      expect(err.message).to.contain(ErrorCodes.RegistryDIDNotAnchored)
     }
   })
 })

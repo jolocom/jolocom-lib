@@ -29,8 +29,8 @@ export const createIdentityFromKeyProvider = async (
 // TODO Figure out how to fit this into the DidMethod, a combination of a vkp and resolver
 export const authAsIdentityFromKeyProvider = async (
   vkp: SoftwareKeyProvider,
-  resolver: IResolver,
   pass: string,
+  resolver: IResolver,
 ) => {
   const identity = await resolver.resolve(vkp.id)
 

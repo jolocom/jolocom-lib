@@ -14,13 +14,8 @@ import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
-import {
-  IKeyMetadata,
-  ISignedCredCreationArgs,
-} from '../credentials/signedCredential/types'
-import {
-  keyIdToDid,
-} from '../utils/helper'
+import { ISignedCredCreationArgs } from '../credentials/signedCredential/types'
+import { keyIdToDid } from '../utils/helper'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
 import { CredentialsReceive } from '../interactionTokens/credentialsReceive'

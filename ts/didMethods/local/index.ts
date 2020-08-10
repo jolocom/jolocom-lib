@@ -62,8 +62,8 @@ export class LocalDidMethod implements IDidMethod {
   ): Promise<IdentityWallet> {
     return authAsIdentityFromKeyProvider(
       vaultedKeyProvider,
-      this.resolver,
       decryptionPassword,
+      this.resolver,
     )
   }
 }

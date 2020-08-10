@@ -39,6 +39,7 @@ describe('IdentityWallet validate JWT', () => {
       vaultedKeyProvider: vault,
       publicKeyMetadata: {
         signingKeyId: mockKeyId,
+        encryptionKeyId: mockKeyId,
       },
     })
   })
