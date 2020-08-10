@@ -1,6 +1,6 @@
 import { IContractsAdapter, ITransactionEncodable } from './types'
 import * as Transaction from 'ethereumjs-tx'
-import { IVaultedKeyProvider, KeyTypes } from '../vaultedKeyProvider/types'
+import { IVaultedKeyProvider } from '@jolocom/vaulted-key-provider'
 
 /**
  * @class
@@ -34,7 +34,7 @@ export class ContractsAdapter implements IContractsAdapter {
     { transactionOptions }: ITransactionEncodable,
     from: string,
     nonce: number,
-    vault: IVaultedKeyProvider,
+    vault: any,
     password: string,
   ) {
     const { to, value, gasPrice, gasLimit } = transactionOptions
@@ -49,10 +49,13 @@ export class ContractsAdapter implements IContractsAdapter {
       gasPrice,
     })
 
-    const privateKey = vault.getPrivateKey({
-      derivationPath: KeyTypes.ethereumKey,
-      encryptionPass: password,
-    })
+    // TODO revisit eth transactions with new VKP in future
+    // const privateKey = vault.getPrivateKey({
+    //   derivationPath: KeyTypes.ethereumKey,
+    //   encryptionPass: password,
+    // })
+
+    const privateKey = Buffer.from('')
 
     tx.sign(privateKey)
 

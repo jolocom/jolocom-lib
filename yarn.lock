@@ -145,22 +145,22 @@
     base64url "^3.0.1"
     clone "^2.1.2"
 
-"@jolocom/native-utils-node@^0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-utils-node/-/native-utils-node-0.4.1.tgz#c769dd2cf82c4909277d1edb5c38bcbeb6a4fbcb"
-  integrity sha512-8QXBT9S5P6fomEljWkdMwomPNrKR0oTN7+PxVM/ldEO7IlcmBQ1bjVj+3ikK68ss/zW5wZNywyfUP7E/CxtXWw==
+"@jolocom/native-utils-node@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-utils-node/-/native-utils-node-0.5.0.tgz#6492e24750f5404419895ff411a86930768cc9f3"
+  integrity sha512-530C+5AuFhxnq9DZ9WI4Y/naHgdhEY6FNTBoS67lOJEBT9jOJyXgU7GCxrSul0UGJCUu/5ZOWuMTO3jZDEXFqA==
 
-"@jolocom/protocol-ts@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/protocol-ts/-/protocol-ts-0.2.0.tgz#a10b4a6636e266293a591afbd0a063075b24e9b9"
-  integrity sha512-ALDlzBXLcnsKxymeIIlzvC0tMpReVivMSa3rTNUSciFjva9irOn54etqi+hx2q3nkO8eIIepcbw0OkHr3qRCsw==
+"@jolocom/protocol-ts@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/protocol-ts/-/protocol-ts-0.5.1.tgz#faa22952029b27d2115be355c4bbf409af00f9c5"
+  integrity sha512-AMnn22qKm+0l840hg3WRioXudxd+1uuJka4oi5vRH4PGinzpEsNoXn5sc4anHy7VbZhwGrBT2UgQEPQYqHP8gQ==
   dependencies:
     cred-types-jolocom-core "^0.0.11"
 
-"@jolocom/vaulted-key-provider@^0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.3.2.tgz#6406ef9ee53c6f34a70b6636d74cec0889714394"
-  integrity sha512-DH/GwQkvd5QWH4KN/BCoWohkBL9tVzJKPyXSFFMvqmHwFH4hxsHS/EgOW/8d7DY8NzRHfZYZq5Ua5WiINozAew==
+"@jolocom/vaulted-key-provider@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.4.0.tgz#900df1006dc320946b4e305e649d71990e89ab00"
+  integrity sha512-HOR62conj1AiUHHqiDHdZ1XHtpSK4bpKAeHxz68+PpUz3QVeQlFXpKP4h3bTjBZEXG69FcaSIChIM1thG1TdNA==
   dependencies:
     base64url "^3.0.1"
 
