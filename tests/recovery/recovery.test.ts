@@ -7,8 +7,8 @@ import { didDocumentJSON } from '../data/didDocument.data'
 import * as sinon from 'sinon'
 import { Identity } from '../../ts/identity/identity'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
-import { keyDerivationArgs } from '../data/identityWallet.data'
-import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
+import {  } from '../data/identity.data'
+import * as crypto from '../../ts/utils/crypto'
 import {
   testDID16,
   testDID32,
@@ -26,6 +26,7 @@ describe('Recovery', () => {
   const sandbox = sinon.createSandbox()
   const resolver = new JolocomResolver()
   const mockDidDoc = DidDocument.fromJSON(didDocumentJSON)
+  const pass = 'secret'
 
   let referenceVault32, referenceVault16
 
@@ -35,18 +36,18 @@ describe('Recovery', () => {
       .resolves(Identity.fromDidDocument({ didDocument: mockDidDoc }))
 
     sandbox
-      .stub(SoftwareKeyProvider, 'getRandom')
+      .stub(crypto, 'getRandom')
       .returns(Buffer.from('12345678123456781234567812345678', 'hex'))
 
-    referenceVault32 = SoftwareKeyProvider.fromSeed(
-      Buffer.from(testSecret32, 'hex'),
-      keyDerivationArgs.encryptionPass,
-    )
+  //  referenceVault32 = SoftwareKeyProvider.fromSeed(
+  //    Buffer.from(testSecret32, 'hex'),
+  //    keyDerivationArgs.encryptionPass,
+  //  )
 
-    referenceVault16 = SoftwareKeyProvider.fromSeed(
-      Buffer.from(testSecret16, 'hex'),
-      keyDerivationArgs.encryptionPass,
-    )
+  //  referenceVault16 = SoftwareKeyProvider.fromSeed(
+  //    Buffer.from(testSecret16, 'hex'),
+  //    keyDerivationArgs.encryptionPass,
+  //  )
   })
 
   afterEach(() => {
@@ -59,7 +60,7 @@ describe('Recovery', () => {
       testSeedPhrase16,
       {
         keyRef: '',
-        encryptionPass: keyDerivationArgs.encryptionPass
+        encryptionPass: pass
       },
     )
 
@@ -73,7 +74,7 @@ describe('Recovery', () => {
       testSeedPhrase32,
       {
         keyRef: '',
-        encryptionPass: keyDerivationArgs.encryptionPass
+        encryptionPass: pass
       },
     )
     sandbox.assert.calledWith(JolocomResolver.prototype.resolve, testDID32)
@@ -86,7 +87,7 @@ describe('Recovery', () => {
       testSeedPhraseWithDid32,
       {
         keyRef: '',
-        encryptionPass: keyDerivationArgs.encryptionPass
+        encryptionPass: pass
       },
     )
     sandbox.assert.calledWith(JolocomResolver.prototype.resolve, testDID32)
@@ -98,7 +99,7 @@ describe('Recovery', () => {
       testSeedPhraseWithDid16,
       {
         keyRef: '',
-        encryptionPass: keyDerivationArgs.encryptionPass
+        encryptionPass: pass
       },
     )
     sandbox.assert.calledWith(JolocomResolver.prototype.resolve, testDID16)
@@ -111,7 +112,7 @@ describe('Recovery', () => {
       testShares,
       {
         keyRef: '',
-        encryptionPass: keyDerivationArgs.encryptionPass
+        encryptionPass: pass
       },
     )
     sandbox.assert.calledWith(JolocomResolver.prototype.resolve, testDID32)

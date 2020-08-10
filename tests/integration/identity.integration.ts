@@ -44,7 +44,7 @@ before(async () => {
   joloDidMethod = new JoloDidMethod(
     testEthereumConfig.providerUrl,
     testEthereumConfig.contractAddress,
-    ipfsHost,
+    // ipfsHost,
   )
   userVault = await getNewVault('id', userPass)
   serviceVault = await getNewVault('id', servicePass)

@@ -7,7 +7,7 @@ import { Identity } from '../../ts/identity/identity'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
 import { ErrorCodes } from '../../ts/errors'
-import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 import { JolocomResolver } from '../../ts/didMethods/jolo/resolver'
 import { Resolver } from 'did-resolver'
 

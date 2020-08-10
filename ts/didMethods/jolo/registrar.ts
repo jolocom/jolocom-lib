@@ -67,7 +67,7 @@ export class JolocomRegistrar implements IRegistrar {
     // generate a new key, add it to the vkp with the expected id, use that, then move the api to the vkp
 
     // TODO Does this matter?
-    if (keyProvider.id) {
+    if (keyProvider.id !== 'id') {
       throw new Error('I SHOULD BE SETTING THIS FOR NOW')
     }
 

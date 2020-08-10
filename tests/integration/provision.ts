@@ -4,7 +4,7 @@ import { ContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { ethers } from 'ethers'
 
-const IPFSFactory = require('ipfsd-ctl')
+// const IPFSFactory = require('ipfsd-ctl')
 const RegistryContract = require('jolocom-registry-contract/build/contracts/Registry.json')
 const PORT = 8945
 const balance = 1e18
@@ -16,7 +16,7 @@ const ganacheServer = ganache.server({
   ],
 })
 
-const daemonFactory = IPFSFactory.create({ type: 'go' })
+// const daemonFactory = IPFSFactory.create({ type: 'go' })
 
 /**
  * @description - Helper function to deploy the registry contract on the local eth network
@@ -45,24 +45,24 @@ const deployContract = async () => {
  *   available at localhost:5001
  */
 
-const spawnIpfsNode = async () => {
-  return new Promise((resolve, reject) =>
-    daemonFactory.spawn(
-      {
-        exec: 'ipfs',
-        disposable: true,
-        defaultAddrs: true,
-      },
-      (spawnErr, ipfsd) => {
-        if (spawnErr) {
-          return reject(spawnErr)
-        }
-
-        ipfsd.api.id(apiErr => (apiErr ? reject(apiErr) : resolve()))
-      },
-    ),
-  )
-}
+// const spawnIpfsNode = async () => {
+//   return new Promise((resolve, reject) =>
+//     daemonFactory.spawn(
+//       {
+//         exec: 'ipfs',
+//         disposable: true,
+//         defaultAddrs: true,
+//       },
+//       (spawnErr, ipfsd) => {
+//         if (spawnErr) {
+//           return reject(spawnErr)
+//         }
+// 
+//         ipfsd.api.id(apiErr => (apiErr ? reject(apiErr) : resolve()))
+//       },
+//     ),
+//   )
+// }
 
 /**
  * @description - Initiates a mock ethereum network using ganache, a discardable ipfs node using ipfsd, and
@@ -83,7 +83,7 @@ export const init = async () =>
       }
 
       await deployContract()
-      await spawnIpfsNode()
+     // await spawnIpfsNode()
 
       const testContractsGateway = new ContractsGateway(
         `http://localhost:${PORT}`,

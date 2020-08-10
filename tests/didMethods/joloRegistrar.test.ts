@@ -1,7 +1,6 @@
 import * as sinon from 'sinon'
 import { didDocumentJSON, mockKeyId } from '../data/didDocument.data'
 import { publicProfileCredJSON } from '../data/identity.data'
-import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { testSeed } from '../data/keys.data'
 import { encryptionPass } from './jolocomRegistry.data'
 import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
