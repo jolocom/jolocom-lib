@@ -18,13 +18,9 @@ const parseAndValidateDidDoc = async (didDocument: IDidDocumentAttrs): Promise<D
     //@ts-ignore optional proof
     await normalizeSignedLdObject(didDocument, didDocument['@context']),
     Buffer.from(didDoc.signature, 'hex'),
-    {
-      publicKeyHex: signingKey.publicKeyHex,
-      controller: [signingKey.id],
-      //@ts-ignore
-      type: signingKey.type,
-      id: 'TODO'
-    }
+    Buffer.from(signingKey.publicKeyHex, 'hex'),
+    //@ts-ignore
+    signingKey.type
   )
 
   if (signatureValid) {
@@ -41,13 +37,9 @@ const parseAndValidateSignedCredential = async (signedCredential: ISignedCredent
   const signatureValid = verifySignature(
     await normalizeSignedLdObject(signedCredential, signedCredential['@context']),
     Buffer.from(signedCred.signature, 'hex'),
-    {
-      publicKeyHex: signingKey.publicKeyHex,
-      controller: [signingKey.id],
-      //@ts-ignore
-      type: signingKey.type,
-      id: 'TODO'
-    }
+    Buffer.from(signingKey.publicKeyHex, 'hex'),
+    //@ts-ignore
+    signingKey.type
   )
 
   if (signatureValid) {
@@ -66,13 +58,9 @@ export const parseAndValidateInteractionToken = async (jwt: string, identity: Id
   const isValid = await verifySignature(
     sha256(Buffer.from([body, payload].join('.'))),
     Buffer.from(interactionToken.signature, 'hex'), // TODO Use signature here, after making sure the encoding is base64
-    {
-      publicKeyHex: signingKey.publicKeyHex,
-      controller: [signingKey.id],
-      //@ts-ignore
-      type: signingKey.type,
-      id: 'TODO'
-    }
+    Buffer.from(signingKey.publicKeyHex, 'hex'),
+    //@ts-ignore
+    signingKey.type
   )
 
   if (isValid) {

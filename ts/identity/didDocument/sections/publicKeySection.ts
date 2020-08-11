@@ -80,6 +80,13 @@ export class PublicKeySection {
    */
 
   @Expose()
+  @Transform((val, obj) => !val && obj.publicKeyBase64
+    ? Buffer.from(obj.publicKeyBase64, 'base64').toString('hex')
+    : val,
+    {
+      toClassOnly: true
+    }
+  )
   public get publicKeyHex(): string {
     return this._publicKeyHex
   }

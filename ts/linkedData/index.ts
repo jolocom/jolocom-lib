@@ -5,8 +5,6 @@ import { canonize } from 'jsonld'
 import { JsonLdObject, SignedJsonLdObject, JsonLdContext } from './types'
 import { JoloDidMethod } from '../didMethods/jolo'
 import { verifySignature } from '../utils/validation'
-import { verify as eccVerify } from 'tiny-secp256k1'
-import { KeyTypes } from '@jolocom/vaulted-key-provider'
 
 /**
  * Helper function to handle JsonLD normalization.
@@ -77,18 +75,13 @@ export const validateJsonLd = async (
     const {
       publicKeyHex,
       type,
-      id
     } = issuerIdentity.didDocument.findPublicKeySectionById(json.proof.creator)
 
     return verifySignature(
       await normalizeSignedLdObject(json, json['@context']),
       Buffer.from(json.proof.signatureValue, 'hex'),
-      {
-        //@ts-ignore TODO
-        type,
-        publicKeyHex,
-        controller: [id],
-        id: '1'
-      }
+      Buffer.from(publicKeyHex, 'hex'),
+      //@ts-ignore
+      type
     )
 }

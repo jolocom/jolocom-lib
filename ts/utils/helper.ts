@@ -1,7 +1,7 @@
 import { pubToAddress, addHexPrefix } from 'ethereumjs-util'
 import fetch from 'node-fetch'
 import { Identity } from '../identity/identity'
-import { IVaultedKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
+import { IVaultedKeyProvider, KeyTypes, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
 import { IKeyMetadata } from '../identityWallet/types'
 import { ErrorCodes } from '../errors'
 
@@ -48,25 +48,30 @@ export const publicKeyToAddress = (publicKey: Buffer): string =>
  * @param identity - Identity to map keys to
  * @param vkp - store of key material to be mapped
  * @param pass - password for vaulted key provider
+ * TODO This should take vkp keys instead of vkp + pass
  */
 export const mapPublicKeys = async (
   identity: Identity,
-  vkp: IVaultedKeyProvider,
-  pass: string,
+  vkpKeys: PublicKeyInfo[],
 ): Promise<IKeyMetadata> => {
-  const vkpKeys = await vkp.getPubKeys(pass)
-  const sigKey = vkpKeys.find(k =>
-    k.controller.find(c => c.endsWith(identity.didDocument.signer.keyId)),
+  const signingKeyRef = `${identity.didDocument.signer.did}${identity.didDocument.signer.keyId}`
+
+  const sigKey = vkpKeys.some(k =>
+    k.controller.find(c =>
+      c === signingKeyRef
+    ),
   )
+
   const encKey = vkpKeys.find(
     k => k.type === KeyTypes.x25519KeyAgreementKey2019,
   )
-  if (!sigKey || !encKey) {
+
+  if (!sigKey) {
     throw new Error(ErrorCodes.PublicKeyNotFound)
   }
 
   return {
-    signingKeyId: sigKey.id,
-    encryptionKeyId: encKey.id,
+    signingKeyId: signingKeyRef,
+    encryptionKeyId: '',
   }
 }

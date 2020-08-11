@@ -1,6 +1,6 @@
 import { IDigestable } from '../linkedDataSignature/types'
 import { JoloDidMethod } from '../didMethods/jolo'
-import { KeyTypes, getCryptoProvider, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
+import { KeyTypes, getCryptoProvider } from '@jolocom/vaulted-key-provider'
 import { cryptoUtils } from '@jolocom/native-utils-node'
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
@@ -9,11 +9,6 @@ import { cryptoUtils } from '@jolocom/native-utils-node'
  * @example `await validateDigestable(signedCredential) // true`
  * @example `await validateDigestable(signedCredential, jolocomResolver()) // true`
  * @returns {boolean} - True if signature is valid, false otherwise */
-
-interface PubKeyForVerification {
-  publicKey: Buffer,
-  type: KeyTypes
-}
 
 /**
  * TODO Document
@@ -25,15 +20,16 @@ interface PubKeyForVerification {
 export const verifySignature = (
   data: Buffer,
   signature: Buffer,
-  pKey: PublicKeyInfo,
+  pKey: Buffer,
+  keyType: KeyTypes
 ): Promise<boolean> => {
   const compatibilityMap = {
     'Secp256k1VerificationKey2018': 'EcdsaSecp256k1VerificationKey2019'
   }
 
   return getCryptoProvider(cryptoUtils).verify(
-    Buffer.from(pKey.publicKeyHex, 'hex'),
-    compatibilityMap[pKey.type] || pKey.type,
+    pKey,
+    compatibilityMap[keyType] || keyType,
     data,
     signature,
   )
@@ -53,23 +49,23 @@ export const validateDigestable = async (
   resolver = new JoloDidMethod().resolver,
 ): Promise<boolean> => {
   const issuerIdentity = await resolver.resolve(toValidate.signer.did)
+
   try {
     const issuerPublicKey = issuerIdentity.didDocument.findPublicKeySectionById(
-      toValidate.signer.keyId,
+      toValidate.signer.keyId
     )
 
-    // TODO Correctly extract / asign the KeyType
     return verifySignature(
       await toValidate.asBytes(),
       Buffer.from(toValidate.signature, 'hex'),
-      {
-        type: issuerPublicKey.type as KeyTypes,
-        publicKeyHex: issuerPublicKey.publicKeyHex,
-        controller: [ issuerPublicKey.id ],
-        id: 'yo'
-      }
+      //@ts-ignore TODO
+      issuerPublicKey.publicKeyHex ? Buffer.from(issuerPublicKey.publicKeyHex, 'hex') : Buffer.from(issuerPublicKey.publicKeyBase64, 'base64'),
+      //issuerPublicKey.publicKeyHex ? Buffer.from(issuerPublicKey.publicKeyHex, 'hex') : Buffer.from(issuerPublicKey.publicKeyBase64, 'base64'),
+      //@ts-ignore
+      issuerPublicKey.type
     )
   } catch(e) {
+    // TODO Remove once done
     console.log('caught', e)
     return false
   }

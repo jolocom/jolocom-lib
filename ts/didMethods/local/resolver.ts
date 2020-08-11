@@ -11,17 +11,17 @@ import { DIDDocument, Resolver } from "did-resolver";
 type Resolve = (did: string) => Promise<DIDDocument>
 
 export class LocalResolver implements IResolver {
-  prefix: 'jolo'
+  prefix: 'un'
   db: InternalDb
   private resolveImplementation: Resolve
 
   //TODO figure out if this belongs here
   constructor(db: InternalDb, didDocFromValidatedEvents = validateEvents) {
     this.db = db
-    this.resolveImplementation = new Resolver(getResolver({
+    this.resolveImplementation = (did: string) => new Resolver(getResolver({
       dbInstance: db,
       validateEvents: didDocFromValidatedEvents
-    })).resolve
+    })).resolve(did)
   }
 
   async resolve(did: string) {

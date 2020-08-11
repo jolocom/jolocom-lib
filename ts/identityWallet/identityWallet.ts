@@ -196,12 +196,10 @@ export class IdentityWallet {
       expires,
     )
 
-    const digest = await vCred.digest()
-
     const signature = await this._keyProvider.sign({
       encryptionPass: pass,
       keyRef: this._publicKeyMetadata.signingKeyId // TODO Is this reliable? Or rather, where is this set?
-    }, digest)
+    }, await vCred.asBytes())
 
     vCred.signature = signature.toString('hex')
     return vCred
@@ -314,14 +312,12 @@ export class IdentityWallet {
 
     jwt.issuer = this.publicKeyMetadata.signingKeyId
 
-    const digest = await jwt.digest()
-    
     const signature = await this._keyProvider.sign(
       { // TODO
         encryptionPass: pass,
         keyRef: this._publicKeyMetadata.signingKeyId
       },
-      digest,
+      await jwt.asBytes(),
     ) // TODO Also, are the signatures hex or b64?
 
     jwt.signature = signature.toString('hex')

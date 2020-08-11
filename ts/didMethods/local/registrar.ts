@@ -23,7 +23,7 @@ const createFromIcp = async (p: CreationParams): Promise<CreationReturn> =>
   JSON.parse(await getIcp(p.encryptedWallet, p.id, p.pass)) as CreationReturn
 
 export class LocalRegistrar implements IRegistrar {
-  public prefix = 'jolo'
+  public prefix = 'un'
   private registrar: ReturnType<typeof getRegistrar>
 
   constructor(db = createDb()) {
@@ -35,31 +35,24 @@ export class LocalRegistrar implements IRegistrar {
     })
   }
 
-  // TODO KERI Must give us a createICP function, and a convertToDidDoc function
-  // otherwise there's no way to update the registrar with the ICP created from
-  // this.registrar.create(), and no way to resolve ourselves
   async create(keyProvider: SoftwareKeyProvider, password: string) {
-    /*
-     * potential eventual API:
-     * const icp = await this.registrar.create()
-     * this.db.append(icp)
-     * return this.registrar.valdateEvents(icp)
-     */
-
-    // TODO currently contains keys as well.
     const ret = (await this.registrar.create({
       encryptedWallet: keyProvider.encryptedWallet,
       id: keyProvider.id,
       pass: password,
     })) as CreationReturn
 
-    // @ts-ignore
+    // @ts-ignore Assigning directly to a private property
     keyProvider._encryptedWallet = Buffer.from(ret.encryptedWallet, 'base64')
+    // @ts-ignore Assigning directly to a private property
+    keyProvider._id = ret.id
+
+    const didDoc = JSON.parse(
+      await validateEvents(JSON.stringify([ret.inceptionEvent]))
+    )
 
     const identity = Identity.fromDidDocument({
-      didDocument: DidDocument.fromJSON(
-        JSON.parse(await validateEvents(JSON.stringify[ret.inceptionEvent])), // TODO A better way? Perhaps didMethod.resolvelve(ourDid), but no resolver ref here :(
-      ),
+      didDocument: DidDocument.fromJSON(didDoc),
     })
 
     this.encounter(ret.inceptionEvent)
