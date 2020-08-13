@@ -110,7 +110,7 @@ Once the request has been decoded, we can create the response:
    * will be populated autmoatically based on the request starting from next major release
    */
 
-  const credentialResponse = awaitidentityWallet.create.interactionTokens.response.share({
+  const credentialResponse = await identityWallet.create.interactionTokens.response.share({
       callbackURL: credentialRequest.payload.interactionToken.callbackURL,
       suppliedCredentials: [signedEmailCredential.toJSON()] // Provide signed credentials of requested type
     },
