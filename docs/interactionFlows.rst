@@ -159,7 +159,7 @@ After decoding the credential response, verify that the user passed the credenti
   /**
    * We check against the request we created in a previous step
    * this requires the server to be stateful. We are currently
-   * expolring alternatives.
+   * exploring alternatives.
    */
 
   const validResponse = credentialResponse.satisfiesRequest(credentialRequest)
