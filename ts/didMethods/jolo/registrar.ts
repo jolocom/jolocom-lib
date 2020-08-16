@@ -139,9 +139,8 @@ export class JolocomRegistrar implements IRegistrar {
     return this.update(keyProvider, password, didDocument).then(() => true)
   }
 
-  async encounter() {
-    console.error(`"encounter" not implemented for did:${this.prefix}`) // TODO Better error
-    return false
+  public async encounter(): Promise<Identity> {
+    throw new Error(`"encounter" not implemented for did:${this.prefix}`) // TODO Better error
   }
 
   private async signDidDocument(

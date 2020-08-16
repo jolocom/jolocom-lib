@@ -8,5 +8,5 @@ export declare class LocalRegistrar implements IRegistrar {
     constructor(db?: import("local-did-resolver/js").InternalDb);
     create(keyProvider: SoftwareKeyProvider, password: string): Promise<Identity>;
     updatePublicProfile(keyProvider: SoftwareKeyProvider, password: string, identity: Identity, publicProfile: SignedCredential): Promise<boolean>;
-    encounter(delta: string): Promise<boolean>;
+    encounter(deltas: [string]): Promise<Identity>;
 }

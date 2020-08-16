@@ -52,14 +52,14 @@ export class LocalRegistrar implements IRegistrar {
     keyProvider._id = ret.id
 
     const didDoc = JSON.parse(
-      await validateEvents(JSON.stringify([ret.inceptionEvent]))
+      await validateEvents(JSON.stringify([ret.inceptionEvent])),
     )
 
     const identity = Identity.fromDidDocument({
       didDocument: DidDocument.fromJSON(didDoc),
     })
 
-    this.encounter(ret.inceptionEvent)
+    this.encounter([ret.inceptionEvent])
     return identity
   }
 
@@ -75,11 +75,9 @@ export class LocalRegistrar implements IRegistrar {
     return false
   }
 
-  public async encounter(delta: string) {
-    await this.registrar.update([delta]).catch((e: Error) => {
-      console.error(e)
-      return false
-    }) // TODO This needs to return bool?
-    return true
+  public async encounter(deltas: [string]) {
+    return Identity.fromDidDocument({
+      didDocument: DidDocument.fromJSON(await this.registrar.update(deltas)),
+    })
   }
 }
