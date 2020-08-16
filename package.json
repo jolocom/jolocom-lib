@@ -1,6 +1,6 @@
 {
   "name": "jolocom-lib",
-  "version": "4.3.5",
+  "version": "5.0.0",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "files": [
@@ -86,7 +86,6 @@
     "form-data": "^2.3.3",
     "jolo-did-registry": "1.0.1",
     "jolo-did-resolver": "0.2.1",
-    "jolocom-registry-contract": "^0.1.7",
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.6.1",
     "jsontokens": "^1.0.0",
