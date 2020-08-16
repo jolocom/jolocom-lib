@@ -20,4 +20,5 @@ export declare const JolocomLib: {
     };
     KeyTypes: typeof KeyTypes;
 };
+export { SoftwareKeyProvider, IVaultedKeyProvider, } from '@jolocom/vaulted-key-provider';
 export { claimsMetadata } from '@jolocom/protocol-ts';

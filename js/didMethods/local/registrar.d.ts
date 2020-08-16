@@ -5,7 +5,7 @@ import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider';
 export declare class LocalRegistrar implements IRegistrar {
     prefix: string;
     private registrar;
-    constructor(db?: import("local-did-resolver/js/db").InternalDb);
+    constructor(db?: import("local-did-resolver/js").InternalDb);
     create(keyProvider: SoftwareKeyProvider, password: string): Promise<Identity>;
     updatePublicProfile(keyProvider: SoftwareKeyProvider, password: string, identity: Identity, publicProfile: SignedCredential): Promise<boolean>;
     encounter(delta: string): Promise<boolean>;

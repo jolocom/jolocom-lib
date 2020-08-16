@@ -11,13 +11,17 @@ import {
 } from '@jolocom/native-utils-node'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
-type CreationReturn = {
+interface CreationReturn {
   id: string
   encryptedWallet: string
   inceptionEvent: string
 }
 
-type CreationParams = { id: string; encryptedWallet: string; pass: string }
+interface CreationParams {
+  id: string
+  encryptedWallet: string
+  pass: string
+}
 
 const createFromIcp = async (p: CreationParams): Promise<CreationReturn> =>
   JSON.parse(await getIcp(p.encryptedWallet, p.id, p.pass)) as CreationReturn
@@ -26,7 +30,7 @@ export class LocalRegistrar implements IRegistrar {
   public prefix = 'un'
   private registrar: ReturnType<typeof getRegistrar>
 
-  constructor(db = createDb()) {
+  public constructor(db = createDb()) {
     this.registrar = getRegistrar({
       dbInstance: db,
       create: createFromIcp,
@@ -35,7 +39,7 @@ export class LocalRegistrar implements IRegistrar {
     })
   }
 
-  async create(keyProvider: SoftwareKeyProvider, password: string) {
+  public async create(keyProvider: SoftwareKeyProvider, password: string) {
     const ret = (await this.registrar.create({
       encryptedWallet: keyProvider.encryptedWallet,
       id: keyProvider.id,
@@ -61,7 +65,7 @@ export class LocalRegistrar implements IRegistrar {
 
   // TODO Verify signature on the public profile? Or just assume it's correct
   // TODO Public profile should perhaps be JSON / any, so that the registrars can be used without having to typecheck / guard / use generics
-  async updatePublicProfile(
+  public async updatePublicProfile(
     keyProvider: SoftwareKeyProvider,
     password: string,
     identity: Identity,
@@ -71,7 +75,7 @@ export class LocalRegistrar implements IRegistrar {
     return false
   }
 
-  async encounter(delta: string) {
+  public async encounter(delta: string) {
     await this.registrar.update([delta]).catch((e: Error) => {
       console.error(e)
       return false
