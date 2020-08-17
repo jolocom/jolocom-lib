@@ -8,7 +8,7 @@ import { JSONWebToken } from '../interactionTokens/JSONWebToken';
 import { PaymentRequest } from '../interactionTokens/paymentRequest';
 import { Authentication } from '../interactionTokens/authentication';
 import { CredentialRequest } from '../interactionTokens/credentialRequest';
-import { KeyTypes, IKeyDerivationArgs } from '../vaultedKeyProvider/types';
+import { KeyTypes } from '../vaultedKeyProvider/types';
 import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types';
 import { ITransactionEncodable } from '../contracts/types';
 import { IRegistry } from '../registries/types';
@@ -49,7 +49,7 @@ export declare class IdentityWallet {
     validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, customRegistry?: IRegistry): Promise<void>;
     asymEncrypt: (data: Buffer, publicKey: Buffer) => Promise<string>;
     asymEncryptToDidKey: (data: Buffer, keyRef: string, customRegistry?: IRegistry) => Promise<string>;
-    asymDecrypt: (data: string, decryptionKeyArgs: IKeyDerivationArgs) => Promise<Buffer>;
+    asymDecrypt: (data: string, pass: string) => Promise<Buffer>;
     private sendTransaction;
     transactions: {
         sendTransaction: (request: ITransactionEncodable, pass: string) => Promise<string>;
@@ -68,7 +68,7 @@ export declare class IdentityWallet {
                 auth: ({ expires, aud, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string) => Promise<JSONWebToken<any>>;
                 offer: ({ expires, aud, ...message }: WithExtraOptions<CredentialOfferRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
                 share: ({ expires, aud, ...message }: WithExtraOptions<ICredentialRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
-                payment: ({ expires, aud, ...message }: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => Promise<JSONWebToken<any>>;
+                payment: (args: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => Promise<JSONWebToken<any>>;
             };
             response: {
                 auth: ({ expires, aud, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, recieved?: JSONWebToken<Authentication>) => Promise<JSONWebToken<any>>;
