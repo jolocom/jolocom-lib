@@ -9,8 +9,6 @@ import {
 import { Identity } from '../identity/identity'
 import { JSONWebToken } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
-import { PaymentResponse } from '../interactionTokens/paymentResponse'
-import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
@@ -274,10 +272,6 @@ export class IdentityWallet {
         return CredentialResponse
       case InteractionType.Authentication:
         return Authentication
-      case InteractionType.PaymentRequest:
-        return PaymentRequest
-      case InteractionType.PaymentResponse:
-        return PaymentResponse
     }
     throw new Error(ErrorCodes.JWTInvalidInteractionType)
   }
@@ -465,9 +459,6 @@ export class IdentityWallet {
         issue: this.makeRes<ICredentialsReceiveAttrs, CredentialOfferResponse>(
           InteractionType.CredentialsReceive,
         ),
-       // payment: this.makeRes<IPaymentResponseAttrs, PaymentRequest>(
-       //    InteractionType.PaymentResponse,
-       //  ),
       },
     },
   }

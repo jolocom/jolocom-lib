@@ -16,8 +16,6 @@ import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
 import { CredentialsReceive } from './credentialsReceive'
 import { keyIdToDid } from '../utils/helper'
-import { PaymentResponse } from './paymentResponse'
-import { PaymentRequest } from './paymentRequest'
 import { CredentialOfferResponse } from './credentialOfferResponse'
 import { CredentialOfferRequest } from './credentialOfferRequest'
 import { ErrorCodes } from '../errors'
@@ -34,8 +32,6 @@ export type JWTEncodable =
   | CredentialOfferRequest
   | CredentialOfferResponse
   | CredentialsReceive
-  | PaymentRequest
-  | PaymentResponse
 
 interface IJWTEncodable {
   [key: string]: any
@@ -304,10 +300,6 @@ const instantiateInteraction = <T>(
       return instantiator(CredentialResponse)
     case InteractionType.Authentication:
       return instantiator(Authentication)
-    case InteractionType.PaymentRequest:
-      return instantiator(PaymentRequest)
-    case InteractionType.PaymentResponse:
-      return instantiator(PaymentResponse)
   }
   throw new Error(ErrorCodes.JWTInvalidInteractionType)
 }
