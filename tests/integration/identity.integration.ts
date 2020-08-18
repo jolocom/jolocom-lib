@@ -7,15 +7,16 @@ import {
   userPass,
   getNewVault,
   servicePass,
-  testIpfsConfig
+  testIpfsConfig,
 } from './integration.data'
-import { ContractsGateway } from '../../ts/contracts/contractsGateway'
-import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
 import { ErrorCodes } from '../../ts/errors'
 import { IDidMethod } from '../../ts/didMethods/types'
 import { JoloDidMethod } from '../../ts/didMethods/jolo'
 import { LocalDidMethod } from '../../ts/didMethods/local'
-import { createIdentityFromKeyProvider, authAsIdentityFromKeyProvider } from '../../ts/didMethods/utils'
+import {
+  createIdentityFromKeyProvider,
+  authAsIdentityFromKeyProvider,
+} from '../../ts/didMethods/utils'
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 import { walletUtils } from '@jolocom/native-utils-node'
@@ -29,43 +30,41 @@ export let joloDidMethod: IDidMethod
 export let localDidMethod: IDidMethod
 export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
-export let testContractsGateway: ContractsGateway
-export let testContractsAdapter: ContractsAdapter
 export let userVault: SoftwareKeyProvider
 export let serviceVault: SoftwareKeyProvider
 
 before(async () => {
-  const {
-    testContractsGateway: gateway,
-    testContractsAdapter: adapter,
-  } = await integrationHelper.init()
-
-  testContractsGateway = gateway
-  testContractsAdapter = adapter
-
   const eventDb = createDb()
   localDidMethod = new LocalDidMethod(eventDb)
 
-//  const ipfsHost = `${testIpfsConfig.protocol}://${testIpfsConfig.host}:${testIpfsConfig.port}`
-//  joloDidMethod = new JoloDidMethod(
-//    testEthereumConfig.providerUrl,
-//    testEthereumConfig.contractAddress,
-//    // ipfsHost,
-//  )
+  //  const ipfsHost = `${testIpfsConfig.protocol}://${testIpfsConfig.host}:${testIpfsConfig.port}`
+  //  joloDidMethod = new JoloDidMethod(
+  //    testEthereumConfig.providerUrl,
+  //    testEthereumConfig.contractAddress,
+  //    // ipfsHost,
+  //  )
 
   userVault = await getNewVault('id', userPass)
   serviceVault = await getNewVault('id', servicePass)
 
-  userIdentityWallet = await createIdentityFromKeyProvider(userVault, userPass, localDidMethod.registrar)
-  serviceIdentityWallet = await createIdentityFromKeyProvider(serviceVault, servicePass, localDidMethod.registrar)
+  userIdentityWallet = await createIdentityFromKeyProvider(
+    userVault,
+    userPass,
+    localDidMethod.registrar,
+  )
+  serviceIdentityWallet = await createIdentityFromKeyProvider(
+    serviceVault,
+    servicePass,
+    localDidMethod.registrar,
+  )
 })
 
 describe('Integration Test - Create, Resolve, Public Profile', () => {
   const publicProfileContent = {
-     name: 'Test Service',
-     description: 'Integration test service',
-     url: 'https://test.com',
-     image: 'https://images.com'
+    name: 'Test Service',
+    description: 'Integration test service',
+    url: 'https://test.com',
+    image: 'https://images.com',
   }
 
   it('should correctly create user and service identities', async () => {
@@ -77,35 +76,40 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       serviceIdentityWallet.did,
     )
 
-   // TODO Created on proof is generated ad-hoc, via date.now()
-   // expect(remoteUserIdentity.didDocument.toJSON()).to.deep.eq(
-   //   userIdentityWallet.didDocument.toJSON(),
-   // )
+    // TODO Created on proof is generated ad-hoc, via date.now()
+    // expect(remoteUserIdentity.didDocument.toJSON()).to.deep.eq(
+    //   userIdentityWallet.didDocument.toJSON(),
+    // )
 
-   // expect(remoteServiceIdentity.didDocument.toJSON()).to.deep.eq(
-   //   remoteServiceIdentity.didDocument.toJSON(),
-   // )
+    // expect(remoteServiceIdentity.didDocument.toJSON()).to.deep.eq(
+    //   remoteServiceIdentity.didDocument.toJSON(),
+    // )
   })
 
   // TODO No public profile on local method yet
   it.skip('should correctly add and commit public profile', async () => {
     await joloDidMethod.registrar.updatePublicProfile(
-       serviceVault,
-       servicePass,
-       serviceIdentityWallet.identity,
-       await serviceIdentityWallet.create.signedCredential({
-         metadata: claimsMetadata.publicProfile,
-         claim: publicProfileContent,
-         subject: serviceIdentityWallet.did
-       }, servicePass)
+      serviceVault,
+      servicePass,
+      serviceIdentityWallet.identity,
+      await serviceIdentityWallet.create.signedCredential(
+        {
+          metadata: claimsMetadata.publicProfile,
+          claim: publicProfileContent,
+          subject: serviceIdentityWallet.did,
+        },
+        servicePass,
+      ),
     )
-
 
     const remoteServiceIdentity = await joloDidMethod.resolver.resolve(
       serviceIdentityWallet.did,
     )
 
-    expect(remoteServiceIdentity.publicProfile.claim).to.deep.eq({...publicProfileContent, id: remoteServiceIdentity.did})
+    expect(remoteServiceIdentity.publicProfile.claim).to.deep.eq({
+      ...publicProfileContent,
+      id: remoteServiceIdentity.did,
+    })
     expect(remoteServiceIdentity.didDocument).to.deep.eq(
       remoteServiceIdentity.didDocument,
     )
@@ -144,7 +148,11 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
   })
 
   it('should correctly fail to authenticate as non existing did', async () => {
-    const mockVault = await SoftwareKeyProvider.newEmptyWallet(walletUtils, 'did:un:wroooooooooong', 'pass')
+    const mockVault = await SoftwareKeyProvider.newEmptyWallet(
+      walletUtils,
+      'did:un:wroooooooooong',
+      'pass',
+    )
 
     try {
       await authAsIdentityFromKeyProvider(

@@ -23,9 +23,6 @@ interface CreationParams {
   pass: string
 }
 
-const createFromIcp = async (p: CreationParams): Promise<CreationReturn> =>
-  JSON.parse(await getIcp(p.encryptedWallet, p.id, p.pass)) as CreationReturn
-
 export class LocalRegistrar implements IRegistrar {
   public prefix = 'un'
   private registrar: ReturnType<typeof getRegistrar>
@@ -33,7 +30,7 @@ export class LocalRegistrar implements IRegistrar {
   public constructor(db = createDb()) {
     this.registrar = getRegistrar({
       dbInstance: db,
-      create: createFromIcp,
+      create: getIcp,
       getIdFromEvent: getIdFromEvent,
       validateEvents: validateEvents,
     })
@@ -52,7 +49,7 @@ export class LocalRegistrar implements IRegistrar {
     keyProvider._id = ret.id
 
     const didDoc = JSON.parse(
-      await validateEvents(JSON.stringify([ret.inceptionEvent]))
+      await validateEvents(JSON.stringify([ret.inceptionEvent])),
     )
 
     const identity = Identity.fromDidDocument({
