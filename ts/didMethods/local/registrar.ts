@@ -56,7 +56,7 @@ export class LocalRegistrar implements IRegistrar {
       didDocument: DidDocument.fromJSON(didDoc),
     })
 
-    this.encounter(ret.inceptionEvent)
+    this.encounter([ret.inceptionEvent])
     return identity
   }
 
@@ -72,8 +72,8 @@ export class LocalRegistrar implements IRegistrar {
     return false
   }
 
-  public async encounter(delta: string) {
-    await this.registrar.update([delta]).catch((e: Error) => {
+  public async encounter(delta: string[]) {
+    await this.registrar.update(delta).catch((e: Error) => {
       console.error(e)
       return false
     }) // TODO This needs to return bool?

@@ -1,19 +1,28 @@
-import { Identity } from "../identity/identity";
-import { SoftwareKeyProvider } from "@jolocom/vaulted-key-provider";
+import { Identity } from '../identity/identity'
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
 /*
  * TODO - is the prefix required on all components, or just the DID Method?
  * probably keep for all, because then the register / resolver can make sure the results are from the right did method
- * 
+ *
  * Replace the generic type T with any / string / object? Not sure if having it generic helps
  */
 
-// TODO 
+// TODO
 export interface IRegistrar {
   prefix: string
-  encounter: (change: string) => Promise<boolean>
-  create: <T>(keyProvider: SoftwareKeyProvider, password: string, creationConfig?: T) => Promise<Identity>
-  updatePublicProfile: (keyProvider: SoftwareKeyProvider, password: string, identity: Identity, publicProfile: any) => Promise<boolean> 
+  encounter: (changes: string[]) => Promise<boolean>
+  create: <T>(
+    keyProvider: SoftwareKeyProvider,
+    password: string,
+    creationConfig?: T,
+  ) => Promise<Identity>
+  updatePublicProfile: (
+    keyProvider: SoftwareKeyProvider,
+    password: string,
+    identity: Identity,
+    publicProfile: any,
+  ) => Promise<boolean>
 }
 
 export interface IResolver {
@@ -23,6 +32,6 @@ export interface IResolver {
 
 export interface IDidMethod {
   prefix: string
-  resolver: IResolver,
+  resolver: IResolver
   registrar: IRegistrar
 }
