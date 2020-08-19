@@ -25,10 +25,11 @@ export class LocalResolver implements IResolver {
   }
 
   async resolve(did: string) {
-    const jsonDidDoc = await this.resolveImplementation(did)
-      .catch(_ => {
-        throw new Error(ErrorCodes.RegistryDIDNotAnchored)
-      })
+    const jsonDidDoc = await this.resolveImplementation(
+      did.split(':')[2],
+    ).catch(_ => {
+      throw new Error(ErrorCodes.RegistryDIDNotAnchored)
+    })
 
     return Identity.fromDidDocument({
       //@ts-ignore
