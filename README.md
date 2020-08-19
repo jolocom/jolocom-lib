@@ -32,3 +32,6 @@ On VSCode, it is possible to allow ESLint to format upon saving of files, which 
 Additionally, we have included a script in package.json to allow use of ESlint/Prettier from the CLI:
 
 - `yarn format` will auto-fix as many problems as it can in the project in files with the extension `.ts`, and log unfixed errors to the console.
+
+## Contributing
+[Help Develop Jolocom Software](https://github.com/jolocom/jolocom#contributing)
