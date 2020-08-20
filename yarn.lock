@@ -157,10 +157,10 @@
   dependencies:
     cred-types-jolocom-core "^0.0.11"
 
-"@jolocom/vaulted-key-provider@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.5.0.tgz#ba0b2137e926f15486d6f52ea722d885918cfed4"
-  integrity sha512-oD1w3SY2CZdPYauC+1VVQM0I6q7m8C5DM/GCAorwc4oBXQWHY59Nf/bhAA/PuUuGNns7rM/SX6tbPqyCNh+OZg==
+"@jolocom/vaulted-key-provider@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.6.0.tgz#56e67e2393a6b82deb1eea849b2d78798b2bdd10"
+  integrity sha512-w3pse8rlmwfp3/5aoiu1kuLbXIFxhYFIgaIojsPcOANHhxZIY5hf1LFvgyat/92ekmegEhUxpDPIySE5V85EsQ==
   dependencies:
     rfc4648 "^1.4.0"
 

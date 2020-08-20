@@ -27,7 +27,11 @@ import {
 } from '../interactionTokens/interactionTokens.types'
 import { ErrorCodes } from '../errors'
 import { JoloDidMethod } from '../didMethods/jolo'
-import { IVaultedKeyProvider, IKeyRefArgs, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
+import {
+  IVaultedKeyProvider,
+  IKeyRefArgs,
+  KeyTypes,
+} from '@jolocom/vaulted-key-provider'
 import { getCryptoProvider } from '@jolocom/vaulted-key-provider/js/cryptoProvider'
 import { getRandomBytes } from '../utils/crypto'
 import { cryptoUtils } from '@jolocom/native-utils-node'
@@ -366,9 +370,11 @@ export class IdentityWallet {
   /**
    * Encrypts data asymmetrically
    * @param data - The data to encrypt
-   * @param pubKey - The key to encrypt to
+   * @param key - The key to encrypt to
+   * @param type - The type of the key to encrypt to
    */
-  public asymEncrypt = async (data: Buffer, publicKey: PublicKeyInfo) => getCryptoProvider(cryptoUtils).encrypt(publicKey, data)
+  public asymEncrypt = async (data: Buffer, key: Buffer, type: KeyTypes) =>
+    getCryptoProvider(cryptoUtils).encrypt(key, type, data)
 
   /**
    * Encrypts data asymmetrically
@@ -377,22 +383,23 @@ export class IdentityWallet {
    * @param resolver - instance of a {@link Resolver} to use for retrieving the target's public keys. If none is provided, the
    * default Jolocom contract is used for resolution.
    */
-
   public asymEncryptToDidKey = async (
     data: Buffer,
     keyRef: string,
     resolver = new JoloDidMethod().resolver,
-  ) => this.asymEncrypt(
-      data,
-      //@ts-ignore, type: string in our .ts files vs type: KeyTypes in PublicKeyInfo
-      (await resolver.resolve(
-        keyIdToDid(keyRef)
-      )).didDocument.publicKey[0]
-    )
+  ) =>
+    await resolver.resolve(keyIdToDid(keyRef)).then(id => {
+      const pk = id.publicKeySection.find(pk => pk.id === keyRef)
+      return this.asymEncrypt(
+        data,
+        Buffer.from(pk.publicKeyHex, 'hex'),
+        pk.type as KeyTypes,
+      )
+    })
 
   /**
    * Decrypts data asymmetrically
-   * @param data - The data to decrypt 
+   * @param data - The data to decrypt
    * @param derivationArgs - The decryption private key derivation arguments
    */
   public asymDecrypt = async (
