@@ -24,9 +24,13 @@ then there is nothing extra for you to do: licensing is already handled.
 Otherwise you are an "external contributor" and you must do the following:
 
 Make sure that every file you modified or created contains a copyright notice comment like the following (at the top of the file):
-# Copyright 2014-2020 Jolocom GmbH and Jolocom contributors
-# SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
-# Code is Apache-2.0 and docs are CC-BY-4.0
+
+   ```text
+    # Copyright 2014-2020 Jolocom GmbH and Jolocom contributors
+    # SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
+    # Code is Apache-2.0 and docs are CC-BY-4.0
+   ```
+   
 If a copyright notice is not present, then add one.
 If the first line of the file is a line beginning with #! (e.g. #!/usr/bin/python3) then leave that as the first line and add the copyright notice afterwards.
 If a copyright notice is present but it says something different, then please change it to say the above.
