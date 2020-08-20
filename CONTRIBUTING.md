@@ -3,15 +3,16 @@ By contributing to any discussion, code, issues, pull requests, or other forms o
 
 ---
 How to make sure your contributions can be included in the [jolocom-lib](https://github.com/jolocom/jolocom-lib) codebase.
+
 ---
 ## Documentation Copyright Policy
 
-The copyright mode for all materials and content associated with this repository and development initiative are licensed under Creative Commons [Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
+The copyright mode for all materials and content associated with this repository and development initiative are licensed under Creative Commons [Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/legalcode).
 
 
 ## Jolocom Software Licensing
 
-The Jolocom jolocom-lib repository is licensed under an [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html). This page describes the Jolocom policy to ensure that all contributions to the jolocom-lib and jolocom-sdk code are also licensed under the Apache 2.0 license (and that the contributor has the right to license it as such).
+Most of Jolocom's repositories like jolocom-sdk, jolocom-lib and jolocom-keriox are licensed under an [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html) - each repository contains the applicable license or copyright information. This page describes the Jolocom policy to ensure that all contributions to any Jolocom codebase are compliant to the applied license (and that the contributor has the right to license it as such).
 - All contributions to Jolocom are also governed by our [Contributor Code of Conduct](https://github.com/jolocom/jolocom/blob/master/code-of-conduct).
 
 If you are:
@@ -21,6 +22,15 @@ If you are:
 then there is nothing extra for you to do: licensing is already handled.
 
 Otherwise you are an "external contributor" and you must do the following:
+
+Make sure that every file you modified or created contains a copyright notice comment like the following (at the top of the file):
+# Copyright 2014-2020 Jolocom GmbH and Jolocom contributors
+# SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
+# Code is Apache-2.0 and docs are CC-BY-4.0
+If a copyright notice is not present, then add one.
+If the first line of the file is a line beginning with #! (e.g. #!/usr/bin/python3) then leave that as the first line and add the copyright notice afterwards.
+If a copyright notice is present but it says something different, then please change it to say the above.
+Make sure you're using the correct syntax for comments (which varies from language to language). The example shown above is for a Python file.
 
 ### Sign your work
 
