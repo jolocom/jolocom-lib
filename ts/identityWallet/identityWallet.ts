@@ -404,8 +404,15 @@ export class IdentityWallet {
    */
   public asymDecrypt = async (
     data: string, // TODO double check what encoding is being used
-    keyRefArgs: IKeyRefArgs,
-  ) => this._keyProvider.decrypt(keyRefArgs, Buffer.from(data, 'base64')) // TODO
+    pass: string,
+  ) =>
+    this._keyProvider.decrypt(
+      {
+        encryptionPass: pass,
+        keyRef: this._publicKeyMetadata.signingKeyId,
+      },
+      Buffer.from(data, 'base64'),
+    )
 
   // private sendTransaction = async (
   //   request: ITransactionEncodable,

@@ -11,7 +11,7 @@ import { ISignedCredCreationArgs } from '../credentials/signedCredential/types';
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest';
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse';
 import { CredentialOfferRequestAttrs, CredentialOfferResponseAttrs, IAuthenticationAttrs, ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs } from '../interactionTokens/interactionTokens.types';
-import { IKeyRefArgs, KeyTypes } from '@jolocom/vaulted-key-provider';
+import { KeyTypes } from '@jolocom/vaulted-key-provider';
 declare type WithExtraOptions<T> = T & {
     expires?: Date;
     aud?: string;
@@ -35,7 +35,7 @@ export declare class IdentityWallet {
     validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: import("../didMethods/types").IResolver): Promise<void>;
     asymEncrypt: (data: Buffer, key: Buffer, type: KeyTypes) => Promise<Buffer>;
     asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: import("../didMethods/types").IResolver) => Promise<Buffer>;
-    asymDecrypt: (data: string, keyRefArgs: IKeyRefArgs) => Promise<Buffer>;
+    asymDecrypt: (data: string, pass: string) => Promise<Buffer>;
     create: {
         credential: typeof Credential.create;
         signedCredential: <T extends BaseMetadata>({ expires, ...credentialParams }: WithExtraOptions<ISignedCredCreationArgs<T>>, pass: string) => Promise<SignedCredential>;
