@@ -1,10 +1,10 @@
 /// <reference types="node" />
 import { IDidDocumentAttrs } from './types';
 import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections';
-import { ISigner } from '../../registries/types';
 import { IDigestable, ILinkedDataSignature } from '../../linkedDataSignature/types';
 import { IKeyDerivationArgs, IVaultedKeyProvider } from '../../vaultedKeyProvider/types';
 import { ContextEntry } from '@jolocom/protocol-ts';
+import { ISigner } from '../../credentials/signedCredential/types';
 export declare class DidDocument implements IDigestable {
     private _id;
     private _specVersion;
@@ -32,7 +32,7 @@ export declare class DidDocument implements IDigestable {
     addServiceEndpoint(endpoint: ServiceEndpointsSection): void;
     resetServiceEndpoints(): void;
     static fromPublicKey(publicKey: Buffer): Promise<DidDocument>;
-    sign(vaultedKeyProvider: IVaultedKeyProvider, derivationArgs: IKeyDerivationArgs, keyId: string): Promise<void>;
+    sign(vaultedKeyProvider: IVaultedKeyProvider, derivationArgs: IKeyDerivationArgs): Promise<void>;
     digest(): Promise<Buffer>;
     hasBeenUpdated(): void;
     toJSON(): IDidDocumentAttrs;

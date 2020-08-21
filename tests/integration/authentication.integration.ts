@@ -8,21 +8,21 @@ import { Authentication } from '../../ts/interactionTokens/authentication'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  testResolver
+  joloDidMethod
 } from './identity.integration'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
 describe('Integration Test - Token interaction flow Authentication', () => {
-  let authRequestJWT
-  let authResponseEncoded
+  let authRequestJWT: JSONWebToken<Authentication>
+  let authResponseEncoded: string
 
   it('Should correctly create an authentication request token by service', async () => {
     authRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.auth(
       jsonAuthentication,
       servicePass,
-    )
+    ) as JSONWebToken<Authentication>
 
     expect(authRequestJWT.interactionToken).to.deep.eq(
       Authentication.fromJSON(jsonAuthentication)
@@ -31,7 +31,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     return userIdentityWallet.validateJWT(
       authRequestJWT,
       undefined,
-      testResolver
+      joloDidMethod.resolver
     )
   })
 
@@ -46,7 +46,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
       await userIdentityWallet.validateJWT(
         decodedAuthRequest,
         undefined,
-        testResolver
+        joloDidMethod.resolver
       )
     } catch (err) {
       return expect(true).to.be.false
@@ -71,7 +71,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     return serviceIdentityWallet.validateJWT(
       authResponseJWT,
       authRequestJWT, 
-      testResolver
+      joloDidMethod.resolver
     )
   })
 
@@ -87,7 +87,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
       await serviceIdentityWallet.validateJWT(
         decodedAuthResponse,
         authRequestJWT,
-        testResolver
+        joloDidMethod.resolver
       )
     } catch (err) {
       return expect(true).to.be.false

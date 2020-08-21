@@ -1,9 +1,7 @@
 import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { IDigestable } from '../linkedDataSignature/types'
 import { getIssuerPublicKey } from './helper'
-import { DidDocument } from '../identity/didDocument/didDocument'
-import { convertDidDocToIDidDocumentAttrs } from './resolution'
-import { jolocomResolver } from '../registries/jolocomRegistry'
+import { JoloDidMethod } from '../didMethods/jolo'
 
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
@@ -16,14 +14,13 @@ import { jolocomResolver } from '../registries/jolocomRegistry'
 
 export const validateDigestable = async (
   toValidate: IDigestable,
-  resolver = jolocomResolver(),
+  resolver = new JoloDidMethod().resolver,
 ): Promise<boolean> => {
   const issuerIdentity = await resolver.resolve(toValidate.signer.did)
   try {
     const issuerPublicKey = getIssuerPublicKey(
       toValidate.signer.keyId,
-      // TODO Use the right type internally
-      DidDocument.fromJSON(convertDidDocToIDidDocumentAttrs(issuerIdentity))
+      issuerIdentity.didDocument
     )
     return SoftwareKeyProvider.verifyDigestable(issuerPublicKey, toValidate)
   } catch {
@@ -42,7 +39,7 @@ export const validateDigestable = async (
 
 export const validateDigestables = async (
   toValidate: IDigestable[],
-  resolver = jolocomResolver(),
+  resolver = new JoloDidMethod().resolver,
 ): Promise<boolean[]> =>
   Promise.all(
     toValidate.map(async digestable =>

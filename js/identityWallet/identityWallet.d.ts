@@ -14,7 +14,6 @@ import { ITransactionEncodable } from '../contracts/types';
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest';
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse';
 import { CredentialOfferRequestAttrs, CredentialOfferResponseAttrs, IAuthenticationAttrs, ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs, IPaymentRequestAttrs, IPaymentResponseAttrs } from '../interactionTokens/interactionTokens.types';
-import { DidDocument } from '../identity/didDocument/didDocument';
 interface PaymentRequestCreationArgs {
     callbackURL: string;
     description: string;
@@ -35,7 +34,7 @@ export declare class IdentityWallet {
     private _contractsGateway;
     did: string;
     identity: Identity;
-    didDocument: DidDocument;
+    didDocument: import("../identity/didDocument/didDocument").DidDocument;
     publicKeyMetadata: IKeyMetadata;
     private vaultedKeyProvider;
     constructor({ identity, publicKeyMetadata, vaultedKeyProvider, contractsGateway, contractsAdapter, }: IIdentityWalletCreateArgs);
@@ -46,9 +45,9 @@ export declare class IdentityWallet {
     private messageCannonicaliser;
     getPublicKeys: (encryptionPass: string) => PublicKeyMap;
     private initializeAndSign;
-    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: import("did-resolver").Resolver): Promise<void>;
+    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: import("../didMethods/types").IResolver): Promise<void>;
     asymEncrypt: (data: Buffer, publicKey: Buffer) => Promise<string>;
-    asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: import("did-resolver").Resolver) => Promise<string>;
+    asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: import("../didMethods/types").IResolver) => Promise<string>;
     asymDecrypt: (data: string, decryptionKeyArgs: IKeyDerivationArgs) => Promise<Buffer>;
     private sendTransaction;
     transactions: {

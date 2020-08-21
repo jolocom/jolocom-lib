@@ -1,7 +1,9 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { validateJsonLd } from '../../ts/linkedData'
-import { Resolver } from 'did-resolver'
+import { Identity } from '../../ts/identity/identity'
+import { DidDocument } from '../../ts/identity/didDocument/didDocument'
+import { IResolver } from '../../ts/didMethods/types'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -85,10 +87,13 @@ const DID_DOC_V0 = {
 
 describe('linkedData validation functions', () => {
   it('validateJsonLd should correctly validate', async () => {
-    const testResolver = new Resolver({
-      //@ts-ignore
-      jolo: () => DID_DOC_V0,
-    })
+    const testResolver: IResolver = {
+      prefix: 'test',
+      resolve: async () =>
+        Identity.fromDidDocument({
+          didDocument: DidDocument.fromJSON(DID_DOC_V0),
+        }),
+    }
 
     const mallformedV0 = {
       ...DID_DOC_V0,

@@ -137,6 +137,14 @@
     resolve-from "^5.0.0"
     resolve-global "^1.0.0"
 
+"@decentralized-identity/did-common-typescript@^0.1.19":
+  version "0.1.19"
+  resolved "https://registry.yarnpkg.com/@decentralized-identity/did-common-typescript/-/did-common-typescript-0.1.19.tgz#91c6dd59311e849cbc91fcff81b65c1a966163b6"
+  integrity sha512-GB3ZLXiyBmzbdur6dwqlf26+LSqeza2i5rE3sCu0vcbZ1R5+Av/vQyTZvh3zD/s4/8bdsnH942IvGu+sQqacqw==
+  dependencies:
+    base64url "^3.0.1"
+    clone "^2.1.2"
+
 "@jolocom/protocol-ts@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@jolocom/protocol-ts/-/protocol-ts-0.2.0.tgz#a10b4a6636e266293a591afbd0a063075b24e9b9"
@@ -1856,7 +1864,7 @@ cliui@^4.0.0:
     strip-ansi "^4.0.0"
     wrap-ansi "^2.0.0"
 
-clone@2.1.2, clone@^2.0.0:
+clone@2.1.2, clone@^2.0.0, clone@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
   integrity sha1-G39Ln1kfHo+DZwQBYANFoCiHQ18=
@@ -1898,6 +1906,13 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.7.tgz#2d1d24317afb8abe95d6d2c0b07b57813539d828"
   integrity sha512-brWl9y6vOB1xYPZcpZde3N9zDByXTosAeMDo4p1wzo6UMOX4vumB+TP1RZ76sfE6Md68Q0NJSrE/gbezd4Ul+w==
+  dependencies:
+    delayed-stream "~1.0.0"
+
+combined-stream@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.8.tgz#c3d45a8b34fd730631a110a8a2520682b31d5a7f"
+  integrity sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==
   dependencies:
     delayed-stream "~1.0.0"
 
@@ -3583,6 +3598,15 @@ form-data@^2.3.3, form-data@~2.3.2:
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
 
+form-data@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/form-data/-/form-data-3.0.0.tgz#31b7e39c85f1355b7139ee0c647cf0de7f83c682"
+  integrity sha512-CKMFDglpbMi6PyN+brwB9Q/GOw0eAnsrEZDgcsH5Krhz5Od/haKHAX0NmQfha2zPPz0JpWzA7GJHGSnvCRLWsg==
+  dependencies:
+    asynckit "^0.4.0"
+    combined-stream "^1.0.8"
+    mime-types "^2.1.12"
+
 formidable@^1.2.0:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/formidable/-/formidable-1.2.1.tgz#70fb7ca0290ee6ff961090415f4b3df3d2082659"
@@ -4957,6 +4981,16 @@ joi@^14.3.1:
     isemail "3.x.x"
     topo "3.x.x"
 
+jolo-did-registry@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/jolo-did-registry/-/jolo-did-registry-1.0.1.tgz#96655f9081050f3608f6f70ef89215c24a87cb11"
+  integrity sha512-vgjZi5hAtV4/0Hj2JjrN5uLzboBpMknyL07+0JRRS2awMlX1PZ4iRKnXZiXaz94cENsrsoDwpHikzitgblEMSg==
+  dependencies:
+    detect-node "^2.0.4"
+    form-data "^3.0.0"
+    jolocom-registry-contract "^0.3.0"
+    node-fetch "^2.6.0"
+
 jolo-did-resolver@0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/jolo-did-resolver/-/jolo-did-resolver-0.2.1.tgz#fe1e2518955c965fe330b64a3fc8ac77a579fe85"
@@ -4967,7 +5001,7 @@ jolo-did-resolver@0.2.1:
     jolocom-registry-contract "0.3.0"
     node-fetch "^2.6.0"
 
-jolocom-registry-contract@0.3.0:
+jolocom-registry-contract@0.3.0, jolocom-registry-contract@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/jolocom-registry-contract/-/jolocom-registry-contract-0.3.0.tgz#43056703b5b7839a9ad9f7a9edec81342504587a"
   integrity sha512-5n/c+xeLUuzYyHEmeHyz3DNWM/8qklQYLNCQV6BBdc2OwwSsP2Q+a+bGsSxcxp/QlP7UEBqnUbkBBubRzq7v/A==

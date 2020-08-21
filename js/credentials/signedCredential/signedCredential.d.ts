@@ -1,11 +1,10 @@
 /// <reference types="node" />
 import 'reflect-metadata';
-import { ISignedCredCreationArgs, ISignedCredentialAttrs } from './types';
+import { ISignedCredCreationArgs, ISignedCredentialAttrs, ISigner } from './types';
 import { IDigestable, ILinkedDataSignature } from '../../linkedDataSignature/types';
 import { BaseMetadata } from '@jolocom/protocol-ts';
 import { IClaimSection } from '../credential/types';
 import { JsonLdContext } from '../../linkedData/types';
-import { ISigner } from '../../registries/types';
 interface IIssInfo {
     keyId: string;
     issuerDid: string;

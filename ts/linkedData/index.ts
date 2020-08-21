@@ -4,9 +4,7 @@ import { getIssuerPublicKey, keyIdToDid } from '../utils/helper'
 import { sha256 } from '../utils/crypto'
 import { canonize } from 'jsonld'
 import { JsonLdObject, SignedJsonLdObject, JsonLdContext } from './types'
-import { convertDidDocToIDidDocumentAttrs } from '../utils/resolution'
-import { DidDocument } from '../identity/didDocument/didDocument'
-import { jolocomResolver } from '../registries/jolocomRegistry'
+import { JoloDidMethod } from '../didMethods/jolo'
 
 /**
  * Helper function to handle JsonLD normalization.
@@ -67,13 +65,13 @@ export const digestJsonLd = async (
 
 export const validateJsonLd = async (
   json: SignedJsonLdObject,
-  resolver = jolocomResolver()
+  resolver = new JoloDidMethod().resolver
 ): Promise<boolean> => {
   const issuerIdentity = await resolver.resolve(keyIdToDid(json.proof.creator))
   try {
     const issuerPublicKey = getIssuerPublicKey(
       json.proof.creator,
-      DidDocument.fromJSON(convertDidDocToIDidDocumentAttrs(issuerIdentity))
+      issuerIdentity.didDocument
     )
 
     return SoftwareKeyProvider.verify(

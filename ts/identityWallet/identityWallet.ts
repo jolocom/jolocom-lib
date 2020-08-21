@@ -25,7 +25,6 @@ import {
   getIssuerPublicKey,
   publicKeyToAddress,
 } from '../utils/helper'
-import { jolocomResolver } from '../registries/jolocomRegistry'
 import {
   IContractsAdapter,
   IContractsGateway,
@@ -44,9 +43,8 @@ import {
   IPaymentRequestAttrs,
   IPaymentResponseAttrs,
 } from '../interactionTokens/interactionTokens.types'
-import { DidDocument } from '../identity/didDocument/didDocument'
 import { ErrorCodes } from '../errors'
-import { convertDidDocToIDidDocumentAttrs } from '../utils/resolution'
+import { JoloDidMethod } from '../didMethods/jolo'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -398,13 +396,14 @@ export class IdentityWallet {
    * default Jolocom contract is used for resolution.
    */
 
+  // TODO Should this just take a resolve function? Probably yes
   public async validateJWT<T, R>(
     receivedJWT: JSONWebToken<T>,
     sentJWT?: JSONWebToken<R>,
-    resolver = jolocomResolver(),
+    resolver = new JoloDidMethod().resolver,
   ): Promise<void> {
-    const result = convertDidDocToIDidDocumentAttrs(await resolver.resolve(keyIdToDid(receivedJWT.issuer)))
-    const pubKey = getIssuerPublicKey(receivedJWT.issuer, DidDocument.fromJSON(result))
+    const issuer = await resolver.resolve(keyIdToDid(receivedJWT.issuer))
+    const pubKey = getIssuerPublicKey(receivedJWT.issuer, issuer.didDocument)
 
     // First we make sure the signature on the interaction token is valid
     if (!(await SoftwareKeyProvider.verifyDigestable(pubKey, receivedJWT))) {
@@ -455,18 +454,14 @@ export class IdentityWallet {
   public asymEncryptToDidKey = async (
     data: Buffer,
     keyRef: string,
-    resolver = jolocomResolver(),
+    resolver = new JoloDidMethod().resolver,
   ) => this.asymEncrypt(
       data,
       getIssuerPublicKey(
         keyRef,
-        DidDocument.fromJSON(
-          convertDidDocToIDidDocumentAttrs(
-            await resolver.resolve(
-              keyIdToDid(keyRef)
-            )
-          )
-        )
+        (await resolver.resolve(
+          keyIdToDid(keyRef)
+        )).didDocument
       )
     )
 

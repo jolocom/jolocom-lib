@@ -14,7 +14,6 @@ import {
   PublicKeySection,
   ServiceEndpointsSection,
 } from './sections'
-import { ISigner } from '../../registries/types'
 import { defaultContextIdentity } from '../../utils/contexts'
 import { publicKeyToDID } from '../../utils/crypto'
 import { digestJsonLd } from '../../linkedData'
@@ -28,6 +27,7 @@ import {
   IVaultedKeyProvider,
 } from '../../vaultedKeyProvider/types'
 import { ContextEntry } from '@jolocom/protocol-ts'
+import { ISigner } from '../../credentials/signedCredential/types'
 
 /**
  * Class modelling a Did Document
@@ -229,7 +229,7 @@ export class DidDocument implements IDigestable {
   public get signer(): ISigner {
     return {
       did: this._id,
-      keyId: this._proof.creator,
+      keyId: (this._proof && this._proof.creator) || this._publicKey[0].id,
     }
   }
 
@@ -347,10 +347,9 @@ export class DidDocument implements IDigestable {
   public async sign(
     vaultedKeyProvider: IVaultedKeyProvider,
     derivationArgs: IKeyDerivationArgs,
-    keyId: string,
   ): Promise<void> {
     this._proof = new EcdsaLinkedDataSignature()
-    this._proof.creator = keyId
+    this._proof.creator = this.signer.keyId
     this._proof.signature = ''
     this._proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
 
