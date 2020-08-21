@@ -1,7 +1,7 @@
 import { IDigestable } from '../linkedDataSignature/types'
 import { JoloDidMethod } from '../didMethods/jolo'
 import { KeyTypes, getCryptoProvider } from '@jolocom/vaulted-key-provider'
-import { cryptoUtils } from '@jolocom/native-utils-node'
+import { cryptoUtils } from '@jolocom/native-core-node'
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
  * @param toValidate - Instance of object implementing the {@link IDigestable} interface

@@ -8,7 +8,7 @@ import {
   getIdFromEvent,
   validateEvents,
   getIcp,
-} from '@jolocom/native-utils-node'
+} from '@jolocom/native-core-node'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
 interface CreationReturn {
