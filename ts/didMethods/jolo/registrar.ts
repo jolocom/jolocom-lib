@@ -110,17 +110,20 @@ export class JolocomRegistrar implements IRegistrar {
 
       const did = publicKeyToDID(Buffer.from(signingKey.publicKeyHex, 'hex'))
 
-      await keyProvider.setKeyController({
-        encryptionPass: password,
-        keyRef: SIGNING_KEY_REF
-      }, `${did}:${SIGNING_KEY_REF}`)
+      await keyProvider.setKeyController(
+        {
+          encryptionPass: password,
+          keyRef: SIGNING_KEY_REF,
+        },
+        `${did}#${SIGNING_KEY_REF}`,
+      )
 
       await keyProvider.changeId(password, did)
 
       await keyProvider.newKeyPair(
         password,
         KeyTypes.ecdsaSecp256k1RecoveryMethod2020,
-        `${did}:${ANCHOR_KEY_REF}`,
+        `${did}#${ANCHOR_KEY_REF}`,
       )
     }
 
