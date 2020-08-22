@@ -10,7 +10,8 @@ import { parseAndValidate } from '../../parse/parseAndValidate'
 type Resolve = (did: string) => Promise<DIDDocument>
 
 export class JolocomResolver implements IResolver {
-  prefix: 'jolo'
+  prefix = 'jolo'
+
   private resolutionFunctions: {
     resolve: Resolve,
     getPublicProfile: (didDoc: DIDDocument) => any

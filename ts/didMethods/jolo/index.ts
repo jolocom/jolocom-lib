@@ -4,7 +4,7 @@ import { JolocomRegistrar } from "./registrar"
 import { PROVIDER_URL, CONTRACT_ADDRESS, IPFS_ENDPOINT } from "./constants"
 
 export class JoloDidMethod implements IDidMethod {
-  public prefix: 'jolo'
+  public prefix = 'jolo'
   public resolver: IResolver
   public registrar: IRegistrar
 

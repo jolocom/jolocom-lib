@@ -11,7 +11,7 @@ import {
 } from '../utils'
 
 export class LocalDidMethod implements IDidMethod {
-  public prefix: 'un'
+  public prefix = 'un'
   public resolver: IResolver
   public registrar: IRegistrar
   private db: InternalDb // TODO Better type, InternalDb doesn't make a lot of sense

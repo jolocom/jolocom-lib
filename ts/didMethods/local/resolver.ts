@@ -10,7 +10,7 @@ import { DIDDocument, Resolver } from "did-resolver";
 type Resolve = (did: string) => Promise<DIDDocument>
 
 export class LocalResolver implements IResolver {
-  prefix: 'un'
+  prefix = 'un'
   db: InternalDb
   private resolveImplementation: Resolve
 
