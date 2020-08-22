@@ -8,13 +8,14 @@ import { IRegistrar } from '../types'
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { PROVIDER_URL, CONTRACT_ADDRESS, IPFS_ENDPOINT } from './constants'
 import {
-  IVaultedKeyProvider,
   KeyTypes,
   SoftwareKeyProvider,
   EncryptedWalletUtils,
+  PublicKeyInfo
 } from '@jolocom/vaulted-key-provider'
 import { publicKeyToDID } from '../../utils/crypto'
 import { fromSeed } from 'bip32'
+import { validateDigestable } from '../../utils/validation'
 
 const SIGNING_KEY_REF = `keys-1`
 const ANCHOR_KEY_REF = `keys-2`
@@ -30,17 +31,26 @@ export const joloSeedToEncryptedWallet = async (
   const ethKeys = fromSeed(seed).derivePath(ETH_DERIVATION_PATH)
   const did = publicKeyToDID(joloKeys.publicKey)
 
-  const skp = await SoftwareKeyProvider.newEmptyWallet(impl, did, newPassword)
+  const skp = await SoftwareKeyProvider.newEmptyWallet(
+    impl,
+    did,
+    newPassword
+  )
+
+  await skp.changeId(newPassword, did)
+
   await skp.addContent(newPassword, {
     type: ['BIP32JolocomIdentitySeedv0'],
     value: seed.toString('hex'),
   })
+
   await skp.addContent(newPassword, {
     controller: [`${did}#${SIGNING_KEY_REF}`],
     type: KeyTypes.ecdsaSecp256k1VerificationKey2019,
     publicKeyHex: joloKeys.publicKey.toString('hex'),
     private_key: joloKeys.privateKey.toString('hex'),
   })
+
   await skp.addContent(newPassword, {
     controller: [`${did}#${ANCHOR_KEY_REF}`],
     type: KeyTypes.ecdsaSecp256k1RecoveryMethod2020,
@@ -64,28 +74,46 @@ export class JolocomRegistrar implements IRegistrar {
   }
 
   async create(keyProvider: SoftwareKeyProvider, password: string) {
-    // generate a new key, add it to the vkp with the expected id, use that, then move the api to the vkp
+    let signingKey: PublicKeyInfo
 
-    // TODO Does this matter?
-    if (keyProvider.id !== 'id') {
-      throw new Error('I SHOULD BE SETTING THIS FOR NOW')
+    if(keyProvider.id.includes(`did:${this.prefix}`)) {
+      const existingSigningKey = await keyProvider.getPubKeyByController(
+        password,
+        `${keyProvider.id}#${SIGNING_KEY_REF}`,
+      )
+
+      const existingAnchoringKey = await keyProvider.getPubKeyByController(
+         password,
+        `${keyProvider.id}#${ANCHOR_KEY_REF}`,
+      )
+
+      if (!existingSigningKey || !existingAnchoringKey) {
+        throw new Error('vault has jolo id, but is either missing the signing or anchoring keys')
+      }
+
+      signingKey = existingSigningKey
+    } else {
+      signingKey = await keyProvider.newKeyPair(
+        password,
+        KeyTypes.ecdsaSecp256k1VerificationKey2019,
+        SIGNING_KEY_REF,
+      )
+
+      const did = publicKeyToDID(Buffer.from(signingKey.publicKeyHex, 'hex'))
+
+      await keyProvider.setKeyController({
+        encryptionPass: password,
+        keyRef: SIGNING_KEY_REF
+      }, `${did}:${SIGNING_KEY_REF}`)
+
+      await keyProvider.changeId(password, did)
+
+      await keyProvider.newKeyPair(
+        password,
+        KeyTypes.ecdsaSecp256k1RecoveryMethod2020,
+        `${did}:${ANCHOR_KEY_REF}`,
+      )
     }
-
-    await keyProvider.newKeyPair(
-      password,
-      KeyTypes.ecdsaSecp256k1VerificationKey2019,
-      ANCHOR_KEY_REF,
-    )
-
-    const signingKey = await keyProvider.newKeyPair(
-      password,
-      KeyTypes.ecdsaSecp256k1VerificationKey2019,
-      SIGNING_KEY_REF,
-    )
-
-    const did = publicKeyToDID(Buffer.from(signingKey.publicKeyHex, 'hex'))
-
-    keyProvider.changeId(password, did)
 
     const identity = Identity.fromDidDocument({
       didDocument: await DidDocument.fromPublicKey(
@@ -93,15 +121,12 @@ export class JolocomRegistrar implements IRegistrar {
       ),
     })
 
-    // TODO
     await this.signDidDocument(identity.didDocument, keyProvider, password)
-
-    await this.update(keyProvider, password, identity.didDocument)
+    await this.update(identity.didDocument, keyProvider, password)
 
     return identity
   }
 
-  // TODO Verify signature on the public profile? Or just assume it's correct
   // TODO Public profile should perhaps be JSON / any, so that the registrars can be used without having to typecheck / guard / use generics
   async updatePublicProfile(
     keyProvider: SoftwareKeyProvider,
@@ -111,25 +136,24 @@ export class JolocomRegistrar implements IRegistrar {
   ) {
     const { didDocument } = identity
 
-    const publicProfileEntry = ServiceEndpointsSection.fromJSON(
-      await this.registry.publishPublicProfile(
-        identity.did,
-        publicProfile.toJSON(),
-      ),
+    // TODO Better message
+    if (!await validateDigestable(publicProfile, identity)) {
+      throw new Error('Could not verify signature on the public profile. Update aborted.')
+    }
+
+    const pubProfSection = ServiceEndpointsSection.fromJSON(
+      await this.registry.publishPublicProfile(identity.did, publicProfile)
     )
 
-    const oldPublicProfileEntry = didDocument.service.findIndex(
-      ({ type }) =>
-        type ===
-        claimsMetadata.publicProfile.type[
-          claimsMetadata.publicProfile.type.length - 1
-        ],
-    )
+    const oldPublicProfileEntry = didDocument.service.findIndex(({ type }) =>
+      type === claimsMetadata.publicProfile.type[
+        claimsMetadata.publicProfile.type.length - 1
+      ])
 
     if (oldPublicProfileEntry !== -1) {
-      didDocument.service.splice(oldPublicProfileEntry, 1, publicProfileEntry)
+      didDocument.service.splice(oldPublicProfileEntry, 1, pubProfSection)
     } else {
-      didDocument.addServiceEndpoint(publicProfileEntry)
+      didDocument.addServiceEndpoint(pubProfSection)
     }
 
     identity.publicProfile = publicProfile
@@ -140,44 +164,52 @@ export class JolocomRegistrar implements IRegistrar {
   }
 
   public async encounter(): Promise<Identity> {
-    throw new Error(`"encounter" not implemented for did:${this.prefix}`) // TODO Better error
+    throw new Error(`"encounter" not implemented for did:${this.prefix}`)
   }
 
   private async signDidDocument(
     didDocument: DidDocument,
-    keyProvider: IVaultedKeyProvider,
+    keyProvider: SoftwareKeyProvider,
     password: string,
   ) {
     didDocument.hasBeenUpdated()
     return didDocument.sign(keyProvider, {
-      keyRef: SIGNING_KEY_REF,
+      keyRef: `${keyProvider.id}#${SIGNING_KEY_REF}`,
       encryptionPass: password,
     })
   }
 
-  // TODO Won't work because we can't do eth tx signing in the VKP
   private async update(
-    keyProvider: SoftwareKeyProvider,
-    password: string,
     didDocument: DidDocument,
+    keyProvider: SoftwareKeyProvider,
+    password: string
   ) {
-    // Essentialy sign_raw with the encoded TX kinda, not really, this is Recoverable signature
-    const anchoringKey = await keyProvider.getPubKey({
-      encryptionPass: password,
-      keyRef: ANCHOR_KEY_REF,
-    })
+    const anchoringKey = await keyProvider.getPubKeyByController(
+      password,
+      `${keyProvider.id}#${ANCHOR_KEY_REF}`,
+    )
 
     if (!anchoringKey) {
-      throw new Error('CAN NOT ANCHOR, NO KEY')
+      throw new Error("No anchoring key found")
     }
+
+    const unsignedTx = await this.registry.publishDidDocument(
+      Buffer.from(anchoringKey.publicKeyHex.slice(2), 'hex'),
+      //@ts-ignore
+      didDocument.toJSON()
+    )
 
     await fuelKeyWithEther(Buffer.from(anchoringKey.publicKeyHex, 'hex'))
 
-    // TODO The TX needs to be assembled here
-    return this.registry.commitDidDoc(
-      Buffer.from('', 'hex'),
-      // @ts-ignore TODO The DID Document related types need to be harmonized
-      didDocument.toJSON(),
-    )
+    const signature = await keyProvider.sign({
+      keyRef: anchoringKey.controller[0],
+      encryptionPass: password
+    }, Buffer.from(unsignedTx.slice(2), 'hex'))
+
+    return this.registry.broadcastTransaction(unsignedTx, {
+      r: '0x' + signature.slice(0, 32).toString('hex'),
+      s: '0x' + signature.slice(32, 64).toString('hex'),
+      recoveryParam: signature[64]
+    }).catch(console.log).then(() => true)
   }
 }

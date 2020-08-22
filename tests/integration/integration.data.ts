@@ -1,5 +1,5 @@
 import { claimsMetadata } from '@jolocom/protocol-ts'
-import { walletUtils } from '@jolocom/native-utils-node'
+import { walletUtils } from '@jolocom/native-core-node-linux-x64'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
 /* Local configuration for ganache server. the contract address is deterministic */
@@ -21,7 +21,7 @@ export const deployerEthKey =
   '0x18e12d1ddf1275201ab20f50dbcc2b7cd6ff21653cc6ac0acd01414862d265c7'
 
 /* The seed for instantiating the user's vault */
-const userSeed = Buffer.from(
+export const userSeed = Buffer.from(
   '901271e3f39bc97987193bfaf986a1590191d83f12d136d3039f6d5a5d837201',
   'hex',
 )

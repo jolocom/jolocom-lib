@@ -10,7 +10,8 @@ import {
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  localDidMethod
+  localDidMethod,
+  joloDidMethod
 } from './identity.integration'
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { CredentialsReceive } from '../../ts/interactionTokens/credentialsReceive'
@@ -57,7 +58,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       await userIdentityWallet.validateJWT(
         decodedCredOfferRequest,
         null,
-        localDidMethod.resolver
+        joloDidMethod.resolver
       )
     } catch (err) {
       return expect(true).to.be.false
@@ -141,7 +142,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
       await userIdentityWallet.validateJWT(
         decodedCredReceive,
         credOfferResponseJWT,
-        localDidMethod.resolver
+        joloDidMethod.resolver
       )
     } catch (err) {
       return expect(true).to.be.false

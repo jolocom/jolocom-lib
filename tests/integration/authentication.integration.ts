@@ -8,7 +8,8 @@ import { Authentication } from '../../ts/interactionTokens/authentication'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  localDidMethod
+  localDidMethod,
+  joloDidMethod
 } from './identity.integration'
 
 chai.use(sinonChai)
@@ -31,7 +32,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     return userIdentityWallet.validateJWT(
       authRequestJWT,
       undefined,
-      localDidMethod.resolver
+      joloDidMethod.resolver
     )
   })
 
@@ -46,7 +47,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
       await userIdentityWallet.validateJWT(
         decodedAuthRequest,
         undefined,
-        localDidMethod.resolver
+        joloDidMethod.resolver
       )
     } catch (err) {
       return expect(true).to.be.false

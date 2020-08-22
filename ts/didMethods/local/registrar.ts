@@ -8,7 +8,7 @@ import {
   getIdFromEvent,
   validateEvents,
   getIcp,
-} from '@jolocom/native-utils-node'
+} from '@jolocom/native-core-node-linux-x64'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
 interface CreationReturn {
@@ -24,7 +24,11 @@ interface CreationParams {
 }
 
 const createFromIcp = async (p: CreationParams): Promise<CreationReturn> =>
-  JSON.parse(await getIcp(p.encryptedWallet, p.id, p.pass)) as CreationReturn
+    getIcp({
+      encryptedWallet: p.encryptedWallet,
+      id: p.id,
+      pass: p.pass
+    })
 
 export class LocalRegistrar implements IRegistrar {
   public prefix = 'un'

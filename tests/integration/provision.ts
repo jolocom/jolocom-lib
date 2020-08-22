@@ -13,7 +13,7 @@ const ganacheServer = ganache.server({
     { secretKey: deployerEthKey, balance },
     { secretKey: userEthKey, balance },
     { secretKey: serviceEthKey, balance },
-  ],
+  ]
 })
 
 // const daemonFactory = IPFSFactory.create({ type: 'go' })
@@ -34,6 +34,7 @@ const deployContract = async () => {
     RegistryContract.bytecode,
     wallet,
   )
+
   let contract = await factory.deploy()
   await contract.deployed()
   return contract.address

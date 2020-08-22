@@ -32,7 +32,7 @@ import { JoloDidMethod } from '../didMethods/jolo'
 import { IVaultedKeyProvider, IKeyRefArgs, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
 import { getCryptoProvider } from '@jolocom/vaulted-key-provider/js/cryptoProvider'
 import { getRandomBytes } from '../utils/crypto'
-import { cryptoUtils } from '@jolocom/native-utils-node'
+import { cryptoUtils } from '@jolocom/native-core-node-linux-x64'
 import { validateDigestable } from '../utils/validation'
 
 /**
@@ -374,7 +374,11 @@ export class IdentityWallet {
    * @param data - The data to encrypt
    * @param pubKey - The key to encrypt to
    */
-  public asymEncrypt = async (data: Buffer, publicKey: PublicKeyInfo) => getCryptoProvider(cryptoUtils).encrypt(publicKey, data)
+  public asymEncrypt = async (data: Buffer, publicKey: PublicKeyInfo) => getCryptoProvider(cryptoUtils).encrypt(
+    Buffer.from(publicKey.publicKeyHex.slice(2), 'hex'),
+    publicKey.type,
+    data
+  )
 
   /**
    * Encrypts data asymmetrically

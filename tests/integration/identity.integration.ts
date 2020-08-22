@@ -7,7 +7,8 @@ import {
   userPass,
   getNewVault,
   servicePass,
-  testIpfsConfig
+  testIpfsConfig,
+  userSeed,
 } from './integration.data'
 import { ContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
@@ -18,8 +19,9 @@ import { LocalDidMethod } from '../../ts/didMethods/local'
 import { createIdentityFromKeyProvider, authAsIdentityFromKeyProvider } from '../../ts/didMethods/utils'
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
-import { walletUtils } from '@jolocom/native-utils-node'
+import { walletUtils } from '@jolocom/native-core-node-linux-x64'
 import { createDb } from 'local-did-resolver/js/db'
+import { joloSeedToEncryptedWallet } from '../../ts/didMethods/jolo/registrar'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -46,18 +48,24 @@ before(async () => {
   const eventDb = createDb()
   localDidMethod = new LocalDidMethod(eventDb)
 
-//  const ipfsHost = `${testIpfsConfig.protocol}://${testIpfsConfig.host}:${testIpfsConfig.port}`
-//  joloDidMethod = new JoloDidMethod(
-//    testEthereumConfig.providerUrl,
-//    testEthereumConfig.contractAddress,
-//    // ipfsHost,
-//  )
+
+  // const ipfsHost = `${testIpfsConfig.protocol}://${testIpfsConfig.host}:${testIpfsConfig.port}`
+  joloDidMethod = new JoloDidMethod(
+    testEthereumConfig.providerUrl,
+    testEthereumConfig.contractAddress,
+    // ipfsHost,
+  )
 
   userVault = await getNewVault('id', userPass)
-  serviceVault = await getNewVault('id', servicePass)
+  const serviceVault = await joloSeedToEncryptedWallet(
+    userSeed,
+    servicePass,
+    walletUtils,
+  )
 
+  // const miracle = await createIdentityFromKeyProvider(userVault, userPass, joloDidMethod.registrar)
   userIdentityWallet = await createIdentityFromKeyProvider(userVault, userPass, localDidMethod.registrar)
-  serviceIdentityWallet = await createIdentityFromKeyProvider(serviceVault, servicePass, localDidMethod.registrar)
+  serviceIdentityWallet = await createIdentityFromKeyProvider(serviceVault, servicePass, joloDidMethod.registrar)
 })
 
 describe('Integration Test - Create, Resolve, Public Profile', () => {
@@ -73,7 +81,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       userIdentityWallet.did,
     )
 
-    const remoteServiceIdentity = await localDidMethod.resolver.resolve(
+    const remoteServiceIdentity = await joloDidMethod.resolver.resolve(
       serviceIdentityWallet.did,
     )
 

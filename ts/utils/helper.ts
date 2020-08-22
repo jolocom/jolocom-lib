@@ -54,7 +54,8 @@ export const mapPublicKeys = async (
   identity: Identity,
   vkpKeys: PublicKeyInfo[],
 ): Promise<IKeyMetadata> => {
-  const signingKeyRef = `${identity.didDocument.signer.did}${identity.didDocument.signer.keyId}`
+  const { keyId, did } = identity.didDocument.signer
+  let signingKeyRef = keyId.includes('did:') ? keyId : `${did}${keyId}`
 
   const sigKey = vkpKeys.some(k =>
     k.controller.find(c =>

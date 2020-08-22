@@ -21,7 +21,7 @@ import {
 } from '../../ts/identity/didDocument/sections'
 import { normalizeJsonLd } from '../../ts/linkedData'
 import { SoftwareKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
-import { walletUtils } from '@jolocom/native-utils-node'
+import { walletUtils } from '@jolocom/native-core-node-linux-x64'
 import { IPublicKeySectionAttrs } from '../../ts/identity/didDocument/sections/types'
 
 const expect = chai.expect
