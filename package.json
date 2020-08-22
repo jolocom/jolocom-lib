@@ -71,7 +71,7 @@
   "dependencies": {
     "@jolocom/jolo-did-registrar": "^1.0.0-rc.0.1",
     "@jolocom/jolo-did-resolver": "^1.0.0-rc.0.1",
-    "@jolocom/native-core-node-linux-x64": "/home/eg/Documents/work/rust-multi-target/node/platform-arch-pkg/jolocom-native-core-node-linux-x64-0.7.5.tgz",
+    "@jolocom/native-core-node": "^0.7.11",
     "@jolocom/protocol-ts": "^0.5.1",
     "@jolocom/vaulted-key-provider": "^0.7.0",
     "base64url": "^3.0.1",

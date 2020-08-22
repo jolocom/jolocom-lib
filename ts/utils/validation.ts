@@ -1,7 +1,7 @@
 import { IDigestable } from '../linkedDataSignature/types'
 import { JoloDidMethod } from '../didMethods/jolo'
 import { KeyTypes, getCryptoProvider } from '@jolocom/vaulted-key-provider'
-import { cryptoUtils } from '@jolocom/native-core-node-linux-x64'
+import { cryptoUtils } from '@jolocom/native-core-node'
 import { Identity } from '../identity/identity'
 import { IResolver } from '../didMethods/types'
 

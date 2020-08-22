@@ -15,7 +15,7 @@ import {
 } from '../../ts/didMethods/utils'
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
-import { walletUtils } from '@jolocom/native-core-node-linux-x64'
+import { walletUtils } from '@jolocom/native-core-node'
 import { createDb } from 'local-did-resolver/js/db'
 
 chai.use(sinonChai)

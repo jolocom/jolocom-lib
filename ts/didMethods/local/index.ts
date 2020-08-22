@@ -3,7 +3,7 @@ import { IdentityWallet } from '../../identityWallet/identityWallet'
 import { LocalRegistrar } from './registrar'
 import { LocalResolver } from './resolver'
 import { InternalDb, createDb } from 'local-did-resolver/js/db'
-import { validateEvents } from '@jolocom/native-core-node-linux-x64'
+import { validateEvents } from '@jolocom/native-core-node'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 import {
   createIdentityFromKeyProvider,

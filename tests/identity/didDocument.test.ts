@@ -20,8 +20,8 @@ import {
   PublicKeySection,
 } from '../../ts/identity/didDocument/sections'
 import { normalizeJsonLd } from '../../ts/linkedData'
-import { SoftwareKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
-import { walletUtils } from '@jolocom/native-core-node-linux-x64'
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
+import { walletUtils } from '@jolocom/native-core-node'
 import { IPublicKeySectionAttrs } from '../../ts/identity/didDocument/sections/types'
 
 const expect = chai.expect

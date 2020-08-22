@@ -494,9 +494,23 @@
     jolocom-registry-contract "^0.5.0"
     node-fetch "^2.6.0"
 
-"@jolocom/native-core-node-linux-x64@file:../rust-multi-target/node/platform-arch-pkg/jolocom-native-core-node-linux-x64-0.7.5.tgz":
-  version "0.7.5"
-  resolved "file:../rust-multi-target/node/platform-arch-pkg/jolocom-native-core-node-linux-x64-0.7.5.tgz#a69e9035a059d6c90cc703da03b1dea55b16e201"
+"@jolocom/native-core-node-darwin-x64@^1.0.0-rc0":
+  version "1.0.0-rc0"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-darwin-x64/-/native-core-node-darwin-x64-1.0.0-rc0.tgz#c89f2beeaac988c3e62341fb4c4acadb8f69d058"
+  integrity sha512-4ALMRa9r1l+5W/x+IUl5Is/8J/e9EATmRvBy/0l5mWuVmqnJzH72M7LF8pcdaOfi62gPwsKittpCxzXrsQlLuw==
+
+"@jolocom/native-core-node-linux-x64@^1.0.0-rc0":
+  version "1.0.0-rc0"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-1.0.0-rc0.tgz#39a036cb05c76f0922ba9b6ec7a842410aca1356"
+  integrity sha512-kdk6Z7odbxJwW0/ulqWH3pn+a5qzzgAFFFRnzM7LPujOKfafkB80QiJnKlLDb6RBTfZ1GRJcHrRs40dUt0yY7A==
+
+"@jolocom/native-core-node@^0.7.11":
+  version "0.7.11"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node/-/native-core-node-0.7.11.tgz#e7eb737d4805c839a29d884f4202c104a4e15d0c"
+  integrity sha512-Xp/pNHmso3Vp7rVPn5YZaUYMlKigJSN5S03VnysDwdac/e/x5yO0mbmYJC10yjqQjZIc7ZkVDSodHTkMI2Hfgw==
+  optionalDependencies:
+    "@jolocom/native-core-node-darwin-x64" "^1.0.0-rc0"
+    "@jolocom/native-core-node-linux-x64" "^1.0.0-rc0"
 
 "@jolocom/protocol-ts@^0.5.1":
   version "0.5.1"
