@@ -4,7 +4,9 @@ import { sha256 } from '../utils/crypto'
 import { canonize } from 'jsonld'
 import { JsonLdObject, SignedJsonLdObject, JsonLdContext } from './types'
 import { JoloDidMethod } from '../didMethods/jolo'
-import { verifySignature } from '../utils/validation'
+import { verifySignatureWithIdentity } from '../utils/validation'
+import { Identity } from '../identity/identity'
+import { IResolver } from '../didMethods/types'
 
 /**
  * Helper function to handle JsonLD normalization.
@@ -63,25 +65,23 @@ export const digestJsonLd = async (
 /**
  * Helper function to handle JsonLD validation.
  * @param json - {@link SignedJsonLdObject} to be validated
- * @param resolver - instance of a {@link Resolver} to use for retrieving the signer's keys. 
- * If none is provided, the default Jolocom contract is used for resolution.
+ * @param resolverOrIdentity - a instance of an Identity, which can be used
+ *   to find signing keys and verify the signature, or an instance of {@link Resolver} to use for retrieving the signer's keys.
+ *   If nothing is provided, the default Jolocom resolver is used.
  */
 
 export const validateJsonLd = async (
   json: SignedJsonLdObject,
-  resolver = new JoloDidMethod().resolver
+  resolverOrIdentity: IResolver | Identity = new JoloDidMethod().resolver
 ): Promise<boolean> => {
-  const issuerIdentity = await resolver.resolve(keyIdToDid(json.proof.creator))
-    const {
-      publicKeyHex,
-      type,
-    } = issuerIdentity.didDocument.findPublicKeySectionById(json.proof.creator)
+  const issuerIdentity = (resolverOrIdentity instanceof Identity)
+    ? resolverOrIdentity
+    : await resolverOrIdentity.resolve(keyIdToDid(json.proof.creator))
 
-    return verifySignature(
+    return verifySignatureWithIdentity(
       await normalizeSignedLdObject(json, json['@context']),
       Buffer.from(json.proof.signatureValue, 'hex'),
-      Buffer.from(publicKeyHex, 'hex'),
-      //@ts-ignore
-      type
+      json.proof.creator,
+      issuerIdentity
     )
 }

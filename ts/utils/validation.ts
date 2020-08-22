@@ -2,13 +2,10 @@ import { IDigestable } from '../linkedDataSignature/types'
 import { JoloDidMethod } from '../didMethods/jolo'
 import { KeyTypes, getCryptoProvider } from '@jolocom/vaulted-key-provider'
 import { cryptoUtils } from '@jolocom/native-core-node'
-/**
- * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
- * @param toValidate - Instance of object implementing the {@link IDigestable} interface
-   * @param resolver - instance of a {@link Resolver} to use for retrieving the signer's keys. If none is provided, the default Jolocom contract is used for resolution.
- * @example `await validateDigestable(signedCredential) // true`
- * @example `await validateDigestable(signedCredential, jolocomResolver()) // true`
- * @returns {boolean} - True if signature is valid, false otherwise */
+import { Identity } from '../identity/identity'
+import { IResolver } from '../didMethods/types'
+
+type IdentityOrResolver = Identity | IResolver
 
 /**
  * TODO Document
@@ -16,8 +13,7 @@ import { cryptoUtils } from '@jolocom/native-core-node'
  * verify the signature (the algs are chosen based on pKey.type)
  */
 
-// TODO The api on cryptoProvider.verify should only need a pub key and a key type
-export const verifySignature = (
+const verifySignature = (
   data: Buffer,
   signature: Buffer,
   pKey: Buffer,
@@ -35,6 +31,26 @@ export const verifySignature = (
   )
 }
 
+export const verifySignatureWithIdentity = async (data: Buffer, signature: Buffer, signingKeyId: string, signer: Identity) => {
+    const signingKey = signer.didDocument.findPublicKeySectionById(
+      signingKeyId
+    )
+
+    if (!signingKey) {
+      console.warn(`Signing key with id ${signingKeyId} not found in signer's DID Document`)
+      return false
+    }
+
+    return verifySignature(
+      data,
+      signature,
+      signingKey.publicKeyHex
+        ? Buffer.from(signingKey.publicKeyHex, 'hex')
+        //@ts-ignore TODO Keri DID Docs and Jolo DID Docs encode the key differently
+        : Buffer.from(signingKey.publicKeyBase64, 'base64'),
+      signingKey.type as KeyTypes
+    )
+}
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
  * @param toValidate - Instance of object implementing the {@link IDigestable} interface
@@ -46,29 +62,18 @@ export const verifySignature = (
 
 export const validateDigestable = async (
   toValidate: IDigestable,
-  resolver = new JoloDidMethod().resolver,
+  resolverOrIdentity: IdentityOrResolver = new JoloDidMethod().resolver,
 ): Promise<boolean> => {
-  const issuerIdentity = await resolver.resolve(toValidate.signer.did)
+  const issuerIdentity = (resolverOrIdentity instanceof Identity)
+    ? resolverOrIdentity
+    : await resolverOrIdentity.resolve(toValidate.signer.did)
 
-  try {
-    const issuerPublicKey = issuerIdentity.didDocument.findPublicKeySectionById(
-      toValidate.signer.keyId
-    )
-
-    return verifySignature(
-      await toValidate.asBytes(),
-      Buffer.from(toValidate.signature, 'hex'),
-      //@ts-ignore TODO
-      issuerPublicKey.publicKeyHex ? Buffer.from(issuerPublicKey.publicKeyHex, 'hex') : Buffer.from(issuerPublicKey.publicKeyBase64, 'base64'),
-      //issuerPublicKey.publicKeyHex ? Buffer.from(issuerPublicKey.publicKeyHex, 'hex') : Buffer.from(issuerPublicKey.publicKeyBase64, 'base64'),
-      //@ts-ignore
-      issuerPublicKey.type
-    )
-  } catch(e) {
-    // TODO Remove once done
-    console.log('caught', e)
-    return false
-  }
+  return verifySignatureWithIdentity(
+    await toValidate.asBytes(),
+    Buffer.from(toValidate.signature, 'hex'),
+    toValidate.signer.keyId,
+    issuerIdentity
+  )
 }
 
 /**
@@ -82,10 +87,10 @@ export const validateDigestable = async (
 
 export const validateDigestables = async (
   toValidate: IDigestable[],
-  resolver = new JoloDidMethod().resolver,
+  resolverOrIdentity: IdentityOrResolver = new JoloDidMethod().resolver,
 ): Promise<boolean[]> =>
   Promise.all(
     toValidate.map(async digestable =>
-      validateDigestable(digestable, resolver),
+      validateDigestable(digestable, resolverOrIdentity),
     ),
   )

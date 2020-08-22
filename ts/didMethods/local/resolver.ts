@@ -7,7 +7,6 @@ import { InternalDb } from 'local-did-resolver/js/db'
 import { validateEvents } from '@jolocom/native-core-node'
 import { DIDDocument, Resolver } from "did-resolver";
 
-// TODO
 type Resolve = (did: string) => Promise<DIDDocument>
 
 export class LocalResolver implements IResolver {
@@ -26,8 +25,8 @@ export class LocalResolver implements IResolver {
 
   async resolve(did: string) {
     const jsonDidDoc = await this.resolveImplementation(
-      did.split(':')[2],
-    ).catch(_ => {
+      did,
+    ).catch(e => {
       throw new Error(ErrorCodes.RegistryDIDNotAnchored)
     })
 

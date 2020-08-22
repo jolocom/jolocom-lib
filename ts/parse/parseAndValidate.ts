@@ -1,26 +1,22 @@
 import { IDidDocumentAttrs } from '../identity/didDocument/types'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { JWTEncodable, JSONWebToken } from '../interactionTokens/JSONWebToken'
-import { normalizeSignedLdObject } from '../linkedData'
+import { validateJsonLd } from '../linkedData'
 import { ErrorCodes } from '../errors'
 import { Identity } from '../identity/identity'
 import { sha256 } from '../utils/crypto'
-import { verifySignature } from '../utils/validation'
+import { verifySignatureWithIdentity } from '../utils/validation'
 import { ISignedCredentialAttrs } from '@jolocom/protocol-ts/dist/lib/signedCredential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { parse } from './parse'
 
 const parseAndValidateDidDoc = async (didDocument: IDidDocumentAttrs): Promise<DidDocument> => {
   const didDoc = DidDocument.fromJSON(didDocument)
-  const signingKey = didDoc.findPublicKeySectionById(didDoc.signer.keyId)
 
-  const signatureValid = verifySignature(
+  const signatureValid = validateJsonLd(
     //@ts-ignore optional proof
-    await normalizeSignedLdObject(didDocument, didDocument['@context']),
-    Buffer.from(didDoc.signature, 'hex'),
-    Buffer.from(signingKey.publicKeyHex, 'hex'),
-    //@ts-ignore
-    signingKey.type
+    didDocument,
+    Identity.fromDidDocument({ didDocument: didDoc })
   )
 
   if (signatureValid) {
@@ -32,14 +28,10 @@ const parseAndValidateDidDoc = async (didDocument: IDidDocumentAttrs): Promise<D
 
 const parseAndValidateSignedCredential = async (signedCredential: ISignedCredentialAttrs, signer: Identity): Promise<SignedCredential> => {
   const signedCred = SignedCredential.fromJSON(signedCredential)
-  const signingKey = signer.didDocument.findPublicKeySectionById(signedCred.signer.keyId)
 
-  const signatureValid = verifySignature(
-    await normalizeSignedLdObject(signedCredential, signedCredential['@context']),
-    Buffer.from(signedCred.signature, 'hex'),
-    Buffer.from(signingKey.publicKeyHex, 'hex'),
-    //@ts-ignore
-    signingKey.type
+  const signatureValid = validateJsonLd(
+    signedCredential,
+    signer
   )
 
   if (signatureValid) {
@@ -49,18 +41,16 @@ const parseAndValidateSignedCredential = async (signedCredential: ISignedCredent
   throw new Error(ErrorCodes.InvalidSignature)
 }
 
-export const parseAndValidateInteractionToken = async (jwt: string, identity: Identity) : Promise<JSONWebToken<JWTEncodable>> =>  {
+export const parseAndValidateInteractionToken = async (jwt: string, signer: Identity) : Promise<JSONWebToken<JWTEncodable>> =>  {
   const interactionToken = parse.interactionToken.fromJWT<JWTEncodable>(jwt)
 
-  const [body, payload, signature] = jwt.split('.')
-  const signingKey = identity.didDocument.findPublicKeySectionById(interactionToken.signer.keyId)
+  const [body, payload, _] = jwt.split('.')
 
-  const isValid = await verifySignature(
+  const isValid = await verifySignatureWithIdentity(
     sha256(Buffer.from([body, payload].join('.'))),
-    Buffer.from(interactionToken.signature, 'hex'), // TODO Use signature here, after making sure the encoding is base64
-    Buffer.from(signingKey.publicKeyHex, 'hex'),
-    //@ts-ignore
-    signingKey.type
+    Buffer.from(interactionToken.signature, 'hex'),
+    interactionToken.signer.keyId,
+    signer
   )
 
   if (isValid) {

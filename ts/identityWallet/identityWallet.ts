@@ -414,34 +414,7 @@ export class IdentityWallet {
       Buffer.from(data, 'base64'),
     )
 
-  // private sendTransaction = async (
-  //   request: ITransactionEncodable,
-  //   pass: string,
-  // ) => {
-  //   const publicKey = this._vaultedKeyProvider.getPublicKey({
-  //     derivationPath: KeyTypes.ethereumKey,
-  //     encryptionPass: pass,
-  //   })
-
-  //   const address = publicKeyToAddress(publicKey)
-  //   const { nonce } = await this._contractsGateway.getAddressInfo(address)
-
-  //   const tx = this._contractsAdapter.assembleTxFromInteractionToken(
-  //     request,
-  //     address,
-  //     nonce,
-  //     this.vaultedKeyProvider,
-  //     pass,
-  //   )
-  //   return this._contractsGateway.broadcastTransaction(tx)
-  // }
-
-  // public transactions = {
-  //   sendTransaction: this.sendTransaction,
-  // }
-
   /* Gathering creation methods in an easier to use public interface */
-
   public create = {
     credential: Credential.create,
     signedCredential: this.createSignedCred,

@@ -1,10 +1,11 @@
-import * as ganache from 'ganache-core'
-import { userEthKey, serviceEthKey, deployerEthKey } from './integration.data'
+// import * as ganache from 'ganache-core'
+// import { userEthKey, serviceEthKey, deployerEthKey } from './integration.data'
 // import { ContractsGateway } from '../../ts/contracts/contractsGateway'
 // import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
 // import { ethers } from 'ethers'
 
 // const IPFSFactory = require('ipfsd-ctl')
+
 // const RegistryContract = require('jolocom-registry-contract/build/contracts/Registry.json')
 // const PORT = 8945
 // const balance = 1e18
@@ -13,7 +14,7 @@ import { userEthKey, serviceEthKey, deployerEthKey } from './integration.data'
 //     { secretKey: deployerEthKey, balance },
 //     { secretKey: userEthKey, balance },
 //     { secretKey: serviceEthKey, balance },
-//   ],
+//   ]
 // })
 
 // const daemonFactory = IPFSFactory.create({ type: 'go' })
@@ -34,6 +35,7 @@ import { userEthKey, serviceEthKey, deployerEthKey } from './integration.data'
 //     RegistryContract.bytecode,
 //     wallet,
 //   )
+// 
 //   let contract = await factory.deploy()
 //   await contract.deployed()
 //   return contract.address
@@ -63,7 +65,6 @@ import { userEthKey, serviceEthKey, deployerEthKey } from './integration.data'
 //     ),
 //   )
 // }
-
 /**
  * @description - Initiates a mock ethereum network using ganache, a discardable ipfs node using ipfsd, and
  *   deploys the Jolocom identity registry contract.

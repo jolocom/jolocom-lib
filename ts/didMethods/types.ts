@@ -11,7 +11,7 @@ import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 // TODO
 export interface IRegistrar {
   prefix: string
-  encounter: (changes: string[]) => Promise<boolean>
+  encounter: (events: [string]) => Promise<Identity>
   create: <T>(
     keyProvider: SoftwareKeyProvider,
     password: string,

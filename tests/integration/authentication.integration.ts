@@ -8,7 +8,7 @@ import { Authentication } from '../../ts/interactionTokens/authentication'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  localDidMethod
+  localDidMethod,
 } from './identity.integration'
 
 chai.use(sinonChai)
@@ -31,8 +31,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     return userIdentityWallet.validateJWT(
       authRequestJWT,
       undefined,
-      localDidMethod.resolver
-    )
+      localDidMethod.resolver)
   })
 
   it('Should allow for consumption of valid authentication request token by user', async () => {

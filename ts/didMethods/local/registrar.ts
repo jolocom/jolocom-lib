@@ -9,18 +9,12 @@ import {
   validateEvents,
   getIcp,
 } from '@jolocom/native-core-node'
-import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
+import { SoftwareKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
 
 interface CreationReturn {
   id: string
   encryptedWallet: string
   inceptionEvent: string
-}
-
-interface CreationParams {
-  id: string
-  encryptedWallet: string
-  pass: string
 }
 
 export class LocalRegistrar implements IRegistrar {
@@ -48,6 +42,13 @@ export class LocalRegistrar implements IRegistrar {
     // @ts-ignore Assigning directly to a private property
     keyProvider._id = ret.id
 
+    // TODO This should be implemented in terms of delegated inception
+    await keyProvider.newKeyPair(
+      password,
+      "X25519KeyAgreementKey2019" as KeyTypes,
+      `${ret.id}#encryption`
+    )
+
     const didDoc = JSON.parse(
       await validateEvents(JSON.stringify([ret.inceptionEvent])),
     )
@@ -72,11 +73,9 @@ export class LocalRegistrar implements IRegistrar {
     return false
   }
 
-  public async encounter(delta: string[]) {
-    await this.registrar.update(delta).catch((e: Error) => {
-      console.error(e)
-      return false
-    }) // TODO This needs to return bool?
-    return true
+  public async encounter(deltas: [string]) {
+    return Identity.fromDidDocument({
+      didDocument: DidDocument.fromJSON(await this.registrar.update(deltas)),
+    })
   }
 }

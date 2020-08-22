@@ -2,7 +2,7 @@ import { Identity } from '../identity/identity';
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider';
 export interface IRegistrar {
     prefix: string;
-    encounter: (changes: string[]) => Promise<boolean>;
+    encounter: (events: [string]) => Promise<Identity>;
     create: <T>(keyProvider: SoftwareKeyProvider, password: string, creationConfig?: T) => Promise<Identity>;
     updatePublicProfile: (keyProvider: SoftwareKeyProvider, password: string, identity: Identity, publicProfile: any) => Promise<boolean>;
 }

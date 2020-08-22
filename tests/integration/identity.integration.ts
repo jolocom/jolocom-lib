@@ -1,17 +1,13 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import * as integrationHelper from './provision'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import {
-  testEthereumConfig,
   userPass,
   getNewVault,
   servicePass,
-  testIpfsConfig,
 } from './integration.data'
 import { ErrorCodes } from '../../ts/errors'
 import { IDidMethod } from '../../ts/didMethods/types'
-import { JoloDidMethod } from '../../ts/didMethods/jolo'
 import { LocalDidMethod } from '../../ts/didMethods/local'
 import {
   createIdentityFromKeyProvider,
@@ -19,14 +15,13 @@ import {
 } from '../../ts/didMethods/utils'
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
-import { walletUtils } from '@jolocom/native-utils-node'
+import { walletUtils } from '@jolocom/native-core-node'
 import { createDb } from 'local-did-resolver/js/db'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
 /* global before and after hook for integration tests & shared variables */
-export let joloDidMethod: IDidMethod
 export let localDidMethod: IDidMethod
 export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
@@ -37,26 +32,11 @@ before(async () => {
   const eventDb = createDb()
   localDidMethod = new LocalDidMethod(eventDb)
 
-  //  const ipfsHost = `${testIpfsConfig.protocol}://${testIpfsConfig.host}:${testIpfsConfig.port}`
-  //  joloDidMethod = new JoloDidMethod(
-  //    testEthereumConfig.providerUrl,
-  //    testEthereumConfig.contractAddress,
-  //    // ipfsHost,
-  //  )
-
   userVault = await getNewVault('id', userPass)
   serviceVault = await getNewVault('id', servicePass)
 
-  userIdentityWallet = await createIdentityFromKeyProvider(
-    userVault,
-    userPass,
-    localDidMethod.registrar,
-  )
-  serviceIdentityWallet = await createIdentityFromKeyProvider(
-    serviceVault,
-    servicePass,
-    localDidMethod.registrar,
-  )
+  userIdentityWallet = await createIdentityFromKeyProvider(userVault, userPass, localDidMethod.registrar)
+  serviceIdentityWallet = await createIdentityFromKeyProvider(serviceVault, servicePass, localDidMethod.registrar)
 })
 
 describe('Integration Test - Create, Resolve, Public Profile', () => {
@@ -88,7 +68,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
 
   // TODO No public profile on local method yet
   it.skip('should correctly add and commit public profile', async () => {
-    await joloDidMethod.registrar.updatePublicProfile(
+    await localDidMethod.registrar.updatePublicProfile(
       serviceVault,
       servicePass,
       serviceIdentityWallet.identity,
@@ -102,7 +82,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       ),
     )
 
-    const remoteServiceIdentity = await joloDidMethod.resolver.resolve(
+    const remoteServiceIdentity = await localDidMethod.resolver.resolve(
       serviceIdentityWallet.did,
     )
 
@@ -136,7 +116,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
     const serviceIdentity = await authAsIdentityFromKeyProvider(
       serviceVault,
       servicePass,
-      joloDidMethod.resolver,
+      localDidMethod.resolver,
     )
     expect(serviceIdentity.identity.publicProfile.subject).to.deep.eq(
       serviceIdentity.did,
