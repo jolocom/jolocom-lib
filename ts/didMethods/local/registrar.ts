@@ -74,8 +74,9 @@ export class LocalRegistrar implements IRegistrar {
   }
 
   public async encounter(deltas: [string]) {
+    const didDocJson = JSON.parse(await this.registrar.update(deltas))
     return Identity.fromDidDocument({
-      didDocument: DidDocument.fromJSON(await this.registrar.update(deltas)),
+      didDocument: DidDocument.fromJSON(didDocJson),
     })
   }
 }
