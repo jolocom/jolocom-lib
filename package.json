@@ -69,9 +69,11 @@
   "license": "MIT",
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
-    "@jolocom/native-utils-node": "^0.5.6",
+    "@jolocom/jolo-did-registrar": "^1.0.0-rc.0.1",
+    "@jolocom/jolo-did-resolver": "^1.0.0-rc.0.1",
+    "@jolocom/native-core-node-linux-x64": "^0.7.4",
     "@jolocom/protocol-ts": "^0.5.1",
-    "@jolocom/vaulted-key-provider": "^0.5.0",
+    "@jolocom/vaulted-key-provider": "^0.7.0",
     "base64url": "^3.0.1",
     "bip32": "^1.0.2",
     "bip39": "^3.0.1",

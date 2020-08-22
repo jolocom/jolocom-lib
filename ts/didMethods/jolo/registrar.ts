@@ -1,5 +1,5 @@
 import { Identity } from '../../identity/identity'
-import { getRegistry } from 'jolo-did-registry'
+import { getRegistrar } from '@jolocom/jolo-did-registrar'
 import { DidDocument } from '../../identity/didDocument/didDocument'
 import { ServiceEndpointsSection } from '../../identity/didDocument/sections'
 import { fuelKeyWithEther } from '../../utils/helper'
@@ -63,14 +63,14 @@ export const joloSeedToEncryptedWallet = async (
 
 export class JolocomRegistrar implements IRegistrar {
   public prefix = 'jolo'
-  public registry: ReturnType<typeof getRegistry>
+  public registrarFns: ReturnType<typeof getRegistrar>
 
   constructor(
     providerUrl = PROVIDER_URL,
     contractAddress = CONTRACT_ADDRESS,
     ipfsHost = IPFS_ENDPOINT,
   ) {
-    this.registry = getRegistry(providerUrl, contractAddress, ipfsHost)
+    this.registrarFns = getRegistrar(providerUrl, contractAddress, ipfsHost)
   }
 
   async create(keyProvider: SoftwareKeyProvider, password: string) {
@@ -142,7 +142,7 @@ export class JolocomRegistrar implements IRegistrar {
     }
 
     const pubProfSection = ServiceEndpointsSection.fromJSON(
-      await this.registry.publishPublicProfile(identity.did, publicProfile)
+      await this.registrarFns.publishPublicProfile(identity.did, publicProfile)
     )
 
     const oldPublicProfileEntry = didDocument.service.findIndex(({ type }) =>
@@ -160,7 +160,7 @@ export class JolocomRegistrar implements IRegistrar {
 
     await this.signDidDocument(didDocument, keyProvider, password)
 
-    return this.update(keyProvider, password, didDocument).then(() => true)
+    return this.update(didDocument, keyProvider, password).then(() => true)
   }
 
   public async encounter(): Promise<Identity> {
@@ -193,7 +193,7 @@ export class JolocomRegistrar implements IRegistrar {
       throw new Error("No anchoring key found")
     }
 
-    const unsignedTx = await this.registry.publishDidDocument(
+    const unsignedTx = await this.registrarFns.publishDidDocument(
       Buffer.from(anchoringKey.publicKeyHex.slice(2), 'hex'),
       //@ts-ignore
       didDocument.toJSON()
@@ -206,7 +206,7 @@ export class JolocomRegistrar implements IRegistrar {
       encryptionPass: password
     }, Buffer.from(unsignedTx.slice(2), 'hex'))
 
-    return this.registry.broadcastTransaction(unsignedTx, {
+    return this.registrarFns.broadcastTransaction(unsignedTx, {
       r: '0x' + signature.slice(0, 32).toString('hex'),
       s: '0x' + signature.slice(32, 64).toString('hex'),
       recoveryParam: signature[64]
