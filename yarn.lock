@@ -145,23 +145,23 @@
     base64url "^3.0.1"
     clone "^2.1.2"
 
-"@jolocom/native-core-node-darwin-x64@^0.7.5":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-darwin-x64/-/native-core-node-darwin-x64-0.7.5.tgz#baf5db9543cd329d637913eab17a83fdd322ca35"
-  integrity sha512-jY10ClY0dAd3XORvpJ4qY1yv4gwwMkYWASXfbLzhkNXtGq1XT23Rxg7jYY20rZ/+JVCoPJWqQLhf4vVrO9MhJw==
+"@jolocom/native-core-node-darwin-x64@^1.0.0-rc0":
+  version "1.0.0-rc0"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-darwin-x64/-/native-core-node-darwin-x64-1.0.0-rc0.tgz#c89f2beeaac988c3e62341fb4c4acadb8f69d058"
+  integrity sha512-4ALMRa9r1l+5W/x+IUl5Is/8J/e9EATmRvBy/0l5mWuVmqnJzH72M7LF8pcdaOfi62gPwsKittpCxzXrsQlLuw==
 
-"@jolocom/native-core-node-linux-x64@^0.7.5":
+"@jolocom/native-core-node-linux-x64@^1.0.0-rc0":
   version "0.7.4"
   resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-0.7.4.tgz#d88ce5aac4c71e2f81ea6f64b86df57da70f1862"
   integrity sha512-ePWfB4G8CD3iaEVaR/xZeVtyk6SF/aPcNEqoNN+f6Obq3NcbYYG2NvLZGImnW44l3VBFJN3lKk1kpymWvC+Bzw==
 
-"@jolocom/native-core-node@^0.7.6":
-  version "0.7.6"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node/-/native-core-node-0.7.6.tgz#183e56f559df06041fadce19edf6d8783b59cbbd"
-  integrity sha512-i/8NHOGBHK9NN97QhI6ULSX3gC7b7nKTglB0OkMzsPOQfiFyAH2lHbcTRwJGf9AEQMd9F1q7Ix3OeysGgpQi/g==
+"@jolocom/native-core-node@^0.7.11":
+  version "0.7.11"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node/-/native-core-node-0.7.11.tgz#e7eb737d4805c839a29d884f4202c104a4e15d0c"
+  integrity sha512-Xp/pNHmso3Vp7rVPn5YZaUYMlKigJSN5S03VnysDwdac/e/x5yO0mbmYJC10yjqQjZIc7ZkVDSodHTkMI2Hfgw==
   optionalDependencies:
-    "@jolocom/native-core-node-darwin-x64" "^0.7.5"
-    "@jolocom/native-core-node-linux-x64" "^0.7.5"
+    "@jolocom/native-core-node-darwin-x64" "^1.0.0-rc0"
+    "@jolocom/native-core-node-linux-x64" "^1.0.0-rc0"
 
 "@jolocom/protocol-ts@^0.5.1":
   version "0.5.1"
