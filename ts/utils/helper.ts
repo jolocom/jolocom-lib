@@ -57,11 +57,7 @@ export const mapPublicKeys = async (
   const { keyId, did } = identity.didDocument.signer
   let signingKeyRef = keyId.includes('did:') ? keyId : `${did}${keyId}`
 
-  const sigKey = vkpKeys.some(k =>
-    k.controller.find(c =>
-      c === signingKeyRef
-    ),
-  )
+  const sigKey = vkpKeys.some(k => k.controller.find(c => c === signingKeyRef))
 
   const encKey = vkpKeys.find(
     k => k.type === KeyTypes.x25519KeyAgreementKey2019,
@@ -73,6 +69,6 @@ export const mapPublicKeys = async (
 
   return {
     signingKeyId: signingKeyRef,
-    encryptionKeyId: '',
+    encryptionKeyId: encKey.controller[0],
   }
 }

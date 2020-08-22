@@ -16,6 +16,7 @@ export const createIdentityFromKeyProvider = async (
   )
 
   const vaultKeys = await vaultedKeyProvider.getPubKeys(decryptionPassword)
+
   return new IdentityWallet({
     identity,
     vaultedKeyProvider,

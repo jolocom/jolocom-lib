@@ -9,26 +9,13 @@ import {
   validateEvents,
   getIcp,
 } from '@jolocom/native-core-node-linux-x64'
-import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
+import { SoftwareKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
 
 interface CreationReturn {
   id: string
   encryptedWallet: string
   inceptionEvent: string
 }
-
-interface CreationParams {
-  id: string
-  encryptedWallet: string
-  pass: string
-}
-
-const createFromIcp = async (p: CreationParams): Promise<CreationReturn> =>
-    getIcp({
-      encryptedWallet: p.encryptedWallet,
-      id: p.id,
-      pass: p.pass
-    })
 
 export class LocalRegistrar implements IRegistrar {
   public prefix = 'un'
@@ -37,7 +24,7 @@ export class LocalRegistrar implements IRegistrar {
   public constructor(db = createDb()) {
     this.registrar = getRegistrar({
       dbInstance: db,
-      create: createFromIcp,
+      create: getIcp,
       getIdFromEvent: getIdFromEvent,
       validateEvents: validateEvents,
     })
@@ -54,6 +41,13 @@ export class LocalRegistrar implements IRegistrar {
     keyProvider._encryptedWallet = Buffer.from(ret.encryptedWallet, 'base64')
     // @ts-ignore Assigning directly to a private property
     keyProvider._id = ret.id
+
+    // TODO This should be implemented in terms of delegated inception
+    await keyProvider.newKeyPair(
+      password,
+      "X25519KeyAgreementKey2019" as KeyTypes,
+      `${ret.id}#encryption`
+    )
 
     const didDoc = JSON.parse(
       await validateEvents(JSON.stringify([ret.inceptionEvent])),

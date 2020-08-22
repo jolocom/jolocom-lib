@@ -9,8 +9,6 @@ import {
 import { Identity } from '../identity/identity'
 import { JSONWebToken } from '../interactionTokens/JSONWebToken'
 import { InteractionType } from '../interactionTokens/types'
-import { PaymentResponse } from '../interactionTokens/paymentResponse'
-import { PaymentRequest } from '../interactionTokens/paymentRequest'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
@@ -29,7 +27,11 @@ import {
 } from '../interactionTokens/interactionTokens.types'
 import { ErrorCodes } from '../errors'
 import { JoloDidMethod } from '../didMethods/jolo'
-import { IVaultedKeyProvider, IKeyRefArgs, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
+import {
+  IVaultedKeyProvider,
+  IKeyRefArgs,
+  KeyTypes,
+} from '@jolocom/vaulted-key-provider'
 import { getCryptoProvider } from '@jolocom/vaulted-key-provider/js/cryptoProvider'
 import { getRandomBytes } from '../utils/crypto'
 import { cryptoUtils } from '@jolocom/native-core-node-linux-x64'
@@ -274,10 +276,6 @@ export class IdentityWallet {
         return CredentialResponse
       case InteractionType.Authentication:
         return Authentication
-      case InteractionType.PaymentRequest:
-        return PaymentRequest
-      case InteractionType.PaymentResponse:
-        return PaymentResponse
     }
     throw new Error(ErrorCodes.JWTInvalidInteractionType)
   }
@@ -372,13 +370,11 @@ export class IdentityWallet {
   /**
    * Encrypts data asymmetrically
    * @param data - The data to encrypt
-   * @param pubKey - The key to encrypt to
+   * @param key - The key to encrypt to
+   * @param type - The type of the key to encrypt to
    */
-  public asymEncrypt = async (data: Buffer, publicKey: PublicKeyInfo) => getCryptoProvider(cryptoUtils).encrypt(
-    Buffer.from(publicKey.publicKeyHex.slice(2), 'hex'),
-    publicKey.type,
-    data
-  )
+  public asymEncrypt = async (data: Buffer, key: Buffer, type: KeyTypes) =>
+    getCryptoProvider(cryptoUtils).encrypt(key, type, data)
 
   /**
    * Encrypts data asymmetrically
@@ -387,57 +383,38 @@ export class IdentityWallet {
    * @param resolver - instance of a {@link Resolver} to use for retrieving the target's public keys. If none is provided, the
    * default Jolocom contract is used for resolution.
    */
-
   public asymEncryptToDidKey = async (
     data: Buffer,
     keyRef: string,
     resolver = new JoloDidMethod().resolver,
-  ) => this.asymEncrypt(
-      data,
-      //@ts-ignore, type: string in our .ts files vs type: KeyTypes in PublicKeyInfo
-      (await resolver.resolve(
-        keyIdToDid(keyRef)
-      )).didDocument.publicKey[0]
-    )
+  ) =>
+    await resolver.resolve(keyIdToDid(keyRef)).then(id => {
+      const pk = id.publicKeySection.find(pk => pk.id === keyRef)
+      return this.asymEncrypt(
+        data,
+        Buffer.from(pk.publicKeyHex, 'hex'),
+        pk.type as KeyTypes,
+      )
+    })
 
   /**
    * Decrypts data asymmetrically
-   * @param data - The data to decrypt 
+   * @param data - The data to decrypt
    * @param derivationArgs - The decryption private key derivation arguments
    */
   public asymDecrypt = async (
     data: string, // TODO double check what encoding is being used
-    keyRefArgs: IKeyRefArgs,
-  ) => this._keyProvider.decrypt(keyRefArgs, Buffer.from(data, 'base64')) // TODO
-
-  // private sendTransaction = async (
-  //   request: ITransactionEncodable,
-  //   pass: string,
-  // ) => {
-  //   const publicKey = this._vaultedKeyProvider.getPublicKey({
-  //     derivationPath: KeyTypes.ethereumKey,
-  //     encryptionPass: pass,
-  //   })
-
-  //   const address = publicKeyToAddress(publicKey)
-  //   const { nonce } = await this._contractsGateway.getAddressInfo(address)
-
-  //   const tx = this._contractsAdapter.assembleTxFromInteractionToken(
-  //     request,
-  //     address,
-  //     nonce,
-  //     this.vaultedKeyProvider,
-  //     pass,
-  //   )
-  //   return this._contractsGateway.broadcastTransaction(tx)
-  // }
-
-  // public transactions = {
-  //   sendTransaction: this.sendTransaction,
-  // }
+    pass: string,
+  ) =>
+    this._keyProvider.decrypt(
+      {
+        encryptionPass: pass,
+        keyRef: this._publicKeyMetadata.signingKeyId,
+      },
+      Buffer.from(data, 'base64'),
+    )
 
   /* Gathering creation methods in an easier to use public interface */
-
   public create = {
     credential: Credential.create,
     signedCredential: this.createSignedCred,
@@ -469,9 +446,6 @@ export class IdentityWallet {
         issue: this.makeRes<ICredentialsReceiveAttrs, CredentialOfferResponse>(
           InteractionType.CredentialsReceive,
         ),
-       // payment: this.makeRes<IPaymentResponseAttrs, PaymentRequest>(
-       //    InteractionType.PaymentResponse,
-       //  ),
       },
     },
   }

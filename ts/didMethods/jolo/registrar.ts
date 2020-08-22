@@ -19,8 +19,11 @@ import { validateDigestable } from '../../utils/validation'
 
 const SIGNING_KEY_REF = `keys-1`
 const ANCHOR_KEY_REF = `keys-2`
+const ENCRYPTION_KEY_REF = `keys-3`
+
 const ETH_DERIVATION_PATH = "m/44'/60'/0'/0/0"
 const JOLO_DERIVATION_PATH = "m/73'/0'/0'/0"
+const ENCRYPTION_DERIVATION_PATH = "m/73'/0'/1'/0"
 
 export const joloSeedToEncryptedWallet = async (
   seed: Buffer,
@@ -57,6 +60,12 @@ export const joloSeedToEncryptedWallet = async (
     publicKeyHex: ethKeys.publicKey.toString('hex'),
     private_key: ethKeys.privateKey.toString('hex'),
   })
+
+  await skp.newKeyPair(
+    newPassword,
+    KeyTypes.x25519KeyAgreementKey2019
+    [`${did}#${ENCRYPTION_KEY_REF}`]
+  )
 
   return skp
 }
