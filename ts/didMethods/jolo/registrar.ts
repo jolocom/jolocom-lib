@@ -96,8 +96,13 @@ export class JolocomRegistrar implements IRegistrar {
         `${keyProvider.id}#${ANCHOR_KEY_REF}`,
       )
 
-      if (!existingSigningKey || !existingAnchoringKey) {
-        throw new Error('vault has jolo id, but is either missing the signing or anchoring keys')
+      let existingEncryptionKey = await keyProvider.getPubKeyByController(
+         password,
+        `${keyProvider.id}#${ENCRYPTION_KEY_REF}`,
+      )
+
+      if (!existingSigningKey || !existingAnchoringKey || !existingEncryptionKey) {
+        throw new Error('vault has jolo id, but is either missing the signing, anchoring, or encr key')
       }
 
       signingKey = existingSigningKey
@@ -110,20 +115,25 @@ export class JolocomRegistrar implements IRegistrar {
 
       const did = publicKeyToDID(Buffer.from(signingKey.publicKeyHex, 'hex'))
 
+      await keyProvider.changeId(password, did)
+
       await keyProvider.setKeyController(
         {
           encryptionPass: password,
-          keyRef: SIGNING_KEY_REF,
+          keyRef: signingKey.id,
         },
         `${did}#${SIGNING_KEY_REF}`,
       )
-
-      await keyProvider.changeId(password, did)
 
       await keyProvider.newKeyPair(
         password,
         KeyTypes.ecdsaSecp256k1RecoveryMethod2020,
         `${did}#${ANCHOR_KEY_REF}`,
+      )
+      await keyProvider.newKeyPair(
+        password,
+        KeyTypes.x25519KeyAgreementKey2019,
+        `${did}#${ENCRYPTION_KEY_REF}`
       )
     }
 
