@@ -1,6 +1,6 @@
 {
   "name": "jolocom-lib",
-  "version": "5.0.18",
+  "version": "5.0.19",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "files": [
@@ -69,8 +69,8 @@
   "license": "MIT",
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
-    "@jolocom/jolo-did-registrar": "^1.0.0-rc3",
-    "@jolocom/jolo-did-resolver": "^1.0.0-rc3",
+    "@jolocom/jolo-did-registrar": "^1.0.0-rc4",
+    "@jolocom/jolo-did-resolver": "^1.0.0-rc4",
     "@jolocom/native-core-node": "^0.7.18",
     "@jolocom/protocol-ts": "^0.5.1",
     "@jolocom/vaulted-key-provider": "^0.7.0",
