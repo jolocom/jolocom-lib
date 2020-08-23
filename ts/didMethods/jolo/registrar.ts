@@ -97,12 +97,18 @@ export class JolocomRegistrar implements IRegistrar {
       )
 
       let existingEncryptionKey = await keyProvider.getPubKeyByController(
-         password,
+        password,
         `${keyProvider.id}#${ENCRYPTION_KEY_REF}`,
       )
 
-      if (!existingSigningKey || !existingAnchoringKey || !existingEncryptionKey) {
-        throw new Error('vault has jolo id, but is either missing the signing, anchoring, or encr key')
+      if (
+        !existingSigningKey ||
+        !existingAnchoringKey ||
+        !existingEncryptionKey
+      ) {
+        throw new Error(
+          'vault has jolo id, but is either missing the signing, anchoring, or encr key',
+        )
       }
 
       signingKey = existingSigningKey
@@ -133,8 +139,9 @@ export class JolocomRegistrar implements IRegistrar {
       await keyProvider.newKeyPair(
         password,
         KeyTypes.x25519KeyAgreementKey2019,
-        `${did}#${ENCRYPTION_KEY_REF}`
+        `${did}#${ENCRYPTION_KEY_REF}`,
       )
+
     }
 
     const identity = Identity.fromDidDocument({
