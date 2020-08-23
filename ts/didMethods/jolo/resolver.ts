@@ -1,5 +1,5 @@
 import { IResolver } from "../types";
-import { getResolver, getPublicProfile } from 'jolo-did-resolver'
+import { getResolver, getPublicProfile } from '@jolocom/jolo-did-resolver'
 import { ErrorCodes } from "../../errors";
 import { DIDDocument, Resolver } from "did-resolver";
 import { Identity } from "../../identity/identity";
