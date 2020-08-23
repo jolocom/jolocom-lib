@@ -45,13 +45,15 @@ export class LocalRegistrar implements IRegistrar {
     // TODO This should be implemented in terms of delegated inception
     await keyProvider.newKeyPair(
       password,
-      "X25519KeyAgreementKey2019" as KeyTypes,
-      `${ret.id}#encryption`
+      KeyTypes.x25519KeyAgreementKey2019
     )
 
     const didDoc = JSON.parse(
       await validateEvents(JSON.stringify([ret.inceptionEvent])),
     )
+
+    // TODO Inconsistency between wallet-rs and this codebase.
+    didDoc.verificationMethod[0].id = '#' + didDoc.verificationMethod[0].publicKeyBase64
 
     const identity = Identity.fromDidDocument({
       didDocument: DidDocument.fromJSON(didDoc),
