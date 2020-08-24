@@ -34,7 +34,7 @@ import {
 } from '@jolocom/vaulted-key-provider'
 import { getCryptoProvider } from '@jolocom/vaulted-key-provider/js/cryptoProvider'
 import { getRandomBytes } from '../utils/crypto'
-import { cryptoUtils } from '@jolocom/native-core-node'
+import { cryptoUtils } from '@jolocom/native-core'
 import { validateDigestable } from '../utils/validation'
 
 /**

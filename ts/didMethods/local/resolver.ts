@@ -4,7 +4,7 @@ import { DidDocument } from "../../identity/didDocument/didDocument";
 import { Identity } from "../../identity/identity";
 import { getResolver } from 'local-did-resolver'
 import { InternalDb } from 'local-did-resolver/js/db'
-import { validateEvents } from '@jolocom/native-core-node'
+import { validateEvents } from '@jolocom/native-core'
 import { DIDDocument, Resolver } from "did-resolver";
 
 type Resolve = (did: string) => Promise<DIDDocument>

@@ -2,7 +2,7 @@ import * as createHash from 'create-hash'
 import { keccak256 } from 'ethereumjs-util'
 import { randomBytes } from 'crypto'
 import { getCryptoProvider } from '@jolocom/vaulted-key-provider'
-import { cryptoUtils } from '@jolocom/native-core-node'
+import { cryptoUtils } from '@jolocom/native-core'
 
 /**
  * Computes the sha256 hash of the provided input
