@@ -1,7 +1,11 @@
 import { pubToAddress, addHexPrefix } from 'ethereumjs-util'
 import fetch from 'node-fetch'
 import { Identity } from '../identity/identity'
-import { IVaultedKeyProvider, KeyTypes, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
+import {
+  IVaultedKeyProvider,
+  KeyTypes,
+  PublicKeyInfo,
+} from '@jolocom/vaulted-key-provider'
 import { IKeyMetadata } from '../identityWallet/types'
 import { ErrorCodes } from '../errors'
 
@@ -55,13 +59,12 @@ export const mapPublicKeys = async (
   vkpKeys: PublicKeyInfo[],
 ): Promise<IKeyMetadata> => {
   const { keyId, did } = identity.didDocument.signer
-  let signingKeyRef = keyId.includes('did:') ? keyId : `${did}${keyId}`
-
-  const sigKey = vkpKeys.some(k => k.controller.find(c => c === signingKeyRef))
-
-  const encKey = vkpKeys.find(
+  const signingKeyRef = keyId.includes('did:') ? keyId : `${did}${keyId}`
+  const encKey = identity.didDocument.publicKey.find(
     k => k.type === KeyTypes.x25519KeyAgreementKey2019,
   )
+
+  const sigKey = vkpKeys.some(k => k.controller.find(c => c === signingKeyRef))
 
   if (!sigKey) {
     throw new Error(ErrorCodes.PublicKeyNotFound)
@@ -69,6 +72,6 @@ export const mapPublicKeys = async (
 
   return {
     signingKeyId: signingKeyRef,
-    encryptionKeyId: encKey.controller[0],
+    encryptionKeyId: encKey.controller,
   }
 }
