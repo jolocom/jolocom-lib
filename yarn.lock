@@ -494,23 +494,23 @@
     detect-node "^2.0.4"
     node-fetch "^2.6.0"
 
-"@jolocom/native-core-node-darwin-x64@^1.0.0-rc6":
-  version "1.0.0-rc6"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-darwin-x64/-/native-core-node-darwin-x64-1.0.0-rc6.tgz#58b42c5d6589639025bb9edf43cf7eb64a5158ce"
-  integrity sha512-Ml5/aOEjG+p8ZxDv7QkV/B7SneBaUBQzo4lA+UmUajmyIBFSNne1WZPs3VVYWdT/dORsrk/NijY+dzC9MIGukg==
+"@jolocom/native-core-node-darwin-x64@^1.0.0-rc7":
+  version "1.0.0-rc7"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-darwin-x64/-/native-core-node-darwin-x64-1.0.0-rc7.tgz#0d69f3f75717d8c471872b69c0009130e12a7eb0"
+  integrity sha512-0Y9JTIBiReRz+3D7PfAQhgm0NxEf78GVZUOz2iKS4TOrgvh6QOMVSZ2HHvaQlwogcnL0Q+uhkE6HyLtKgXVVdg==
 
-"@jolocom/native-core-node-linux-x64@^1.0.0-rc6":
+"@jolocom/native-core-node-linux-x64@^1.0.0-rc7":
   version "1.0.0-rc3"
   resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-1.0.0-rc3.tgz#b41a3f9662d1525563eea64d874c15050188fcda"
   integrity sha512-RJLgRlmRliRLDzNItnCLIHbbp/K7LsysJpFSX6HqTR15KA7Rfk6mKKkHvlWD26bmItrzvatL8KXVigRpctaVqA==
 
-"@jolocom/native-core@^0.7.20":
-  version "0.7.20"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core/-/native-core-0.7.20.tgz#50adc28d18d54166e3ecfa8b5c6773d7c0a0b70e"
-  integrity sha512-+DBTE6RH/mwapTvPhPt8fWO1LjlE1SBvWbOOn6ozvCJgqeZKtsW89buaBRXatyduMpJXZDsB9UXAHG/r3KHtag==
+"@jolocom/native-core@^0.7.21":
+  version "0.7.21"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core/-/native-core-0.7.21.tgz#8d5068ac682bc3146045d0fce717e62c640020f2"
+  integrity sha512-09tj712dMp+T/RxmLnENW7WQJfiaqCOyZyVepns/C8Tbx8R3oifGUZ3yClV+PxRXUtftIR+arO1Th19tgG03PA==
   optionalDependencies:
-    "@jolocom/native-core-node-darwin-x64" "^1.0.0-rc6"
-    "@jolocom/native-core-node-linux-x64" "^1.0.0-rc6"
+    "@jolocom/native-core-node-darwin-x64" "^1.0.0-rc7"
+    "@jolocom/native-core-node-linux-x64" "^1.0.0-rc7"
 
 "@jolocom/protocol-ts@^0.5.1":
   version "0.5.1"
