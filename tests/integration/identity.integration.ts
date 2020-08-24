@@ -54,6 +54,7 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       serviceIdentityWallet.did,
     )
 
+    expect(remoteUserIdentity.publicKeySection.length).eq(2)
     // TODO Created on proof is generated ad-hoc, via date.now()
     // expect(remoteUserIdentity.didDocument.toJSON()).to.deep.eq(
     //   userIdentityWallet.didDocument.toJSON(),
