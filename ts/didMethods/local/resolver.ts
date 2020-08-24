@@ -30,6 +30,10 @@ export class LocalResolver implements IResolver {
       throw new Error(ErrorCodes.RegistryDIDNotAnchored)
     })
 
+    // TODO FIX Inconsistency between wallet-rs and this codebase.
+    //@ts-ignore verification method does not exist on DIDDocument
+    jsonDidDoc.verificationMethod[0].id = '#' + jsonDidDoc.verificationMethod[0].publicKeyBase64
+
     return Identity.fromDidDocument({
       //@ts-ignore
       didDocument: DidDocument.fromJSON(jsonDidDoc)

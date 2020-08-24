@@ -34,7 +34,6 @@ export const authAsIdentityFromKeyProvider = async (
   resolver: IResolver,
 ) => {
   const identity = await resolver.resolve(vkp.id)
-
   const vaultKeys = await vkp.getPubKeys(pass)
 
   return new IdentityWallet({
