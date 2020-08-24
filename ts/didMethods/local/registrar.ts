@@ -48,9 +48,6 @@ export class LocalRegistrar implements IRegistrar {
       await validateEvents(JSON.stringify([ret.inceptionEvent])),
     )
 
-    // TODO Inconsistency between wallet-rs and this codebase.
-    didDoc.verificationMethod[0].id = '#' + didDoc.verificationMethod[0].publicKeyBase64
-
     const identity = Identity.fromDidDocument({
       didDocument: DidDocument.fromJSON(didDoc),
     })
