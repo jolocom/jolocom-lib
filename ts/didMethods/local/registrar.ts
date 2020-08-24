@@ -4,11 +4,7 @@ import { DidDocument } from '../../identity/didDocument/didDocument'
 import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
 import { IRegistrar } from '../types'
 import { createDb } from 'local-did-resolver/js/db'
-import {
-  getIdFromEvent,
-  validateEvents,
-  getIcp,
-} from '@jolocom/native-core'
+import { getIdFromEvent, validateEvents, getIcp } from '@jolocom/native-core'
 import { SoftwareKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
 
 interface CreationReturn {
@@ -59,7 +55,7 @@ export class LocalRegistrar implements IRegistrar {
       didDocument: DidDocument.fromJSON(didDoc),
     })
 
-    this.encounter([ret.inceptionEvent])
+    await this.encounter([ret.inceptionEvent])
     return identity
   }
 
