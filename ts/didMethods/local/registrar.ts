@@ -1,9 +1,9 @@
 import { Identity } from '../../identity/identity'
-import { getRegistrar } from 'local-did-resolver'
+import { getRegistrar } from 'local-resolver-registrar'
 import { DidDocument } from '../../identity/didDocument/didDocument'
 import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
 import { IRegistrar } from '../types'
-import { createDb } from 'local-did-resolver/js/db'
+import { createDb } from 'local-resolver-registrar/js/db'
 import { getIdFromEvent, validateEvents, getIcp } from '@jolocom/native-core'
 import { SoftwareKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
 
@@ -14,7 +14,7 @@ interface CreationReturn {
 }
 
 export class LocalRegistrar implements IRegistrar {
-  public prefix = 'un'
+  public prefix = 'jun'
   private registrar: ReturnType<typeof getRegistrar>
 
   public constructor(db = createDb()) {

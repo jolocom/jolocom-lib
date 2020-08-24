@@ -15,8 +15,7 @@ import {
 } from '../../ts/didMethods/utils'
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
-import { walletUtils } from '@jolocom/native-core-node'
-import { createDb } from 'local-did-resolver/js/db'
+import { walletUtils } from '@jolocom/native-core'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -29,8 +28,7 @@ export let userVault: SoftwareKeyProvider
 export let serviceVault: SoftwareKeyProvider
 
 before(async () => {
-  const eventDb = createDb()
-  localDidMethod = new LocalDidMethod(eventDb)
+  localDidMethod = new LocalDidMethod()
 
   userVault = await getNewVault('id', userPass)
   serviceVault = await getNewVault('id', servicePass)

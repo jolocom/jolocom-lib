@@ -1,7 +1,7 @@
 import { Identity } from '../../identity/identity'
 import { getRegistrar } from '@jolocom/jolo-did-registrar'
 import { DidDocument } from '../../identity/didDocument/didDocument'
-import { ServiceEndpointsSection } from '../../identity/didDocument/sections'
+import { ServiceEndpointsSection, PublicKeySection } from '../../identity/didDocument/sections'
 import { fuelKeyWithEther } from '../../utils/helper'
 import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
 import { IRegistrar } from '../types'
@@ -84,8 +84,9 @@ export class JolocomRegistrar implements IRegistrar {
 
   async create(keyProvider: SoftwareKeyProvider, password: string) {
     let signingKey: PublicKeyInfo
+    let encryptionKey: PublicKeyInfo
 
-    if(keyProvider.id.includes(`did:${this.prefix}`)) {
+    if(keyProvider.id.startsWith(`did:${this.prefix}`)) {
       const existingSigningKey = await keyProvider.getPubKeyByController(
         password,
         `${keyProvider.id}#${SIGNING_KEY_REF}`,
@@ -112,6 +113,7 @@ export class JolocomRegistrar implements IRegistrar {
       }
 
       signingKey = existingSigningKey
+      encryptionKey = existingEncryptionKey
     } else {
       signingKey = await keyProvider.newKeyPair(
         password,
@@ -136,7 +138,8 @@ export class JolocomRegistrar implements IRegistrar {
         KeyTypes.ecdsaSecp256k1RecoveryMethod2020,
         `${did}#${ANCHOR_KEY_REF}`,
       )
-      await keyProvider.newKeyPair(
+
+      encryptionKey = await keyProvider.newKeyPair(
         password,
         KeyTypes.x25519KeyAgreementKey2019,
         `${did}#${ENCRYPTION_KEY_REF}`,
@@ -144,10 +147,16 @@ export class JolocomRegistrar implements IRegistrar {
 
     }
 
+    const didDocumentInstace = await DidDocument.fromPublicKey(
+      Buffer.from(signingKey.publicKeyHex, 'hex'),
+    )
+
+    didDocumentInstace.addPublicKeySection(PublicKeySection.fromJSON(
+      { ...encryptionKey }
+    ))
+
     const identity = Identity.fromDidDocument({
-      didDocument: await DidDocument.fromPublicKey(
-        Buffer.from(signingKey.publicKeyHex, 'hex'),
-      ),
+      didDocument: didDocumentInstace,
     })
 
     await this.signDidDocument(identity.didDocument, keyProvider, password)
