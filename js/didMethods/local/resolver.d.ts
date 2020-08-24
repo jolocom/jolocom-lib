@@ -1,6 +1,6 @@
 import { IResolver } from "../types";
 import { Identity } from "../../identity/identity";
-import { InternalDb } from 'local-did-resolver/js/db';
+import { InternalDb } from 'local-resolver-registrar/js/db';
 export declare class LocalResolver implements IResolver {
     prefix: string;
     db: InternalDb;

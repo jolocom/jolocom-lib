@@ -1,6 +1,6 @@
 import { IDidMethod, IResolver, IRegistrar } from '../types';
 import { IdentityWallet } from '../../identityWallet/identityWallet';
-import { InternalDb } from 'local-did-resolver/js/db';
+import { InternalDb } from 'local-resolver-registrar/js/db';
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider';
 export declare class LocalDidMethod implements IDidMethod {
     prefix: string;
