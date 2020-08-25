@@ -494,23 +494,23 @@
     detect-node "^2.0.4"
     node-fetch "^2.6.0"
 
-"@jolocom/native-core-node-darwin-x64@^1.0.0-rc8":
-  version "1.0.0-rc8"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-darwin-x64/-/native-core-node-darwin-x64-1.0.0-rc8.tgz#9a62b3a9f90164f21bd8e4009ae59f122d5cd9fb"
-  integrity sha512-91HT+y2Y4PY/MDeURMGqgd6tqfJktgn1HCMqiS1GEKtPS8sHvWoSw+a2yyvR4oqe1cfn8t8Ex5uhwfV4Ji5ILQ==
+"@jolocom/native-core-node-darwin-x64@^1.0.0-rc10":
+  version "1.0.0-rc10"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-darwin-x64/-/native-core-node-darwin-x64-1.0.0-rc10.tgz#94104107dcd2439afda6f8a96b17999db0a60e52"
+  integrity sha512-0RieFBbH1eSvC9T+sAey0muDLp6qBpqErJC6W0mAKKy5FDgtgDaY1dGxyZYsHoUePGvtmG8vp8hgkKGdU+0rvg==
 
-"@jolocom/native-core-node-linux-x64@^1.0.0-rc8":
-  version "1.0.0-rc8"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-1.0.0-rc8.tgz#b55632f2afa34930fdf73c3205f78561837497b6"
-  integrity sha512-Y72VVorKQoFszBMWyYTvyxLX9Sf2oGaKZihbvReUqPi8pBNHgUYnaO23w1AMzg+pmlyXlFtrvAOksCn8FT2Qzg==
+"@jolocom/native-core-node-linux-x64@^1.0.0-rc10":
+  version "1.0.0-rc9"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-1.0.0-rc9.tgz#71a787a529e3008579e0dc1479f9fe07604d3440"
+  integrity sha512-d61M/4LEq6N/lX1tNrK5fKWXKNVk1puA6lOoG25BipIp5EfsI5mLI75vOtDR5Ad+CrxXQNCFidRC1W2cRoqZjg==
 
-"@jolocom/native-core@^0.7.22":
-  version "0.7.22"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core/-/native-core-0.7.22.tgz#3124aaa99056e2493e42d73ec45097bbfaadca40"
-  integrity sha512-oZ0Qdo0fNGlcWaLMzdoLGNrQlb4RpKUkC/u3YTJl2mk/jKDlPfF4H/VOrgAIG5uoPwqsQAp+OlkGRw2DZDjUgA==
+"@jolocom/native-core@^0.7.25":
+  version "0.7.25"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core/-/native-core-0.7.25.tgz#05cd7af50f61ab19c8c289f410c15fafc756c8fd"
+  integrity sha512-aMbJLhWlz2L61y5l0hhIwVfzOenHUrOoej27nyoZI4uksrbnYkBG4EL3ln3jk+4ewo432JjYSTwT5m7YlL/qKw==
   optionalDependencies:
-    "@jolocom/native-core-node-darwin-x64" "^1.0.0-rc8"
-    "@jolocom/native-core-node-linux-x64" "^1.0.0-rc8"
+    "@jolocom/native-core-node-darwin-x64" "^1.0.0-rc10"
+    "@jolocom/native-core-node-linux-x64" "^1.0.0-rc10"
 
 "@jolocom/protocol-ts@^0.5.1":
   version "0.5.1"
