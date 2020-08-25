@@ -1,5 +1,5 @@
 import { claimsMetadata } from '@jolocom/protocol-ts'
-import { walletUtils } from '@jolocom/native-core-node'
+import { walletUtils } from '@jolocom/native-core'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
 /* Local configuration for ganache server. the contract address is deterministic */

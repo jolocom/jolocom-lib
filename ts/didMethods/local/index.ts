@@ -2,7 +2,7 @@ import { IDidMethod, IResolver, IRegistrar } from '../types'
 import { IdentityWallet } from '../../identityWallet/identityWallet'
 import { LocalRegistrar } from './registrar'
 import { LocalResolver } from './resolver'
-import { InternalDb, createDb } from 'local-did-resolver/js/db'
+import { InternalDb, createDb } from 'local-resolver-registrar/js/db'
 import { validateEvents } from '@jolocom/native-core'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 import {
@@ -11,7 +11,7 @@ import {
 } from '../utils'
 
 export class LocalDidMethod implements IDidMethod {
-  public prefix = 'un'
+  public prefix = 'jun'
   public resolver: IResolver
   public registrar: IRegistrar
   private db: InternalDb // TODO Better type, InternalDb doesn't make a lot of sense
