@@ -526,10 +526,10 @@
   dependencies:
     ethers "5.0.5"
 
-"@jolocom/vaulted-key-provider@^0.7.3":
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.7.3.tgz#4dea978c4b816efd7d0a9dd8974f3e1994e0440e"
-  integrity sha512-1EwKWDT0X62mggmQchphf30wrfaybmls3L9Xb284ZGof9/RVlKtjLEsDKx3QwoMW4AF31rFlxcBP5i3xMevSuA==
+"@jolocom/vaulted-key-provider@^0.7.4":
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/@jolocom/vaulted-key-provider/-/vaulted-key-provider-0.7.4.tgz#5f807c81cdff28962aa7c23d6ee475cc00e1399e"
+  integrity sha512-oUboC/p15LUZnzC8ktEJVhijoFKgABZuiOWQ1MQxS19x7So3XaU14jT8pp5Dp+1YU+lP1Q7KIib5d7z2LOG0Tw==
   dependencies:
     rfc4648 "^1.4.0"
 

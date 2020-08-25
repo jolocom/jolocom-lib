@@ -1,6 +1,6 @@
 {
   "name": "jolocom-lib",
-  "version": "5.0.29",
+  "version": "5.0.30",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "files": [
@@ -73,7 +73,7 @@
     "@jolocom/jolo-did-resolver": "^1.0.0-rc5",
     "@jolocom/native-core": "^0.7.22",
     "@jolocom/protocol-ts": "^0.5.1",
-    "@jolocom/vaulted-key-provider": "^0.7.3",
+    "@jolocom/vaulted-key-provider": "^0.7.4",
     "base64url": "^3.0.1",
     "bip32": "^1.0.2",
     "bip39": "^3.0.1",
