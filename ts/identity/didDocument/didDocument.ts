@@ -120,7 +120,6 @@ export class DidDocument implements IDigestable {
       : PublicKeySection.fromJSON(val)
     }), { toClassOnly: true }
   )
-
   public get authentication(): AuthenticationSection[] {
     return this._authentication
   }
@@ -148,12 +147,18 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose()
-  @Type(() => PublicKeySection)
-  @Transform((pubKeys, { verificationMethod }) => verificationMethod 
-    ? [...(pubKeys || []), ...verificationMethod]
-    : pubKeys, { 
-      toClassOnly: true
-    })
+  @Transform((pubKeys, rest) => {
+    const { verificationMethod } = rest
+    if (verificationMethod && verificationMethod.length) {
+      return [...(pubKeys || []), ...verificationMethod]
+    }
+
+    return pubKeys || []
+    }, { toClassOnly: true }
+  )
+  @Transform((pubKeys) => {
+    return pubKeys && pubKeys.map(PublicKeySection.fromJSON)
+  })
   public get publicKey(): PublicKeySection[] {
     return this._publicKey
   }

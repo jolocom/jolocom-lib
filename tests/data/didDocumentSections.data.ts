@@ -15,13 +15,13 @@ export const mockPubKeySectionCreationAttrs = {
 
 export const mockPublicKey = {
   id: mockKeyId,
-  type: 'Secp256k1VerificationKey2018',
+  type: 'EcdsaSecp256k1VerificationKey2019',
   controller: mockDid,
   publicKeyHex: mockPublicKeyHex,
 }
 export const mockPublicKey2 = {
   id: mockKeyId2,
-  type: 'Secp256k1VerificationKey2018',
+  type: 'EcdsaSecp256k1VerificationKey2019',
   controller: mockDid,
   publicKeyHex: mockPublicKeyHex,
 }
