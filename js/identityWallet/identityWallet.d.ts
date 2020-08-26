@@ -35,6 +35,7 @@ export declare class IdentityWallet {
     validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: import("../didMethods/types").IResolver): Promise<void>;
     asymEncrypt: (data: Buffer, key: Buffer, type: KeyTypes) => Promise<Buffer>;
     asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: import("../didMethods/types").IResolver) => Promise<Buffer>;
+    asymEncryptToDid: (data: Buffer, did: string, resolver?: import("../didMethods/types").IResolver) => Promise<Buffer>;
     asymDecrypt: (data: string, pass: string) => Promise<Buffer>;
     create: {
         credential: typeof Credential.create;
