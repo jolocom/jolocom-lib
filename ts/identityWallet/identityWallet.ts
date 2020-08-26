@@ -436,16 +436,28 @@ export class IdentityWallet {
    * @param data - The data to decrypt
    * @param pass - The VKP password
    */
-  public asymDecrypt = async (
-    data: string, // TODO double check what encoding is being used
-    pass: string,
-  ) =>
+  public asymDecrypt = async (data: Buffer, pass: string) =>
     this._keyProvider.decrypt(
       {
         encryptionPass: pass,
         keyRef: this._publicKeyMetadata.encryptionKeyId,
       },
-      Buffer.from(data, 'base64'),
+      data,
+    )
+
+  /**
+   * Signs data
+   *
+   * @param data - The data to sign
+   * @param pass - The VKP password
+   */
+  public sign = async (data: Buffer, pass: string) =>
+    this._keyProvider.sign(
+      {
+        encryptionPass: pass,
+        keyRef: this._publicKeyMetadata.encryptionKeyId,
+      },
+      data,
     )
 
   /* Gathering creation methods in an easier to use public interface */
