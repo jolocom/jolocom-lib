@@ -6,10 +6,11 @@ import { fuelKeyWithEther } from './utils/helper'
 import { validateDigestable, validateDigestables } from './utils/validation'
 import { didMethods } from './didMethods'
 import {
-  IVaultedKeyProvider,
   SoftwareKeyProvider,
   KeyTypes,
 } from '@jolocom/vaulted-key-provider'
+import { walletUtils } from '@jolocom/native-core'
+import { createIdentityFromKeyProvider } from './didMethods/utils'
 
 export const JolocomLib = {
   parse,

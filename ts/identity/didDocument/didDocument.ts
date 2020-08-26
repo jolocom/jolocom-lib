@@ -134,7 +134,6 @@ export class DidDocument implements IDigestable {
       if (typeof el === 'string') {
         this._authentication.push(el)
       } else {
-        console.log(el)
         this._authentication.push(el.id)
         this._publicKey.push(el)
       }
