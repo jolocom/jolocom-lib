@@ -16,6 +16,7 @@ import {
 import { publicKeyToDID } from '../../utils/crypto'
 import { fromSeed } from 'bip32'
 import { validateDigestable } from '../../utils/validation'
+import { mnemonicToEntropy } from 'ethers/lib/utils'
 
 const SIGNING_KEY_REF = `keys-1`
 const ANCHOR_KEY_REF = `keys-2`
@@ -29,10 +30,11 @@ export const joloSeedToEncryptedWallet = async (
   seed: Buffer,
   newPassword: string,
   impl: EncryptedWalletUtils,
+  originalDid?: string
 ): Promise<SoftwareKeyProvider> => {
   const joloKeys = fromSeed(seed).derivePath(JOLO_DERIVATION_PATH)
   const ethKeys = fromSeed(seed).derivePath(ETH_DERIVATION_PATH)
-  const did = publicKeyToDID(joloKeys.publicKey)
+  const did = originalDid || publicKeyToDID(joloKeys.publicKey)
 
   const skp = await SoftwareKeyProvider.newEmptyWallet(
     impl,
@@ -63,7 +65,8 @@ export const joloSeedToEncryptedWallet = async (
 
   await skp.newKeyPair(
     newPassword,
-    KeyTypes.x25519KeyAgreementKey2019
+    //@ts-ignore Investigate further, using the enum value might pass undefined sometimes
+    "X25519KeyAgreementKey2019",
     [`${did}#${ENCRYPTION_KEY_REF}`]
   )
 

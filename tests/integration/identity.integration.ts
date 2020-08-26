@@ -16,6 +16,7 @@ import {
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 import { walletUtils } from '@jolocom/native-core'
+import { PublicKeySection } from '../../ts/identity/didDocument/sections'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -54,7 +55,15 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       serviceIdentityWallet.did,
     )
 
-    expect(remoteUserIdentity.publicKeySection.length).eq(2)
+    remoteUserIdentity.publicKeySection
+      .map(section => expect(section).instanceOf(PublicKeySection))
+
+    remoteServiceIdentity.publicKeySection
+      .map(section => expect(section).instanceOf(PublicKeySection))
+
+    expect(remoteUserIdentity.publicKeySection.length).to.eq(2)
+    expect(remoteServiceIdentity.publicKeySection.length).to.eq(2)
+
     // TODO Created on proof is generated ad-hoc, via date.now()
     // expect(remoteUserIdentity.didDocument.toJSON()).to.deep.eq(
     //   userIdentityWallet.didDocument.toJSON(),

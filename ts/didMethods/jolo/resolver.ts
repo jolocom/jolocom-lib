@@ -37,9 +37,7 @@ export class JolocomResolver implements IResolver {
 
   async resolve(did: string) {
     const jsonDidDoc = await this.resolutionFunctions.resolve(did)
-      // TODO Don't discard reason
-      .catch(e => {
-        console.error(e)
+      .catch(_ => {
         throw new Error(ErrorCodes.RegistryDIDNotAnchored)
       })
 

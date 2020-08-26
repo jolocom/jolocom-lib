@@ -117,8 +117,8 @@ export class DidDocument implements IDigestable {
     const { type, publicKey } = val
     return type === 'Secp256k1SignatureAuthentication2018' && !!publicKey
       ? publicKey
-      : val
-    }), { toClassOnly: true, until: 0.13 }
+      : PublicKeySection.fromJSON(val)
+    }), { toClassOnly: true }
   )
   public get authentication(): AuthenticationSection[] {
     return this._authentication
@@ -134,7 +134,6 @@ export class DidDocument implements IDigestable {
       if (typeof el === 'string') {
         this._authentication.push(el)
       } else {
-        console.log(el)
         this._authentication.push(el.id)
         this._publicKey.push(el)
       }
@@ -148,14 +147,18 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose()
-  @Transform(pubKeys => pubKeys && pubKeys.map(PublicKeySection.fromJSON), {
-    toClassOnly: true
+  @Transform((pubKeys, rest) => {
+    const { verificationMethod } = rest
+    if (verificationMethod && verificationMethod.length) {
+      return [...(pubKeys || []), ...verificationMethod]
+    }
+
+    return pubKeys || []
+    }, { toClassOnly: true }
+  )
+  @Transform((pubKeys) => {
+    return pubKeys && pubKeys.map(PublicKeySection.fromJSON)
   })
-  @Transform((pubKeys, { verificationMethod }) => verificationMethod 
-    ? [...(pubKeys || []), ...verificationMethod]
-    : pubKeys, { 
-      toClassOnly: true
-    })
   public get publicKey(): PublicKeySection[] {
     return this._publicKey
   }

@@ -114,7 +114,7 @@ export class PublicKeySection {
     const publicKeySecion = new PublicKeySection()
     publicKeySecion.controller = did
     publicKeySecion.id = id
-    publicKeySecion.type = 'Secp256k1VerificationKey2018'
+    publicKeySecion.type = 'EcdsaSecp256k1VerificationKey2019'
     publicKeySecion.publicKeyHex = publicKey.toString('hex')
 
     return publicKeySecion

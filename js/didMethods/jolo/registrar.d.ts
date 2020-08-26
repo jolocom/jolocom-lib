@@ -4,7 +4,7 @@ import { getRegistrar } from '@jolocom/jolo-did-registrar';
 import { SignedCredential } from '../../credentials/signedCredential/signedCredential';
 import { IRegistrar } from '../types';
 import { SoftwareKeyProvider, EncryptedWalletUtils } from '@jolocom/vaulted-key-provider';
-export declare const joloSeedToEncryptedWallet: (seed: Buffer, newPassword: string, impl: EncryptedWalletUtils) => Promise<SoftwareKeyProvider>;
+export declare const joloSeedToEncryptedWallet: (seed: Buffer, newPassword: string, impl: EncryptedWalletUtils, originalDid?: string) => Promise<SoftwareKeyProvider>;
 export declare class JolocomRegistrar implements IRegistrar {
     prefix: string;
     registrarFns: ReturnType<typeof getRegistrar>;

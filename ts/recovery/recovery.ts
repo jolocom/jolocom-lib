@@ -1,9 +1,9 @@
-import { IdentityWallet } from '../identityWallet/identityWallet'
-import { publicKeyToDID } from '../utils/crypto'
 import { mnemonicToEntropy, validateMnemonic } from 'bip39'
 import { JoloDidMethod } from '../didMethods/jolo'
+import { EncryptedWalletUtils } from '@jolocom/vaulted-key-provider'
+import { joloSeedToEncryptedWallet } from '../didMethods/jolo/registrar'
+import { authAsIdentityFromKeyProvider } from '../didMethods/utils'
 import { SocialRecovery } from './socialRecovery'
-import { IKeyRefArgs } from '@jolocom/vaulted-key-provider'
 
 /**
  * List of possible seed phrase lengths referring to the BIP39 spec (https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
@@ -32,40 +32,49 @@ function sliceSeedPhrase(
   }
 }
 
-async function recoverFromSeedPhrase(
-  resolver = new JoloDidMethod().resolver,
+export const joloMnemonicToEncryptedWallet = async (
   mnemonicPhrase: string,
-  keyMetaData: IKeyRefArgs,
-//@ts-ignore - REIMPLEMENT
-): Promise<IdentityWallet> {
-  // let did: string
-  // let vault: SoftwareKeyProvider
-  // const { seedPhrase, didPhrase } = sliceSeedPhrase(mnemonicPhrase)
-  // vault = SoftwareKeyProvider.recoverKeyPair(
-  //   seedPhrase,
-  //   keyMetaData.encryptionPass,
-  // )
-  // if (didPhrase) {
-  //   did = 'did:jolo:' + mnemonicToEntropy(didPhrase)
-  // } else {
-  //   did = publicKeyToDID(vault.getPublicKey(keyMetaData))
-  // }
-  // return authJoloIdentity(await SoftwareKeyProvider.newEmptyWallet(cryptoUtils, '', 'hello'), keyMetaData.encryptionPass, resolver)
+  newPassword: string,
+  impl: EncryptedWalletUtils,
+) => {
+  const { seedPhrase, didPhrase } = sliceSeedPhrase(mnemonicPhrase)
+
+  const seed = Buffer.from(
+    mnemonicToEntropy(seedPhrase), 'hex'
+  )
+
+  const did = didPhrase && `did:jolo:${mnemonicToEntropy(didPhrase)}`;
+
+  return joloSeedToEncryptedWallet(seed, newPassword, impl, did)
 }
 
-async function recoverFromShards(
+const recoverFromSeedPhrase = async (
+  mnemonicPhrase: string,
+  newPassword: string,
+  impl: EncryptedWalletUtils,
   resolver = new JoloDidMethod().resolver,
-  shards: string[],
-  keyMetaData: IKeyRefArgs,
-//@ts-ignore - REIMPLEMENT
-): Promise<IdentityWallet> {
-  // const { did, secret } = SocialRecovery.combineShard(shards)
-  // const vault = SoftwareKeyProvider.fromSeed(
-  //   Buffer.from(secret, 'hex'),
-  //   keyMetaData.encryptionPass,
-  // )
+) => authAsIdentityFromKeyProvider(
+    await joloMnemonicToEncryptedWallet(mnemonicPhrase, newPassword, impl),
+    newPassword,
+    resolver
+  )
 
-  // return authJoloIdentity(vault, keyMetaData.encryptionPass, resolver)
+
+const recoverFromShards = async (
+  shards: string[],
+  newPassword: string,
+  impl: EncryptedWalletUtils,
+  resolver = new JoloDidMethod().resolver,
+) => {
+  const { did, secret } = SocialRecovery.combineShard(shards)
+
+  return authAsIdentityFromKeyProvider(
+    await joloSeedToEncryptedWallet(
+      Buffer.from(secret, 'hex'),
+      newPassword,
+      impl,
+      did
+    ), newPassword, resolver)
 }
 
 export { recoverFromSeedPhrase, recoverFromShards }

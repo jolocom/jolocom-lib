@@ -1,5 +1,5 @@
-import { IdentityWallet } from '../identityWallet/identityWallet';
-import { IKeyRefArgs } from '@jolocom/vaulted-key-provider';
-declare function recoverFromSeedPhrase(resolver: import("../didMethods/types").IResolver, mnemonicPhrase: string, keyMetaData: IKeyRefArgs): Promise<IdentityWallet>;
-declare function recoverFromShards(resolver: import("../didMethods/types").IResolver, shards: string[], keyMetaData: IKeyRefArgs): Promise<IdentityWallet>;
+import { EncryptedWalletUtils } from '@jolocom/vaulted-key-provider';
+export declare const joloMnemonicToEncryptedWallet: (mnemonicPhrase: string, newPassword: string, impl: EncryptedWalletUtils) => Promise<import("@jolocom/vaulted-key-provider").SoftwareKeyProvider>;
+declare const recoverFromSeedPhrase: (mnemonicPhrase: string, newPassword: string, impl: EncryptedWalletUtils, resolver?: import("../didMethods/types").IResolver) => Promise<import("../identityWallet/identityWallet").IdentityWallet>;
+declare const recoverFromShards: (shards: string[], newPassword: string, impl: EncryptedWalletUtils, resolver?: import("../didMethods/types").IResolver) => Promise<import("../identityWallet/identityWallet").IdentityWallet>;
 export { recoverFromSeedPhrase, recoverFromShards };

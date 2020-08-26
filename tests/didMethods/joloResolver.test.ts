@@ -10,12 +10,26 @@ import { ErrorCodes } from '../../ts/errors'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 import { JolocomResolver } from '../../ts/didMethods/jolo/resolver'
 import { Resolver } from 'did-resolver'
+import { parseAndValidate } from '../../ts/parse/parseAndValidate'
+import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 
 const sandbox = sinon.createSandbox()
 
+const docWithoutPubProfile = {
+  ...didDocumentJSON,
+  service: []
+}
+
 describe('Jolo Did method - resolve', () => {
   before(() => {
-    sandbox.stub(SoftwareKeyProvider, 'verify').returns(true)
+    sandbox.stub(parseAndValidate, 'signedCredential')
+    .resolves(SignedCredential.fromJSON(
+      publicProfileCredJSON
+    ))
+
+    sandbox.stub(parseAndValidate, 'didDocument')
+    .onCall(0).returns(DidDocument.fromJSON(docWithoutPubProfile))
+    .onCall(1).returns(DidDocument.fromJSON(didDocumentJSON))
   })
 
   after(() => {
