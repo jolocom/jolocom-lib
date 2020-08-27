@@ -8,7 +8,7 @@
   ],
   "typings": "js/index.d.ts",
   "scripts": {
-    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts --exit",
+    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts ./tests/**/**/*.ts --exit",
     "clean": "rm -rf ./js",
     "prepublish": "yarn clean; yarn build",
     "build": "tsc -p .",
@@ -72,7 +72,7 @@
     "@hawkingnetwork/ed25519-hd-key-rn": "^1.0.1",
     "@jolocom/jolo-did-registrar": "^1.0.0-rc5",
     "@jolocom/jolo-did-resolver": "^1.0.0-rc5",
-    "@jolocom/native-core": "^0.7.25",
+    "@jolocom/native-core": "^1.0.0-rc1",
     "@jolocom/protocol-ts": "^0.5.1",
     "@jolocom/vaulted-key-provider": "^0.7.4",
     "base64url": "^3.0.1",
