@@ -69,6 +69,7 @@
   "license": "MIT",
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
+    "@hawkingnetwork/ed25519-hd-key-rn": "^1.0.1",
     "@jolocom/jolo-did-registrar": "^1.0.0-rc5",
     "@jolocom/jolo-did-resolver": "^1.0.0-rc5",
     "@jolocom/native-core": "^0.7.25",

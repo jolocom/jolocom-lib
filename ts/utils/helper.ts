@@ -2,7 +2,6 @@ import { pubToAddress, addHexPrefix } from 'ethereumjs-util'
 import fetch from 'node-fetch'
 import { Identity } from '../identity/identity'
 import {
-  IVaultedKeyProvider,
   KeyTypes,
   PublicKeyInfo,
 } from '@jolocom/vaulted-key-provider'

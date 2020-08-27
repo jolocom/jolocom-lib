@@ -55,11 +55,13 @@ describe('Integration Test - Create, Resolve, Public Profile', () => {
       serviceIdentityWallet.did,
     )
 
-    remoteUserIdentity.publicKeySection
-      .map(section => expect(section).instanceOf(PublicKeySection))
+    remoteUserIdentity.publicKeySection.map(section =>
+      expect(section).instanceOf(PublicKeySection),
+    )
 
-    remoteServiceIdentity.publicKeySection
-      .map(section => expect(section).instanceOf(PublicKeySection))
+    remoteServiceIdentity.publicKeySection.map(section =>
+      expect(section).instanceOf(PublicKeySection),
+    )
 
     expect(remoteUserIdentity.publicKeySection.length).to.eq(2)
     expect(remoteServiceIdentity.publicKeySection.length).to.eq(2)

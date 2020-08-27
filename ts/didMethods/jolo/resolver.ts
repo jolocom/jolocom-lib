@@ -36,10 +36,9 @@ export class JolocomResolver implements IResolver {
   }
 
   async resolve(did: string) {
-    const jsonDidDoc = await this.resolutionFunctions.resolve(did)
-      .catch(_ => {
-        throw new Error(ErrorCodes.RegistryDIDNotAnchored)
-      })
+    const jsonDidDoc = await this.resolutionFunctions.resolve(did).catch(_ => {
+      throw new Error(ErrorCodes.RegistryDIDNotAnchored)
+    })
 
     const publicProfileJson = await this.resolutionFunctions.getPublicProfile(
       jsonDidDoc,

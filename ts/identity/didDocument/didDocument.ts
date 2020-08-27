@@ -113,12 +113,16 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose()
-  @Transform(auths => auths && auths.map(val => {
-    const { type, publicKey } = val
-    return type === 'Secp256k1SignatureAuthentication2018' && !!publicKey
-      ? publicKey
-      : PublicKeySection.fromJSON(val)
-    }), { toClassOnly: true }
+  @Transform(
+    auths =>
+      auths &&
+      auths.map(val => {
+        const { type, publicKey } = val
+        return type === 'Secp256k1SignatureAuthentication2018' && !!publicKey
+          ? publicKey
+          : PublicKeySection.fromJSON(val)
+      }),
+    { toClassOnly: true },
   )
   public get authentication(): AuthenticationSection[] {
     return this._authentication
@@ -130,14 +134,15 @@ export class DidDocument implements IDigestable {
    */
 
   public set authentication(authentication: AuthenticationSection[]) {
-    authentication && authentication.forEach(el => {
-      if (typeof el === 'string') {
-        this._authentication.push(el)
-      } else {
-        this._authentication.push(el.id)
-        this._publicKey.push(el)
-      }
-    })
+    authentication &&
+      authentication.forEach(el => {
+        if (typeof el === 'string') {
+          this._authentication.push(el)
+        } else {
+          this._authentication.push(el.id)
+          this._publicKey.push(el)
+        }
+      })
     this._authentication = authentication
   }
 
@@ -147,16 +152,18 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose()
-  @Transform((pubKeys, rest) => {
-    const { verificationMethod } = rest
-    if (verificationMethod && verificationMethod.length) {
-      return [...(pubKeys || []), ...verificationMethod]
-    }
+  @Transform(
+    (pubKeys, rest) => {
+      const { verificationMethod } = rest
+      if (verificationMethod && verificationMethod.length) {
+        return [...(pubKeys || []), ...verificationMethod]
+      }
 
-    return pubKeys || []
-    }, { toClassOnly: true }
+      return pubKeys || []
+    },
+    { toClassOnly: true },
   )
-  @Transform((pubKeys) => {
+  @Transform(pubKeys => {
     return pubKeys && pubKeys.map(PublicKeySection.fromJSON)
   })
   public get publicKey(): PublicKeySection[] {
@@ -178,7 +185,9 @@ export class DidDocument implements IDigestable {
    */
 
   public findPublicKeySectionById(keyId: string) {
-    return this._publicKey.find(({id}) => id === keyId || id === `#${keyId.split('#').pop()}`)
+    return this._publicKey.find(
+      ({ id }) => id === keyId || id === `#${keyId.split('#').pop()}`,
+    )
   }
 
   /**
@@ -380,7 +389,10 @@ export class DidDocument implements IDigestable {
     this._proof.signature = ''
     this._proof.nonce = (await getRandomBytes(8)).toString('hex')
 
-    const signature = await vaultedKeyProvider.sign(signConfig, await this.asBytes())
+    const signature = await vaultedKeyProvider.sign(
+      signConfig,
+      await this.asBytes(),
+    )
 
     this._proof.signature = signature.toString('hex')
   }
