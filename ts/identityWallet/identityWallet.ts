@@ -393,7 +393,7 @@ export class IdentityWallet {
     resolver = new JoloDidMethod().resolver,
   ) =>
     resolver.resolve(keyIdToDid(keyRef)).then(ident => {
-      const pk = ident.publicKeySection.find(pk => pk.id === keyRef)
+      const pk = ident.publicKeySection.find(pk => keyRef.endsWith(pk.id))
       if (!pk) throw new Error(ErrorCodes.PublicKeyNotFound)
 
       return this.asymEncrypt(
