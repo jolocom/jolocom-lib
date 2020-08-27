@@ -455,7 +455,7 @@ export class IdentityWallet {
     this._keyProvider.sign(
       {
         encryptionPass: pass,
-        keyRef: this._publicKeyMetadata.encryptionKeyId,
+        keyRef: this._publicKeyMetadata.signingKeyId,
       },
       data,
     )
