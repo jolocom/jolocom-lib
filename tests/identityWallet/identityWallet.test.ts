@@ -22,6 +22,7 @@ const expect = chai.expect
 
 /* Saves some space during stubbing, helper functions */
 
+//@ts-ignore Stubbed implementation
 const stubbedKeyProvider = {
   sign: sinon.stub().resolves(Buffer.from('aaaa', 'hex'))
 } as IVaultedKeyProvider
@@ -61,7 +62,7 @@ describe('IdentityWallet', () => {
     before(() => {
       stubCredCreate = sandbox
         .stub(SignedCredential, 'create')
-        .returns(SignedCredential.fromJSON(emailVerifiableCredential))
+        .resolves(SignedCredential.fromJSON(emailVerifiableCredential))
 
       spyFromJWTEncodable = sandbox.spy(JSONWebToken, 'fromJWTEncodable')
     })

@@ -1,14 +1,12 @@
 import { IDidMethod, IResolver, IRegistrar } from '../types'
-import { IdentityWallet } from '../../identityWallet/identityWallet'
 import { LocalRegistrar } from './registrar'
 import { LocalResolver } from './resolver'
 import { InternalDb, createDb } from 'local-resolver-registrar/js/db'
-import { validateEvents } from '@jolocom/native-core'
-import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
+import { validateEvents, walletUtils } from '@jolocom/native-core'
 import {
-  createIdentityFromKeyProvider,
   authAsIdentityFromKeyProvider,
 } from '../utils'
+import { recoverJunKeyProviderFromSeed } from './recovery'
 
 export class LocalDidMethod implements IDidMethod {
   public prefix = 'jun'
@@ -23,47 +21,13 @@ export class LocalDidMethod implements IDidMethod {
     this.registrar = new LocalRegistrar(db)
   }
 
-  /**
-   * Registers a  new Jolocom identity on Ethereum and IPFS and returns an instance of the Identity Wallet class
-   * @param vaultedKeyProvider - Instance of Vaulted Provider class storing password encrypted seed.
-   * @param decryptionPassword - password used to decrypt seed in vault for key generation
-   * @example `const identityWallet = await registry.create(vaultedProvider, 'password')`
-   */
+  public async recoverFromSeed(seed: Buffer, newPassword: string) {
+    const {
+      keyProvider,
+      inceptionEvent
+    } = await recoverJunKeyProviderFromSeed(seed ,newPassword, walletUtils)
 
-  public async create(
-    vaultedKeyProvider: SoftwareKeyProvider,
-    decryptionPassword: string,
-  ): Promise<IdentityWallet> {
-    return createIdentityFromKeyProvider(
-      vaultedKeyProvider,
-      decryptionPassword,
-      this.registrar,
-    )
-  }
-
-  /**
-   * Resolves a jolocom did and returns an {@link Identity} class instance
-   * @param did - The jolocom did to resolve
-   * @example `const serviceIdentity = await registry.resolve('did:jolo:...')`
-   */
-
-  /**
-   * Derives the identity public key, fetches the public
-   *   profile and did document, and instantiates an identity wallet
-   *   with the vault, decryption pass, and and key metadata
-   * @param vaultedKeyProvider - Vaulted key store
-   * @param derivationArgs - password for the vault and derivation path
-   * @example `const wallet = registry.authenticate(vault, { derivationPath: '...', encryptionPass: '...'})`
-   */
-
-  public async authenticate(
-    vaultedKeyProvider: SoftwareKeyProvider,
-    decryptionPassword: string,
-  ): Promise<IdentityWallet> {
-    return authAsIdentityFromKeyProvider(
-      vaultedKeyProvider,
-      decryptionPassword,
-      this.resolver,
-    )
+    await this.registrar.encounter(inceptionEvent)
+    return authAsIdentityFromKeyProvider(keyProvider, newPassword, this.resolver)
   }
 }

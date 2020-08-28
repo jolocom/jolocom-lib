@@ -75,6 +75,7 @@
     "@jolocom/native-core": "^1.0.0-rc1",
     "@jolocom/protocol-ts": "^0.5.1",
     "@jolocom/vaulted-key-provider": "^0.7.4",
+    "@types/sinon": "^9.0.5",
     "base64url": "^3.0.1",
     "bip32": "^1.0.2",
     "bip39": "^3.0.1",

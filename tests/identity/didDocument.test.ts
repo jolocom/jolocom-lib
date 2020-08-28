@@ -44,7 +44,7 @@ describe('DidDocument', async () => {
     // This sets the claimId
     sandbox
       .stub(nodeCrypto, 'randomBytes')
-      .returns(Buffer.from('1842fb5f567dd532', 'hex'))
+      .resolves(Buffer.from('1842fb5f567dd532', 'hex'))
 
     // Currently stubbing because we have no way
     // to deterministically generate keys on the software

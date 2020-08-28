@@ -27,8 +27,8 @@ describe('Jolo Did method - resolve', () => {
     ))
 
     sandbox.stub(parseAndValidate, 'didDocument')
-    .onCall(0).returns(DidDocument.fromJSON(docWithoutPubProfile))
-    .onCall(1).returns(DidDocument.fromJSON(didDocumentJSON))
+    .onCall(0).resolves(DidDocument.fromJSON(docWithoutPubProfile))
+    .onCall(1).resolves(DidDocument.fromJSON(didDocumentJSON))
   })
 
   after(() => {

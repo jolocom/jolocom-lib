@@ -1,4 +1,5 @@
 import * as secrets from 'secrets.js-grempe'
+import { entropyToMnemonic } from 'bip39'
 import { ErrorCodes } from '../errors'
 
 export class SocialRecovery {
@@ -28,14 +29,14 @@ export class SocialRecovery {
 
   public static combineShard(
     shards: string[],
-  ): { did: string; secret: string } {
+  ): { did: string; secret: Buffer } {
     const result = SocialRecovery.unpack(
       secrets.combine(shards.map(SocialRecovery.decompress)),
     )
 
     return {
-      did: 'did:jolo:' + result.label,
-      secret: result.secret,
+      did: result.label,
+      secret: Buffer.from(result.secret, 'hex'),
     }
   }
   private static unpack(shard: string): { secret: string; label: string } {

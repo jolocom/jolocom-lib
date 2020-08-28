@@ -1,12 +1,11 @@
 import { SoftwareKeyProvider, EncryptedWalletUtils } from '@jolocom/vaulted-key-provider'
-import { validateEvents, getIcpFromKeySet } from '@jolocom/native-core'
+import { getIcpFromKeySet } from '@jolocom/native-core'
 import { derivePath } from '@hawkingnetwork/ed25519-hd-key-rn'
-import { Identity } from '../../identity/identity'
-import { DidDocument } from '../../identity/didDocument/didDocument'
-import { IRegistrar } from '../types'
+import { IDidMethod } from '../types'
+import { authAsIdentityFromKeyProvider } from '../utils'
+import { mnemonicToEntropy } from 'bip39'
 
 const DERIVATION_PATHS = {
-  // TODO Change back
   controlKey: "m/73'/0'/0'",
   preRotatedControlKey: "m/73'/0'/1'",
   encKey: "m/73'/1'/0'",
@@ -25,11 +24,10 @@ export const slip10DeriveKey = (seed: Buffer) => (path: String): Buffer => {
   return derivePath(path, seed).key
 }
 
-export const recoverIdentityFromSlip0010Seed = async (
+export const recoverJunKeyProviderFromSeed = async (
   seed: Buffer,
   newPassword: string,
   impl: EncryptedWalletUtils,
-  registrar?: IRegistrar
 ) => {
   const derivationFn = slip10DeriveKey(seed)
 
@@ -44,20 +42,38 @@ export const recoverIdentityFromSlip0010Seed = async (
     password: newPassword
   })
 
-  const vkp = await SoftwareKeyProvider.newEmptyWallet(impl, id, newPassword)
+  const keyProvider = await SoftwareKeyProvider.newEmptyWallet(impl, id, newPassword)
 
   //@ts-ignore
-  vkp._encryptedWallet = Buffer.from(encryptedWallet, 'base64')
+  keyProvider._encryptedWallet = Buffer.from(encryptedWallet, 'base64')
 
-  const didDoc = JSON.parse(
-    await validateEvents(JSON.stringify([inceptionEvent])),
-  )
-
-  const identity = Identity.fromDidDocument({
-    didDocument: DidDocument.fromJSON(didDoc),
-  })
-
-  registrar && await registrar.encounter([inceptionEvent])
-  return identity
+  return {
+    keyProvider,
+    inceptionEvent: [inceptionEvent]
+  }
 }
 
+export const junMnemonicToEncryptedWallet = async (
+  mnemonicPhrase: string,
+  newPassword: string,
+  didMethod: IDidMethod,
+  impl: EncryptedWalletUtils,
+) => {
+  const seed = mnemonicToEntropy(mnemonicPhrase)
+  const {
+    keyProvider,
+    inceptionEvent
+  } = await recoverJunKeyProviderFromSeed(
+    Buffer.from(seed, 'hex'),
+    newPassword,
+    impl
+  )
+
+  await didMethod.registrar.encounter(inceptionEvent)
+
+  return authAsIdentityFromKeyProvider(
+    keyProvider,
+    newPassword,
+    didMethod.resolver
+  )
+}

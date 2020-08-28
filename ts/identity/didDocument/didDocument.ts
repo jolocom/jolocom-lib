@@ -15,7 +15,7 @@ import {
   ServiceEndpointsSection,
 } from './sections'
 import { defaultContextIdentity } from '../../utils/contexts'
-import { publicKeyToDID, getRandomBytes } from '../../utils/crypto'
+import { getRandomBytes } from '../../utils/crypto'
 import { digestJsonLd, normalizeSignedLdObject } from '../../linkedData'
 import {
   IDigestable,
@@ -24,6 +24,7 @@ import {
 import { ContextEntry } from '@jolocom/protocol-ts'
 import { ISigner } from '../../credentials/signedCredential/types'
 import { IVaultedKeyProvider, IKeyRefArgs } from '@jolocom/vaulted-key-provider'
+import { publicKeyToJoloDID } from '../../didMethods/jolo/utils'
 
 /**
  * Class modelling a Did Document
@@ -362,7 +363,7 @@ export class DidDocument implements IDigestable {
    */
 
   public static async fromPublicKey(publicKey: Buffer): Promise<DidDocument> {
-    const did = publicKeyToDID(publicKey)
+    const did = publicKeyToJoloDID(publicKey)
     const keyId = `${did}#keys-1`
 
     const didDocument = new DidDocument()

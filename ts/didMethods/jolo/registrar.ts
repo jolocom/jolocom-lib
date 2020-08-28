@@ -10,68 +10,13 @@ import { PROVIDER_URL, CONTRACT_ADDRESS, IPFS_ENDPOINT } from './constants'
 import {
   KeyTypes,
   SoftwareKeyProvider,
-  EncryptedWalletUtils,
   PublicKeyInfo
 } from '@jolocom/vaulted-key-provider'
-import { publicKeyToDID } from '../../utils/crypto'
-import { fromSeed } from 'bip32'
 import { validateDigestable } from '../../utils/validation'
-import { mnemonicToEntropy } from 'ethers/lib/utils'
+import { KEY_REFS } from './constants'
+import { publicKeyToJoloDID } from './utils'
 
-const SIGNING_KEY_REF = `keys-1`
-const ANCHOR_KEY_REF = `keys-2`
-const ENCRYPTION_KEY_REF = `keys-3`
-
-const ETH_DERIVATION_PATH = "m/44'/60'/0'/0/0"
-const JOLO_DERIVATION_PATH = "m/73'/0'/0'/0"
-const ENCRYPTION_DERIVATION_PATH = "m/73'/0'/1'/0"
-
-export const joloSeedToEncryptedWallet = async (
-  seed: Buffer,
-  newPassword: string,
-  impl: EncryptedWalletUtils,
-  originalDid?: string
-): Promise<SoftwareKeyProvider> => {
-  const joloKeys = fromSeed(seed).derivePath(JOLO_DERIVATION_PATH)
-  const ethKeys = fromSeed(seed).derivePath(ETH_DERIVATION_PATH)
-  const did = originalDid || publicKeyToDID(joloKeys.publicKey)
-
-  const skp = await SoftwareKeyProvider.newEmptyWallet(
-    impl,
-    did,
-    newPassword
-  )
-
-  await skp.changeId(newPassword, did)
-
-  await skp.addContent(newPassword, {
-    type: ['BIP32JolocomIdentitySeedv0'],
-    value: seed.toString('hex'),
-  })
-
-  await skp.addContent(newPassword, {
-    controller: [`${did}#${SIGNING_KEY_REF}`],
-    type: KeyTypes.ecdsaSecp256k1VerificationKey2019,
-    publicKeyHex: joloKeys.publicKey.toString('hex'),
-    private_key: joloKeys.privateKey.toString('hex'),
-  })
-
-  await skp.addContent(newPassword, {
-    controller: [`${did}#${ANCHOR_KEY_REF}`],
-    type: KeyTypes.ecdsaSecp256k1RecoveryMethod2020,
-    publicKeyHex: ethKeys.publicKey.toString('hex'),
-    private_key: ethKeys.privateKey.toString('hex'),
-  })
-
-  await skp.newKeyPair(
-    newPassword,
-    //@ts-ignore Investigate further, using the enum value might pass undefined sometimes
-    "X25519KeyAgreementKey2019",
-    [`${did}#${ENCRYPTION_KEY_REF}`]
-  )
-
-  return skp
-}
+const { SIGNING_KEY_REF, ANCHOR_KEY_REF, ENCRYPTION_KEY_REF } =  KEY_REFS
 
 export class JolocomRegistrar implements IRegistrar {
   public prefix = 'jolo'
@@ -124,7 +69,7 @@ export class JolocomRegistrar implements IRegistrar {
         SIGNING_KEY_REF,
       )
 
-      const did = publicKeyToDID(Buffer.from(signingKey.publicKeyHex, 'hex'))
+      const did = publicKeyToJoloDID(Buffer.from(signingKey.publicKeyHex, 'hex'))
 
       await keyProvider.changeId(password, did)
 

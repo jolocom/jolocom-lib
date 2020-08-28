@@ -1,5 +1,6 @@
 import { Identity } from '../identity/identity'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
+import { IdentityWallet } from '../identityWallet/identityWallet'
 
 /*
  * TODO - is the prefix required on all components, or just the DID Method?
@@ -34,4 +35,5 @@ export interface IDidMethod {
   prefix: string
   resolver: IResolver
   registrar: IRegistrar
+  recoverFromSeed? : (seed: Buffer, newPassword: string) => Promise<IdentityWallet>
 }
