@@ -44,11 +44,11 @@ const parseAndValidateSignedCredential = async (signedCredential: ISignedCredent
 export const parseAndValidateInteractionToken = async (jwt: string, signer: Identity) : Promise<JSONWebToken<JWTEncodable>> =>  {
   const interactionToken = parse.interactionToken.fromJWT<JWTEncodable>(jwt)
 
-  const [body, payload, _] = jwt.split('.')
+  const [body, payload, signature] = jwt.split('.')
 
   const isValid = await verifySignatureWithIdentity(
-    sha256(Buffer.from([body, payload].join('.'))),
-    Buffer.from(interactionToken.signature, 'hex'),
+    Buffer.from(Buffer.from([body, payload].join('.'))),
+    Buffer.from(signature, 'hex'),
     interactionToken.signer.keyId,
     signer
   )

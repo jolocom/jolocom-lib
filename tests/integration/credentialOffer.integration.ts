@@ -17,6 +17,7 @@ import { CredentialsReceive } from '../../ts/interactionTokens/credentialsReceiv
 import { CredentialOfferRequest } from '../../ts/interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../../ts/interactionTokens/credentialOfferResponse'
 import { validateDigestable } from '../../ts/utils/validation'
+import { parseAndValidate } from '../../ts/parse/parseAndValidate'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -46,23 +47,14 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
   })
 
   it('Should allow for consumption of valid credential offer request token by user', async () => {
-    const decodedCredOfferRequest = JSONWebToken.decode<CredentialOfferRequest>(
+    const decodedCredOfferRequest = await parseAndValidate.interactionToken(
       credOfferRequestEncoded,
-    )
+      serviceIdentityWallet.identity
+    ) as JSONWebToken<CredentialOfferRequest>
 
     expect(decodedCredOfferRequest.interactionToken).to.be.instanceOf(
       CredentialOfferRequest,
     )
-
-    try {
-      await userIdentityWallet.validateJWT(
-        decodedCredOfferRequest,
-        null,
-        localDidMethod.resolver
-      )
-    } catch (err) {
-      return expect(true).to.be.false
-    }
 
     credOfferResponseJWT = await userIdentityWallet.create.interactionTokens.response.offer(
       credentialOfferResponseCreationArgs,
@@ -71,6 +63,7 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     ) as JSONWebToken<CredentialOfferResponse>
 
     credOfferResponseEncoded = credOfferResponseJWT.encode()
+
     expect(credOfferResponseJWT.interactionToken).to.be.instanceOf(
       CredentialOfferResponse,
     )
@@ -81,30 +74,14 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     )
   })
 
-  it('Should allow for consumption of valid credential offer response token by service', async () => {
-    const decodedCredOfferResponse = JSONWebToken.decode<
-      CredentialOfferRequest
-    >(credOfferResponseEncoded)
-
-    expect(decodedCredOfferResponse.interactionToken).to.be.instanceOf(
-      CredentialOfferResponse,
-    )
-
-    try {
-      await serviceIdentityWallet.validateJWT(
-        decodedCredOfferResponse,
-        credOfferRequestJWT,
-        localDidMethod.resolver
-      )
-    } catch (err) {
-      return expect(true).to.be.false
-    }
-  })
-
   it('Should correctly create a credential receive token by service', async () => {
-    const decodedCredOfferResponse = JSONWebToken.decode<
-      CredentialOfferResponse
-    >(credOfferResponseEncoded)
+    const decodedCredOfferResponse = await parseAndValidate.interactionToken(
+      credOfferResponseEncoded,
+      userIdentityWallet.identity
+    ) as JSONWebToken<CredentialOfferResponse>
+
+    expect(decodedCredOfferResponse.interactionToken).to.be.instanceOf(CredentialOfferResponse)
+
     const signedCredForUser = await serviceIdentityWallet.create.signedCredential(
       {
         metadata: claimsMetadata.emailAddress,
@@ -131,22 +108,14 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
   })
 
   it('Should allow for consumtion of valid credential receive token by user', async () => {
-    const decodedCredReceive = JSONWebToken.decode<CredentialsReceive>(
+    const decodedCredReceive = await parseAndValidate.interactionToken(
       credReceiveEncoded,
-    )
+      serviceIdentityWallet.identity
+    ) as JSONWebToken<CredentialsReceive>
+
     expect(decodedCredReceive.interactionToken).to.be.instanceOf(
       CredentialsReceive,
     )
-
-    try {
-      await userIdentityWallet.validateJWT(
-        decodedCredReceive,
-        credOfferResponseJWT,
-        localDidMethod.resolver
-      )
-    } catch (err) {
-      return expect(true).to.be.false
-    }
 
     expect(
       decodedCredReceive.interactionToken.signedCredentials[0].subject,
