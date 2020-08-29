@@ -334,7 +334,8 @@ export class SignedCredential implements IDigestable {
     if (signedCredential.expires <= signedCredential.issued) {
       throw new Error(ErrorCodes.VCInvalidExpiryDate)
     }
-    signedCredential.prepareSignature(issInfo.keyId)
+
+    await signedCredential.prepareSignature(issInfo.keyId)
     signedCredential.issuer = issInfo.issuerDid
 
     return signedCredential
