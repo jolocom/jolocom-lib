@@ -8,8 +8,8 @@ import { Authentication } from '../../ts/interactionTokens/authentication'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  localDidMethod,
 } from './identity.integration'
+import { parseAndValidate } from '../../ts/parse/parseAndValidate'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -27,29 +27,15 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     expect(authRequestJWT.interactionToken).to.deep.eq(
       Authentication.fromJSON(jsonAuthentication)
     )
-
-    return userIdentityWallet.validateJWT(
-      authRequestJWT,
-      undefined,
-      localDidMethod.resolver)
   })
 
   it('Should allow for consumption of valid authentication request token by user', async () => {
-    const decodedAuthRequest = JSONWebToken.decode<Authentication>(
+    const decodedAuthRequest = await parseAndValidate.interactionToken(
       authRequestJWT.encode(),
-    )
+      serviceIdentityWallet.identity
+    ) as JSONWebToken<Authentication>
 
     expect(decodedAuthRequest.interactionToken).to.be.instanceOf(Authentication)
-
-    try {
-      await userIdentityWallet.validateJWT(
-        decodedAuthRequest,
-        undefined,
-        localDidMethod.resolver
-      )
-    } catch (err) {
-      return expect(true).to.be.false
-    }
 
     const authResponseJWT = await userIdentityWallet.create.interactionTokens.response.auth(
       {
@@ -59,6 +45,7 @@ describe('Integration Test - Token interaction flow Authentication', () => {
       userPass,
       decodedAuthRequest,
     )
+
     authResponseEncoded = authResponseJWT.encode()
 
     expect(authResponseJWT.interactionToken).to.be.instanceOf(Authentication)
@@ -66,30 +53,14 @@ describe('Integration Test - Token interaction flow Authentication', () => {
     expect(authResponseJWT.audience).to.eq(
       keyIdToDid(decodedAuthRequest.issuer),
     )
-
-    return serviceIdentityWallet.validateJWT(
-      authResponseJWT,
-      authRequestJWT,
-      localDidMethod.resolver
-    )
   })
 
   it('Should allow for consumption of valid authentication response token by service', async () => {
-    const decodedAuthResponse = JSONWebToken.decode<Authentication>(
+    const decodedAuthResponse = await parseAndValidate.interactionToken(
       authResponseEncoded,
-    )
-    expect(decodedAuthResponse.interactionToken).to.be.instanceOf(
-      Authentication,
-    )
+      userIdentityWallet.identity
+    ) as JSONWebToken<Authentication>
 
-    try {
-      await serviceIdentityWallet.validateJWT(
-        decodedAuthResponse,
-        authRequestJWT,
-        localDidMethod.resolver
-      )
-    } catch (err) {
-      return expect(true).to.be.false
-    }
+    expect(decodedAuthResponse.interactionToken).to.be.instanceOf(Authentication)
   })
 })

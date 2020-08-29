@@ -78,6 +78,7 @@ export const validateJsonLd = async (
     ? resolverOrIdentity
     : await resolverOrIdentity.resolve(keyIdToDid(json.proof.creator))
 
+
     return verifySignatureWithIdentity(
       await normalizeSignedLdObject(json, json['@context']),
       Buffer.from(json.proof.signatureValue, 'hex'),

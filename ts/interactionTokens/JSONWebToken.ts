@@ -230,10 +230,9 @@ export class JSONWebToken<T> implements IDigestable {
   }
 
   public async asBytes() {
-    const { encode } = base64url
     return Buffer.from([
-      encode(JSON.stringify(this._header)),
-      encode(JSON.stringify(this._payload)),
+      base64url.encode(JSON.stringify(this.header)),
+      base64url.encode(JSON.stringify(this.payload)),
     ].join('.'))
   }
 
