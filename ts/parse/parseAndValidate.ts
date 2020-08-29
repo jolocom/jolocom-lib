@@ -13,7 +13,7 @@ import { parse } from './parse'
 const parseAndValidateDidDoc = async (didDocument: IDidDocumentAttrs): Promise<DidDocument> => {
   const didDoc = DidDocument.fromJSON(didDocument)
 
-  const signatureValid = validateJsonLd(
+  const signatureValid = await validateJsonLd(
     //@ts-ignore optional proof
     didDocument,
     Identity.fromDidDocument({ didDocument: didDoc })
@@ -29,13 +29,13 @@ const parseAndValidateDidDoc = async (didDocument: IDidDocumentAttrs): Promise<D
 const parseAndValidateSignedCredential = async (signedCredential: ISignedCredentialAttrs, signer: Identity): Promise<SignedCredential> => {
   const signedCred = SignedCredential.fromJSON(signedCredential)
 
-  const signatureValid = validateJsonLd(
+  const signatureValid = await validateJsonLd(
     signedCredential,
     signer
   )
 
   if (signatureValid) {
-    signedCred
+    return signedCred
   }
 
   throw new Error(ErrorCodes.InvalidSignature)

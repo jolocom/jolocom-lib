@@ -368,28 +368,34 @@ export class IdentityWallet {
   }
 
   /**
-   * Encrypts data asymmetrically
-   * @param data - The data to encrypt
-   * @param key - The key to encrypt to
-   * @param type - The type of the key to encrypt to
+   * Encrypts data asymmetrically, give a key
+   *
+   * @param data Buffer   The data to encrypt
+   * @param key  Buffer   The key to encrypt to
+   * @param type KeyTypes The type of the key to encrypt to
    */
   public asymEncrypt = async (data: Buffer, key: Buffer, type: KeyTypes) =>
     getCryptoProvider(cryptoUtils).encrypt(key, type, data)
 
   /**
-   * Encrypts data asymmetrically
-   * @param data - The data to encrypt
-   * @param keyRef - The public key reference to encrypt to (e.g. 'did:jolo:12345#key-1')
-   * @param resolver - instance of a {@link Resolver} to use for retrieving the target's public keys. If none is provided, the
-   * default Jolocom contract is used for resolution.
+   * Encrypts data asymmetrically, given a key reference (including the DID)
+   * It resolves the DID and looks for the referenced key
+   *
+   * @param data     Buffer    The data to encrypt
+   * @param keyRef   string    The public key reference to encrypt to (e.g. 'did:jolo:12345#key-1')
+   * @param resolver IResolver instance of a {@link Resolver} to use for
+   *                           retrieving the target's public keys. If none is provided, the default
+   *                           Jolocom contract is used for resolution.
    */
   public asymEncryptToDidKey = async (
     data: Buffer,
     keyRef: string,
     resolver = new JoloDidMethod().resolver,
   ) =>
-    await resolver.resolve(keyIdToDid(keyRef)).then(id => {
-      const pk = id.publicKeySection.find(pk => pk.id === keyRef)
+    resolver.resolve(keyIdToDid(keyRef)).then(ident => {
+      const pk = ident.publicKeySection.find(pk => keyRef.endsWith(pk.id))
+      if (!pk) throw new Error(ErrorCodes.PublicKeyNotFound)
+
       return this.asymEncrypt(
         data,
         Buffer.from(pk.publicKeyHex, 'hex'),
@@ -398,20 +404,60 @@ export class IdentityWallet {
     })
 
   /**
-   * Decrypts data asymmetrically
-   * @param data - The data to decrypt
-   * @param derivationArgs - The decryption private key derivation arguments
+   * Encrypts data asymmetrically, given a DID
+   * It resolves the DID and looks for the first key of type x25519KeyAgreementKey2019
+   *
+   * @param data     Buffer    The data to encrypt
+   * @param did     string     The DID whose public key will be used to encrypt to (e.g. 'did:jolo:12345#key-1')
+   * @param resolver IResolver instance of a {@link Resolver} to use for
+   *                           retrieving the target's public keys. If none is provided, the default
+   *                           Jolocom contract is used for resolution.
    */
-  public asymDecrypt = async (
-    data: string, // TODO double check what encoding is being used
-    pass: string,
+  public asymEncryptToDid = async (
+    data: Buffer,
+    did: string,
+    resolver = new JoloDidMethod().resolver,
   ) =>
+    resolver.resolve(did).then(ident => {
+      const encKey = ident.didDocument.publicKey.find(
+        k => k.type === KeyTypes.x25519KeyAgreementKey2019,
+      )
+      if (!encKey) throw new Error(ErrorCodes.PublicKeyNotFound)
+      return this.asymEncrypt(
+        data,
+        Buffer.from(encKey.publicKeyHex, 'hex'),
+        encKey.type as KeyTypes
+      )
+    })
+
+  /**
+   * Decrypts data asymmetrically
+   *
+   * @param data - The data to decrypt
+   * @param pass - The VKP password
+   */
+  public asymDecrypt = async (data: Buffer, pass: string) =>
     this._keyProvider.decrypt(
+      {
+        encryptionPass: pass,
+        keyRef: this._publicKeyMetadata.encryptionKeyId,
+      },
+      data,
+    )
+
+  /**
+   * Signs data
+   *
+   * @param data - The data to sign
+   * @param pass - The VKP password
+   */
+  public sign = async (data: Buffer, pass: string) =>
+    this._keyProvider.sign(
       {
         encryptionPass: pass,
         keyRef: this._publicKeyMetadata.signingKeyId,
       },
-      Buffer.from(data, 'base64'),
+      data,
     )
 
   /* Gathering creation methods in an easier to use public interface */

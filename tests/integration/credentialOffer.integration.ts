@@ -16,6 +16,7 @@ import { claimsMetadata } from '@jolocom/protocol-ts'
 import { CredentialsReceive } from '../../ts/interactionTokens/credentialsReceive'
 import { CredentialOfferRequest } from '../../ts/interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../../ts/interactionTokens/credentialOfferResponse'
+import { validateDigestable } from '../../ts/utils/validation'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -150,5 +151,10 @@ describe('Integration Test - Token interaction flow Credential Offer', () => {
     expect(
       decodedCredReceive.interactionToken.signedCredentials[0].subject,
     ).to.eq(userIdentityWallet.did)
+
+    expect(
+      await validateDigestable(decodedCredReceive.interactionToken.signedCredentials[0], localDidMethod.resolver)
+    ).to.eq(true)
+
   })
 })
