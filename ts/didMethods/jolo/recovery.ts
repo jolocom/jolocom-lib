@@ -50,9 +50,10 @@ export const recoverJoloKeyProviderFromSeed = async (
 
   await skp.newKeyPair(
     newPassword,
-    //@ts-ignore Investigate further, using the enum value might pass undefined sometimes
+    //@ts-ignore Investigate further, using the enum value
+    //leads to failure to downcast to string in rust
     "X25519KeyAgreementKey2019",
-    [`${did}#${ENCRYPTION_KEY_REF}`]
+    `${did}#${ENCRYPTION_KEY_REF}`
   )
 
   return skp

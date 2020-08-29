@@ -136,6 +136,6 @@ describe('parseAndValidate', () => {
     })
 
 
-    it('lib@4.0.2 Should correctly parse and validate credentials created by JOLO identities', async () => {})
+    it('lib@4.0.2 Should correctly parse and validate JWTs created by JOLO identities', async () => {})
   })
 })

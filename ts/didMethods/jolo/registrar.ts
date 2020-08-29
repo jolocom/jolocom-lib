@@ -37,18 +37,24 @@ export class JolocomRegistrar implements IRegistrar {
     if(keyProvider.id.startsWith(`did:${this.prefix}`)) {
       const existingSigningKey = await keyProvider.getPubKeyByController(
         password,
-        `${keyProvider.id}#${SIGNING_KEY_REF}`,
-      )
+        `${keyProvider.id}#${SIGNING_KEY_REF}`
+      ).catch(_ => {
+        throw new Error(`Jolo registrar - No signing key with ref ${SIGNING_KEY_REF} found`)
+      })
 
       const existingAnchoringKey = await keyProvider.getPubKeyByController(
          password,
         `${keyProvider.id}#${ANCHOR_KEY_REF}`,
-      )
+      ).catch(_ => {
+        throw new Error(`Jolo registrar - No anchoring key with ref ${ANCHOR_KEY_REF} found`)
+      })
 
       let existingEncryptionKey = await keyProvider.getPubKeyByController(
         password,
         `${keyProvider.id}#${ENCRYPTION_KEY_REF}`,
-      )
+      ).catch(_ => { 
+        throw new Error(`Jolo registrar - No encryption key with ref ${ENCRYPTION_KEY_REF} found`)
+      })
 
       if (
         !existingSigningKey ||
