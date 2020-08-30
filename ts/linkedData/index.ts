@@ -33,7 +33,7 @@ export const normalizeJsonLd = async (
  * @param context - JsonLD context to use during normalization
  */
 
-export const normalizeLdProof = async (
+const normalizeLdProof = async (
   { signatureValue, id, type, ...toNormalize }: ILinkedDataSignatureAttrs,
   context: JsonLdContext,
 ): Promise<string> => normalizeJsonLd(toNormalize, context)

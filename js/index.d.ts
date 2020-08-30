@@ -10,6 +10,7 @@ export declare const JolocomLib: {
     };
     didMethods: {
         jolo: import("./didMethods/jolo").JoloDidMethod;
+        jun: import("./didMethods/local").LocalDidMethod;
     };
     KeyProvider: typeof SoftwareKeyProvider;
     util: {
