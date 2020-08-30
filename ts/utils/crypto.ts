@@ -19,3 +19,6 @@ export function sha256(data: Buffer): Buffer {
 export async function getRandomBytes(nr: number): Promise<Buffer> {
   return getCryptoProvider(cryptoUtils).getRandom(nr)
 }
+
+// Exporting for consuming applications (e.g. the SDK).
+export { mnemonicToEntropy, entropyToMnemonic } from 'bip39'
