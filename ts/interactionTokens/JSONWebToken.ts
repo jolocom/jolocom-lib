@@ -16,8 +16,6 @@ import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
 import { CredentialsReceive } from './credentialsReceive'
 import { keyIdToDid } from '../utils/helper'
-import { PaymentResponse } from './paymentResponse'
-import { PaymentRequest } from './paymentRequest'
 import { CredentialOfferResponse } from './credentialOfferResponse'
 import { CredentialOfferRequest } from './credentialOfferRequest'
 import { ErrorCodes } from '../errors'
@@ -34,8 +32,6 @@ export type JWTEncodable =
   | CredentialOfferRequest
   | CredentialOfferResponse
   | CredentialsReceive
-  | PaymentRequest
-  | PaymentResponse
 
 interface IJWTEncodable {
   [key: string]: any
@@ -233,18 +229,20 @@ export class JSONWebToken<T> implements IDigestable {
     ].join('.')
   }
 
+  public async asBytes() {
+    return Buffer.from([
+      base64url.encode(JSON.stringify(this.header)),
+      base64url.encode(JSON.stringify(this.payload)),
+    ].join('.'))
+  }
+
   /*
    * @description - Serializes the class and computes the sha256 hash
    * @returns {Buffer} - sha256 hash of the serialized class
    */
 
   public async digest() {
-    const { encode } = base64url
-    const toSign = [
-      encode(JSON.stringify(this.header)),
-      encode(JSON.stringify(this.payload)),
-    ].join('.')
-    return sha256(Buffer.from(toSign))
+    return sha256(await this.asBytes())
   }
 
   public toJSON(): IJSONWebTokenAttrs {
@@ -301,10 +299,6 @@ const instantiateInteraction = <T>(
       return instantiator(CredentialResponse)
     case InteractionType.Authentication:
       return instantiator(Authentication)
-    case InteractionType.PaymentRequest:
-      return instantiator(PaymentRequest)
-    case InteractionType.PaymentResponse:
-      return instantiator(PaymentResponse)
   }
   throw new Error(ErrorCodes.JWTInvalidInteractionType)
 }

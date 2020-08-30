@@ -1,6 +1,11 @@
-import { DidDocument } from '../identity/didDocument/didDocument'
 import { pubToAddress, addHexPrefix } from 'ethereumjs-util'
 import fetch from 'node-fetch'
+import { Identity } from '../identity/identity'
+import {
+  KeyTypes,
+  PublicKeyInfo,
+} from '@jolocom/vaulted-key-provider'
+import { IKeyMetadata } from '../identityWallet/types'
 import { ErrorCodes } from '../errors'
 
 /**
@@ -12,16 +17,6 @@ import { ErrorCodes } from '../errors'
 
 export function keyIdToDid(keyId: string): string {
   return keyId.substring(0, keyId.indexOf('#'))
-}
-
-export function getIssuerPublicKey(keyId: string, ddo: DidDocument): Buffer {
-  const relevantKeySection = ddo.publicKey.find(section => section.id === keyId)
-
-  if (!relevantKeySection) {
-    throw new Error(ErrorCodes.PublicKeyNotFound)
-  }
-
-  return Buffer.from(relevantKeySection.publicKeyHex, 'hex')
 }
 
 /**
@@ -50,3 +45,36 @@ export function fuelKeyWithEther(publicKey: Buffer) {
 
 export const publicKeyToAddress = (publicKey: Buffer): string =>
   addHexPrefix(pubToAddress(publicKey, true).toString('hex'))
+
+/**
+ * Helper function to map DID Document key references to vkp key URNs
+ * @param identity - Identity to map keys to
+ * @param vkp - store of key material to be mapped
+ * @param pass - password for vaulted key provider
+ * TODO This should take vkp keys instead of vkp + pass
+ */
+export const mapPublicKeys = async (
+  identity: Identity,
+  vkpKeys: PublicKeyInfo[],
+): Promise<IKeyMetadata> => {
+  const { keyId, did } = identity.didDocument.signer
+  const signingKeyRef = keyId.includes('did:') ? keyId : `${did}${keyId}`
+  const encKey = identity.didDocument.publicKey.find(
+    k => k.type === KeyTypes.x25519KeyAgreementKey2019,
+  )
+
+  const encKeyRef = encKey && (encKey.id.startsWith('did:')
+    ? encKey.id
+    : `${encKey.controller}${encKey.id}`)
+
+  const sigKey = vkpKeys.some(k => k.controller.find(c => c === signingKeyRef))
+
+  if (!sigKey) {
+    throw new Error(ErrorCodes.PublicKeyNotFound)
+  }
+
+  return {
+    signingKeyId: signingKeyRef,
+    encryptionKeyId: encKeyRef,
+  }
+}

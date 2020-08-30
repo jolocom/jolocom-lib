@@ -1,15 +1,16 @@
-import { Identity } from "../../identity/identity";
-import { getRegistry } from 'jolo-did-registry';
-import { IVaultedKeyProvider } from "@jolocom/protocol-ts/dist/lib/vaultedKeyProvider";
-import { SignedCredential } from "../../credentials/signedCredential/signedCredential";
-import { IRegistrar } from "../types";
+import { Identity } from '../../identity/identity';
+import { getRegistrar } from '@jolocom/jolo-did-registrar';
+import { SignedCredential } from '../../credentials/signedCredential/signedCredential';
+import { IRegistrar } from '../types';
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider';
 export declare class JolocomRegistrar implements IRegistrar {
     prefix: string;
-    registry: ReturnType<typeof getRegistry>;
+    registrarFns: ReturnType<typeof getRegistrar>;
     constructor(providerUrl?: string, contractAddress?: string, ipfsHost?: string);
-    create(keyProvider: IVaultedKeyProvider, password: string): Promise<Identity>;
-    updatePublicProfile(keyProvider: IVaultedKeyProvider, password: string, identity: Identity, publicProfile: SignedCredential): Promise<boolean>;
-    encounter(): Promise<boolean>;
+    create(keyProvider: SoftwareKeyProvider, password: string): Promise<Identity>;
+    didDocumentFromKeyProvider(keyProvider: SoftwareKeyProvider, password: string): Promise<Identity>;
+    updatePublicProfile(keyProvider: SoftwareKeyProvider, password: string, identity: Identity, publicProfile: SignedCredential): Promise<boolean>;
+    encounter(): Promise<Identity>;
     private signDidDocument;
     private update;
 }

@@ -4,28 +4,24 @@ import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { Identity } from '../../ts/identity/identity'
 import { didDocumentJSON, mockKeyId } from '../data/didDocument.data'
-import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import {
   validSignedCredReqJWT, invalidSignature, validSignedCredResJWT, invalidNonce,
 } from '../data/interactionTokens/jsonWebToken.data'
-import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
-import { testSeed } from '../data/keys.data'
-import { jolocomContractsAdapter } from '../../ts/contracts/contractsAdapter'
-import { jolocomContractsGateway } from '../../ts/contracts/contractsGateway'
 import { ErrorCodes } from '../../ts/errors'
 import { expect } from 'chai'
 import { JolocomResolver } from '../../ts/didMethods/jolo/resolver'
+import { IVaultedKeyProvider } from '@jolocom/vaulted-key-provider'
+import * as validationUtils from '../../ts/utils/validation'
 
 chai.use(sinonChai)
 
 describe('IdentityWallet validate JWT', () => {
   const sandbox = sinon.createSandbox()
-  const encryptionPass = 'secret'
   const didDocument = DidDocument.fromJSON(didDocumentJSON)
   const identity = Identity.fromDidDocument({ didDocument })
-  const vault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
+  const vault = {} as IVaultedKeyProvider
 
   let iw: IdentityWallet
   let clock
@@ -42,11 +38,9 @@ describe('IdentityWallet validate JWT', () => {
       identity,
       vaultedKeyProvider: vault,
       publicKeyMetadata: {
-        derivationPath: KeyTypes.jolocomIdentityKey,
-        keyId: mockKeyId,
+        signingKeyId: mockKeyId,
+        encryptionKeyId: mockKeyId,
       },
-      contractsAdapter: jolocomContractsAdapter,
-      contractsGateway: jolocomContractsGateway,
     })
   })
 
@@ -104,7 +98,7 @@ describe('IdentityWallet validate JWT', () => {
     }
 
     /** @dev Restored in afterEach */
-    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+    sandbox.stub(validationUtils, 'validateDigestable').resolves(true)
 
     try {
       await iw.validateJWT(
@@ -127,7 +121,7 @@ describe('IdentityWallet validate JWT', () => {
     }
 
     /** @dev Restored in afterEach */
-    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+    sandbox.stub(validationUtils, 'validateDigestable').resolves(true)
 
     try {
       await iw.validateJWT(
@@ -150,7 +144,7 @@ describe('IdentityWallet validate JWT', () => {
     }
 
     /** @dev Restored in afterEach */
-    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+    sandbox.stub(validationUtils, 'validateDigestable').resolves(true)
 return iw.validateJWT(
   JSONWebToken.fromJSON(requestWithNoAud),
   undefined,
@@ -167,7 +161,7 @@ return iw.validateJWT(
       },
     }
     /** @dev Restored in afterEach */
-    sandbox.stub(SoftwareKeyProvider, 'verifyDigestable').resolves(true)
+    sandbox.stub(validationUtils, 'validateDigestable').resolves(true)
 
     try {
       await iw.validateJWT(

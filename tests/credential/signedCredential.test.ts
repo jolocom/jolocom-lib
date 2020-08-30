@@ -12,7 +12,8 @@ import { EmailClaimMetadata } from '@jolocom/protocol-ts'
 import { Credential } from '../../ts/credentials/credential/credential'
 import { mockEmailCredCreationAttrs } from '../data/credential/credential.data'
 import { expect } from 'chai'
-import * as crypto from 'crypto'
+import *  as crypto from '../../ts/utils/crypto'
+import *  as nodeCrypto from 'crypto'
 import { ErrorCodes } from '../../ts/errors'
 
 chai.use(sinonChai)
@@ -25,8 +26,15 @@ describe('SignedCredential', () => {
 
   before(async () => {
     credentialCreate = sandbox.spy(Credential, 'create')
+    // This sets the nonce on the proof
     sandbox
-      .stub(crypto, 'randomBytes')
+      .stub(crypto, 'getRandomBytes')
+      .resolves(Buffer.from('1842fb5f567dd532', 'hex'))
+
+    // This sets the claimId
+    sandbox
+      .stub(nodeCrypto, 'randomBytes')
+      //@ts-ignore TS complains. It thinks the return of randomBytes is void.
       .returns(Buffer.from('1842fb5f567dd532', 'hex'))
 
     clock = sinon.useFakeTimers()

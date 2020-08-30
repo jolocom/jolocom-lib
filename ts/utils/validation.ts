@@ -1,8 +1,56 @@
-import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { IDigestable } from '../linkedDataSignature/types'
-import { getIssuerPublicKey } from './helper'
 import { JoloDidMethod } from '../didMethods/jolo'
+import { KeyTypes, getCryptoProvider } from '@jolocom/vaulted-key-provider'
+import { cryptoUtils } from '@jolocom/native-core'
+import { Identity } from '../identity/identity'
+import { IResolver } from '../didMethods/types'
 
+export type IdentityOrResolver = Identity | IResolver
+
+/**
+ * TODO Document
+ * Given a buffer (the message, not hashed), a signature, and a pKey object, will attempt to
+ * verify the signature (the algs are chosen based on pKey.type)
+ */
+
+const verifySignature = (
+  data: Buffer,
+  signature: Buffer,
+  pKey: Buffer,
+  keyType: KeyTypes
+): Promise<boolean> => {
+  const compatibilityMap = {
+    'Secp256k1VerificationKey2018': 'EcdsaSecp256k1VerificationKey2019'
+  }
+
+  return getCryptoProvider(cryptoUtils).verify(
+    pKey,
+    compatibilityMap[keyType] || keyType,
+    data,
+    signature,
+  )
+}
+
+export const verifySignatureWithIdentity = async (data: Buffer, signature: Buffer, signingKeyId: string, signer: Identity) => {
+    const signingKey = signer.didDocument.findPublicKeySectionById(
+      signingKeyId
+    )
+
+    if (!signingKey) {
+      console.warn(`Signing key with id ${signingKeyId} not found in signer's DID Document`)
+      return false
+    }
+
+    return verifySignature(
+      data,
+      signature,
+      signingKey.publicKeyHex
+        ? Buffer.from(signingKey.publicKeyHex, 'hex')
+        //@ts-ignore TODO Keri DID Docs and Jolo DID Docs encode the key differently
+        : Buffer.from(signingKey.publicKeyBase64, 'base64'),
+      signingKey.type as KeyTypes
+    )
+}
 /**
  * Validates the signature on a {@link SignedCredential} or {@link JSONWebToken}
  * @param toValidate - Instance of object implementing the {@link IDigestable} interface
@@ -14,18 +62,18 @@ import { JoloDidMethod } from '../didMethods/jolo'
 
 export const validateDigestable = async (
   toValidate: IDigestable,
-  resolver = new JoloDidMethod().resolver,
+  resolverOrIdentity: IdentityOrResolver = new JoloDidMethod().resolver,
 ): Promise<boolean> => {
-  const issuerIdentity = await resolver.resolve(toValidate.signer.did)
-  try {
-    const issuerPublicKey = getIssuerPublicKey(
-      toValidate.signer.keyId,
-      issuerIdentity.didDocument
-    )
-    return SoftwareKeyProvider.verifyDigestable(issuerPublicKey, toValidate)
-  } catch {
-    return false
-  }
+  const issuerIdentity = (resolverOrIdentity instanceof Identity)
+    ? resolverOrIdentity
+    : await resolverOrIdentity.resolve(toValidate.signer.did)
+
+  return verifySignatureWithIdentity(
+    await toValidate.asBytes(),
+    Buffer.from(toValidate.signature, 'hex'),
+    toValidate.signer.keyId,
+    issuerIdentity
+  )
 }
 
 /**
@@ -39,11 +87,10 @@ export const validateDigestable = async (
 
 export const validateDigestables = async (
   toValidate: IDigestable[],
-  resolver = new JoloDidMethod().resolver,
+  resolverOrIdentity: IdentityOrResolver = new JoloDidMethod().resolver,
 ): Promise<boolean[]> =>
   Promise.all(
     toValidate.map(async digestable =>
-      validateDigestable(digestable, resolver),
+      validateDigestable(digestable, resolverOrIdentity),
     ),
   )
-

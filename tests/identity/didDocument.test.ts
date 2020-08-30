@@ -1,7 +1,8 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
-import * as crypto from 'crypto'
-import { testPublicIdentityKey, testSeed } from '../data/keys.data'
+import *  as crypto from '../../ts/utils/crypto'
+import *  as nodeCrypto from 'crypto'
+import { testPublicIdentityKey } from '../data/keys.data'
 import {
   didDocumentJSONv0,
   didDocumentJSON,
@@ -18,39 +19,65 @@ import {
   ServiceEndpointsSection,
   PublicKeySection,
 } from '../../ts/identity/didDocument/sections'
-import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { normalizeJsonLd } from '../../ts/linkedData'
-import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
+import { walletUtils } from '@jolocom/native-core'
+import { IPublicKeySectionAttrs } from '../../ts/identity/didDocument/sections/types'
 
 const expect = chai.expect
 
-describe('DidDocument', () => {
+describe('DidDocument', async () => {
   const sandbox = sinon.createSandbox()
-  const vault = SoftwareKeyProvider.fromSeed(testSeed, 'password')
-  const derivationArgs = {
-    derivationPath: KeyTypes.jolocomIdentityKey,
-    encryptionPass: 'password',
-  }
+  const pass = 'password'
+  let vault: SoftwareKeyProvider
 
-  let referenceDidDocument
+  let referenceDidDocument: DidDocument
   let clock
 
-  before(() => {
+  before(async () => {
     clock = sinon.useFakeTimers()
+    // This sets the nonce on the proof
     sandbox
-      .stub(crypto, 'randomBytes')
-      .returns(Buffer.from('1842fb5f567dd532', 'hex'))
+      .stub(crypto, 'getRandomBytes')
+      .resolves(Buffer.from('1842fb5f567dd532', 'hex'))
+
+    // This sets the claimId
+    sandbox
+      .stub(nodeCrypto, 'randomBytes')
+      .resolves(Buffer.from('1842fb5f567dd532', 'hex'))
+
+    // Currently stubbing because we have no way
+    // to deterministically generate keys on the software
+    // key provider, to test signature generation reliably.
+    sandbox
+      .stub(SoftwareKeyProvider.prototype, 'sign')
+      .resolves(
+        Buffer.from(
+          '3e4bca6a08643c4a67c02abd109accd19f2f9ad1c93cd9f39d3f23edc122de7a72d1de44420b456c20b1875ed254417efdf8dd16fb8ded818d830dac475ec55a',
+          'hex'
+        )
+      )
+
+    vault = await SoftwareKeyProvider.newEmptyWallet(walletUtils, '', pass)
   })
 
   beforeEach(async () => {
     referenceDidDocument = await DidDocument.fromPublicKey(
       testPublicIdentityKey,
     )
-    referenceDidDocument.addAuthKey(mockPublicKey2)
+
+    referenceDidDocument.addAuthKey(
+      PublicKeySection.fromJSON(mockPublicKey2)
+    )
+
     referenceDidDocument.addServiceEndpoint(
       ServiceEndpointsSection.fromJSON(mockPubProfServiceEndpointJSON),
     )
-    await referenceDidDocument.sign(vault, derivationArgs, mockKeyId)
+
+    await referenceDidDocument.sign(vault, {
+      encryptionPass: pass,
+      keyRef: referenceDidDocument.signer.keyId
+    })
   })
 
   after(() => {
@@ -85,7 +112,9 @@ describe('DidDocument', () => {
   it('Should correctly implement fromJSON for version 0', () => {
     const didDocumentv0 = DidDocument.fromJSON(didDocumentJSONv0)
 
-    didDocumentv0.addAuthKey(mockPublicKey2 as PublicKeySection)
+    didDocumentv0.addAuthKey(PublicKeySection.fromJSON(mockPublicKey2))
+
+
     expect(didDocumentv0).to.deep.eq(referenceDidDocument)
   })
 
@@ -99,8 +128,9 @@ describe('DidDocument', () => {
   })
 
   it('Should correctly implement normalize', async () => {
-    const { proof, ...document } = referenceDidDocument.toJSON()
-    const njld = await normalizeJsonLd(document, referenceDidDocument.context)
+    const { proof, ...document } = didDocumentJSON
+    //@ts-ignore
+    const njld = await normalizeJsonLd(document, document['@context'])
     expect(njld).to.deep.eq(normalizedDidDocument)
   })
 
@@ -108,10 +138,9 @@ describe('DidDocument', () => {
     await referenceDidDocument.sign(
       vault,
       {
-        derivationPath: KeyTypes.jolocomIdentityKey,
-        encryptionPass: 'password',
-      },
-      mockKeyId,
+        keyRef: referenceDidDocument.signer.keyId,
+        encryptionPass: pass,
+      }
     )
 
     expect(referenceDidDocument.signature).to.eq(
@@ -133,7 +162,9 @@ describe('DidDocument', () => {
     const pub = referenceDidDocument.publicKey.map(pub => pub.toJSON())
     const serv = referenceDidDocument.service.map(ser => ser.toJSON())
 
-    expect(auth).to.deep.eq(authentication)
+    expect(auth[0]).to.deep.eq(authentication[0])
+    expect(auth[1]).to.deep.eq(PublicKeySection.fromJSON(authentication[1] as IPublicKeySectionAttrs))
+
     expect(pub).to.deep.eq(publicKey)
     expect(serv).to.deep.eq(service)
     expect(referenceDidDocument.context).to.deep.eq(didDocumentJSON['@context'])

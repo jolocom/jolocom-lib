@@ -13,8 +13,8 @@ import { keyIdToDid } from '../../ts/utils/helper'
 import {
   userIdentityWallet,
   serviceIdentityWallet,
-  joloDidMethod
 } from './identity.integration'
+import { parseAndValidate } from '../../ts/parse/parseAndValidate'
 
 chai.use(sinonChai)
 const expect = chai.expect
@@ -39,23 +39,14 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
   })
 
   it('Should allow for consumption of valid credential request token by user', async () => {
-    const decodedCredRequest = JSONWebToken.decode<CredentialRequest>(
+    const decodedCredRequest = await parseAndValidate.interactionToken(
       credRequestEncoded,
-    )
+      serviceIdentityWallet.identity
+    ) as JSONWebToken<CredentialRequest>
 
     expect(decodedCredRequest.interactionToken).to.be.instanceOf(
       CredentialRequest,
     )
-
-    try {
-      await userIdentityWallet.validateJWT(
-        decodedCredRequest,
-        null,
-        joloDidMethod.resolver
-      )
-    } catch (err) {
-      return expect(true).to.be.false
-    }
 
     const emailSignedCred = await userIdentityWallet.create.signedCredential(
       emailCredJSON,
@@ -83,22 +74,14 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
   })
 
   it('Should allow for consumption of valid credential response token by service', async () => {
-    const decodedCredResponse = JSONWebToken.decode<CredentialResponse>(
+    const decodedCredResponse = await parseAndValidate.interactionToken(
       credResponseEncoded,
-    )
+      userIdentityWallet.identity
+    ) as JSONWebToken<CredentialResponse>
+
     expect(decodedCredResponse.interactionToken).to.be.instanceOf(
       CredentialResponse,
     )
-
-    try {
-      await serviceIdentityWallet.validateJWT(
-        decodedCredResponse,
-        credRequestJWT,
-        joloDidMethod.resolver
-      )
-    } catch (err) {
-      return expect(true).to.be.false
-    }
 
     return expect(
       decodedCredResponse.interactionToken.satisfiesRequest(

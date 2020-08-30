@@ -6,11 +6,9 @@ import { CredentialResponse } from './credentialResponse';
 import { CredentialRequest } from './credentialRequest';
 import { Authentication } from './authentication';
 import { CredentialsReceive } from './credentialsReceive';
-import { PaymentResponse } from './paymentResponse';
-import { PaymentRequest } from './paymentRequest';
 import { CredentialOfferResponse } from './credentialOfferResponse';
 import { CredentialOfferRequest } from './credentialOfferRequest';
-export declare type JWTEncodable = CredentialResponse | CredentialRequest | Authentication | CredentialOfferRequest | CredentialOfferResponse | CredentialsReceive | PaymentRequest | PaymentResponse;
+export declare type JWTEncodable = CredentialResponse | CredentialRequest | Authentication | CredentialOfferRequest | CredentialOfferResponse | CredentialsReceive;
 interface IPayloadSection<T> {
     iat?: number;
     exp?: number;
@@ -43,6 +41,7 @@ export declare class JSONWebToken<T> implements IDigestable {
     setIssueAndExpiryTime: (expiry?: Date) => void;
     static decode<T>(jwt: string): JSONWebToken<T>;
     encode(): string;
+    asBytes(): Promise<Buffer>;
     digest(): Promise<Buffer>;
     toJSON(): IJSONWebTokenAttrs;
     static fromJSON<T>(json: IJSONWebTokenAttrs): JSONWebToken<T>;

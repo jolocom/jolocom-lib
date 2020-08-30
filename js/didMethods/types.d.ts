@@ -1,10 +1,12 @@
-import { IVaultedKeyProvider } from "@jolocom/protocol-ts/dist/lib/vaultedKeyProvider";
-import { Identity } from "../identity/identity";
+/// <reference types="node" />
+import { Identity } from '../identity/identity';
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider';
+import { IdentityWallet } from '../identityWallet/identityWallet';
 export interface IRegistrar {
     prefix: string;
-    encounter: (change: string) => Promise<boolean>;
-    create: <T>(keyProvider: IVaultedKeyProvider, password: string, creationConfig?: T) => Promise<Identity>;
-    updatePublicProfile: (keyProvider: IVaultedKeyProvider, password: string, identity: Identity, publicProfile: any) => Promise<boolean>;
+    encounter: (events: string[]) => Promise<Identity>;
+    create: <T>(keyProvider: SoftwareKeyProvider, password: string, creationConfig?: T) => Promise<Identity>;
+    updatePublicProfile: (keyProvider: SoftwareKeyProvider, password: string, identity: Identity, publicProfile: any) => Promise<boolean>;
 }
 export interface IResolver {
     prefix: string;
@@ -14,4 +16,8 @@ export interface IDidMethod {
     prefix: string;
     resolver: IResolver;
     registrar: IRegistrar;
+    recoverFromSeed?: (seed: Buffer, newPassword: string) => Promise<{
+        identityWallet: IdentityWallet;
+        succesfullyResolved: boolean;
+    }>;
 }

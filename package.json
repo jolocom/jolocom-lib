@@ -1,6 +1,6 @@
 {
   "name": "jolocom-lib",
-  "version": "4.1.0",
+  "version": "5.1.0-rc1",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "files": [
@@ -8,7 +8,7 @@
   ],
   "typings": "js/index.d.ts",
   "scripts": {
-    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts --exit",
+    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts ./tests/**/**/*.ts --exit",
     "clean": "rm -rf ./js",
     "prepublish": "yarn clean; yarn build",
     "build": "tsc -p .",
@@ -69,34 +69,35 @@
   "license": "MIT",
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
-    "@decentralized-identity/did-common-typescript": "^0.1.19",
-    "@jolocom/protocol-ts": "^0.2.0",
+    "@hawkingnetwork/ed25519-hd-key-rn": "^1.0.1",
+    "@jolocom/jolo-did-registrar": "^1.0.0-rc5",
+    "@jolocom/jolo-did-resolver": "^1.0.0-rc5",
+    "@jolocom/native-core": "^1.0.0-rc1",
+    "@jolocom/protocol-ts": "^0.5.1",
+    "@jolocom/vaulted-key-provider": "^0.7.4",
+    "@types/sinon": "^9.0.5",
     "base64url": "^3.0.1",
     "bip32": "^1.0.2",
     "bip39": "^3.0.1",
-    "class-transformer": "^0.2.3",
+    "class-transformer": "^0.3.1",
     "create-hash": "^1.2.0",
     "detect-node": "^2.0.4",
     "did-resolver": "2.0.0",
-    "eccrypto": "rootstock/eccrypto#485e11f163093fb6e0d5263fa46ed5075dedfe88",
     "ethereumjs-tx": "^1.3.7",
     "ethereumjs-util": "^6.1.0",
-    "ethers": "^4.0.27",
     "form-data": "^2.3.3",
-    "jolo-did-registry": "1.0.1",
-    "jolo-did-resolver": "0.2.1",
-    "jolocom-registry-contract": "^0.1.7",
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.6.1",
     "jsontokens": "^1.0.0",
+    "local-resolver-registrar": "^0.3.1",
     "node-fetch": "^2.3.0",
     "qrcode": "^1.3.3",
     "reflect-metadata": "^0.1.13",
     "secrets.js-grempe": "^1.1.0",
-    "sinon-chai": "^3.3.0",
-    "tiny-secp256k1": "^1.0.1"
+    "sinon-chai": "^3.3.0"
   },
   "devDependencies": {
+    "@decentralized-identity/did-common-typescript": "^0.1.19",
     "@types/bip39": "^2.4.2",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
@@ -121,7 +122,7 @@
     "source-map-support": "^0.5.10",
     "ts-node": "^8.0.2",
     "typedoc": "^0.14.2",
-    "typescript": "^3.6.3"
+    "typescript": "3.6.3"
   },
   "config": {
     "commitizen": {

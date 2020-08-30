@@ -1,10 +1,12 @@
-import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
-import { getIssuerPublicKey, keyIdToDid } from '../utils/helper'
+import { keyIdToDid } from '../utils/helper'
 import { sha256 } from '../utils/crypto'
 import { canonize } from 'jsonld'
 import { JsonLdObject, SignedJsonLdObject, JsonLdContext } from './types'
 import { JoloDidMethod } from '../didMethods/jolo'
+import { verifySignatureWithIdentity } from '../utils/validation'
+import { Identity } from '../identity/identity'
+import { IResolver } from '../didMethods/types'
 
 /**
  * Helper function to handle JsonLD normalization.
@@ -36,6 +38,15 @@ export const normalizeLdProof = async (
   context: JsonLdContext,
 ): Promise<string> => normalizeJsonLd(toNormalize, context)
 
+export const normalizeSignedLdObject = async (
+  { proof, ['@context']: _, ...data }: SignedJsonLdObject,
+  context: JsonLdContext,
+): Promise<Buffer> =>
+    Buffer.concat([
+      sha256(Buffer.from(await normalizeLdProof(proof, context))),
+      sha256(Buffer.from(await normalizeJsonLd(data, context))),
+    ])
+
 /**
  * Helper function to handle signed JsonLD digestions
  * @dev The function expects the JsonLD '@context' to be passed as an argument,
@@ -46,40 +57,32 @@ export const normalizeLdProof = async (
  */
 
 export const digestJsonLd = async (
-  { proof, ['@context']: _, ...data }: SignedJsonLdObject,
+  signedLdObject: SignedJsonLdObject,
   context: JsonLdContext,
 ): Promise<Buffer> =>
-  sha256(
-    Buffer.concat([
-      sha256(Buffer.from(await normalizeLdProof(proof, context))),
-      sha256(Buffer.from(await normalizeJsonLd(data, context))),
-    ]),
-  )
+  sha256(await normalizeSignedLdObject(signedLdObject, context))
 
 /**
  * Helper function to handle JsonLD validation.
  * @param json - {@link SignedJsonLdObject} to be validated
- * @param resolver - instance of a {@link Resolver} to use for retrieving the signer's keys. 
- * If none is provided, the default Jolocom contract is used for resolution.
+ * @param resolverOrIdentity - a instance of an Identity, which can be used
+ *   to find signing keys and verify the signature, or an instance of {@link Resolver} to use for retrieving the signer's keys.
+ *   If nothing is provided, the default Jolocom resolver is used.
  */
 
 export const validateJsonLd = async (
   json: SignedJsonLdObject,
-  resolver = new JoloDidMethod().resolver
+  resolverOrIdentity: IResolver | Identity = new JoloDidMethod().resolver
 ): Promise<boolean> => {
-  const issuerIdentity = await resolver.resolve(keyIdToDid(json.proof.creator))
-  try {
-    const issuerPublicKey = getIssuerPublicKey(
-      json.proof.creator,
-      issuerIdentity.didDocument
-    )
+  const issuerIdentity = (resolverOrIdentity instanceof Identity)
+    ? resolverOrIdentity
+    : await resolverOrIdentity.resolve(keyIdToDid(json.proof.creator))
 
-    return SoftwareKeyProvider.verify(
-      await digestJsonLd(json, json['@context']),
-      issuerPublicKey,
+
+    return verifySignatureWithIdentity(
+      await normalizeSignedLdObject(json, json['@context']),
       Buffer.from(json.proof.signatureValue, 'hex'),
+      json.proof.creator,
+      issuerIdentity
     )
-  } catch {
-    return false
-  }
 }

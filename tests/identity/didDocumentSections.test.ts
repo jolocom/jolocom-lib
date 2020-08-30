@@ -23,7 +23,7 @@ describe('DidDocumentSections', () => {
     clock = sinon.useFakeTimers()
     sandbox
       .stub(crypto, 'randomBytes')
-      .returns(Buffer.from('1842fb5f567dd532', 'hex'))
+      .resolves(Buffer.from('1842fb5f567dd532', 'hex'))
   })
 
   after(() => {

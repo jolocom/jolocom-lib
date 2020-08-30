@@ -15,19 +15,16 @@ import {
   ServiceEndpointsSection,
 } from './sections'
 import { defaultContextIdentity } from '../../utils/contexts'
-import { publicKeyToDID } from '../../utils/crypto'
-import { digestJsonLd } from '../../linkedData'
+import { getRandomBytes } from '../../utils/crypto'
+import { digestJsonLd, normalizeSignedLdObject } from '../../linkedData'
 import {
   IDigestable,
   ILinkedDataSignature,
 } from '../../linkedDataSignature/types'
-import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
-import {
-  IKeyDerivationArgs,
-  IVaultedKeyProvider,
-} from '../../vaultedKeyProvider/types'
 import { ContextEntry } from '@jolocom/protocol-ts'
 import { ISigner } from '../../credentials/signedCredential/types'
+import { IVaultedKeyProvider, IKeyRefArgs } from '@jolocom/vaulted-key-provider'
+import { publicKeyToJoloDID } from '../../didMethods/jolo/utils'
 
 /**
  * Class modelling a Did Document
@@ -116,11 +113,18 @@ export class DidDocument implements IDigestable {
    * @example `console.log(didDocument.authentication) // [AuthenticationSection {...}, ...]`
    */
 
-  @Expose({ name: 'authentication' })
-  @Transform(auths => auths.map(a => a.publicKey), {
-    toClassOnly: true,
-    until: 0.13,
-  })
+  @Expose()
+  @Transform(
+    auths =>
+      auths &&
+      auths.map(val => {
+        const { type, publicKey } = val
+        return type === 'Secp256k1SignatureAuthentication2018' && !!publicKey
+          ? publicKey
+          : PublicKeySection.fromJSON(val)
+      }),
+    { toClassOnly: true },
+  )
   public get authentication(): AuthenticationSection[] {
     return this._authentication
   }
@@ -131,6 +135,15 @@ export class DidDocument implements IDigestable {
    */
 
   public set authentication(authentication: AuthenticationSection[]) {
+    authentication &&
+      authentication.forEach(el => {
+        if (typeof el === 'string') {
+          this._authentication.push(el)
+        } else {
+          this._authentication.push(el.id)
+          this._publicKey.push(el)
+        }
+      })
     this._authentication = authentication
   }
 
@@ -140,7 +153,20 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose()
-  @Type(() => PublicKeySection)
+  @Transform(
+    (pubKeys, rest) => {
+      const { verificationMethod } = rest
+      if (verificationMethod && verificationMethod.length) {
+        return [...(pubKeys || []), ...verificationMethod]
+      }
+
+      return pubKeys || []
+    },
+    { toClassOnly: true },
+  )
+  @Transform(pubKeys => {
+    return pubKeys && pubKeys.map(PublicKeySection.fromJSON)
+  })
   public get publicKey(): PublicKeySection[] {
     return this._publicKey
   }
@@ -152,6 +178,17 @@ export class DidDocument implements IDigestable {
 
   public set publicKey(value: PublicKeySection[]) {
     this._publicKey = value
+  }
+
+  /**
+   * Helper function, which when given a keyId, will
+   * try find the appropriate publicKeySection on the Did Document and return it
+   */
+
+  public findPublicKeySectionById(keyId: string) {
+    return this._publicKey.find(
+      ({ id }) => id === keyId || id === `#${keyId.split('#').pop()}`,
+    )
   }
 
   /**
@@ -280,7 +317,7 @@ export class DidDocument implements IDigestable {
    */
 
   public addAuthKeyId(authenticationKeyId: string): void {
-    this.authentication.push(authenticationKeyId)
+    this._authentication.push(authenticationKeyId)
   }
 
   /**
@@ -289,7 +326,7 @@ export class DidDocument implements IDigestable {
    */
 
   public addAuthKey(authenticationKey: PublicKeySection): void {
-    this.authentication.push(authenticationKey)
+    this._authentication.push(authenticationKey)
   }
 
   /**
@@ -298,7 +335,7 @@ export class DidDocument implements IDigestable {
    */
 
   public addPublicKeySection(section: PublicKeySection): void {
-    this.publicKey.push(section)
+    this._publicKey.push(section)
   }
 
   /**
@@ -326,7 +363,7 @@ export class DidDocument implements IDigestable {
    */
 
   public static async fromPublicKey(publicKey: Buffer): Promise<DidDocument> {
-    const did = publicKeyToDID(publicKey)
+    const did = publicKeyToJoloDID(publicKey)
     const keyId = `${did}#keys-1`
 
     const didDocument = new DidDocument()
@@ -346,18 +383,24 @@ export class DidDocument implements IDigestable {
 
   public async sign(
     vaultedKeyProvider: IVaultedKeyProvider,
-    derivationArgs: IKeyDerivationArgs,
+    signConfig: IKeyRefArgs,
   ): Promise<void> {
     this._proof = new EcdsaLinkedDataSignature()
     this._proof.creator = this.signer.keyId
     this._proof.signature = ''
-    this._proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
+    this._proof.nonce = (await getRandomBytes(8)).toString('hex')
 
-    const didDocumentSignature = await vaultedKeyProvider.signDigestable(
-      derivationArgs,
-      this,
+    const signature = await vaultedKeyProvider.sign(
+      signConfig,
+      await this.asBytes(),
     )
-    this._proof.signature = didDocumentSignature.toString('hex')
+
+    this._proof.signature = signature.toString('hex')
+  }
+
+  public async asBytes(): Promise<Buffer> {
+    //@ts-ignore optional proof causing issues
+    return normalizeSignedLdObject(this.toJSON(), this.context)
   }
 
   /**

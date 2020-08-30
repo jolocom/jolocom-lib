@@ -69,6 +69,7 @@ export class IpfsStorageAgent implements IIpfsConnector {
     const endpoint = `${this.endpoint}/api/v0/add?pin=${pin}`
 
     const serializedData = this.serializeJSON(data)
+    //@ts-ignore formdata is not assignable to bodyinit
     const { Hash } = await this.postRequest(endpoint, serializedData).then(
       res => res.json(),
     )

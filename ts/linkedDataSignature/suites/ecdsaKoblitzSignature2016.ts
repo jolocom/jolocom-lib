@@ -1,6 +1,5 @@
 import 'reflect-metadata'
 import {
-  Type,
   plainToClass,
   classToPlain,
   Exclude,
@@ -153,6 +152,10 @@ export class EcdsaLinkedDataSignature
     delete json.id
 
     return canonize(json)
+  }
+
+  public async asBytes(): Promise<Buffer> {
+    return Buffer.from(await this.normalize())
   }
 
   /**

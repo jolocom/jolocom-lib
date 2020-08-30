@@ -2,26 +2,17 @@
 import { BaseMetadata } from '@jolocom/protocol-ts';
 import { Credential } from '../credentials/credential/credential';
 import { SignedCredential } from '../credentials/signedCredential/signedCredential';
-import { ExclusivePartial, IIdentityWalletCreateArgs } from './types';
+import { ExclusivePartial, IKeyMetadata, IIdentityWalletCreateArgs } from './types';
 import { Identity } from '../identity/identity';
 import { JSONWebToken } from '../interactionTokens/JSONWebToken';
-import { PaymentRequest } from '../interactionTokens/paymentRequest';
 import { Authentication } from '../interactionTokens/authentication';
 import { CredentialRequest } from '../interactionTokens/credentialRequest';
-import { KeyTypes, IKeyDerivationArgs } from '../vaultedKeyProvider/types';
-import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types';
-import { ITransactionEncodable } from '../contracts/types';
+import { ISignedCredCreationArgs } from '../credentials/signedCredential/types';
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest';
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse';
-import { CredentialOfferRequestAttrs, CredentialOfferResponseAttrs, IAuthenticationAttrs, ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs, IPaymentRequestAttrs, IPaymentResponseAttrs } from '../interactionTokens/interactionTokens.types';
-interface PaymentRequestCreationArgs {
-    callbackURL: string;
-    description: string;
-    transactionOptions: ExclusivePartial<IPaymentRequestAttrs['transactionOptions'], 'value'>;
-}
-declare type PublicKeyMap = {
-    [key in keyof typeof KeyTypes]?: string;
-};
+import { CredentialOfferRequestAttrs, CredentialOfferResponseAttrs, IAuthenticationAttrs, ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs } from '../interactionTokens/interactionTokens.types';
+import { KeyTypes } from '@jolocom/vaulted-key-provider';
+import { IResolver } from '../didMethods/types';
 declare type WithExtraOptions<T> = T & {
     expires?: Date;
     aud?: string;
@@ -29,30 +20,25 @@ declare type WithExtraOptions<T> = T & {
 export declare class IdentityWallet {
     private _identity;
     private _publicKeyMetadata;
-    private _vaultedKeyProvider;
-    private _contractsAdapter;
-    private _contractsGateway;
+    private _keyProvider;
     did: string;
     identity: Identity;
     didDocument: import("../identity/didDocument/didDocument").DidDocument;
     publicKeyMetadata: IKeyMetadata;
-    private vaultedKeyProvider;
-    constructor({ identity, publicKeyMetadata, vaultedKeyProvider, contractsGateway, contractsAdapter, }: IIdentityWalletCreateArgs);
+    constructor({ identity, publicKeyMetadata, vaultedKeyProvider, }: IIdentityWalletCreateArgs);
     private createSignedCred;
     private createMessage;
     private makeReq;
     private makeRes;
     private messageCannonicaliser;
-    getPublicKeys: (encryptionPass: string) => PublicKeyMap;
+    getPublicKeys: (encryptionPass: string) => Promise<import("@jolocom/vaulted-key-provider").PublicKeyInfo[]>;
     private initializeAndSign;
-    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: import("../didMethods/types").IResolver): Promise<void>;
-    asymEncrypt: (data: Buffer, publicKey: Buffer) => Promise<string>;
-    asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: import("../didMethods/types").IResolver) => Promise<string>;
-    asymDecrypt: (data: string, decryptionKeyArgs: IKeyDerivationArgs) => Promise<Buffer>;
-    private sendTransaction;
-    transactions: {
-        sendTransaction: (request: ITransactionEncodable, pass: string) => Promise<string>;
-    };
+    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: IResolver): Promise<void>;
+    asymEncrypt: (data: Buffer, key: Buffer, type: KeyTypes) => Promise<Buffer>;
+    asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: IResolver) => Promise<Buffer>;
+    asymEncryptToDid: (data: Buffer, did: string, resolver?: IResolver) => Promise<Buffer>;
+    asymDecrypt: (data: Buffer, pass: string) => Promise<Buffer>;
+    sign: (data: Buffer, pass: string) => Promise<Buffer>;
     create: {
         credential: typeof Credential.create;
         signedCredential: <T extends BaseMetadata>({ expires, ...credentialParams }: WithExtraOptions<ISignedCredCreationArgs<T>>, pass: string) => Promise<SignedCredential>;
@@ -67,14 +53,12 @@ export declare class IdentityWallet {
                 auth: ({ expires, aud, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string) => Promise<JSONWebToken<any>>;
                 offer: ({ expires, aud, ...message }: WithExtraOptions<CredentialOfferRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
                 share: ({ expires, aud, ...message }: WithExtraOptions<ICredentialRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
-                payment: (args: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => Promise<JSONWebToken<any>>;
             };
             response: {
                 auth: ({ expires, aud, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, recieved?: JSONWebToken<Authentication>) => Promise<JSONWebToken<any>>;
                 offer: ({ expires, aud, ...message }: WithExtraOptions<CredentialOfferResponseAttrs>, pass: string, recieved?: JSONWebToken<CredentialOfferRequest>) => Promise<JSONWebToken<any>>;
                 share: ({ expires, aud, ...message }: WithExtraOptions<ICredentialResponseAttrs>, pass: string, recieved?: JSONWebToken<CredentialRequest>) => Promise<JSONWebToken<any>>;
                 issue: ({ expires, aud, ...message }: WithExtraOptions<ICredentialsReceiveAttrs>, pass: string, recieved?: JSONWebToken<CredentialOfferResponse>) => Promise<JSONWebToken<any>>;
-                payment: ({ expires, aud, ...message }: WithExtraOptions<IPaymentResponseAttrs>, pass: string, recieved?: JSONWebToken<PaymentRequest>) => Promise<JSONWebToken<any>>;
             };
         };
     };
