@@ -26,20 +26,20 @@ describe('Local Did Method, slip0010 recovery', async () => {
   it('Should correctly derive keys / incept an identity given a seed', async () => {
     // The expected values are self generated, derived using slip0010, the testSeed, and jolocom specific paths
     const testSeed = Buffer.from('000102030405060708090a0b0c0d0e0f', 'hex')
-    const recoveredIdentity = await new LocalDidMethod().recoverFromSeed(testSeed, 'pass')
+    const { identityWallet, succesfullyResolved } = await new LocalDidMethod().recoverFromSeed(testSeed, 'pass')
     // const recoveredIdentity = await recoverIdentityFromSlip0010Seed(testSeed, 'pass', walletUtils)
-    expect(recoveredIdentity.did).to.eq(
+    expect(identityWallet.identity.did).to.eq(
       'did:jun:Ff3uktIBIG0Olx7dHOjkWEhHejyxqYXPPW_aIPAN8R_57K9s7aoNhII5TtLY-vmhHFKo6hdUPpguaH0LtBU_3rw'
     )
 
-    expect(recoveredIdentity.identity.publicKeySection[0].toJSON()).to.deep.eq({
+    expect(identityWallet.identity.publicKeySection[0].toJSON()).to.deep.eq({
       controller: "did:jun:Ff3uktIBIG0Olx7dHOjkWEhHejyxqYXPPW_aIPAN8R_57K9s7aoNhII5TtLY-vmhHFKo6hdUPpguaH0LtBU_3rw",
       id: "#D2UI8qsT_W3L_zHZeMOJt2LzjK-Z2KhBrYKjGEW-q6d8",
       publicKeyHex: "d9423caac4ff5b72ffcc765e30e26dd8bce32be6762a106b60a8c6116faae9df",
       type: "Ed25519VerificationKey2018"
     })
 
-    expect(recoveredIdentity.identity.publicKeySection[1].toJSON()).to.deep.eq({
+    expect(identityWallet.identity.publicKeySection[1].toJSON()).to.deep.eq({
       controller: "did:jun:Ff3uktIBIG0Olx7dHOjkWEhHejyxqYXPPW_aIPAN8R_57K9s7aoNhII5TtLY-vmhHFKo6hdUPpguaH0LtBU_3rw",
       id: "#CGUL0FEWtao96Bo6RUJ50xlV29x90jhibNly7fOTL_m8",
       publicKeyHex: "1942f41445ad6a8f7a068e91509e74c65576f71f748e189b365cbb7ce4cbfe6f",

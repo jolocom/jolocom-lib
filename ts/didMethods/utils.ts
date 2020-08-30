@@ -2,6 +2,8 @@ import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 import { IdentityWallet } from '../identityWallet/identityWallet'
 import { IResolver, IRegistrar } from './types'
 import { mapPublicKeys } from '../utils/helper'
+import { IdentityOrResolver } from '../utils/validation'
+import { Identity } from '../identity/identity'
 
 // TODO Figure out how to fit this into the DidMethod
 // The function will be replaced by a more generic alternative once the new VKP is integrated
@@ -31,9 +33,12 @@ export const createIdentityFromKeyProvider = async (
 export const authAsIdentityFromKeyProvider = async (
   vkp: SoftwareKeyProvider,
   pass: string,
-  resolver: IResolver,
+  identityOrResolver: IdentityOrResolver,
 ) => {
-  const identity = await resolver.resolve(vkp.id)
+  const identity = identityOrResolver instanceof Identity
+    ?  identityOrResolver
+      : await identityOrResolver.resolve(vkp.id)
+
   const vaultKeys = await vkp.getPubKeys(pass)
 
   return new IdentityWallet({

@@ -4,9 +4,7 @@ import { KEY_PATHS, KEY_REFS } from './constants'
 import { fromSeed, validateMnemonic } from 'bip32'
 import { publicKeyToJoloDID } from "./utils";
 import { authAsIdentityFromKeyProvider } from "../utils";
-import { IDidMethod, IResolver } from "../types";
-import { SocialRecovery } from "../../recovery/socialRecovery";
-import { entropyToMnemonic } from "bip39";
+import { IDidMethod } from "../types";
 
 const { JOLO_DERIVATION_PATH, ETH_DERIVATION_PATH } = KEY_PATHS
 const { SIGNING_KEY_REF, ENCRYPTION_KEY_REF, ANCHOR_KEY_REF } = KEY_REFS

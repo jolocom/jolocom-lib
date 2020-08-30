@@ -119,6 +119,35 @@ export class JolocomRegistrar implements IRegistrar {
     return identity
   }
 
+  // TODO Document, also make use of internally
+  async didDocumentFromKeyProvider(keyProvider: SoftwareKeyProvider, password: string) {
+    const did = keyProvider.id
+    const signingKey = await keyProvider.getPubKeyByController(password, `${did}#${SIGNING_KEY_REF}`)
+    const encryptionKey = await keyProvider.getPubKeyByController(password, `${did}#${ENCRYPTION_KEY_REF}`)
+
+    if (!signingKey || !encryptionKey) {
+      throw new Error(
+        `Could not find signing or encryption key. Vault id - ${did}`,
+      )
+    }
+
+    const didDocumentInstace = await DidDocument.fromPublicKey(
+      Buffer.from(signingKey.publicKeyHex, 'hex'),
+    )
+
+    didDocumentInstace.addPublicKeySection(PublicKeySection.fromJSON(
+      { ...encryptionKey }
+    ))
+
+    const identity = Identity.fromDidDocument({
+      didDocument: didDocumentInstace,
+    })
+
+    await this.signDidDocument(identity.didDocument, keyProvider, password)
+
+    return identity
+  }
+
   // TODO Public profile should perhaps be JSON / any, so that the registrars can be used without having to typecheck / guard / use generics
   async updatePublicProfile(
     keyProvider: SoftwareKeyProvider,

@@ -35,5 +35,5 @@ export interface IDidMethod {
   prefix: string
   resolver: IResolver
   registrar: IRegistrar
-  recoverFromSeed? : (seed: Buffer, newPassword: string) => Promise<IdentityWallet>
+  recoverFromSeed? : (seed: Buffer, newPassword: string) => Promise<{ identityWallet: IdentityWallet, succesfullyResolved: boolean }>
 }

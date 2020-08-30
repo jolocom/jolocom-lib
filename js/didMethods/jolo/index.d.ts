@@ -1,9 +1,14 @@
 /// <reference types="node" />
-import { IDidMethod, IResolver, IRegistrar } from "../types";
+import { IDidMethod } from "../types";
+import { JolocomResolver } from "./resolver";
+import { JolocomRegistrar } from "./registrar";
 export declare class JoloDidMethod implements IDidMethod {
     prefix: string;
-    resolver: IResolver;
-    registrar: IRegistrar;
+    resolver: JolocomResolver;
+    registrar: JolocomRegistrar;
     constructor(providerUrl?: string, contractAddress?: string, ipfsHost?: string);
-    recoverFromSeed(seed: Buffer, newPassword: string): Promise<import("../../identityWallet/identityWallet").IdentityWallet>;
+    recoverFromSeed(seed: Buffer, newPassword: string): Promise<{
+        identityWallet: import("../../identityWallet/identityWallet").IdentityWallet;
+        succesfullyResolved: boolean;
+    }>;
 }

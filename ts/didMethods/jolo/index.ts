@@ -1,4 +1,4 @@
-import { IDidMethod, IResolver, IRegistrar } from "../types"
+import { IDidMethod } from "../types"
 import { JolocomResolver } from "./resolver"
 import { JolocomRegistrar } from "./registrar"
 import { PROVIDER_URL, CONTRACT_ADDRESS, IPFS_ENDPOINT } from "./constants"
@@ -8,8 +8,8 @@ import { authAsIdentityFromKeyProvider } from "../utils"
 
 export class JoloDidMethod implements IDidMethod {
   public prefix = 'jolo'
-  public resolver: IResolver
-  public registrar: IRegistrar
+  public resolver: JolocomResolver
+  public registrar: JolocomRegistrar
 
   constructor(
     providerUrl = PROVIDER_URL,
@@ -22,7 +22,24 @@ export class JoloDidMethod implements IDidMethod {
 
   public async recoverFromSeed(seed: Buffer, newPassword: string) {
     const keyProvider = await recoverJoloKeyProviderFromSeed(seed, newPassword, walletUtils)
-    return authAsIdentityFromKeyProvider(keyProvider, newPassword, this.resolver)
+    try {
+      return {
+        identityWallet: await authAsIdentityFromKeyProvider(
+          keyProvider,
+          newPassword,
+          this.resolver
+        ),
+        succesfullyResolved: true
+      }
+    } catch (e) {
+      return {
+        identityWallet: await authAsIdentityFromKeyProvider(
+          keyProvider,
+          newPassword,
+          await this.registrar.didDocumentFromKeyProvider(keyProvider, newPassword),
+        ),
+        succesfullyResolved: false
+      }
+    }
   }
 }
-

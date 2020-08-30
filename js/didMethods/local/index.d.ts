@@ -7,5 +7,8 @@ export declare class LocalDidMethod implements IDidMethod {
     registrar: IRegistrar;
     private db;
     constructor(db?: InternalDb);
-    recoverFromSeed(seed: Buffer, newPassword: string): Promise<import("../../identityWallet/identityWallet").IdentityWallet>;
+    recoverFromSeed(seed: Buffer, newPassword: string): Promise<{
+        identityWallet: import("../../identityWallet/identityWallet").IdentityWallet;
+        succesfullyResolved: boolean;
+    }>;
 }

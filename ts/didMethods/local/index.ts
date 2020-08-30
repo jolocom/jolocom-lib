@@ -12,10 +12,10 @@ export class LocalDidMethod implements IDidMethod {
   public prefix = 'jun'
   public resolver: IResolver
   public registrar: IRegistrar
-  private db: InternalDb // TODO Better type, InternalDb doesn't make a lot of sense
+  private db: InternalDb // TODO Rename type InternalDb
 
   constructor(
-    db = createDb(), // TODO Don't rely on the test db
+    db = createDb(), // TODO Alternative to in-memory map?
   ) {
     this.resolver = new LocalResolver(db, validateEvents)
     this.registrar = new LocalRegistrar(db)
@@ -28,6 +28,10 @@ export class LocalDidMethod implements IDidMethod {
     } = await recoverJunKeyProviderFromSeed(seed ,newPassword, walletUtils)
 
     await this.registrar.encounter(inceptionEvent)
-    return authAsIdentityFromKeyProvider(keyProvider, newPassword, this.resolver)
+
+    return {
+      identityWallet: await authAsIdentityFromKeyProvider(keyProvider, newPassword, this.resolver),
+      succesfullyResolved: true
+    }
   }
 }
