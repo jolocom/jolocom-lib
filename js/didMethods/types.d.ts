@@ -1,5 +1,7 @@
+/// <reference types="node" />
 import { Identity } from '../identity/identity';
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider';
+import { IdentityWallet } from '../identityWallet/identityWallet';
 export interface IRegistrar {
     prefix: string;
     encounter: (events: string[]) => Promise<Identity>;
@@ -14,4 +16,8 @@ export interface IDidMethod {
     prefix: string;
     resolver: IResolver;
     registrar: IRegistrar;
+    recoverFromSeed?: (seed: Buffer, newPassword: string) => Promise<{
+        identityWallet: IdentityWallet;
+        succesfullyResolved: boolean;
+    }>;
 }

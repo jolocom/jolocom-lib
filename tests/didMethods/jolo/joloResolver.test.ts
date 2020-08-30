@@ -1,17 +1,16 @@
 import * as sinon from 'sinon'
 import { expect } from 'chai'
-import { didDocumentJSON, mockDid } from '../data/didDocument.data'
+import { didDocumentJSON, mockDid } from '../../data/didDocument.data'
 
-import { publicProfileCredJSON } from '../data/identity.data'
-import { Identity } from '../../ts/identity/identity'
-import { DidDocument } from '../../ts/identity/didDocument/didDocument'
-import { mockPubProfServiceEndpointJSON } from '../data/didDocumentSections.data'
-import { ErrorCodes } from '../../ts/errors'
-import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
-import { JolocomResolver } from '../../ts/didMethods/jolo/resolver'
+import { publicProfileCredJSON } from '../../data/identity.data'
+import { Identity } from '../../../ts/identity/identity'
+import { DidDocument } from '../../../ts/identity/didDocument/didDocument'
+import { mockPubProfServiceEndpointJSON } from '../../data/didDocumentSections.data'
+import { ErrorCodes } from '../../../ts/errors'
+import { JolocomResolver } from '../../../ts/didMethods/jolo/resolver'
 import { Resolver } from 'did-resolver'
-import { parseAndValidate } from '../../ts/parse/parseAndValidate'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import { parseAndValidate } from '../../../ts/parse/parseAndValidate'
+import { SignedCredential } from '../../../ts/credentials/signedCredential/signedCredential'
 
 const sandbox = sinon.createSandbox()
 
@@ -28,8 +27,8 @@ describe('Jolo Did method - resolve', () => {
     ))
 
     sandbox.stub(parseAndValidate, 'didDocument')
-    .onCall(0).returns(DidDocument.fromJSON(docWithoutPubProfile))
-    .onCall(1).returns(DidDocument.fromJSON(didDocumentJSON))
+    .onCall(0).resolves(DidDocument.fromJSON(docWithoutPubProfile))
+    .onCall(1).resolves(DidDocument.fromJSON(didDocumentJSON))
   })
 
   after(() => {

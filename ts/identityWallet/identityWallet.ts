@@ -36,6 +36,7 @@ import { getCryptoProvider } from '@jolocom/vaulted-key-provider/js/cryptoProvid
 import { getRandomBytes } from '../utils/crypto'
 import { cryptoUtils } from '@jolocom/native-core'
 import { validateDigestable } from '../utils/validation'
+import { IResolver } from '../didMethods/types'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -335,7 +336,7 @@ export class IdentityWallet {
   public async validateJWT<T, R>(
     receivedJWT: JSONWebToken<T>,
     sentJWT?: JSONWebToken<R>,
-    resolver = new JoloDidMethod().resolver,
+    resolver: IResolver = new JoloDidMethod().resolver,
   ): Promise<void> {
     if (!(await validateDigestable(receivedJWT, resolver))) {
       throw new Error(ErrorCodes.IDWInvalidJWTSignature)
@@ -390,7 +391,7 @@ export class IdentityWallet {
   public asymEncryptToDidKey = async (
     data: Buffer,
     keyRef: string,
-    resolver = new JoloDidMethod().resolver,
+    resolver: IResolver = new JoloDidMethod().resolver,
   ) =>
     resolver.resolve(keyIdToDid(keyRef)).then(ident => {
       const pk = ident.publicKeySection.find(pk => keyRef.endsWith(pk.id))
@@ -416,7 +417,7 @@ export class IdentityWallet {
   public asymEncryptToDid = async (
     data: Buffer,
     did: string,
-    resolver = new JoloDidMethod().resolver,
+    resolver: IResolver = new JoloDidMethod().resolver,
   ) =>
     resolver.resolve(did).then(ident => {
       const encKey = ident.didDocument.publicKey.find(

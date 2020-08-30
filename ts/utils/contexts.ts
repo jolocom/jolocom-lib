@@ -30,8 +30,8 @@ export const defaultContext = [
 /* Expanded default context for did documents, more verbose, but works in offline use cases */
 
 export const defaultContextIdentity: ContextEntry[] = [
+  //@ts-ignore, the verson is an int, which is not foreseen by the ContextEntry type
   {
-    //@ts-ignore, the verson is an int, which is not foreseen by the ContextEntry type
     '@version': 1.1,
     id: '@id',
     type: '@type',

@@ -1,6 +1,3 @@
-import {
-  joloMnemonicToEncryptedWallet
-} from '../../ts/recovery/recovery'
 import { expect } from 'chai'
 import {
   testDID16,
@@ -10,79 +7,39 @@ import {
   testSeedPhraseWithDid16,
   testSeedPhraseWithDid32,
   testShares,
+  testSecret32,
+  testSecret16
 } from '../data/recovery.data'
-import { walletUtils } from '@jolocom/native-core'
-import * as sinon from 'sinon'
+import { sliceSeedPhrase, shardsToMnemonic } from '../../ts/recovery/recovery'
 
-describe('Recovery', () => {
-  const pass = 'secret'
+describe('Utility Recovery functions', () => {
 
-  it('should recover from a short seed phrase 12 words', async () => {
-    const keyProvider = await joloMnemonicToEncryptedWallet(
-      testSeedPhrase16,
-      pass,
-      walletUtils,
-    )
+  it('should recover ', async () => {
+    expect(sliceSeedPhrase(testSeedPhrase16)).to.deep.eq({
+      encodedDid: 0,
+      seed: testSecret16
+    })
 
-    expect(keyProvider.id).to.eq(testDID16)
-    expect(await keyProvider.getPubKeys(pass)).length(3)
+
+    expect(sliceSeedPhrase(testSeedPhrase32)).to.deep.eq({
+      encodedDid: 0,
+      seed: testSecret32
+    })
+
+    expect(sliceSeedPhrase(testSeedPhraseWithDid16)).to.deep.eq({
+      encodedDid: testDID16.replace('did:jolo:', ''),
+      seed: testSecret16
+    })
+
+    expect(sliceSeedPhrase(testSeedPhraseWithDid32)).to.deep.eq({
+      encodedDid: testDID32.replace('did:jolo:', ''),
+      seed: testSecret32
+    })
   })
-
-  it('should recover from a short seed phrase 24 words', async () => {
-    const keyProvider = await joloMnemonicToEncryptedWallet(
-      testSeedPhrase32,
-      pass,
-      walletUtils,
-    )
-
-    expect(keyProvider.id).to.eq(testDID32)
-    expect(await keyProvider.getPubKeys(pass)).length(3)
-  })
-
-  it('should recover from a long seed phrase 24 words', async () => {
-    const keyProvider = await joloMnemonicToEncryptedWallet(
-      testSeedPhrase32,
-      pass,
-      walletUtils,
-    )
-
-    expect(keyProvider.id).to.eq(testDID32)
-    expect(await keyProvider.getPubKeys(pass)).length(3)
-  })
-
-  it('should recover from a long seed phrase 12 words', async () => {
-    const keyProvider = await joloMnemonicToEncryptedWallet(
-      testSeedPhraseWithDid16,
-      pass,
-      walletUtils,
-    )
-
-    expect(keyProvider.id).to.eq(testDID16)
-    expect(await keyProvider.getPubKeys(pass)).length(3)
-  })
-
-  it('should recover from a long seed phrase 12 words', async () => {
-    const keyProvider = await joloMnemonicToEncryptedWallet(
-      testSeedPhraseWithDid32,
-      pass,
-      walletUtils,
-    )
-
-    expect(keyProvider.id).to.eq(testDID32)
-    expect(await keyProvider.getPubKeys(pass)).length(3)
-  })
-
 
   it('should recover from shards', async () => {
-//    const identityWallet = await recoverFromShards(
-//      resolver,
-//      testShares,
-//      {
-//        keyRef: '',
-//        encryptionPass: pass
-//      },
-//    )
-//    sandbox.assert.calledWith(JolocomResolver.prototype.resolve, testDID32)
-//    expect(identityWallet['_vaultedKeyProvider']).to.deep.eq(referenceVault32)
-   })
+    const {didPhrase, seed} = await shardsToMnemonic(testShares)
+
+    expect(`${seed} ${didPhrase}`).to.eq(testSeedPhraseWithDid32)
+  })
 })

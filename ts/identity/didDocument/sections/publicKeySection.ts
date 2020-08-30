@@ -28,6 +28,7 @@ export class PublicKeySection {
    */
 
   @Expose()
+  @Transform((val, obj) => val || obj.id && obj.id.split('#')[0], { toClassOnly: true, until: 0.13 })
   @Transform((val, obj) => obj.owner || val, { toClassOnly: true, until: 0.13 })
   public get controller(): string {
     return this._controller

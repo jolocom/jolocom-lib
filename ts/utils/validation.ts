@@ -5,7 +5,7 @@ import { cryptoUtils } from '@jolocom/native-core'
 import { Identity } from '../identity/identity'
 import { IResolver } from '../didMethods/types'
 
-type IdentityOrResolver = Identity | IResolver
+export type IdentityOrResolver = Identity | IResolver
 
 /**
  * TODO Document

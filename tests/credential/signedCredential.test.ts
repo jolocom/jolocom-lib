@@ -34,6 +34,7 @@ describe('SignedCredential', () => {
     // This sets the claimId
     sandbox
       .stub(nodeCrypto, 'randomBytes')
+      //@ts-ignore TS complains. It thinks the return of randomBytes is void.
       .returns(Buffer.from('1842fb5f567dd532', 'hex'))
 
     clock = sinon.useFakeTimers()

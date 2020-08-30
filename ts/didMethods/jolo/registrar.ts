@@ -10,68 +10,13 @@ import { PROVIDER_URL, CONTRACT_ADDRESS, IPFS_ENDPOINT } from './constants'
 import {
   KeyTypes,
   SoftwareKeyProvider,
-  EncryptedWalletUtils,
   PublicKeyInfo
 } from '@jolocom/vaulted-key-provider'
-import { publicKeyToDID } from '../../utils/crypto'
-import { fromSeed } from 'bip32'
 import { validateDigestable } from '../../utils/validation'
-import { mnemonicToEntropy } from 'ethers/lib/utils'
+import { KEY_REFS } from './constants'
+import { publicKeyToJoloDID } from './utils'
 
-const SIGNING_KEY_REF = `keys-1`
-const ANCHOR_KEY_REF = `keys-2`
-const ENCRYPTION_KEY_REF = `keys-3`
-
-const ETH_DERIVATION_PATH = "m/44'/60'/0'/0/0"
-const JOLO_DERIVATION_PATH = "m/73'/0'/0'/0"
-const ENCRYPTION_DERIVATION_PATH = "m/73'/0'/1'/0"
-
-export const joloSeedToEncryptedWallet = async (
-  seed: Buffer,
-  newPassword: string,
-  impl: EncryptedWalletUtils,
-  originalDid?: string
-): Promise<SoftwareKeyProvider> => {
-  const joloKeys = fromSeed(seed).derivePath(JOLO_DERIVATION_PATH)
-  const ethKeys = fromSeed(seed).derivePath(ETH_DERIVATION_PATH)
-  const did = originalDid || publicKeyToDID(joloKeys.publicKey)
-
-  const skp = await SoftwareKeyProvider.newEmptyWallet(
-    impl,
-    did,
-    newPassword
-  )
-
-  await skp.changeId(newPassword, did)
-
-  await skp.addContent(newPassword, {
-    type: ['BIP32JolocomIdentitySeedv0'],
-    value: seed.toString('hex'),
-  })
-
-  await skp.addContent(newPassword, {
-    controller: [`${did}#${SIGNING_KEY_REF}`],
-    type: KeyTypes.ecdsaSecp256k1VerificationKey2019,
-    publicKeyHex: joloKeys.publicKey.toString('hex'),
-    private_key: joloKeys.privateKey.toString('hex'),
-  })
-
-  await skp.addContent(newPassword, {
-    controller: [`${did}#${ANCHOR_KEY_REF}`],
-    type: KeyTypes.ecdsaSecp256k1RecoveryMethod2020,
-    publicKeyHex: ethKeys.publicKey.toString('hex'),
-    private_key: ethKeys.privateKey.toString('hex'),
-  })
-
-  await skp.newKeyPair(
-    newPassword,
-    //@ts-ignore Investigate further, using the enum value might pass undefined sometimes
-    "X25519KeyAgreementKey2019",
-    [`${did}#${ENCRYPTION_KEY_REF}`]
-  )
-
-  return skp
-}
+const { SIGNING_KEY_REF, ANCHOR_KEY_REF, ENCRYPTION_KEY_REF } =  KEY_REFS
 
 export class JolocomRegistrar implements IRegistrar {
   public prefix = 'jolo'
@@ -92,18 +37,24 @@ export class JolocomRegistrar implements IRegistrar {
     if(keyProvider.id.startsWith(`did:${this.prefix}`)) {
       const existingSigningKey = await keyProvider.getPubKeyByController(
         password,
-        `${keyProvider.id}#${SIGNING_KEY_REF}`,
-      )
+        `${keyProvider.id}#${SIGNING_KEY_REF}`
+      ).catch(_ => {
+        throw new Error(`Jolo registrar - No signing key with ref ${SIGNING_KEY_REF} found`)
+      })
 
       const existingAnchoringKey = await keyProvider.getPubKeyByController(
          password,
         `${keyProvider.id}#${ANCHOR_KEY_REF}`,
-      )
+      ).catch(_ => {
+        throw new Error(`Jolo registrar - No anchoring key with ref ${ANCHOR_KEY_REF} found`)
+      })
 
       let existingEncryptionKey = await keyProvider.getPubKeyByController(
         password,
         `${keyProvider.id}#${ENCRYPTION_KEY_REF}`,
-      )
+      ).catch(_ => { 
+        throw new Error(`Jolo registrar - No encryption key with ref ${ENCRYPTION_KEY_REF} found`)
+      })
 
       if (
         !existingSigningKey ||
@@ -124,7 +75,7 @@ export class JolocomRegistrar implements IRegistrar {
         SIGNING_KEY_REF,
       )
 
-      const did = publicKeyToDID(Buffer.from(signingKey.publicKeyHex, 'hex'))
+      const did = publicKeyToJoloDID(Buffer.from(signingKey.publicKeyHex, 'hex'))
 
       await keyProvider.changeId(password, did)
 
@@ -164,6 +115,35 @@ export class JolocomRegistrar implements IRegistrar {
 
     await this.signDidDocument(identity.didDocument, keyProvider, password)
     await this.update(identity.didDocument, keyProvider, password)
+
+    return identity
+  }
+
+  // TODO Document, also make use of internally
+  async didDocumentFromKeyProvider(keyProvider: SoftwareKeyProvider, password: string) {
+    const did = keyProvider.id
+    const signingKey = await keyProvider.getPubKeyByController(password, `${did}#${SIGNING_KEY_REF}`)
+    const encryptionKey = await keyProvider.getPubKeyByController(password, `${did}#${ENCRYPTION_KEY_REF}`)
+
+    if (!signingKey || !encryptionKey) {
+      throw new Error(
+        `Could not find signing or encryption key. Vault id - ${did}`,
+      )
+    }
+
+    const didDocumentInstace = await DidDocument.fromPublicKey(
+      Buffer.from(signingKey.publicKeyHex, 'hex'),
+    )
+
+    didDocumentInstace.addPublicKeySection(PublicKeySection.fromJSON(
+      { ...encryptionKey }
+    ))
+
+    const identity = Identity.fromDidDocument({
+      didDocument: didDocumentInstace,
+    })
+
+    await this.signDidDocument(identity.didDocument, keyProvider, password)
 
     return identity
   }

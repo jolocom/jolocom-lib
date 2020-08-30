@@ -12,6 +12,7 @@ import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequ
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse';
 import { CredentialOfferRequestAttrs, CredentialOfferResponseAttrs, IAuthenticationAttrs, ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs } from '../interactionTokens/interactionTokens.types';
 import { KeyTypes } from '@jolocom/vaulted-key-provider';
+import { IResolver } from '../didMethods/types';
 declare type WithExtraOptions<T> = T & {
     expires?: Date;
     aud?: string;
@@ -32,10 +33,10 @@ export declare class IdentityWallet {
     private messageCannonicaliser;
     getPublicKeys: (encryptionPass: string) => Promise<import("@jolocom/vaulted-key-provider").PublicKeyInfo[]>;
     private initializeAndSign;
-    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: import("../didMethods/types").IResolver): Promise<void>;
+    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: IResolver): Promise<void>;
     asymEncrypt: (data: Buffer, key: Buffer, type: KeyTypes) => Promise<Buffer>;
-    asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: import("../didMethods/types").IResolver) => Promise<Buffer>;
-    asymEncryptToDid: (data: Buffer, did: string, resolver?: import("../didMethods/types").IResolver) => Promise<Buffer>;
+    asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: IResolver) => Promise<Buffer>;
+    asymEncryptToDid: (data: Buffer, did: string, resolver?: IResolver) => Promise<Buffer>;
     asymDecrypt: (data: Buffer, pass: string) => Promise<Buffer>;
     sign: (data: Buffer, pass: string) => Promise<Buffer>;
     create: {

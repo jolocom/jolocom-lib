@@ -475,6 +475,13 @@
     "@ethersproject/properties" "^5.0.0"
     "@ethersproject/strings" "^5.0.0"
 
+"@hawkingnetwork/ed25519-hd-key-rn@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@hawkingnetwork/ed25519-hd-key-rn/-/ed25519-hd-key-rn-1.0.1.tgz#aeb48f3648abe3f522ef1d064b84593aed2a38f1"
+  integrity sha512-M5SiKEyCo1ft4y0mDI5Wt4yUxQQbonJoLcow0fPeqeiFBpxeivYk7WCCjG+QS0PQMIIJ2cTpKh2Q/W63oyn5jA==
+  dependencies:
+    create-hmac "^1.1.7"
+
 "@jolocom/jolo-did-registrar@^1.0.0-rc5":
   version "1.0.0-rc5"
   resolved "https://registry.yarnpkg.com/@jolocom/jolo-did-registrar/-/jolo-did-registrar-1.0.0-rc5.tgz#4bd2563493c1a0c47d6d1c3b74c654e10361a089"
@@ -500,9 +507,9 @@
   integrity sha512-Mhn0k11KPy+mp74dU1/nX8gjXu7m0ZKiTq9CHPAVF/HRGxoycJCNa/WM+G+tfLDn9RvHk9aAhgtQASYkV2fpnA==
 
 "@jolocom/native-core-node-linux-x64@^1.0.0-rc14":
-  version "1.0.0-rc9"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-1.0.0-rc9.tgz#71a787a529e3008579e0dc1479f9fe07604d3440"
-  integrity sha512-d61M/4LEq6N/lX1tNrK5fKWXKNVk1puA6lOoG25BipIp5EfsI5mLI75vOtDR5Ad+CrxXQNCFidRC1W2cRoqZjg==
+  version "1.0.0-rc14"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-1.0.0-rc14.tgz#0d46deba3bc0cb7dc18dfc75e388c476cbbb5aba"
+  integrity sha512-axl2+EtX6nqKTZeNE3U8t1Qi3QOWyHsUeSjgpw+s7mcyEZNgfJH8ewNttE1sh0uWH++tkTw8x1SkED8Czhslrw==
 
 "@jolocom/native-core@^1.0.0-rc1":
   version "1.0.0-rc1"
@@ -667,6 +674,18 @@
   dependencies:
     "@types/glob" "*"
     "@types/node" "*"
+
+"@types/sinon@^9.0.5":
+  version "9.0.5"
+  resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-9.0.5.tgz#56b2a12662dd8c7d081cdc511af5f872cb37377f"
+  integrity sha512-4CnkGdM/5/FXDGqL32JQ1ttVrGvhOoesLLF7VnTh4KdjK5N5VQOtxaylFqqTjnHx55MnD9O02Nbk5c1ELC8wlQ==
+  dependencies:
+    "@types/sinonjs__fake-timers" "*"
+
+"@types/sinonjs__fake-timers@*":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@types/sinonjs__fake-timers/-/sinonjs__fake-timers-6.0.1.tgz#681df970358c82836b42f989188d133e218c458e"
+  integrity sha512-yYezQwGWty8ziyYLdZjwxyMb0CZR49h8JALHGrxjQHWlqGgc8kLdHEgWrgL0uZ29DMvEVBDnHU2Wg36zKSIUtA==
 
 "@typescript-eslint/eslint-plugin@^1.5.0":
   version "1.5.0"

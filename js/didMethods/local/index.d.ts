@@ -1,13 +1,14 @@
+/// <reference types="node" />
 import { IDidMethod, IResolver, IRegistrar } from '../types';
-import { IdentityWallet } from '../../identityWallet/identityWallet';
 import { InternalDb } from 'local-resolver-registrar/js/db';
-import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider';
 export declare class LocalDidMethod implements IDidMethod {
     prefix: string;
     resolver: IResolver;
     registrar: IRegistrar;
     private db;
     constructor(db?: InternalDb);
-    create(vaultedKeyProvider: SoftwareKeyProvider, decryptionPassword: string): Promise<IdentityWallet>;
-    authenticate(vaultedKeyProvider: SoftwareKeyProvider, decryptionPassword: string): Promise<IdentityWallet>;
+    recoverFromSeed(seed: Buffer, newPassword: string): Promise<{
+        identityWallet: import("../../identityWallet/identityWallet").IdentityWallet;
+        succesfullyResolved: boolean;
+    }>;
 }

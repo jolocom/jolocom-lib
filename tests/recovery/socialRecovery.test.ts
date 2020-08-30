@@ -16,8 +16,8 @@ describe('Social Recovery', () => {
     const { did, secret } = SocialRecovery.combineShard(
       shards.slice(0, threshold),
     )
-    expect(did).to.equal(testDID32)
-    expect(secret).to.equal(testSecret32)
+    expect(did).to.equal(testDID32.replace('did:jolo:', ''))
+    expect(secret.toString('hex')).to.equal(testSecret32)
   })
 
   it('should create shares correctly', () => {
@@ -27,8 +27,8 @@ describe('Social Recovery', () => {
 
   it('should combine shares correctly', () => {
     const { did, secret } = SocialRecovery.combineShard(testShares.slice(0, 3))
-    expect(secret).to.equal(testSecret32)
-    expect(did).to.equal(testDID32)
+    expect(secret.toString('hex')).to.equal(testSecret32)
+    expect(did).to.equal(testDID32.replace('did:jolo:', ''))
   })
 
   it('should fail if not enough shares are presented', () => {
