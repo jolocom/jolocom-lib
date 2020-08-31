@@ -501,23 +501,23 @@
     detect-node "^2.0.4"
     node-fetch "^2.6.0"
 
-"@jolocom/native-core-node-darwin-x64@^1.0.0-rc14":
-  version "1.0.0-rc14"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-darwin-x64/-/native-core-node-darwin-x64-1.0.0-rc14.tgz#e1d835543497aff7d8b3cb5699088b359952d504"
-  integrity sha512-Mhn0k11KPy+mp74dU1/nX8gjXu7m0ZKiTq9CHPAVF/HRGxoycJCNa/WM+G+tfLDn9RvHk9aAhgtQASYkV2fpnA==
+"@jolocom/native-core-node-darwin-x64@^1.0.0-rc15":
+  version "1.0.0-rc15"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-darwin-x64/-/native-core-node-darwin-x64-1.0.0-rc15.tgz#4bc65d7bffbc706b1f4b120bcb70406a55ca396c"
+  integrity sha512-UVkDR65JDLERAtZ7Fq3SBnPTUDNRVdbw3f9UgUgb4uNP7HvAa8ln4yVSOyPE4FRDeype0cDRtArokTEzenwOxw==
 
-"@jolocom/native-core-node-linux-x64@^1.0.0-rc14":
-  version "1.0.0-rc14"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-1.0.0-rc14.tgz#0d46deba3bc0cb7dc18dfc75e388c476cbbb5aba"
-  integrity sha512-axl2+EtX6nqKTZeNE3U8t1Qi3QOWyHsUeSjgpw+s7mcyEZNgfJH8ewNttE1sh0uWH++tkTw8x1SkED8Czhslrw==
+"@jolocom/native-core-node-linux-x64@^1.0.0-rc15":
+  version "1.0.0-rc15"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-1.0.0-rc15.tgz#73106ca497c936c8a44a0ea82d6634d9487e4b39"
+  integrity sha512-zGoosZEVCCTQygVNoKot9sKKEwC/PLFH8RAHiRBsehIsmF+HULzusK6Z1xDjIeW8W3DEe1Wn7EdhCZCWPgEsHQ==
 
-"@jolocom/native-core@^1.0.0-rc2":
-  version "1.0.0-rc2"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core/-/native-core-1.0.0-rc2.tgz#6a8e65b3e6ea172dd6eeee0a545bf48c1073a9bf"
-  integrity sha512-mpncYK9m2bLrijyMKinelAcaa1i9Pf5g5B1QCX4rshTgmpaOs9RMTbQtYtsGFSN5bB24TEaFMNd/yN5nwZs8lg==
+"@jolocom/native-core@^1.0.0-rc3":
+  version "1.0.0-rc3"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core/-/native-core-1.0.0-rc3.tgz#6a654bafdf787af7acc8c1d8052db2fbb8082fba"
+  integrity sha512-UIaE6ImjMqGw5lbw9o/rbXDA4mKSEo540XDcy3poC5yc7nv8L9UWcuK58ZWJDBteZDQDY4WmZ+vkV2vpz5qsMA==
   optionalDependencies:
-    "@jolocom/native-core-node-darwin-x64" "^1.0.0-rc14"
-    "@jolocom/native-core-node-linux-x64" "^1.0.0-rc14"
+    "@jolocom/native-core-node-darwin-x64" "^1.0.0-rc15"
+    "@jolocom/native-core-node-linux-x64" "^1.0.0-rc15"
 
 "@jolocom/protocol-ts@^0.5.1":
   version "0.5.1"
@@ -3099,10 +3099,10 @@ load-json-file@^1.0.0:
     pinkie-promise "^2.0.0"
     strip-bom "^2.0.0"
 
-local-resolver-registrar@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/local-resolver-registrar/-/local-resolver-registrar-0.3.1.tgz#0a06f0269102c55e43ccc80b7004868afd3199ea"
-  integrity sha512-MG+sdZUTa4XA2uOExWfhq/taoLRHpbeP8rcImc8OlPRz0WSikuCUkLEifSCY0X/p+tsXjw2uPSe3XldswTMocA==
+local-resolver-registrar@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/local-resolver-registrar/-/local-resolver-registrar-0.3.2.tgz#f9d33efe641a7134a1b4da3c37fc19054486a7ed"
+  integrity sha512-jh7jch+h8XQ2C6ErH2xXeEplhKKASOKin9eV95WKx8ikriRtx2WnQIObUDMQYGzou5GthFZ2KO+RgSu8ebRNnw==
 
 locate-path@^2.0.0:
   version "2.0.0"
