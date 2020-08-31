@@ -1,6 +1,6 @@
 {
   "name": "jolocom-lib",
-  "version": "5.1.0-rc3",
+  "version": "5.1.0-rc4",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "files": [
@@ -83,7 +83,7 @@
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.6.1",
     "jsontokens": "^1.0.0",
-    "local-resolver-registrar": "^0.3.1",
+    "local-resolver-registrar": "^0.3.2",
     "node-fetch": "^2.3.0",
     "reflect-metadata": "^0.1.13",
     "secrets.js-grempe": "^1.1.0"
