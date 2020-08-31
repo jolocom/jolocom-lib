@@ -57,20 +57,3 @@ export const recoverJoloKeyProviderFromSeed = async (
   return skp
 }
 
-export const recoverJoloIdwFromMnemonic = async (
-  mnemonicPhrase: string,
-  newPassword: string,
-  didMethod: IDidMethod,
-  impl: EncryptedWalletUtils,
-) => {
-  const {
-    encodedDid,
-    seed
-  } = sliceSeedPhrase(mnemonicPhrase)
-
-  const originalDid = encodedDid && `did:jolo:${encodedDid}`
-
-  const keyProvider = await recoverJoloKeyProviderFromSeed(Buffer.from(seed, 'hex'), newPassword, impl, originalDid)
-  return authAsIdentityFromKeyProvider(keyProvider, newPassword, didMethod.resolver)
-}
-
