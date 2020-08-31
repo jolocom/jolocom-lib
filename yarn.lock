@@ -511,10 +511,10 @@
   resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-linux-x64/-/native-core-node-linux-x64-1.0.0-rc14.tgz#0d46deba3bc0cb7dc18dfc75e388c476cbbb5aba"
   integrity sha512-axl2+EtX6nqKTZeNE3U8t1Qi3QOWyHsUeSjgpw+s7mcyEZNgfJH8ewNttE1sh0uWH++tkTw8x1SkED8Czhslrw==
 
-"@jolocom/native-core@^1.0.0-rc1":
-  version "1.0.0-rc1"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core/-/native-core-1.0.0-rc1.tgz#94277de938cedad213942d1aa5a6c015deaff75c"
-  integrity sha512-r/eeKR+Sl0D9tAUCCkPoblX0HkligG6tlPY0IhsynHjb4NlQRi7e4U/LNwHtCxomYHCu12zq8XzM6FqUJIgwlQ==
+"@jolocom/native-core@^1.0.0-rc2":
+  version "1.0.0-rc2"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core/-/native-core-1.0.0-rc2.tgz#6a8e65b3e6ea172dd6eeee0a545bf48c1073a9bf"
+  integrity sha512-mpncYK9m2bLrijyMKinelAcaa1i9Pf5g5B1QCX4rshTgmpaOs9RMTbQtYtsGFSN5bB24TEaFMNd/yN5nwZs8lg==
   optionalDependencies:
     "@jolocom/native-core-node-darwin-x64" "^1.0.0-rc14"
     "@jolocom/native-core-node-linux-x64" "^1.0.0-rc14"
