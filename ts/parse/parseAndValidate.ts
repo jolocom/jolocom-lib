@@ -10,13 +10,15 @@ import { ISignedCredentialAttrs } from '@jolocom/protocol-ts/dist/lib/signedCred
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { parse } from './parse'
 
-const parseAndValidateDidDoc = async (didDocument: IDidDocumentAttrs): Promise<DidDocument> => {
+const parseAndValidateDidDoc = async (
+  didDocument: IDidDocumentAttrs,
+): Promise<DidDocument> => {
   const didDoc = DidDocument.fromJSON(didDocument)
 
   const signatureValid = await validateJsonLd(
     //@ts-ignore optional proof
     didDocument,
-    Identity.fromDidDocument({ didDocument: didDoc })
+    Identity.fromDidDocument({ didDocument: didDoc }),
   )
 
   if (signatureValid) {
@@ -26,13 +28,13 @@ const parseAndValidateDidDoc = async (didDocument: IDidDocumentAttrs): Promise<D
   throw new Error(ErrorCodes.InvalidSignature)
 }
 
-const parseAndValidateSignedCredential = async (signedCredential: ISignedCredentialAttrs, signer: Identity): Promise<SignedCredential> => {
+const parseAndValidateSignedCredential = async (
+  signedCredential: ISignedCredentialAttrs,
+  signer: Identity,
+): Promise<SignedCredential> => {
   const signedCred = SignedCredential.fromJSON(signedCredential)
 
-  const signatureValid = await validateJsonLd(
-    signedCredential,
-    signer
-  )
+  const signatureValid = await validateJsonLd(signedCredential, signer)
 
   if (signatureValid) {
     return signedCred
@@ -41,7 +43,10 @@ const parseAndValidateSignedCredential = async (signedCredential: ISignedCredent
   throw new Error(ErrorCodes.InvalidSignature)
 }
 
-export const parseAndValidateInteractionToken = async (jwt: string, signer: Identity) : Promise<JSONWebToken<JWTEncodable>> =>  {
+export const parseAndValidateInteractionToken = async (
+  jwt: string,
+  signer: Identity,
+): Promise<JSONWebToken<JWTEncodable>> => {
   const interactionToken = parse.interactionToken.fromJWT<JWTEncodable>(jwt)
 
   const [body, payload, signature] = jwt.split('.')
@@ -50,7 +55,7 @@ export const parseAndValidateInteractionToken = async (jwt: string, signer: Iden
     Buffer.from(Buffer.from([body, payload].join('.'))),
     Buffer.from(signature, 'hex'),
     interactionToken.signer.keyId,
-    signer
+    signer,
   )
 
   if (isValid) {

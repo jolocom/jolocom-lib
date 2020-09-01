@@ -7,5 +7,6 @@ import { IJSONWebTokenAttrs } from './types'
 
 export const JSONWebTokenParser = {
   fromJWT: <T>(jwt: string): JSONWebToken<T> => JSONWebToken.decode(jwt),
-  fromJSON: <T>(json: IJSONWebTokenAttrs): JSONWebToken<T> => JSONWebToken.fromJSON(json),
+  fromJSON: <T>(json: IJSONWebTokenAttrs): JSONWebToken<T> =>
+    JSONWebToken.fromJSON(json),
 }

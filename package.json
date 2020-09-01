@@ -7,29 +7,30 @@
     "js/"
   ],
   "typings": "js/index.d.ts",
+  "husky": {
+    "hooks": {
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+    }
+  },
   "scripts": {
-    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts ./tests/**/**/*.ts --exit",
+    "test": "nyc --reporter=lcov --reporter=text-summary mocha --exit",
     "clean": "rm -rf ./js",
     "prepublish": "yarn clean; yarn build",
     "build": "tsc -p .",
     "build:watch": "tsc -w -p .",
-    "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
-    "test:debug": "mocha --opts ./mocha.opts --inspect -w ./tests/**/*.test.ts",
-    "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
-    "test:integration": "mocha --opts ./mocha.opts ./tests/**/*.integration.ts --exit",
-    "format": "eslint --fix --ext .ts .",
+    "test:watch": "mocha -w ./tests/**/*.test.ts",
+    "test:debug": "mocha --inspect -w ./tests/**/*.test.ts",
+    "test:integration": "nyc mocha --require ts-node/register ./tests/**/*.integration.ts --exit",
+    "format": "eslint --fix --ext .ts ./ts",
     "generate-api-docs": "typedoc ./ts"
-  },
-  "husky": {
-    "hooks": {}
   },
   "nyc": {
     "include": [
-      "./ts/**/*.ts"
+      "ts/**/*.ts"
     ],
     "exclude": [
-      "./**/types.ts",
-      "./**/*.types.ts"
+      "**/types.ts",
+      "**/*.types.ts"
     ],
     "extension": [
       ".ts"
@@ -90,28 +91,30 @@
   },
   "devDependencies": {
     "@decentralized-identity/did-common-typescript": "^0.1.19",
-    "sinon-chai": "^3.3.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/bip39": "^2.4.2",
-    "@types/chai": "^4.1.7",
-    "@types/mocha": "^5.2.6",
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.3",
     "@types/node": "^11.9.4",
-    "@typescript-eslint/eslint-plugin": "^1.5.0",
-    "@typescript-eslint/parser": "^1.5.0",
+    "@types/sinon-chai": "^3.2.4",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
     "chai": "^4.2.0",
     "commitizen": "^4.0.3",
     "cz-conventional-changelog": "3.0.2",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^4.1.0",
-    "eslint-plugin-prettier": "^3.0.1",
-    "husky": "^3.0.5",
+    "eslint": "^7.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.2.5",
     "istanbul": "^0.4.5",
-    "mocha": "^5.0.0",
-    "nyc": "^12.0.2",
+    "mocha": "^8.1.3",
+    "nyc": "^15.1.0",
     "precise-commits": "^1.0.2",
     "prettier": "^1.18.2",
-    "sinon": "^7.2.5",
-    "source-map-support": "^0.5.10",
-    "ts-node": "^8.0.2",
+    "sinon": "^9.0.3",
+    "sinon-chai": "^3.5.0",
+    "source-map-support": "^0.5.19",
+    "ts-node": "^9.0.0",
     "typedoc": "^0.14.2",
     "typescript": "3.6.3"
   },

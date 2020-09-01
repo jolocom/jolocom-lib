@@ -22,10 +22,7 @@ export const createIdentityFromKeyProvider = async (
   return new IdentityWallet({
     identity,
     vaultedKeyProvider,
-    publicKeyMetadata: await mapPublicKeys(
-      identity,
-      vaultKeys
-    ),
+    publicKeyMetadata: await mapPublicKeys(identity, vaultKeys),
   })
 }
 
@@ -35,8 +32,9 @@ export const authAsIdentityFromKeyProvider = async (
   pass: string,
   identityOrResolver: IdentityOrResolver,
 ) => {
-  const identity = identityOrResolver instanceof Identity
-    ?  identityOrResolver
+  const identity =
+    identityOrResolver instanceof Identity
+      ? identityOrResolver
       : await identityOrResolver.resolve(vkp.id)
 
   const vaultKeys = await vkp.getPubKeys(pass)

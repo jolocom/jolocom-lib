@@ -1,4 +1,4 @@
-import { ContextEntry } from "@jolocom/protocol-ts"
+import { ContextEntry } from '@jolocom/protocol-ts'
 
 /* Expanded default context for verifiable credentials, more verbose, but works in offline use cases */
 

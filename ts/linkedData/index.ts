@@ -42,10 +42,10 @@ export const normalizeSignedLdObject = async (
   { proof, ['@context']: _, ...data }: SignedJsonLdObject,
   context: JsonLdContext,
 ): Promise<Buffer> =>
-    Buffer.concat([
-      sha256(Buffer.from(await normalizeLdProof(proof, context))),
-      sha256(Buffer.from(await normalizeJsonLd(data, context))),
-    ])
+  Buffer.concat([
+    sha256(Buffer.from(await normalizeLdProof(proof, context))),
+    sha256(Buffer.from(await normalizeJsonLd(data, context))),
+  ])
 
 /**
  * Helper function to handle signed JsonLD digestions
@@ -72,17 +72,17 @@ export const digestJsonLd = async (
 
 export const validateJsonLd = async (
   json: SignedJsonLdObject,
-  resolverOrIdentity: IResolver | Identity = new JoloDidMethod().resolver
+  resolverOrIdentity: IResolver | Identity = new JoloDidMethod().resolver,
 ): Promise<boolean> => {
-  const issuerIdentity = (resolverOrIdentity instanceof Identity)
-    ? resolverOrIdentity
-    : await resolverOrIdentity.resolve(keyIdToDid(json.proof.creator))
+  const issuerIdentity =
+    resolverOrIdentity instanceof Identity
+      ? resolverOrIdentity
+      : await resolverOrIdentity.resolve(keyIdToDid(json.proof.creator))
 
-
-    return verifySignatureWithIdentity(
-      await normalizeSignedLdObject(json, json['@context']),
-      Buffer.from(json.proof.signatureValue, 'hex'),
-      json.proof.creator,
-      issuerIdentity
-    )
+  return verifySignatureWithIdentity(
+    await normalizeSignedLdObject(json, json['@context']),
+    Buffer.from(json.proof.signatureValue, 'hex'),
+    json.proof.creator,
+    issuerIdentity,
+  )
 }

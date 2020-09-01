@@ -3,5 +3,5 @@ import { LocalDidMethod } from './local'
 
 export const didMethods = {
   jolo: new JoloDidMethod(),
-  jun: new LocalDidMethod()
+  jun: new LocalDidMethod(),
 }

@@ -1,10 +1,10 @@
-import { IResolver } from "../types";
+import { IResolver } from '../types'
 import { getResolver, getPublicProfile } from '@jolocom/jolo-did-resolver'
-import { ErrorCodes } from "../../errors";
-import { DIDDocument, Resolver } from "did-resolver";
-import { Identity } from "../../identity/identity";
-import { SignedCredential } from "../../credentials/signedCredential/signedCredential";
-import { IPFS_ENDPOINT, PROVIDER_URL, CONTRACT_ADDRESS } from "./constants";
+import { ErrorCodes } from '../../errors'
+import { DIDDocument, Resolver } from 'did-resolver'
+import { Identity } from '../../identity/identity'
+import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
+import { IPFS_ENDPOINT, PROVIDER_URL, CONTRACT_ADDRESS } from './constants'
 import { parseAndValidate } from '../../parse/parseAndValidate'
 
 type Resolve = (did: string) => Promise<DIDDocument>
@@ -13,11 +13,11 @@ export class JolocomResolver implements IResolver {
   prefix = 'jolo'
 
   private resolutionFunctions: {
-    resolve: Resolve,
+    resolve: Resolve
     getPublicProfile: (didDoc: DIDDocument) => any
   } = {
     resolve: undefined,
-    getPublicProfile: undefined
+    getPublicProfile: undefined,
   }
 
   constructor(
@@ -28,11 +28,10 @@ export class JolocomResolver implements IResolver {
     this.resolutionFunctions.getPublicProfile = (didDoc: DIDDocument) =>
       getPublicProfile(didDoc, ipfsHost)
 
-    this.resolutionFunctions.resolve = (did: string) => new Resolver(getResolver(
-      providerUrl,
-      contractAddress,
-      ipfsHost,
-    )).resolve(did)
+    this.resolutionFunctions.resolve = (did: string) =>
+      new Resolver(getResolver(providerUrl, contractAddress, ipfsHost)).resolve(
+        did,
+      )
   }
 
   async resolve(did: string) {
@@ -52,13 +51,13 @@ export class JolocomResolver implements IResolver {
     if (publicProfileJson) {
       publicProfile = await parseAndValidate.signedCredential(
         publicProfileJson,
-        Identity.fromDidDocument({ didDocument })
+        Identity.fromDidDocument({ didDocument }),
       )
     }
 
     return Identity.fromDidDocument({
       didDocument,
-      publicProfile: publicProfile,
+      publicProfile,
     })
   }
 }

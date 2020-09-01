@@ -1,7 +1,7 @@
 /// <reference types="node" />
-import { IDidMethod } from "../types";
-import { JolocomResolver } from "./resolver";
-import { JolocomRegistrar } from "./registrar";
+import { IDidMethod } from '../types';
+import { JolocomResolver } from './resolver';
+import { JolocomRegistrar } from './registrar';
 export declare class JoloDidMethod implements IDidMethod {
     prefix: string;
     resolver: JolocomResolver;

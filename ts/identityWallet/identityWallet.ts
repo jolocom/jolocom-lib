@@ -160,11 +160,7 @@ export class IdentityWallet {
     publicKeyMetadata,
     vaultedKeyProvider,
   }: IIdentityWalletCreateArgs) {
-    if (
-      !identity ||
-      !publicKeyMetadata ||
-      !vaultedKeyProvider
-    ) {
+    if (!identity || !publicKeyMetadata || !vaultedKeyProvider) {
       throw new Error(ErrorCodes.IDWInvalidCreationArgs)
     }
 
@@ -186,7 +182,6 @@ export class IdentityWallet {
     }: WithExtraOptions<ISignedCredCreationArgs<T>>,
     pass: string,
   ) => {
-
     const vCred = await SignedCredential.create(
       {
         subject: credentialParams.subject || this.did,
@@ -199,10 +194,13 @@ export class IdentityWallet {
       expires,
     )
 
-    const signature = await this._keyProvider.sign({
-      encryptionPass: pass,
-      keyRef: this._publicKeyMetadata.signingKeyId // TODO Is this reliable? Or rather, where is this set?
-    }, await vCred.asBytes())
+    const signature = await this._keyProvider.sign(
+      {
+        encryptionPass: pass,
+        keyRef: this._publicKeyMetadata.signingKeyId, // TODO Is this reliable? Or rather, where is this set?
+      },
+      await vCred.asBytes(),
+    )
 
     vCred.signature = signature.toString('hex')
     return vCred
@@ -224,11 +222,7 @@ export class IdentityWallet {
     if (args.aud) jwt.audience = args.aud
     jwt.timestampAndSetExpiry(args.expires)
 
-    return this.initializeAndSign(
-      jwt,
-      pass,
-      recieved,
-    )
+    return this.initializeAndSign(jwt, pass, recieved)
   }
 
   private makeReq = <T>(typ: string) => (
@@ -288,7 +282,8 @@ export class IdentityWallet {
    */
 
   // TODO Don't just delegate to the vkp, postprocess to make easier to consume
-  public getPublicKeys = (encryptionPass: string) => this._keyProvider.getPubKeys(encryptionPass)
+  public getPublicKeys = (encryptionPass: string) =>
+    this._keyProvider.getPubKeys(encryptionPass)
 
   /**
    * Initializes the JWT Class with required fields (exp, iat, iss, typ) and adds a signature
@@ -312,9 +307,10 @@ export class IdentityWallet {
     jwt.issuer = this.publicKeyMetadata.signingKeyId
 
     const signature = await this._keyProvider.sign(
-      { // TODO
+      {
+        // TODO
         encryptionPass: pass,
-        keyRef: this._publicKeyMetadata.signingKeyId
+        keyRef: this._publicKeyMetadata.signingKeyId,
       },
       await jwt.asBytes(),
     ) // TODO Also, are the signatures hex or b64?
@@ -427,7 +423,7 @@ export class IdentityWallet {
       return this.asymEncrypt(
         data,
         Buffer.from(encKey.publicKeyHex, 'hex'),
-        encKey.type as KeyTypes
+        encKey.type as KeyTypes,
       )
     })
 
@@ -476,7 +472,7 @@ export class IdentityWallet {
         ),
         share: this.makeReq<ICredentialRequestAttrs>(
           InteractionType.CredentialRequest,
-        )
+        ),
       },
       response: {
         auth: this.makeRes<

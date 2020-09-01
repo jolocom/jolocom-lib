@@ -21,8 +21,8 @@ export class LocalRegistrar implements IRegistrar {
     this.registrar = getRegistrar({
       dbInstance: db,
       create: getIcp,
-      getIdFromEvent: getIdFromEvent,
-      validateEvents: validateEvents,
+      getIdFromEvent,
+      validateEvents,
     })
   }
 

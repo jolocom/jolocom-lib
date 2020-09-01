@@ -8,7 +8,11 @@ import {
   Type,
 } from 'class-transformer'
 import { digestJsonLd, normalizeSignedLdObject } from '../../linkedData'
-import { ISignedCredCreationArgs, ISignedCredentialAttrs, ISigner } from './types'
+import {
+  ISignedCredCreationArgs,
+  ISignedCredentialAttrs,
+  ISigner,
+} from './types'
 import {
   IDigestable,
   ILinkedDataSignature,
@@ -32,7 +36,7 @@ const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
  */
 
 const generateClaimId = (length: number) =>
-  `claimId:${(randomBytes(length)).toString('hex')}`
+  `claimId:${randomBytes(length).toString('hex')}`
 
 /**
  * @description Data needed to prepare signature on credential

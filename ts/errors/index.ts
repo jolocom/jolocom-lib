@@ -20,5 +20,5 @@ export enum ErrorCodes {
   IDWIncorrectJWTNonce = 'IDWIncorrectJWTNonce',
   IDWTokenExpired = 'IDWTokenExpired',
   VCInvalidExpiryDate = 'VCInvalidExpiryDate',
-  InvalidSignature = 'InvalidSignature'
+  InvalidSignature = 'InvalidSignature',
 }

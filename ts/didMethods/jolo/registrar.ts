@@ -1,7 +1,10 @@
 import { Identity } from '../../identity/identity'
 import { getRegistrar } from '@jolocom/jolo-did-registrar'
 import { DidDocument } from '../../identity/didDocument/didDocument'
-import { ServiceEndpointsSection, PublicKeySection } from '../../identity/didDocument/sections'
+import {
+  ServiceEndpointsSection,
+  PublicKeySection,
+} from '../../identity/didDocument/sections'
 import { fuelKeyWithEther } from '../../utils/helper'
 import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
 import { IRegistrar } from '../types'
@@ -10,13 +13,13 @@ import { PROVIDER_URL, CONTRACT_ADDRESS, IPFS_ENDPOINT } from './constants'
 import {
   KeyTypes,
   SoftwareKeyProvider,
-  PublicKeyInfo
+  PublicKeyInfo,
 } from '@jolocom/vaulted-key-provider'
 import { validateDigestable } from '../../utils/validation'
 import { KEY_REFS } from './constants'
 import { publicKeyToJoloDID } from './utils'
 
-const { SIGNING_KEY_REF, ANCHOR_KEY_REF, ENCRYPTION_KEY_REF } =  KEY_REFS
+const { SIGNING_KEY_REF, ANCHOR_KEY_REF, ENCRYPTION_KEY_REF } = KEY_REFS
 
 export class JolocomRegistrar implements IRegistrar {
   public prefix = 'jolo'
@@ -34,27 +37,33 @@ export class JolocomRegistrar implements IRegistrar {
     let signingKey: PublicKeyInfo
     let encryptionKey: PublicKeyInfo
 
-    if(keyProvider.id.startsWith(`did:${this.prefix}`)) {
-      const existingSigningKey = await keyProvider.getPubKeyByController(
-        password,
-        `${keyProvider.id}#${SIGNING_KEY_REF}`
-      ).catch(_ => {
-        throw new Error(`Jolo registrar - No signing key with ref ${SIGNING_KEY_REF} found`)
-      })
+    if (keyProvider.id.startsWith(`did:${this.prefix}`)) {
+      const existingSigningKey = await keyProvider
+        .getPubKeyByController(password, `${keyProvider.id}#${SIGNING_KEY_REF}`)
+        .catch(_ => {
+          throw new Error(
+            `Jolo registrar - No signing key with ref ${SIGNING_KEY_REF} found`,
+          )
+        })
 
-      const existingAnchoringKey = await keyProvider.getPubKeyByController(
-         password,
-        `${keyProvider.id}#${ANCHOR_KEY_REF}`,
-      ).catch(_ => {
-        throw new Error(`Jolo registrar - No anchoring key with ref ${ANCHOR_KEY_REF} found`)
-      })
+      const existingAnchoringKey = await keyProvider
+        .getPubKeyByController(password, `${keyProvider.id}#${ANCHOR_KEY_REF}`)
+        .catch(_ => {
+          throw new Error(
+            `Jolo registrar - No anchoring key with ref ${ANCHOR_KEY_REF} found`,
+          )
+        })
 
-      let existingEncryptionKey = await keyProvider.getPubKeyByController(
-        password,
-        `${keyProvider.id}#${ENCRYPTION_KEY_REF}`,
-      ).catch(_ => { 
-        throw new Error(`Jolo registrar - No encryption key with ref ${ENCRYPTION_KEY_REF} found`)
-      })
+      const existingEncryptionKey = await keyProvider
+        .getPubKeyByController(
+          password,
+          `${keyProvider.id}#${ENCRYPTION_KEY_REF}`,
+        )
+        .catch(_ => {
+          throw new Error(
+            `Jolo registrar - No encryption key with ref ${ENCRYPTION_KEY_REF} found`,
+          )
+        })
 
       if (
         !existingSigningKey ||
@@ -75,7 +84,9 @@ export class JolocomRegistrar implements IRegistrar {
         SIGNING_KEY_REF,
       )
 
-      const did = publicKeyToJoloDID(Buffer.from(signingKey.publicKeyHex, 'hex'))
+      const did = publicKeyToJoloDID(
+        Buffer.from(signingKey.publicKeyHex, 'hex'),
+      )
 
       await keyProvider.changeId(password, did)
 
@@ -98,16 +109,15 @@ export class JolocomRegistrar implements IRegistrar {
         KeyTypes.x25519KeyAgreementKey2019,
         `${did}#${ENCRYPTION_KEY_REF}`,
       )
-
     }
 
     const didDocumentInstace = await DidDocument.fromPublicKey(
       Buffer.from(signingKey.publicKeyHex, 'hex'),
     )
 
-    didDocumentInstace.addPublicKeySection(PublicKeySection.fromJSON(
-      { ...encryptionKey }
-    ))
+    didDocumentInstace.addPublicKeySection(
+      PublicKeySection.fromJSON({ ...encryptionKey }),
+    )
 
     const identity = Identity.fromDidDocument({
       didDocument: didDocumentInstace,
@@ -120,10 +130,19 @@ export class JolocomRegistrar implements IRegistrar {
   }
 
   // TODO Document, also make use of internally
-  async didDocumentFromKeyProvider(keyProvider: SoftwareKeyProvider, password: string) {
+  async didDocumentFromKeyProvider(
+    keyProvider: SoftwareKeyProvider,
+    password: string,
+  ) {
     const did = keyProvider.id
-    const signingKey = await keyProvider.getPubKeyByController(password, `${did}#${SIGNING_KEY_REF}`)
-    const encryptionKey = await keyProvider.getPubKeyByController(password, `${did}#${ENCRYPTION_KEY_REF}`)
+    const signingKey = await keyProvider.getPubKeyByController(
+      password,
+      `${did}#${SIGNING_KEY_REF}`,
+    )
+    const encryptionKey = await keyProvider.getPubKeyByController(
+      password,
+      `${did}#${ENCRYPTION_KEY_REF}`,
+    )
 
     if (!signingKey || !encryptionKey) {
       throw new Error(
@@ -135,9 +154,9 @@ export class JolocomRegistrar implements IRegistrar {
       Buffer.from(signingKey.publicKeyHex, 'hex'),
     )
 
-    didDocumentInstace.addPublicKeySection(PublicKeySection.fromJSON(
-      { ...encryptionKey }
-    ))
+    didDocumentInstace.addPublicKeySection(
+      PublicKeySection.fromJSON({ ...encryptionKey }),
+    )
 
     const identity = Identity.fromDidDocument({
       didDocument: didDocumentInstace,
@@ -158,18 +177,23 @@ export class JolocomRegistrar implements IRegistrar {
     const { didDocument } = identity
 
     // TODO Better message
-    if (!await validateDigestable(publicProfile, identity)) {
-      throw new Error('Could not verify signature on the public profile. Update aborted.')
+    if (!(await validateDigestable(publicProfile, identity))) {
+      throw new Error(
+        'Could not verify signature on the public profile. Update aborted.',
+      )
     }
 
     const pubProfSection = ServiceEndpointsSection.fromJSON(
-      await this.registrarFns.publishPublicProfile(identity.did, publicProfile)
+      await this.registrarFns.publishPublicProfile(identity.did, publicProfile),
     )
 
-    const oldPublicProfileEntry = didDocument.service.findIndex(({ type }) =>
-      type === claimsMetadata.publicProfile.type[
-        claimsMetadata.publicProfile.type.length - 1
-      ])
+    const oldPublicProfileEntry = didDocument.service.findIndex(
+      ({ type }) =>
+        type ===
+        claimsMetadata.publicProfile.type[
+          claimsMetadata.publicProfile.type.length - 1
+        ],
+    )
 
     if (oldPublicProfileEntry !== -1) {
       didDocument.service.splice(oldPublicProfileEntry, 1, pubProfSection)
@@ -203,7 +227,7 @@ export class JolocomRegistrar implements IRegistrar {
   private async update(
     didDocument: DidDocument,
     keyProvider: SoftwareKeyProvider,
-    password: string
+    password: string,
   ) {
     const anchoringKey = await keyProvider.getPubKeyByController(
       password,
@@ -211,26 +235,32 @@ export class JolocomRegistrar implements IRegistrar {
     )
 
     if (!anchoringKey) {
-      throw new Error("No anchoring key found")
+      throw new Error('No anchoring key found')
     }
 
     const unsignedTx = await this.registrarFns.publishDidDocument(
       Buffer.from(anchoringKey.publicKeyHex.slice(2), 'hex'),
       //@ts-ignore
-      didDocument.toJSON()
+      didDocument.toJSON(),
     )
 
     await fuelKeyWithEther(Buffer.from(anchoringKey.publicKeyHex, 'hex'))
 
-    const signature = await keyProvider.sign({
-      keyRef: anchoringKey.controller[0],
-      encryptionPass: password
-    }, Buffer.from(unsignedTx.slice(2), 'hex'))
+    const signature = await keyProvider.sign(
+      {
+        keyRef: anchoringKey.controller[0],
+        encryptionPass: password,
+      },
+      Buffer.from(unsignedTx.slice(2), 'hex'),
+    )
 
-    return this.registrarFns.broadcastTransaction(unsignedTx, {
-      r: '0x' + signature.slice(0, 32).toString('hex'),
-      s: '0x' + signature.slice(32, 64).toString('hex'),
-      recoveryParam: signature[64]
-    }).catch(console.log).then(() => true)
+    return this.registrarFns
+      .broadcastTransaction(unsignedTx, {
+        r: '0x' + signature.slice(0, 32).toString('hex'),
+        s: '0x' + signature.slice(32, 64).toString('hex'),
+        recoveryParam: signature[64],
+      })
+      .catch(console.log)
+      .then(() => true)
   }
 }
