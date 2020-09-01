@@ -28,7 +28,10 @@ export class PublicKeySection {
    */
 
   @Expose()
-  @Transform((val, obj) => val || obj.id && obj.id.split('#')[0], { toClassOnly: true, until: 0.13 })
+  @Transform((val, obj) => val || (obj.id && obj.id.split('#')[0]), {
+    toClassOnly: true,
+    until: 0.13,
+  })
   @Transform((val, obj) => obj.owner || val, { toClassOnly: true, until: 0.13 })
   public get controller(): string {
     return this._controller
@@ -81,12 +84,14 @@ export class PublicKeySection {
    */
 
   @Expose()
-  @Transform((val, obj) => !val && obj.publicKeyBase64
-    ? Buffer.from(obj.publicKeyBase64, 'base64').toString('hex')
-    : val,
+  @Transform(
+    (val, obj) =>
+      !val && obj.publicKeyBase64
+        ? Buffer.from(obj.publicKeyBase64, 'base64').toString('hex')
+        : val,
     {
-      toClassOnly: true
-    }
+      toClassOnly: true,
+    },
   )
   public get publicKeyHex(): string {
     return this._publicKeyHex

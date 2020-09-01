@@ -164,9 +164,7 @@ export class DidDocument implements IDigestable {
     },
     { toClassOnly: true },
   )
-  @Transform(pubKeys => {
-    return pubKeys && pubKeys.map(PublicKeySection.fromJSON)
-  })
+  @Transform(pubKeys => pubKeys && pubKeys.map(PublicKeySection.fromJSON))
   public get publicKey(): PublicKeySection[] {
     return this._publicKey
   }

@@ -17,8 +17,8 @@ export function sliceSeedPhrase(
 ): { seed: string; encodedDid: string } {
   const seedPhraseArray = seedPhrase.split(' ')
 
-  const divideAt = SEED_PHRASE_LENGTH_LIST.find(
-    l => validateMnemonic(seedPhraseArray.slice(0, l).join(' '))
+  const divideAt = SEED_PHRASE_LENGTH_LIST.find(l =>
+    validateMnemonic(seedPhraseArray.slice(0, l).join(' ')),
   )
 
   const firstEncodedValue = seedPhraseArray.slice(0, divideAt)
@@ -26,7 +26,9 @@ export function sliceSeedPhrase(
 
   return {
     seed: mnemonicToEntropy(firstEncodedValue.join(' ')),
-    encodedDid: secondEncodedValue.length && (mnemonicToEntropy(secondEncodedValue.join(' '))),
+    encodedDid:
+      secondEncodedValue.length &&
+      mnemonicToEntropy(secondEncodedValue.join(' ')),
   }
 }
 
@@ -34,7 +36,6 @@ export const shardsToMnemonic = async (shards: string[]) => {
   const { did, secret } = SocialRecovery.combineShard(shards)
   return {
     didPhrase: entropyToMnemonic(Buffer.from(did, 'hex')),
-    seed: entropyToMnemonic(secret)
+    seed: entropyToMnemonic(secret),
   }
 }
-

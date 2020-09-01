@@ -1,5 +1,5 @@
-import { IResolver } from "../types";
-import { Identity } from "../../identity/identity";
+import { IResolver } from '../types';
+import { Identity } from '../../identity/identity';
 export declare class JolocomResolver implements IResolver {
     prefix: string;
     private resolutionFunctions;

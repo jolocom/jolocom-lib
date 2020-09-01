@@ -12,5 +12,3 @@ export function publicKeyToJoloDID(publicKey: Buffer): string {
   const suffix = keccak256(publicKey)
   return prefix + suffix.toString('hex')
 }
-
-

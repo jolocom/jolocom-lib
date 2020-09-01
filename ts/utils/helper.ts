@@ -1,10 +1,7 @@
 import { pubToAddress, addHexPrefix } from 'ethereumjs-util'
 import fetch from 'node-fetch'
 import { Identity } from '../identity/identity'
-import {
-  KeyTypes,
-  PublicKeyInfo,
-} from '@jolocom/vaulted-key-provider'
+import { KeyTypes, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
 import { IKeyMetadata } from '../identityWallet/types'
 import { ErrorCodes } from '../errors'
 
@@ -63,9 +60,11 @@ export const mapPublicKeys = async (
     k => k.type === KeyTypes.x25519KeyAgreementKey2019,
   )
 
-  const encKeyRef = encKey && (encKey.id.startsWith('did:')
-    ? encKey.id
-    : `${encKey.controller}${encKey.id}`)
+  const encKeyRef =
+    encKey &&
+    (encKey.id.startsWith('did:')
+      ? encKey.id
+      : `${encKey.controller}${encKey.id}`)
 
   const sigKey = vkpKeys.some(k => k.controller.find(c => c === signingKeyRef))
 

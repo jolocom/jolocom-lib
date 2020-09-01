@@ -1,4 +1,4 @@
-import { ContextEntry } from "@jolocom/protocol-ts";
+import { ContextEntry } from '@jolocom/protocol-ts';
 export declare const defaultContext: {
     id: string;
     type: string;

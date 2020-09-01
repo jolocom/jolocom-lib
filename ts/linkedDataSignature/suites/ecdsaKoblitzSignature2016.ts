@@ -27,10 +27,10 @@ import { keyIdToDid } from '../../utils/helper'
 export class EcdsaLinkedDataSignature
   implements ILinkedDataSignature, IDigestable {
   private _type = 'EcdsaKoblitzSignature2016'
-  private _creator: string = ''
+  private _creator = ''
   private _created: Date = new Date()
-  private _nonce: string = ''
-  private _signatureValue: string = ''
+  private _nonce = ''
+  private _signatureValue = ''
 
   /**
    * Get the creation date of the linked data signature
