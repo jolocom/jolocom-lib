@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { testDID32, testSecret32, testShares } from '../data/recovery.data'
 
 describe('Social Recovery', () => {
-  it('should create and combine', function() {
+  it('should create and combine', () => {
     const amount = 255
     const threshold = 50
     const shards = SocialRecovery.createShards(

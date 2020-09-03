@@ -25,10 +25,10 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
   let credResponseEncoded: string
 
   it('Should correctly create a credential request token by service', async () => {
-    credRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.share(
+    credRequestJWT = (await serviceIdentityWallet.create.interactionTokens.request.share(
       integrationCredRequestJSON,
       servicePass,
-    ) as JSONWebToken<CredentialRequest>
+    )) as JSONWebToken<CredentialRequest>
     credRequestEncoded = credRequestJWT.encode()
 
     expect(credRequestJWT.interactionToken).to.deep.eq(
@@ -39,10 +39,10 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
   })
 
   it('Should allow for consumption of valid credential request token by user', async () => {
-    const decodedCredRequest = await parseAndValidate.interactionToken(
+    const decodedCredRequest = (await parseAndValidate.interactionToken(
       credRequestEncoded,
-      serviceIdentityWallet.identity
-    ) as JSONWebToken<CredentialRequest>
+      serviceIdentityWallet.identity,
+    )) as JSONWebToken<CredentialRequest>
 
     expect(decodedCredRequest.interactionToken).to.be.instanceOf(
       CredentialRequest,
@@ -74,10 +74,10 @@ describe('Integration Test - Token interaction flow Credential Request and Respo
   })
 
   it('Should allow for consumption of valid credential response token by service', async () => {
-    const decodedCredResponse = await parseAndValidate.interactionToken(
+    const decodedCredResponse = (await parseAndValidate.interactionToken(
       credResponseEncoded,
-      userIdentityWallet.identity
-    ) as JSONWebToken<CredentialResponse>
+      userIdentityWallet.identity,
+    )) as JSONWebToken<CredentialResponse>
 
     expect(decodedCredResponse.interactionToken).to.be.instanceOf(
       CredentialResponse,

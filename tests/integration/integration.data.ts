@@ -27,7 +27,8 @@ export const userSeed = Buffer.from(
 )
 
 export const userPass = 'a'.repeat(32)
-export const getNewVault = (id: string, pass: string)  => SoftwareKeyProvider.newEmptyWallet(walletUtils, id, pass)
+export const getNewVault = (id: string, pass: string) =>
+  SoftwareKeyProvider.newEmptyWallet(walletUtils, id, pass)
 
 /* The private eth key derived from the user's seed */
 export const userEthKey =

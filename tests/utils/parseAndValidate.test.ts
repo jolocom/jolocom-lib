@@ -12,7 +12,10 @@ import {
   signedCredTestVector1,
   signedCredTestVector2,
 } from './testVectors/signedCredentialData'
-import { signedJWTTestVector0, signedJWTTestVector1 } from './testVectors/signedJwtTestData'
+import {
+  signedJWTTestVector0,
+  signedJWTTestVector1,
+} from './testVectors/signedJwtTestData'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
@@ -52,10 +55,9 @@ describe('parseAndValidate', () => {
       })
 
       return expect(
-        await parseAndValidate.signedCredential(
-          signedCredTestVector1.signedCredential,
-          identity,
-        ).catch(_ => false),
+        await parseAndValidate
+          .signedCredential(signedCredTestVector1.signedCredential, identity)
+          .catch(_ => false),
       ).to.eq(false)
     })
 
@@ -102,10 +104,9 @@ describe('parseAndValidate', () => {
       })
 
       return expect(
-        await parseAndValidate.interactionToken(
-          signedJWTTestVector0.signedJWT,
-          identity,
-        ).catch(_ => false),
+        await parseAndValidate
+          .interactionToken(signedJWTTestVector0.signedJWT, identity)
+          .catch(_ => false),
       ).to.eq(false)
     })
 
@@ -134,7 +135,6 @@ describe('parseAndValidate', () => {
         ),
       ).instanceOf(JSONWebToken)
     })
-
 
     it('lib@4.0.2 Should correctly parse and validate JWTs created by JOLO identities', async () => {})
   })

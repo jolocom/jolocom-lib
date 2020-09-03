@@ -19,21 +19,21 @@ describe('Integration Test - Token interaction flow Authentication', () => {
   let authResponseEncoded: string
 
   it('Should correctly create an authentication request token by service', async () => {
-    authRequestJWT = await serviceIdentityWallet.create.interactionTokens.request.auth(
+    authRequestJWT = (await serviceIdentityWallet.create.interactionTokens.request.auth(
       jsonAuthentication,
       servicePass,
-    ) as JSONWebToken<Authentication>
+    )) as JSONWebToken<Authentication>
 
     expect(authRequestJWT.interactionToken).to.deep.eq(
-      Authentication.fromJSON(jsonAuthentication)
+      Authentication.fromJSON(jsonAuthentication),
     )
   })
 
   it('Should allow for consumption of valid authentication request token by user', async () => {
-    const decodedAuthRequest = await parseAndValidate.interactionToken(
+    const decodedAuthRequest = (await parseAndValidate.interactionToken(
       authRequestJWT.encode(),
-      serviceIdentityWallet.identity
-    ) as JSONWebToken<Authentication>
+      serviceIdentityWallet.identity,
+    )) as JSONWebToken<Authentication>
 
     expect(decodedAuthRequest.interactionToken).to.be.instanceOf(Authentication)
 
@@ -56,11 +56,13 @@ describe('Integration Test - Token interaction flow Authentication', () => {
   })
 
   it('Should allow for consumption of valid authentication response token by service', async () => {
-    const decodedAuthResponse = await parseAndValidate.interactionToken(
+    const decodedAuthResponse = (await parseAndValidate.interactionToken(
       authResponseEncoded,
-      userIdentityWallet.identity
-    ) as JSONWebToken<Authentication>
+      userIdentityWallet.identity,
+    )) as JSONWebToken<Authentication>
 
-    expect(decodedAuthResponse.interactionToken).to.be.instanceOf(Authentication)
+    expect(decodedAuthResponse.interactionToken).to.be.instanceOf(
+      Authentication,
+    )
   })
 })

@@ -5,10 +5,10 @@
 // import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 // import { IResolver } from '../../ts/didMethods/types'
 // import { parseAndValidate } from '../../ts/parse/parseAndValidate'
-// 
+//
 // chai.use(sinonChai)
 // const expect = chai.expect
-// 
+//
 // const DID_DOC_V0 = {
 //   '@context': [
 //     {
@@ -85,7 +85,7 @@
 //       'did:jolo:d74f9e9c9a405e87352211afc9575e6dc8aa99ae8870c1bbcc2adf68084d80f4#keys-1',
 //   },
 // }
-// 
+//
 // describe('linkedData validation functions', () => {
 //   it('validateJsonLd should correctly validate', async () => {
 //     const testResolver: IResolver = {
@@ -95,7 +95,7 @@
 //           didDocument: DidDocument.fromJSON(DID_DOC_V0),
 //         }),
 //     }
-// 
+//
 //     const mallformedV0 = {
 //       ...DID_DOC_V0,
 //       proof: {
@@ -103,7 +103,7 @@
 //         nonce: '0',
 //       },
 //     }
-// 
+//
 //     expect(await parseAndValidate.didDocument(DID_DOC_V0)).to.eq(DidDocument.fromJSON(DID_DOC_V0))
 //     expect(await validateJsonLd(DID_DOC_V0, testResolver)).to.eq(true)
 //     expect(await validateJsonLd(mallformedV0, testResolver)).to.eq(false)

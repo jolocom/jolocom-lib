@@ -16,19 +16,21 @@ const sandbox = sinon.createSandbox()
 
 const docWithoutPubProfile = {
   ...didDocumentJSON,
-  service: []
+  service: [],
 }
 
 describe('Jolo Did method - resolve', () => {
   before(() => {
-    sandbox.stub(parseAndValidate, 'signedCredential')
-    .resolves(SignedCredential.fromJSON(
-      publicProfileCredJSON
-    ))
+    sandbox
+      .stub(parseAndValidate, 'signedCredential')
+      .resolves(SignedCredential.fromJSON(publicProfileCredJSON))
 
-    sandbox.stub(parseAndValidate, 'didDocument')
-    .onCall(0).resolves(DidDocument.fromJSON(docWithoutPubProfile))
-    .onCall(1).resolves(DidDocument.fromJSON(didDocumentJSON))
+    sandbox
+      .stub(parseAndValidate, 'didDocument')
+      .onCall(0)
+      .resolves(DidDocument.fromJSON(docWithoutPubProfile))
+      .onCall(1)
+      .resolves(DidDocument.fromJSON(didDocumentJSON))
   })
 
   after(() => {
@@ -49,9 +51,7 @@ describe('Jolo Did method - resolve', () => {
       didDocWithoutPubProfilie
 
     //@ts-ignore resolutionFunctions is private
-    testResolver.resolutionFunctions.getPublicProfile = async didDoc => {
-      return null
-    }
+    testResolver.resolutionFunctions.getPublicProfile = async didDoc => null
 
     const { didDocument, publicProfile } = await testResolver.resolve(mockDid)
 
@@ -66,7 +66,7 @@ describe('Jolo Did method - resolve', () => {
 
     //@ts-ignore
     testResolver.resolutionFunctions.resolve = new Resolver({
-      jolo: async (did: string) => null
+      jolo: async (did: string) => null,
     }).resolve
 
     return testResolver

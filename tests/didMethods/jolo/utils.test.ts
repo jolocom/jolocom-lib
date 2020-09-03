@@ -9,14 +9,14 @@
 // import { mockDid, didDocumentJSON } from '../data/didDocument.data'
 // import { expect } from 'chai'
 // import { DidDocument } from '../../ts/identity/didDocument/didDocument'
-// 
+//
 // describe('Jolocom Registry - authenticate', () => {
 //   const sandbox = sinon.createSandbox()
-// 
+//
 //   const mockDidDoc = DidDocument.fromJSON(didDocumentJSON)
 //   const mockVault = SoftwareKeyProvider.fromSeed(testSeed, encryptionPass)
 //   const registry = new JolocomRegistry()
-// 
+//
 //   before(async () => {
 //     sandbox.stub(mockVault, 'getPublicKey').returns(testPublicIdentityKey)
 //     sandbox
@@ -28,11 +28,11 @@
 //       },
 //     ])
 //   })
-// 
+//
 //   after(() => {
 //     sandbox.restore()
 //   })
-// 
+//
 //   it('should correctly authenticate', async () => {
 //     const iw = await registry.authenticate(mockVault, keyMetadata.encryptionPass)
 //     sandbox.assert.calledWith(mockVault.getPublicKey, keyMetadata)

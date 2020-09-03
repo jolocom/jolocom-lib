@@ -1,11 +1,7 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
-import {
-  userPass,
-  getNewVault,
-  servicePass,
-} from './integration.data'
+import { userPass, getNewVault, servicePass } from './integration.data'
 import { ErrorCodes } from '../../ts/errors'
 import { IDidMethod } from '../../ts/didMethods/types'
 import { LocalDidMethod } from '../../ts/didMethods/local'
@@ -34,8 +30,16 @@ before(async () => {
   userVault = await getNewVault('id', userPass)
   serviceVault = await getNewVault('id', servicePass)
 
-  userIdentityWallet = await createIdentityFromKeyProvider(userVault, userPass, localDidMethod.registrar)
-  serviceIdentityWallet = await createIdentityFromKeyProvider(serviceVault, servicePass, localDidMethod.registrar)
+  userIdentityWallet = await createIdentityFromKeyProvider(
+    userVault,
+    userPass,
+    localDidMethod.registrar,
+  )
+  serviceIdentityWallet = await createIdentityFromKeyProvider(
+    serviceVault,
+    servicePass,
+    localDidMethod.registrar,
+  )
 })
 
 describe('Integration Test - Create, Resolve, Public Profile', () => {
