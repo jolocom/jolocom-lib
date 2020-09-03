@@ -27,10 +27,7 @@ import {
 } from '../interactionTokens/interactionTokens.types'
 import { ErrorCodes } from '../errors'
 import { JoloDidMethod } from '../didMethods/jolo'
-import {
-  IVaultedKeyProvider,
-  KeyTypes,
-} from '@jolocom/vaulted-key-provider'
+import { IVaultedKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
 import { getCryptoProvider } from '@jolocom/vaulted-key-provider/js/cryptoProvider'
 import { getRandomBytes } from '../utils/crypto'
 import { cryptoUtils } from '@jolocom/native-core'

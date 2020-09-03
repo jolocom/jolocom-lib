@@ -16,7 +16,7 @@ export type ExclusivePartial<T, K extends keyof T> = Partial<Omit<T, K>> &
   Required<Pick<T, K>>
 
 type PubKeyEntry = {
-  keyId: string,
+  keyId: string
   type: KeyTypes
 }
 

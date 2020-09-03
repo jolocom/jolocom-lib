@@ -4,17 +4,18 @@ import {
   classToPlain,
   Expose,
   Transform,
-  Exclude
+  Exclude,
 } from 'class-transformer'
 import { canonize } from 'jsonld'
-import {
-  LinkedDataSignatureSuite, ILinkedDataSignatureAttrs,
-} from './types'
-
+import { LinkedDataSignatureSuite, ILinkedDataSignatureAttrs } from './types'
 
 import { defaultContext } from '../utils/contexts'
 import { keyIdToDid } from '../utils/helper'
-import { isoStringToDate, dateToISOString, withDefaultValue } from '../utils/classTransformerUtils'
+import {
+  isoStringToDate,
+  dateToISOString,
+  withDefaultValue,
+} from '../utils/classTransformerUtils'
 
 @Exclude()
 export class LinkedDataSignature {
@@ -32,7 +33,7 @@ export class LinkedDataSignature {
 
   @Expose()
   @Transform(isoStringToDate, { toClassOnly: true })
-  @Transform(dateToISOString, { toPlainOnly: true, })
+  @Transform(dateToISOString, { toPlainOnly: true })
   get created() {
     return this._created
   }
@@ -52,7 +53,7 @@ export class LinkedDataSignature {
    */
 
   @Expose()
-  @Transform(withDefaultValue(""), { toPlainOnly: true })
+  @Transform(withDefaultValue(''), { toPlainOnly: true })
   get type() {
     return this._type
   }
@@ -72,7 +73,7 @@ export class LinkedDataSignature {
    */
 
   @Expose()
-  @Transform(withDefaultValue(""), { toPlainOnly: true })
+  @Transform(withDefaultValue(''), { toPlainOnly: true })
   get nonce() {
     return this._nonce
   }
@@ -92,7 +93,7 @@ export class LinkedDataSignature {
    */
 
   @Expose({ name: 'signatureValue' })
-  @Transform(withDefaultValue(""), { toPlainOnly: true })
+  @Transform(withDefaultValue(''), { toPlainOnly: true })
   get signature() {
     return this._signatureValue
   }
@@ -112,7 +113,7 @@ export class LinkedDataSignature {
    */
 
   @Expose()
-  @Transform(withDefaultValue(""), { toPlainOnly: true })
+  @Transform(withDefaultValue(''), { toPlainOnly: true })
   get creator(): string {
     return this._creator
   }
@@ -154,10 +155,7 @@ export class LinkedDataSignature {
     return Buffer.from(await this.normalize())
   }
 
-
-  public static fromJSON(
-    json: ILinkedDataSignatureAttrs,
-  ): LinkedDataSignature {
+  public static fromJSON(json: ILinkedDataSignatureAttrs): LinkedDataSignature {
     return plainToClass(this, json)
   }
 

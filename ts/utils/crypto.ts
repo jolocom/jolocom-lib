@@ -22,10 +22,8 @@ export async function getRandomBytes(nr: number): Promise<Buffer> {
 }
 
 // TODO A bit more precise. Prepending 0x won't always work if the string is already prefixed
-export const parseHexOrBase64 = (hexOrBase64: string) => {
-  return Buffer.from(hexOrBase64, isHexString(`0x${hexOrBase64}`) ? 'hex': 'base64')
-}
-
+export const parseHexOrBase64 = (hexOrBase64: string) =>
+  Buffer.from(hexOrBase64, isHexString(`0x${hexOrBase64}`) ? 'hex' : 'base64')
 
 // Exporting for consuming applications (e.g. the SDK).
 export { mnemonicToEntropy, entropyToMnemonic } from 'bip39'

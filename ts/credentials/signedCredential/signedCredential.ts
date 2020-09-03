@@ -15,7 +15,7 @@ import {
 } from './types'
 import {
   IDigestable,
-  getLDSignatureTypeByKeyType
+  getLDSignatureTypeByKeyType,
 } from '../../linkedDataSignature/types'
 import { BaseMetadata } from '@jolocom/protocol-ts'
 import { IClaimSection } from '../credential/types'
@@ -26,7 +26,11 @@ import { ErrorCodes } from '../../errors'
 import { getRandomBytes } from '../../utils/crypto'
 import { randomBytes } from 'crypto'
 import { IdentityWallet } from '../../identityWallet/identityWallet'
-import { withDefaultValue, dateToISOString, isoStringToDate } from '../../utils/classTransformerUtils'
+import {
+  withDefaultValue,
+  dateToISOString,
+  isoStringToDate,
+} from '../../utils/classTransformerUtils'
 
 // Credentials are valid for a year by default
 const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
@@ -85,7 +89,7 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Transform(withDefaultValue(generateClaimId(8)), { toClassOnly: true })
+  @Transform(val => val || generateClaimId(8), { toClassOnly: true })
   get id(): string {
     return this._id
   }
@@ -105,7 +109,7 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Transform(withDefaultValue(""))
+  @Transform(withDefaultValue(''))
   get issuer(): string {
     return this._issuer
   }
@@ -342,10 +346,9 @@ export class SignedCredential implements IDigestable {
     this.proof.creator = keyId
     this.proof.type = getLDSignatureTypeByKeyType(type)
     this.proof.nonce = (await getRandomBytes(8)).toString('hex')
-    this.proof.signature = await identityWallet.sign(
-      await this.asBytes(),
-      password
-    ).then(res => res.toString('base64'))
+    this.proof.signature = await identityWallet
+      .sign(await this.asBytes(), password)
+      .then(res => res.toString('base64'))
   }
 
   public async asBytes(): Promise<Buffer> {

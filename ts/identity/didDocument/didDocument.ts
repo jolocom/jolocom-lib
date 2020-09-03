@@ -380,9 +380,11 @@ export class DidDocument implements IDigestable {
 
   public async sign(
     vaultedKeyProvider: SoftwareKeyProvider,
-    password: string
+    password: string,
   ): Promise<void> {
-    const { signingKey : { keyId, type} } = mapPublicKeys(this, await vaultedKeyProvider.getPubKeys(password))
+    const {
+      signingKey: { keyId, type },
+    } = mapPublicKeys(this, await vaultedKeyProvider.getPubKeys(password))
 
     const signatureSuite = getLDSignatureTypeByKeyType(type)
 
@@ -394,13 +396,15 @@ export class DidDocument implements IDigestable {
     this.proof.created = new Date()
     this.proof.type = getLDSignatureTypeByKeyType(type)
     this.proof.nonce = (await getRandomBytes(8)).toString('hex')
-    this.proof.signature = await vaultedKeyProvider.sign(
-      {
-        encryptionPass: password,
-        keyRef: keyId
-      },
-      await this.asBytes(),
-    ).then(res => res.toString('base64'))
+    this.proof.signature = await vaultedKeyProvider
+      .sign(
+        {
+          encryptionPass: password,
+          keyRef: keyId,
+        },
+        await this.asBytes(),
+      )
+      .then(res => res.toString('base64'))
   }
 
   public async asBytes(): Promise<Buffer> {

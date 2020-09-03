@@ -64,13 +64,11 @@ export const mapPublicKeys = (
     k => k.type === KeyTypes.x25519KeyAgreementKey2019,
   )
 
-
   const encKeyRef =
     encKey &&
     (encKey.id.startsWith('did:')
       ? encKey.id
       : `${encKey.controller}${encKey.id}`)
-
 
   if (!sigKey) {
     throw new Error(ErrorCodes.PublicKeyNotFound)
@@ -79,12 +77,12 @@ export const mapPublicKeys = (
   return {
     signingKey: {
       keyId: sigKey.controller[0],
-      type: sigKey.type
+      type: sigKey.type,
     },
     encryptionKey: {
       keyId: encKeyRef,
       // @ts-ignore TODO Convert type
-      type: encKeyRef && encKey.type
+      type: encKeyRef && encKey.type,
     },
   }
 }
