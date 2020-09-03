@@ -1,6 +1,6 @@
 import { ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
 import { keyIdToDid } from '../utils/helper'
-import { sha256 } from '../utils/crypto'
+import { sha256, parseHexOrBase64 } from '../utils/crypto'
 import { canonize } from 'jsonld'
 import { JsonLdObject, SignedJsonLdObject, JsonLdContext } from './types'
 import { JoloDidMethod } from '../didMethods/jolo'
@@ -81,7 +81,7 @@ export const validateJsonLd = async (
 
   return verifySignatureWithIdentity(
     await normalizeSignedLdObject(json, json['@context']),
-    Buffer.from(json.proof.signatureValue, 'hex'),
+    parseHexOrBase64(json.proof.signatureValue),
     json.proof.creator,
     issuerIdentity,
   )
