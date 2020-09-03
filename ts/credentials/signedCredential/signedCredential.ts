@@ -15,16 +15,18 @@ import {
 } from './types'
 import {
   IDigestable,
-  ILinkedDataSignature,
+  getLDSignatureTypeByKeyType
 } from '../../linkedDataSignature/types'
 import { BaseMetadata } from '@jolocom/protocol-ts'
 import { IClaimSection } from '../credential/types'
-import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
+import { LinkedDataSignature } from '../../linkedDataSignature/index'
 import { JsonLdContext } from '../../linkedData/types'
 import { Credential } from '../credential/credential'
 import { ErrorCodes } from '../../errors'
 import { getRandomBytes } from '../../utils/crypto'
 import { randomBytes } from 'crypto'
+import { IdentityWallet } from '../../identityWallet/identityWallet'
+import { withDefaultValue, dateToISOString, isoStringToDate } from '../../utils/classTransformerUtils'
 
 // Credentials are valid for a year by default
 const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
@@ -37,16 +39,6 @@ const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
 
 const generateClaimId = (length: number) =>
   `claimId:${randomBytes(length).toString('hex')}`
-
-/**
- * @description Data needed to prepare signature on credential
- * @see {@link https://w3c.github.io/vc-data-model/ | specification}
- */
-
-interface IIssInfo {
-  keyId: string
-  issuerDid: string
-}
 
 /**
  * @class
@@ -64,7 +56,7 @@ export class SignedCredential implements IDigestable {
   private _claim: IClaimSection = {}
   private _issued: Date
   private _expires?: Date
-  private _proof: ILinkedDataSignature = new EcdsaLinkedDataSignature()
+  private _proof: LinkedDataSignature = new LinkedDataSignature()
 
   /**
    * Get the `@context` section of the JSON-ld document
@@ -93,7 +85,7 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Transform(value => value || generateClaimId(8), { toClassOnly: true })
+  @Transform(withDefaultValue(generateClaimId(8)), { toClassOnly: true })
   get id(): string {
     return this._id
   }
@@ -113,6 +105,7 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
+  @Transform(withDefaultValue(""))
   get issuer(): string {
     return this._issuer
   }
@@ -132,10 +125,8 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Transform((value: Date) => value && value.toISOString(), {
-    toPlainOnly: true,
-  })
-  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+  @Transform(dateToISOString, { toPlainOnly: true })
+  @Transform(isoStringToDate, { toClassOnly: true })
   get issued(): Date {
     return this._issued
   }
@@ -205,10 +196,8 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Transform((value: Date) => value && value.toISOString(), {
-    toPlainOnly: true,
-  })
-  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+  @Transform(dateToISOString, { toPlainOnly: true })
+  @Transform(isoStringToDate, { toClassOnly: true })
   get expires(): Date {
     return this._expires
   }
@@ -228,11 +217,9 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Type(() => EcdsaLinkedDataSignature)
-  @Transform(value => value || new EcdsaLinkedDataSignature(), {
-    toClassOnly: true,
-  })
-  get proof(): ILinkedDataSignature {
+  @Type(() => LinkedDataSignature)
+  @Transform(withDefaultValue(new LinkedDataSignature()), { toClassOnly: true })
+  get proof(): LinkedDataSignature {
     return this._proof
   }
 
@@ -241,7 +228,7 @@ export class SignedCredential implements IDigestable {
    * @example `signedCredential.proof = new EcdsaLinkedDataSignature()`
    */
 
-  set proof(proof: ILinkedDataSignature) {
+  set proof(proof: LinkedDataSignature) {
     this._proof = proof
   }
 
@@ -315,9 +302,9 @@ export class SignedCredential implements IDigestable {
   }
 
   /**
-   * Instantiates a {@link SignedCredential} based on passed options
-   * @param credentialOptions - Options for creating credential, and for deriving public signing key
-   * @param issInfo - Public data data
+   * Instantiates a {@link SignedCredential} based on passed options. The proof section
+   * of the credential is not populated until SignedCredential.sign() is called
+   * @param credentialOptions - Options for creating credential
    * @param expires - Expiration date for the credential, defaults to 1 year from Date.now()
    * @example [[include:signedCredential.create.md]]
    * @internal
@@ -325,7 +312,6 @@ export class SignedCredential implements IDigestable {
 
   public static async create<T extends BaseMetadata>(
     credentialOptions: ISignedCredCreationArgs<T>,
-    issInfo: IIssInfo,
     expires = new Date(Date.now() + DEFAULT_EXPIRY_MS),
   ) {
     const credential = Credential.create(credentialOptions)
@@ -339,23 +325,27 @@ export class SignedCredential implements IDigestable {
       throw new Error(ErrorCodes.VCInvalidExpiryDate)
     }
 
-    await signedCredential.prepareSignature(issInfo.keyId)
-    signedCredential.issuer = issInfo.issuerDid
-
     return signedCredential
   }
 
-  /**
-   * Sets all fields on the instance necessary to compute the signature
-   * @param keyId - Public key identifier, as defined in the {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}.
-   * @internal
-   */
+  public async sign(identityWallet: IdentityWallet, password: string) {
+    const { keyId, type } = identityWallet.publicKeyMetadata.signingKey
 
-  private async prepareSignature(keyId: string) {
+    const signatureSuite = getLDSignatureTypeByKeyType(type)
+
+    if (!signatureSuite) {
+      throw new Error(`No LD signature suite found for key of type ${type}`)
+    }
+
+    this.issuer = identityWallet.did
+    this.proof.created = new Date()
     this.proof.creator = keyId
-    // TODO Is this needed?
-    this.proof.signature = ''
+    this.proof.type = getLDSignatureTypeByKeyType(type)
     this.proof.nonce = (await getRandomBytes(8)).toString('hex')
+    this.proof.signature = await identityWallet.sign(
+      await this.asBytes(),
+      password
+    ).then(res => res.toString('base64'))
   }
 
   public async asBytes(): Promise<Buffer> {
