@@ -1,14 +1,14 @@
 /// <reference types="node" />
 import 'reflect-metadata';
-import { ILinkedDataSignature, ILinkedDataSignatureAttrs, IDigestable } from '../types';
-export declare class EcdsaLinkedDataSignature implements ILinkedDataSignature, IDigestable {
+import { LinkedDataSignatureSuite, ILinkedDataSignatureAttrs } from './types';
+export declare class LinkedDataSignature {
     private _type;
     private _creator;
     private _created;
     private _nonce;
     private _signatureValue;
     created: Date;
-    type: string;
+    type: LinkedDataSignatureSuite;
     nonce: string;
     signature: string;
     creator: string;
@@ -18,7 +18,6 @@ export declare class EcdsaLinkedDataSignature implements ILinkedDataSignature, I
     };
     private normalize;
     asBytes(): Promise<Buffer>;
-    digest(): Promise<Buffer>;
-    static fromJSON(json: ILinkedDataSignatureAttrs): EcdsaLinkedDataSignature;
+    static fromJSON(json: ILinkedDataSignatureAttrs): LinkedDataSignature;
     toJSON(): ILinkedDataSignatureAttrs;
 }

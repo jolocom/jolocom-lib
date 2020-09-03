@@ -52,8 +52,8 @@ export const verifySignatureWithIdentity = async (
     signature,
     signingKey.publicKeyHex
       ? Buffer.from(signingKey.publicKeyHex, 'hex')
-      : //@ts-ignore TODO Keri DID Docs and Jolo DID Docs encode the key differently
-        Buffer.from(signingKey.publicKeyBase64, 'base64'),
+      //@ts-ignore TODO Keri DID Docs and Jolo DID Docs encode the key differently
+      : Buffer.from(signingKey.publicKeyBase64, 'base64'),
     signingKey.type as KeyTypes,
   )
 }

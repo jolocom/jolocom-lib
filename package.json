@@ -100,6 +100,7 @@
     "@typescript-eslint/eslint-plugin": "^4.0.1",
     "@typescript-eslint/parser": "^4.0.1",
     "chai": "^4.2.0",
+    "chai-exclude": "^2.0.2",
     "commitizen": "^4.0.3",
     "cz-conventional-changelog": "3.0.2",
     "eslint": "^7.8.0",
