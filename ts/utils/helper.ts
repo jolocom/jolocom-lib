@@ -1,9 +1,9 @@
 import { pubToAddress, addHexPrefix } from 'ethereumjs-util'
 import fetch from 'node-fetch'
-import { Identity } from '../identity/identity'
 import { KeyTypes, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
 import { IKeyMetadata } from '../identityWallet/types'
 import { ErrorCodes } from '../errors'
+import { DidDocument } from '../identity/didDocument/didDocument'
 
 /**
  * Helper function to convert a key identifier to the owner did
@@ -45,20 +45,25 @@ export const publicKeyToAddress = (publicKey: Buffer): string =>
 
 /**
  * Helper function to map DID Document key references to vkp key URNs
- * @param identity - Identity to map keys to
- * @param vkp - store of key material to be mapped
- * @param pass - password for vaulted key provider
- * TODO This should take vkp keys instead of vkp + pass
+ * @param identity - The DID Document from this identity will be used as a source of keys to map
+ * @param vkpKeys - Keys to map to the entries in the did doc (notmrally the result of calling vkp.getPubKeys(pass))
+ * @returns - A map with generic key roles (e.g. signing, encryption), assembled from combing references from the DID Document
+ * with keys from the vkp
  */
-export const mapPublicKeys = async (
-  identity: Identity,
+
+export const mapPublicKeys = (
+  didDocument: DidDocument,
   vkpKeys: PublicKeyInfo[],
-): Promise<IKeyMetadata> => {
-  const { keyId, did } = identity.didDocument.signer
+): IKeyMetadata => {
+  const { keyId, did } = didDocument.signer
+
   const signingKeyRef = keyId.includes('did:') ? keyId : `${did}${keyId}`
-  const encKey = identity.didDocument.publicKey.find(
+
+  const sigKey = vkpKeys.find(k => k.controller.find(c => c === signingKeyRef))
+  const encKey = didDocument.publicKey.find(
     k => k.type === KeyTypes.x25519KeyAgreementKey2019,
   )
+
 
   const encKeyRef =
     encKey &&
@@ -66,14 +71,20 @@ export const mapPublicKeys = async (
       ? encKey.id
       : `${encKey.controller}${encKey.id}`)
 
-  const sigKey = vkpKeys.some(k => k.controller.find(c => c === signingKeyRef))
 
   if (!sigKey) {
     throw new Error(ErrorCodes.PublicKeyNotFound)
   }
 
   return {
-    signingKeyId: signingKeyRef,
-    encryptionKeyId: encKeyRef,
+    signingKey: {
+      keyId: sigKey.controller[0],
+      type: sigKey.type
+    },
+    encryptionKey: {
+      keyId: encKeyRef,
+      // @ts-ignore TODO Convert type
+      type: encKeyRef && encKey.type
+    },
   }
 }
