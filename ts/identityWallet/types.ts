@@ -1,5 +1,5 @@
 import { Identity } from '../identity/identity'
-import { IVaultedKeyProvider } from '@jolocom/vaulted-key-provider'
+import { IVaultedKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
 
 export interface IIdentityWalletCreateArgs {
   vaultedKeyProvider: IVaultedKeyProvider
@@ -15,8 +15,13 @@ export interface IIdentityWalletCreateArgs {
 export type ExclusivePartial<T, K extends keyof T> = Partial<Omit<T, K>> &
   Required<Pick<T, K>>
 
+type PubKeyEntry = {
+  keyId: string,
+  type: KeyTypes
+}
+
 export interface IKeyMetadata {
-  signingKeyId: string
-  encryptionKeyId: string
-  [key: string]: string
+  signingKey: PubKeyEntry
+  encryptionKey: PubKeyEntry
+  [key: string]: PubKeyEntry
 }

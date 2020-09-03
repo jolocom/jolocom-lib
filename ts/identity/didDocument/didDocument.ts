@@ -8,7 +8,7 @@ import {
   Type,
 } from 'class-transformer'
 import { IDidDocumentAttrs } from './types'
-import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
+import { LinkedDataSignature } from '../../linkedDataSignature'
 import {
   AuthenticationSection,
   PublicKeySection,
@@ -17,14 +17,13 @@ import {
 import { defaultContextIdentity } from '../../utils/contexts'
 import { getRandomBytes } from '../../utils/crypto'
 import { digestJsonLd, normalizeSignedLdObject } from '../../linkedData'
-import {
-  IDigestable,
-  ILinkedDataSignature,
-} from '../../linkedDataSignature/types'
 import { ContextEntry } from '@jolocom/protocol-ts'
 import { ISigner } from '../../credentials/signedCredential/types'
-import { IVaultedKeyProvider, IKeyRefArgs } from '@jolocom/vaulted-key-provider'
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 import { publicKeyToJoloDID } from '../../didMethods/jolo/utils'
+import { mapPublicKeys } from '../../utils/helper'
+import { IDigestable } from '@jolocom/protocol-ts/dist/lib/linkedDataSignature'
+import { getLDSignatureTypeByKeyType } from '../../linkedDataSignature/types'
 
 /**
  * Class modelling a Did Document
@@ -42,7 +41,7 @@ export class DidDocument implements IDigestable {
   private _service: ServiceEndpointsSection[] = []
   private _created: Date = new Date()
   private _updated: Date = new Date()
-  private _proof: ILinkedDataSignature
+  private _proof = new LinkedDataSignature()
   private _context: ContextEntry[] = defaultContextIdentity
 
   /**
@@ -292,11 +291,11 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose()
-  @Type(() => EcdsaLinkedDataSignature)
-  @Transform(value => value || new EcdsaLinkedDataSignature(), {
+  @Type(() => LinkedDataSignature)
+  @Transform(value => value || new LinkedDataSignature(), {
     toClassOnly: true,
   })
-  public get proof(): ILinkedDataSignature {
+  public get proof(): LinkedDataSignature {
     return this._proof
   }
 
@@ -305,7 +304,7 @@ export class DidDocument implements IDigestable {
    * @example `didDocument.proof = new EcdsaLinkedDataSignature()`
    */
 
-  public set proof(proof: ILinkedDataSignature) {
+  public set proof(proof: LinkedDataSignature) {
     this._proof = proof
   }
 
@@ -380,20 +379,28 @@ export class DidDocument implements IDigestable {
    */
 
   public async sign(
-    vaultedKeyProvider: IVaultedKeyProvider,
-    signConfig: IKeyRefArgs,
+    vaultedKeyProvider: SoftwareKeyProvider,
+    password: string
   ): Promise<void> {
-    this._proof = new EcdsaLinkedDataSignature()
-    this._proof.creator = this.signer.keyId
-    this._proof.signature = ''
-    this._proof.nonce = (await getRandomBytes(8)).toString('hex')
+    const { signingKey : { keyId, type} } = mapPublicKeys(this, await vaultedKeyProvider.getPubKeys(password))
 
-    const signature = await vaultedKeyProvider.sign(
-      signConfig,
+    const signatureSuite = getLDSignatureTypeByKeyType(type)
+
+    if (!signatureSuite) {
+      throw new Error(`No LD signature suite found for key of type ${type}`)
+    }
+
+    this.proof.creator = keyId
+    this.proof.created = new Date()
+    this.proof.type = getLDSignatureTypeByKeyType(type)
+    this.proof.nonce = (await getRandomBytes(8)).toString('hex')
+    this.proof.signature = await vaultedKeyProvider.sign(
+      {
+        encryptionPass: password,
+        keyRef: keyId
+      },
       await this.asBytes(),
-    )
-
-    this._proof.signature = signature.toString('hex')
+    ).then(res => res.toString('base64'))
   }
 
   public async asBytes(): Promise<Buffer> {

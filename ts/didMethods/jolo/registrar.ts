@@ -218,10 +218,7 @@ export class JolocomRegistrar implements IRegistrar {
     password: string,
   ) {
     didDocument.hasBeenUpdated()
-    return didDocument.sign(keyProvider, {
-      keyRef: `${keyProvider.id}#${SIGNING_KEY_REF}`,
-      encryptionPass: password,
-    })
+    return didDocument.sign(keyProvider, password)
   }
 
   private async update(

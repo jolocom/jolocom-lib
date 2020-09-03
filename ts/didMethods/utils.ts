@@ -1,6 +1,6 @@
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 import { IdentityWallet } from '../identityWallet/identityWallet'
-import { IResolver, IRegistrar } from './types'
+import { IRegistrar } from './types'
 import { mapPublicKeys } from '../utils/helper'
 import { IdentityOrResolver } from '../utils/validation'
 import { Identity } from '../identity/identity'
@@ -22,7 +22,7 @@ export const createIdentityFromKeyProvider = async (
   return new IdentityWallet({
     identity,
     vaultedKeyProvider,
-    publicKeyMetadata: await mapPublicKeys(identity, vaultKeys),
+    publicKeyMetadata: mapPublicKeys(identity.didDocument, vaultKeys),
   })
 }
 
@@ -42,6 +42,6 @@ export const authAsIdentityFromKeyProvider = async (
   return new IdentityWallet({
     vaultedKeyProvider: vkp,
     identity,
-    publicKeyMetadata: await mapPublicKeys(identity, vaultKeys),
+    publicKeyMetadata: mapPublicKeys(identity.didDocument, vaultKeys),
   })
 }
