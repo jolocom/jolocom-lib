@@ -14,7 +14,7 @@ import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { keyIdToDid } from '../../ts/utils/helper'
 import { ErrorCodes } from '../../ts/errors'
-import { IVaultedKeyProvider } from '@jolocom/vaulted-key-provider'
+import { IVaultedKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
 import { emailVerifiableCredential } from '../data/credential/signedCredential.data'
 
 chai.use(sinonChai)
@@ -24,9 +24,8 @@ const expect = chai.expect
 
 //@ts-ignore Stubbed implementation
 const stubbedKeyProvider = {
-  sign: sinon.stub().resolves(Buffer.from('aaaa', 'hex'))
+  sign: sinon.stub().resolves(Buffer.from('aaaa', 'hex')),
 } as IVaultedKeyProvider
-
 
 describe('IdentityWallet', () => {
   const encryptionPass = 'secret'
@@ -35,14 +34,21 @@ describe('IdentityWallet', () => {
 
   let iw: IdentityWallet
 
+  // TODO Not sure this is a useful test
   describe('constructor', () => {
     it('Should correctly initialize', () => {
       iw = new IdentityWallet({
         identity,
         vaultedKeyProvider: stubbedKeyProvider,
         publicKeyMetadata: {
-          signingKeyId: mockKeyId,
-          encryptionKeyId: mockKeyId,
+          signingKey: {
+            keyId: mockKeyId,
+            type: KeyTypes.ecdsaSecp256k1RecoveryMethod2020, // TODO Handle this
+          },
+          encryptionKey: {
+            keyId: mockKeyId,
+            type: KeyTypes.x25519KeyAgreementKey2019,
+          },
         },
       })
 
@@ -83,7 +89,7 @@ describe('IdentityWallet', () => {
         'interactionTokens',
       ]
       const flowTypes = ['request', 'response']
-      const tokenTypesRequest = ['auth', 'offer', 'share', ]
+      const tokenTypesRequest = ['auth', 'offer', 'share']
       const tokenTypesResponse = ['auth', 'offer', 'share', 'issue']
 
       expect(Object.keys(iw.create)).to.deep.eq(categories)

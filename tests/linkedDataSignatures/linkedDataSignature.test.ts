@@ -5,7 +5,7 @@ import * as jsonld from 'jsonld'
 import { LinkedDataSignature } from '../../ts/linkedDataSignature'
 import {
   signatureAttributes,
-  signatureSectionAsBytes
+  signatureSectionAsBytes,
 } from './ecdsaSignature.data'
 import { mockKeyId } from '../data/credential/signedCredential.data'
 import { LinkedDataSignatureSuite } from '../../ts/linkedDataSignature/types'
@@ -19,7 +19,7 @@ describe('Linked Data Signature', () => {
 
   after(() => {
     clock.restore()
-//    stubbedCanonise.restore()
+    //    stubbedCanonise.restore()
   })
 
   /* Implicitly tests toJSON too */

@@ -7,12 +7,15 @@ import { didDocumentJSON, mockKeyId } from '../data/didDocument.data'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import {
-  validSignedCredReqJWT, invalidSignature, validSignedCredResJWT, invalidNonce,
+  validSignedCredReqJWT,
+  invalidSignature,
+  validSignedCredResJWT,
+  invalidNonce,
 } from '../data/interactionTokens/jsonWebToken.data'
 import { ErrorCodes } from '../../ts/errors'
 import { expect } from 'chai'
 import { JolocomResolver } from '../../ts/didMethods/jolo/resolver'
-import { IVaultedKeyProvider } from '@jolocom/vaulted-key-provider'
+import { IVaultedKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
 import * as validationUtils from '../../ts/utils/validation'
 
 chai.use(sinonChai)
@@ -38,8 +41,14 @@ describe('IdentityWallet validate JWT', () => {
       identity,
       vaultedKeyProvider: vault,
       publicKeyMetadata: {
-        signingKeyId: mockKeyId,
-        encryptionKeyId: mockKeyId,
+        signingKey: {
+          keyId: mockKeyId,
+          type: KeyTypes.ecdsaSecp256k1RecoveryMethod2020, // TODO Handle this
+        },
+        encryptionKey: {
+          keyId: mockKeyId,
+          type: KeyTypes.x25519KeyAgreementKey2019,
+        },
       },
     })
   })
@@ -48,13 +57,12 @@ describe('IdentityWallet validate JWT', () => {
     sandbox.restore()
   })
 
-  it('Should sucessfully perform necessary validation steps on received jwt', () => {
-    return iw.validateJWT(
+  it('Should sucessfully perform necessary validation steps on received jwt', () =>
+    iw.validateJWT(
       JSONWebToken.fromJSON(validSignedCredReqJWT),
       undefined,
       testResolver,
-    )
-  })
+    ))
 
   it('Should throw error on invalid signature', async () => {
     const tokenWithInvalidSignature = {
@@ -145,11 +153,11 @@ describe('IdentityWallet validate JWT', () => {
 
     /** @dev Restored in afterEach */
     sandbox.stub(validationUtils, 'validateDigestable').resolves(true)
-return iw.validateJWT(
-  JSONWebToken.fromJSON(requestWithNoAud),
-  undefined,
-  testResolver,
-)
+    return iw.validateJWT(
+      JSONWebToken.fromJSON(requestWithNoAud),
+      undefined,
+      testResolver,
+    )
   })
 
   it('Should throw error if the aud on a request is defined and does not match current identity', async () => {

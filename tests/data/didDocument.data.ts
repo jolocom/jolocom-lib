@@ -35,7 +35,7 @@ export const didDocumentJSONv0 = {
   ],
   created: '1970-01-01T00:00:00.000Z',
   proof: {
-    type: 'EcdsaKoblitzSignature2016',
+    type: 'EcdsaSecp256k1Signature2019',
     creator: mockKeyId,
     nonce: '1842fb5f567dd532',
     signatureValue:
@@ -76,7 +76,7 @@ export const didDocumentJSON = {
   created: '1970-01-01T00:00:00.000Z',
   updated: '1970-01-01T00:00:00.000Z',
   proof: {
-    type: 'EcdsaKoblitzSignature2016',
+    type: 'EcdsaSecp256k1Signature2019',
     creator: mockKeyId,
     nonce: '1842fb5f567dd532',
     signatureValue:

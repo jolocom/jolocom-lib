@@ -27,3 +27,21 @@ export const emailVerifiableCredential = {
     created: '1970-01-01T00:00:00.000Z',
   },
 }
+
+export const unsignedEmailCredential = {
+  '@context': [...defaultContext, ...claimsMetadata.emailAddress.context],
+  id: 'claimId:1842fb5f567dd532',
+  name: 'Email address',
+  issuer: '',
+  type: ['Credential', 'ProofOfEmailCredential'],
+  claim: { email: 'test@jolocom.io', id: mockSubject },
+  issued: '1970-01-01T00:00:00.000Z',
+  expires: '1971-01-01T00:00:00.000Z',
+  proof: {
+    type: '',
+    creator: '',
+    nonce: '',
+    signatureValue: '',
+    created: '',
+  },
+}
