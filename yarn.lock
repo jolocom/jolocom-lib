@@ -3508,10 +3508,10 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.1.6.tgz#1c00c743b433cd0a4e80758f7b64a57440d9ff00"
   integrity sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
 
-local-resolver-registrar@^0.3.2:
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/local-resolver-registrar/-/local-resolver-registrar-0.3.2.tgz#f9d33efe641a7134a1b4da3c37fc19054486a7ed"
-  integrity sha512-jh7jch+h8XQ2C6ErH2xXeEplhKKASOKin9eV95WKx8ikriRtx2WnQIObUDMQYGzou5GthFZ2KO+RgSu8ebRNnw==
+local-resolver-registrar@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/local-resolver-registrar/-/local-resolver-registrar-0.3.3.tgz#3d620e46b7789ed2f3b9cd3811face317b50b602"
+  integrity sha512-o3mEAq9P2Mus44RLhkcmASl+goVYwCZ5Ok9PsreuIbxpall+9p+2Po9I/ZAXPv+yYEX4+GKQplkZtTUswFg94Q==
 
 locate-path@^2.0.0:
   version "2.0.0"
