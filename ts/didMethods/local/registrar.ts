@@ -38,15 +38,13 @@ export class LocalRegistrar implements IRegistrar {
     // @ts-ignore Assigning directly to a private property
     keyProvider._id = ret.id
 
-    const didDoc = JSON.parse(
-      await validateEvents(JSON.stringify([ret.inceptionEvent])),
-    )
+    const didDoc = JSON.parse(await validateEvents(ret.inceptionEvent))
 
     const identity = Identity.fromDidDocument({
       didDocument: DidDocument.fromJSON(didDoc),
     })
 
-    await this.encounter([ret.inceptionEvent])
+    await this.encounter(ret.inceptionEvent)
     return identity
   }
 
@@ -62,7 +60,7 @@ export class LocalRegistrar implements IRegistrar {
     return false
   }
 
-  public async encounter(deltas: string[]) {
+  public async encounter(deltas: string) {
     const didDocJson = JSON.parse(await this.registrar.update(deltas))
     return Identity.fromDidDocument({
       didDocument: DidDocument.fromJSON(didDocJson),

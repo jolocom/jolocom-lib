@@ -84,7 +84,7 @@
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.6.1",
     "jsontokens": "^1.0.0",
-    "local-resolver-registrar": "^0.3.3",
+    "local-resolver-registrar": "^0.4.0",
     "node-fetch": "^2.3.0",
     "reflect-metadata": "^0.1.13",
     "secrets.js-grempe": "^1.1.0"
