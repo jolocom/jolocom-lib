@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { IJWTHeader } from './types';
+import { IJWTHeader, SupportedJWA } from './types';
 import { IJSONWebTokenAttrs } from './types';
 import { IDigestable } from '../linkedDataSignature/types';
 import { CredentialResponse } from './credentialResponse';
@@ -36,7 +36,10 @@ export declare class JSONWebToken<T> implements IDigestable {
         did: string;
         keyId: string;
     };
-    static fromJWTEncodable<T>(toEncode: T): JSONWebToken<T>;
+    static fromJWTEncodable<T>(toEncode: T, header?: {
+        typ: string;
+        alg: SupportedJWA;
+    }): JSONWebToken<T>;
     timestampAndSetExpiry(expiry?: Date): void;
     setIssueAndExpiryTime: (expiry?: Date) => void;
     static decode<T>(jwt: string): JSONWebToken<T>;

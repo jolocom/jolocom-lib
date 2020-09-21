@@ -29,7 +29,6 @@ import { ErrorCodes } from '../errors'
 import { JoloDidMethod } from '../didMethods/jolo'
 import {
   IVaultedKeyProvider,
-  IKeyRefArgs,
   KeyTypes,
 } from '@jolocom/vaulted-key-provider'
 import { getCryptoProvider } from '@jolocom/vaulted-key-provider/js/cryptoProvider'
@@ -188,7 +187,7 @@ export class IdentityWallet {
         ...credentialParams,
       },
       {
-        keyId: this.publicKeyMetadata.signingKeyId,
+        keyId: this.publicKeyMetadata.signingKey.keyId,
         issuerDid: this.did,
       },
       expires,
@@ -197,7 +196,7 @@ export class IdentityWallet {
     const signature = await this._keyProvider.sign(
       {
         encryptionPass: pass,
-        keyRef: this._publicKeyMetadata.signingKeyId, // TODO Is this reliable? Or rather, where is this set?
+        keyRef: this._publicKeyMetadata.signingKey.keyId, // TODO Is this reliable? Or rather, where is this set?
       },
       await vCred.asBytes(),
     )
@@ -304,13 +303,13 @@ export class IdentityWallet {
       jwt.nonce = (await getRandomBytes(8)).toString('hex')
     }
 
-    jwt.issuer = this.publicKeyMetadata.signingKeyId
+    jwt.issuer = this.publicKeyMetadata.signingKey.keyId
 
     const signature = await this._keyProvider.sign(
       {
         // TODO
         encryptionPass: pass,
-        keyRef: this._publicKeyMetadata.signingKeyId,
+        keyRef: this._publicKeyMetadata.signingKey.keyId,
       },
       await jwt.asBytes(),
     ) // TODO Also, are the signatures hex or b64?
@@ -437,7 +436,7 @@ export class IdentityWallet {
     this._keyProvider.decrypt(
       {
         encryptionPass: pass,
-        keyRef: this._publicKeyMetadata.encryptionKeyId,
+        keyRef: this._publicKeyMetadata.encryptionKey.keyId,
       },
       data,
     )
@@ -452,7 +451,7 @@ export class IdentityWallet {
     this._keyProvider.sign(
       {
         encryptionPass: pass,
-        keyRef: this._publicKeyMetadata.signingKeyId,
+        keyRef: this._publicKeyMetadata.signingKey.keyId,
       },
       data,
     )
