@@ -4,6 +4,7 @@ import { KeyTypes, getCryptoProvider } from '@jolocom/vaulted-key-provider'
 import { cryptoUtils } from '@jolocom/native-core'
 import { Identity } from '../identity/identity'
 import { IResolver } from '../didMethods/types'
+import { parseHexOrBase64 } from './helper'
 
 export type IdentityOrResolver = Identity | IResolver
 
@@ -76,7 +77,7 @@ export const validateDigestable = async (
 
   return verifySignatureWithIdentity(
     await toValidate.asBytes(),
-    Buffer.from(toValidate.signature, 'hex'),
+    parseHexOrBase64(toValidate.signature),
     toValidate.signer.keyId,
     issuerIdentity,
   )

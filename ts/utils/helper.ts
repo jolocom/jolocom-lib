@@ -4,6 +4,27 @@ import { DidDocument } from '../identity/didDocument/didDocument'
 import { KeyTypes, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
 import { IKeyMetadata } from '../identityWallet/types'
 import { ErrorCodes } from '../errors'
+import { isHexString } from 'ethers/lib/utils'
+
+/**
+ * Helper which will strip the 0x prefix from a hex string
+ * If no hex prefix is present, the unmodified string is returned
+ */
+
+export const stripHexPrefix = (hexPrefixedString: string) => {
+  return addHexPrefix(hexPrefixedString).slice(2)
+}
+
+/**
+ * Helper which will attempt to parse a string as hex first, and then,
+ * in case of failure, as base64. Returns the decoded buffer
+ */
+
+export const parseHexOrBase64 = (hexOrB64: string) => {
+  return isHexString(addHexPrefix(hexOrB64))
+    ? Buffer.from(stripHexPrefix(hexOrB64), 'hex')
+    : Buffer.from(hexOrB64, 'base64')
+}
 
 /**
  * Helper function to convert a key identifier to the owner did

@@ -9,6 +9,7 @@ import { verifySignatureWithIdentity } from '../utils/validation'
 import { ISignedCredentialAttrs } from '@jolocom/protocol-ts/dist/lib/signedCredential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { parse } from './parse'
+import { parseHexOrBase64 } from '../utils/helper'
 
 const parseAndValidateDidDoc = async (
   didDocument: IDidDocumentAttrs,
@@ -53,7 +54,7 @@ export const parseAndValidateInteractionToken = async (
 
   const isValid = await verifySignatureWithIdentity(
     Buffer.from(Buffer.from([body, payload].join('.'))),
-    Buffer.from(signature, 'hex'),
+    parseHexOrBase64(signature),
     interactionToken.signer.keyId,
     signer,
   )

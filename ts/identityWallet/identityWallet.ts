@@ -319,7 +319,7 @@ export class IdentityWallet {
       await jwt.asBytes(),
     ) // TODO Also, are the signatures hex or b64?
 
-    jwt.signature = signature.toString('hex')
+    jwt.signature = signature.toString('base64')
 
     return jwt
   }
