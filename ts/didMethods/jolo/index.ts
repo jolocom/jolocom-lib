@@ -30,6 +30,7 @@ export class JoloDidMethod implements IDidMethod {
       newPassword,
       walletUtils,
     )
+
     try {
       return {
         identityWallet: await authAsIdentityFromKeyProvider(
