@@ -8,7 +8,7 @@ import {
 } from './types'
 import { Identity } from '../identity/identity'
 import { JSONWebToken } from '../interactionTokens/JSONWebToken'
-import { InteractionType } from '../interactionTokens/types'
+import { InteractionType, KeyTypeToJWA } from '../interactionTokens/types'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
@@ -297,19 +297,24 @@ export class IdentityWallet {
     receivedJWT?: JSONWebToken<R>,
   ) {
     if (receivedJWT) {
-      jwt.audience = keyIdToDid(receivedJWT.issuer)
+      jwt.audience = receivedJWT.signer.did
       jwt.nonce = receivedJWT.nonce
     } else {
       jwt.nonce = (await getRandomBytes(8)).toString('hex')
     }
 
-    jwt.issuer = this.publicKeyMetadata.signingKey.keyId
+    const { signingKey } = this.publicKeyMetadata
+    jwt.issuer = signingKey.keyId
+    jwt.header = {
+      typ: "JWT",
+      alg: KeyTypeToJWA[signingKey.type]
+    }
 
     const signature = await this._keyProvider.sign(
       {
         // TODO
         encryptionPass: pass,
-        keyRef: this._publicKeyMetadata.signingKey.keyId,
+        keyRef: signingKey.keyId,
       },
       await jwt.asBytes(),
     ) // TODO Also, are the signatures hex or b64?
