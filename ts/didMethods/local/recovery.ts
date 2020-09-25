@@ -62,7 +62,7 @@ export const recoverJunKeyProviderFromSeed = async (
 
   return {
     keyProvider,
-    inceptionEvent: [inceptionEvent],
+    inceptionEvent: inceptionEvent,
   }
 }
 

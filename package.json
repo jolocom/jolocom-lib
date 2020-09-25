@@ -3,14 +3,10 @@
   "version": "5.1.0-rc6",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
-  "files": [
-    "js/"
-  ],
+  "files": ["js/"],
   "typings": "js/index.d.ts",
   "husky": {
-    "hooks": {
-      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
-    }
+    "hooks": {}
   },
   "scripts": {
     "test": "nyc --reporter=lcov --reporter=text-summary mocha --exit",
@@ -25,23 +21,11 @@
     "generate-api-docs": "typedoc ./ts"
   },
   "nyc": {
-    "include": [
-      "ts/**/*.ts"
-    ],
-    "exclude": [
-      "**/types.ts",
-      "**/*.types.ts"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [
-      "text",
-      "text-summary"
-    ],
+    "include": ["ts/**/*.ts"],
+    "exclude": ["**/types.ts", "**/*.types.ts"],
+    "extension": [".ts"],
+    "require": ["ts-node/register"],
+    "reporter": ["text", "text-summary"],
     "all": true,
     "sourceMap": true,
     "instrument": true
@@ -50,10 +34,7 @@
     "type": "git",
     "url": "git+https://github.com/jolocom/jolocom-lib.git"
   },
-  "keywords": [
-    "Jolocom",
-    "Self-Sovereign Identity"
-  ],
+  "keywords": ["Jolocom", "Self-Sovereign Identity"],
   "author": "Eugeniu Rusu <eugeniu@jolocom.com>",
   "contributors": [
     "Eugeniu Rusu <eugeniu@jolocom.com>",
@@ -70,7 +51,7 @@
     "@hawkingnetwork/ed25519-hd-key-rn": "^1.0.1",
     "@jolocom/jolo-did-registrar": "^1.0.0-rc5",
     "@jolocom/jolo-did-resolver": "^1.0.0-rc5",
-    "@jolocom/native-core": "^1.0.0-rc3",
+    "@jolocom/native-core": "^1.0.0-rc4",
     "@jolocom/protocol-ts": "^0.5.1",
     "@jolocom/vaulted-key-provider": "^0.7.4",
     "@types/sinon": "^9.0.5",
@@ -84,7 +65,7 @@
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.6.1",
     "jsontokens": "^1.0.0",
-    "local-resolver-registrar": "^0.4.0",
+    "@jolocom/local-resolver-registrar": "^1.0.0-rc1",
     "node-fetch": "^2.3.0",
     "reflect-metadata": "^0.1.13",
     "secrets.js-grempe": "^1.1.0"
