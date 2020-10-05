@@ -1,7 +1,11 @@
 import { defaultContextIdentity } from '../../ts/utils/contexts'
 
+export const mockSeed = Buffer.from('a'.repeat(64), 'hex')
+export const mockPass = 'secret'
+export const mockJunDid = 'did:jun:Er9pmwbXpDOd_Vp46jVJUrZGjW-ujSXeoobGS77z2_Po'
 export const mockDid =
   'did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777'
+export const mockJoloDid = mockDid
 export const mockIpfsHash = 'QmZCEmfiKZhRPB88cEqmcHzQu6siSmVpieG6HTQse4e4Js'
 export const mockKeyId = `${mockDid}#keys-1`
 export const mockKeyId2 = `${mockDid}#keys-2`

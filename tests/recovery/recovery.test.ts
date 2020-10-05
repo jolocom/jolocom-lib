@@ -20,7 +20,6 @@ describe('Utility Recovery functions', () => {
       seed: testSecret16
     })
 
-
     expect(sliceSeedPhrase(testSeedPhrase32)).to.deep.eq({
       encodedDid: 0,
       seed: testSecret32

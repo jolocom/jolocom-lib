@@ -5,7 +5,7 @@ import {
   ServiceEndpointsSection,
   PublicKeySection,
 } from '../../identity/didDocument/sections'
-import { fuelKeyWithEther } from '../../utils/helper'
+import { fuelKeyWithEther, stripHexPrefix } from '../../utils/helper'
 import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
 import { IRegistrar } from '../types'
 import { claimsMetadata } from '@jolocom/protocol-ts'
@@ -18,6 +18,7 @@ import {
 import { validateDigestable } from '../../utils/validation'
 import { KEY_REFS } from './constants'
 import { publicKeyToJoloDID } from './utils'
+import { addHexPrefix } from 'ethereumjs-util'
 
 const { SIGNING_KEY_REF, ANCHOR_KEY_REF, ENCRYPTION_KEY_REF } = KEY_REFS
 
@@ -239,7 +240,7 @@ export class JolocomRegistrar implements IRegistrar {
     }
 
     const unsignedTx = await this.registrarFns.publishDidDocument(
-      Buffer.from(anchoringKey.publicKeyHex.slice(2), 'hex'),
+      Buffer.from(stripHexPrefix(anchoringKey.publicKeyHex), 'hex'),
       //@ts-ignore
       didDocument.toJSON(),
     )
@@ -251,13 +252,13 @@ export class JolocomRegistrar implements IRegistrar {
         keyRef: anchoringKey.controller[0],
         encryptionPass: password,
       },
-      Buffer.from(unsignedTx.slice(2), 'hex'),
+      Buffer.from(stripHexPrefix(unsignedTx), 'hex'),
     )
 
     return this.registrarFns
       .broadcastTransaction(unsignedTx, {
-        r: '0x' + signature.slice(0, 32).toString('hex'),
-        s: '0x' + signature.slice(32, 64).toString('hex'),
+        r: addHexPrefix(signature.slice(0, 32).toString('hex')),
+        s: addHexPrefix(signature.slice(32, 64).toString('hex')),
         recoveryParam: signature[64],
       })
       .catch(console.log)
