@@ -16,7 +16,7 @@ const expect = chai.expect
 const TEST_SEED = Buffer.from('a'.repeat(64), 'hex')
 const TEST_PASS = 'secret'
 
-const JUN_DID_64A = 'did:jun:FhHgj-WRVqeODSIJl1a8GDV9KG9WM8HLIo6ucni6zlHcyJNhQxHW5nA6YLR4NQuOB2X1xdkYUq7VRBUBahCYmpA'
+const JUN_DID_64A = 'did:jun:Er9pmwbXpDOd_Vp46jVJUrZGjW-ujSXeoobGS77z2_Po'
 const JOLO_DID_64A = mockDid
 
 describe('IdentityWallet', () => {
