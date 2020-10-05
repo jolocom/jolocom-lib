@@ -29,6 +29,7 @@ import { ErrorCodes } from '../errors'
 import { JoloDidMethod } from '../didMethods/jolo'
 import {
   IVaultedKeyProvider,
+  IKeyRefArgs,
   KeyTypes,
 } from '@jolocom/vaulted-key-provider'
 import { getCryptoProvider } from '@jolocom/vaulted-key-provider/js/cryptoProvider'
@@ -187,7 +188,7 @@ export class IdentityWallet {
         ...credentialParams,
       },
       {
-        keyId: this.publicKeyMetadata.signingKey.keyId,
+        keyId: this.publicKeyMetadata.signingKeyId,
         issuerDid: this.did,
       },
       expires,
@@ -196,7 +197,7 @@ export class IdentityWallet {
     const signature = await this._keyProvider.sign(
       {
         encryptionPass: pass,
-        keyRef: this._publicKeyMetadata.signingKey.keyId, // TODO Is this reliable? Or rather, where is this set?
+        keyRef: this._publicKeyMetadata.signingKeyId, // TODO Is this reliable? Or rather, where is this set?
       },
       await vCred.asBytes(),
     )
@@ -303,18 +304,21 @@ export class IdentityWallet {
       jwt.nonce = (await getRandomBytes(8)).toString('hex')
     }
 
-    const { signingKey } = this.publicKeyMetadata
-    jwt.issuer = signingKey.keyId
+    const { signingKeyId } = this.publicKeyMetadata
+    const { type: signingKeyType } = await this._keyProvider.getPubKeyByController(
+      pass, signingKeyId
+    )
+    jwt.issuer = signingKeyId
     jwt.header = {
       typ: "JWT",
-      alg: KeyTypeToJWA[signingKey.type]
+      alg: KeyTypeToJWA[signingKeyType]
     }
 
     const signature = await this._keyProvider.sign(
       {
         // TODO
         encryptionPass: pass,
-        keyRef: signingKey.keyId,
+        keyRef: signingKeyId,
       },
       await jwt.asBytes(),
     ) // TODO Also, are the signatures hex or b64?
@@ -441,7 +445,7 @@ export class IdentityWallet {
     this._keyProvider.decrypt(
       {
         encryptionPass: pass,
-        keyRef: this._publicKeyMetadata.encryptionKey.keyId,
+        keyRef: this._publicKeyMetadata.encryptionKeyId,
       },
       data,
     )
@@ -456,7 +460,7 @@ export class IdentityWallet {
     this._keyProvider.sign(
       {
         encryptionPass: pass,
-        keyRef: this._publicKeyMetadata.signingKey.keyId,
+        keyRef: this._publicKeyMetadata.signingKeyId,
       },
       data,
     )

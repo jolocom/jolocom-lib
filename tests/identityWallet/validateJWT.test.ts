@@ -3,7 +3,7 @@ import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { Identity } from '../../ts/identity/identity'
-import { didDocumentJSON, mockKeyId, mockKeyId2 } from '../data/didDocument.data'
+import { didDocumentJSON, mockKeyId } from '../data/didDocument.data'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import {
@@ -12,7 +12,7 @@ import {
 import { ErrorCodes } from '../../ts/errors'
 import { expect } from 'chai'
 import { JolocomResolver } from '../../ts/didMethods/jolo/resolver'
-import { IVaultedKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
+import { IVaultedKeyProvider } from '@jolocom/vaulted-key-provider'
 import * as validationUtils from '../../ts/utils/validation'
 
 chai.use(sinonChai)
@@ -38,14 +38,8 @@ describe('IdentityWallet validate JWT', () => {
       identity,
       vaultedKeyProvider: vault,
       publicKeyMetadata: {
-        signingKey: {
-          keyId: mockKeyId,
-          type: KeyTypes.ecdsaSecp256k1VerificationKey2019
-        },
-        encryptionKey: {
-          keyId: mockKeyId2,
-          type: KeyTypes.x25519KeyAgreementKey2019
-        },
+        signingKeyId: mockKeyId,
+        encryptionKeyId: mockKeyId,
       },
     })
   })

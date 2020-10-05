@@ -1,6 +1,6 @@
 import { pubToAddress, addHexPrefix } from 'ethereumjs-util'
 import fetch from 'node-fetch'
-import { DidDocument } from '../identity/didDocument/didDocument'
+import { Identity } from '../identity/identity'
 import { KeyTypes, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
 import { IKeyMetadata } from '../identityWallet/types'
 import { ErrorCodes } from '../errors'
@@ -66,21 +66,18 @@ export const publicKeyToAddress = (publicKey: Buffer): string =>
 
 /**
  * Helper function to map DID Document key references to vkp key URNs
- * @param didDocument - The DID Document from this identity will be used as a source of keys to map
- * @param vkpKeys - Keys to map to the entries in the did doc (notmrally the result of calling vkp.getPubKeys(pass))
- * @returns - A map with generic key roles (e.g. signing, encryption), assembled from combing references from the DID Document
- *   with keys from the vkp
+ * @param identity - Identity to map keys to
+ * @param vkp - store of key material to be mapped
+ * @param pass - password for vaulted key provider
+ * TODO This should take vkp keys instead of vkp + pass
  */
-
-export const mapPublicKeys = (
-  didDocument: DidDocument,
+export const mapPublicKeys = async (
+  identity: Identity,
   vkpKeys: PublicKeyInfo[],
-): IKeyMetadata => {
-  const { keyId, did } = didDocument.signer
+): Promise<IKeyMetadata> => {
+  const { keyId, did } = identity.didDocument.signer
   const signingKeyRef = keyId.includes('did:') ? keyId : `${did}${keyId}`
-
-  const sigKey = vkpKeys.find(k => k.controller.find(c => c === signingKeyRef))
-  const encKey = didDocument.publicKey.find(
+  const encKey = identity.didDocument.publicKey.find(
     k => k.type === KeyTypes.x25519KeyAgreementKey2019,
   )
 
@@ -90,18 +87,14 @@ export const mapPublicKeys = (
       ? encKey.id
       : `${encKey.controller}${encKey.id}`)
 
+  const sigKey = vkpKeys.some(k => k.controller.find(c => c === signingKeyRef))
+
   if (!sigKey) {
     throw new Error(ErrorCodes.PublicKeyNotFound)
   }
 
   return {
-    signingKey: {
-      keyId: sigKey.controller[0],
-      type: sigKey.type
-    },
-    encryptionKey: {
-      keyId: encKeyRef,
-      type: encKeyRef && KeyTypes[encKey.type] // TODO Make sure this does not break
-    },
+    signingKeyId: signingKeyRef,
+    encryptionKeyId: encKeyRef,
   }
 }

@@ -5,7 +5,7 @@ import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { Credential } from '../../ts/credentials/credential/credential'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
-import { didDocumentJSON, mockKeyId, mockKeyId2, mockDid } from '../data/didDocument.data'
+import { didDocumentJSON, mockKeyId, mockDid } from '../data/didDocument.data'
 import { mockNameCredCreationAttrs } from '../data/credential/credential.data'
 import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
 import { credentialResponseJSON } from '../data/interactionTokens/credentialResponse.data'
@@ -14,7 +14,7 @@ import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { keyIdToDid } from '../../ts/utils/helper'
 import { ErrorCodes } from '../../ts/errors'
-import { IVaultedKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
+import { IVaultedKeyProvider } from '@jolocom/vaulted-key-provider'
 import { emailVerifiableCredential } from '../data/credential/signedCredential.data'
 
 chai.use(sinonChai)
@@ -41,14 +41,8 @@ describe('IdentityWallet', () => {
         identity,
         vaultedKeyProvider: stubbedKeyProvider,
         publicKeyMetadata: {
-          signingKey: {
-            keyId: mockKeyId,
-            type: KeyTypes.ecdsaSecp256k1VerificationKey2019
-          },
-          encryptionKey: {
-            keyId: mockKeyId2,
-            type: KeyTypes.x25519KeyAgreementKey2019
-          },
+          signingKeyId: mockKeyId,
+          encryptionKeyId: mockKeyId,
         },
       })
 
@@ -110,7 +104,7 @@ describe('IdentityWallet', () => {
     })
 
     it('Should attempt to create signedCredential', async () => {
-      await iw.create.signedCredential(
+      const cred = await iw.create.signedCredential(
         mockNameCredCreationAttrs,
         encryptionPass,
       )
