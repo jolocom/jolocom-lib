@@ -24,7 +24,8 @@ const expect = chai.expect
 
 //@ts-ignore Stubbed implementation
 const stubbedKeyProvider = {
-  sign: sinon.stub().resolves(Buffer.from('aaaa', 'hex'))
+  sign: sinon.stub().resolves(Buffer.from('aaaa', 'hex')),
+  getPubKeyByController: sinon.stub().resolves({id: '#', type: ''})
 } as IVaultedKeyProvider
 
 
