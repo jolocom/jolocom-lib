@@ -1,9 +1,9 @@
 import { Identity } from '../../identity/identity'
-import { getRegistrar } from 'local-resolver-registrar'
+import { getRegistrar } from '@jolocom/local-resolver-registrar'
 import { DidDocument } from '../../identity/didDocument/didDocument'
 import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
 import { IRegistrar } from '../types'
-import { createDb } from 'local-resolver-registrar/js/db'
+import { createDb } from '@jolocom/local-resolver-registrar/js/db'
 import { getIdFromEvent, validateEvents, getIcp } from '@jolocom/native-core'
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
@@ -38,15 +38,13 @@ export class LocalRegistrar implements IRegistrar {
     // @ts-ignore Assigning directly to a private property
     keyProvider._id = ret.id
 
-    const didDoc = JSON.parse(
-      await validateEvents(JSON.stringify([ret.inceptionEvent])),
-    )
+    const didDoc = JSON.parse(await validateEvents(ret.inceptionEvent))
 
     const identity = Identity.fromDidDocument({
       didDocument: DidDocument.fromJSON(didDoc),
     })
 
-    await this.encounter([ret.inceptionEvent])
+    await this.encounter(ret.inceptionEvent)
     return identity
   }
 
@@ -62,7 +60,7 @@ export class LocalRegistrar implements IRegistrar {
     return false
   }
 
-  public async encounter(deltas: string[]) {
+  public async encounter(deltas: string) {
     const didDocJson = JSON.parse(await this.registrar.update(deltas))
     return Identity.fromDidDocument({
       didDocument: DidDocument.fromJSON(didDocJson),

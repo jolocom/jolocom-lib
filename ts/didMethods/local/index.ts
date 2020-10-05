@@ -1,7 +1,7 @@
 import { IDidMethod, IResolver, IRegistrar } from '../types'
 import { LocalRegistrar } from './registrar'
 import { LocalResolver } from './resolver'
-import { InternalDb, createDb } from 'local-resolver-registrar/js/db'
+import { InternalDb, createDb } from '@jolocom/local-resolver-registrar/js/db'
 import { validateEvents, walletUtils } from '@jolocom/native-core'
 import { authAsIdentityFromKeyProvider } from '../utils'
 import { recoverJunKeyProviderFromSeed } from './recovery'
