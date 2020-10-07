@@ -3,12 +3,9 @@ import {
   SoftwareKeyProvider,
   KeyTypes,
 } from '@jolocom/vaulted-key-provider'
-import { sliceSeedPhrase } from '../../recovery/recovery'
 import { KEY_PATHS, KEY_REFS } from './constants'
-import { fromSeed, validateMnemonic } from 'bip32'
+import { fromMasterSeed } from 'hdkey'
 import { publicKeyToJoloDID } from './utils'
-import { authAsIdentityFromKeyProvider } from '../utils'
-import { IDidMethod } from '../types'
 
 const { JOLO_DERIVATION_PATH, ETH_DERIVATION_PATH } = KEY_PATHS
 const { SIGNING_KEY_REF, ENCRYPTION_KEY_REF, ANCHOR_KEY_REF } = KEY_REFS
@@ -19,8 +16,8 @@ export const recoverJoloKeyProviderFromSeed = async (
   impl: EncryptedWalletUtils,
   originalDid?: string,
 ): Promise<SoftwareKeyProvider> => {
-  const joloKeys = fromSeed(seed).derivePath(JOLO_DERIVATION_PATH)
-  const ethKeys = fromSeed(seed).derivePath(ETH_DERIVATION_PATH)
+  const joloKeys = fromMasterSeed(seed).derive(JOLO_DERIVATION_PATH)
+  const ethKeys = fromMasterSeed(seed).derive(ETH_DERIVATION_PATH)
   const did = originalDid || publicKeyToJoloDID(joloKeys.publicKey)
 
   const skp = await SoftwareKeyProvider.newEmptyWallet(impl, did, newPassword)

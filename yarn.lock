@@ -1233,29 +1233,17 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.1.0.tgz#30fa40c9e7fe07dbc895678cd287024dea241dd9"
   integrity sha512-1Yj8h9Q+QDF5FzhMs/c9+6UntbD5MkRfRwac8DoEm9ZfUBZ7tZ55YcGVAzEe4bXsdQHEk+s9S5wsOKVdZrw0tQ==
 
-bindings@^1.2.1, bindings@^1.3.0:
+bindings@^1.2.1:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.4.0.tgz#909efa49f2ebe07ecd3cb136778f665052040127"
   integrity sha512-7znEVX22Djn+nYjxCWKDne0RRloa9XfYa84yk3s+HkE3LpDYZmhArYr9O9huBoHY3/oXispx5LorIX7Sl2CgSQ==
   dependencies:
     file-uri-to-path "1.0.0"
 
-bip32@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/bip32/-/bip32-1.0.2.tgz#982e2ad2cae6fc6a2f53dda3e6c3be9364674b28"
-  integrity sha512-kedLYj8yvYzND+EfzeoMSlGiN7ImiRBF/MClJSZPkMfcU+OQO7ZpL5L/Yg+TunebBZIHhunstiQF//KLKSF5rg==
-  dependencies:
-    bs58check "^2.1.1"
-    create-hash "^1.2.0"
-    create-hmac "^1.1.7"
-    tiny-secp256k1 "^1.0.0"
-    typeforce "^1.11.5"
-    wif "^2.0.6"
-
-bip39@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/bip39/-/bip39-3.0.1.tgz#7e8831a36a20366a9216ce5b852dccc28cbf8332"
-  integrity sha512-h1mxBCpocHoZ6eUWNwh13bSXCZYy/wknSAvs1se3XDOTeerHU3jA8E4PIoPr8YMY3kdDSCpM1HypJmDS+C7U2Q==
+bip39@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/bip39/-/bip39-3.0.2.tgz#2baf42ff3071fc9ddd5103de92e8f80d9257ee32"
+  integrity sha512-J4E1r2N0tUylTKt07ibXvhpT2c5pyAFgvuA5q1H9uDy6dEGpjV8jmymh3MTYJDLCNbIVClSB9FbND49I6N24MQ==
   dependencies:
     "@types/node" "11.11.6"
     create-hash "^1.1.0"
@@ -1334,7 +1322,7 @@ bs58@^4.0.0:
   dependencies:
     base-x "^3.0.2"
 
-bs58check@<3.0.0, bs58check@^2.1.1:
+bs58check@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/bs58check/-/bs58check-2.1.2.tgz#53b018291228d82a5aa08e7d796fdafda54aebfc"
   integrity sha512-0TS1jicxdU09dwJMNZtVAfzPi6Q6QeN0pM1Fkzrjn+XYHvzMKPU3pHVpva+769iNVSfIYWf7LJ6WR+BuuMf8cA==
@@ -1909,7 +1897,7 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-elliptic@6.5.3:
+elliptic@6.5.3, elliptic@^6.5.2:
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.3.tgz#cb59eb2efdaf73a0bd78ccd7015a62ad6e0f93d6"
   integrity sha512-IMqzv5wNQf+E6aHeIqATs0tOLeOTwj1QKbRcS3jBbYkl5oLAserA8yJTT7/VyHUYG91PRmPyeQDObKLPpeS4dw==
@@ -1922,7 +1910,7 @@ elliptic@6.5.3:
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
 
-elliptic@^6.2.3, elliptic@^6.4.0, elliptic@^6.4.1:
+elliptic@^6.2.3, elliptic@^6.4.1:
   version "6.4.1"
   resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.4.1.tgz#c2d0b7776911b86722c632c3c06c60f2f819939a"
   integrity sha512-BsXLz5sqX8OHcsh7CqBMztyXARmGQ3LWPtGjJi6DiJHq5C/qvi9P3OqgswKSDftbu8+IoI/QDTAm2fFnQ9SZSQ==
@@ -2856,6 +2844,15 @@ hasha@^5.0.0:
   dependencies:
     is-stream "^2.0.0"
     type-fest "^0.8.0"
+
+hdkey@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/hdkey/-/hdkey-2.0.1.tgz#0a211d0c510bfc44fa3ec9d44b13b634641cad74"
+  integrity sha512-c+tl9PHG9/XkGgG0tD7CJpRVaE0jfZizDNmnErUAKQ4EjQSOcOUcV3EN9ZEZS8pZ4usaeiiK0H7stzuzna8feA==
+  dependencies:
+    bs58check "^2.1.2"
+    safe-buffer "^5.1.1"
+    secp256k1 "^4.0.0"
 
 he@1.2.0:
   version "1.2.0"
@@ -3829,7 +3826,7 @@ mute-stream@0.0.7:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
   integrity sha1-MHXOk7whuPq0PhvE2n6BFe0ee6s=
 
-nan@^2.10.0, nan@^2.2.1:
+nan@^2.2.1:
   version "2.12.1"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.12.1.tgz#7b1aa193e9aa86057e3c7bbd0ac448e770925552"
   integrity sha512-JY7V6lRkStKcKTvHO5NVSQRv+RV+FIL5pvDoLiAtSL9pKlC5x9PKQcZDsq7m4FO4d57mkhC6Z+QhAh3Jdk5JFw==
@@ -3872,6 +3869,11 @@ nise@^4.0.4:
     just-extend "^4.0.2"
     path-to-regexp "^1.7.0"
 
+node-addon-api@^2.0.0:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-2.0.2.tgz#432cfa82962ce494b132e9d72a15b29f71ff5d32"
+  integrity sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==
+
 node-fetch@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.3.0.tgz#1a1d940bbfb916a1d3e0219f037e89e71f8c5fa5"
@@ -3886,6 +3888,11 @@ node-forge@^0.7.6:
   version "0.7.6"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.7.6.tgz#fdf3b418aee1f94f0ef642cd63486c77ca9724ac"
   integrity sha512-sol30LUpz1jQFBjOKwbjxijiE3b6pjd74YwfD0fJOKPjF+fONKb2Yg8rYgS6+bK6VDl+/wfr4IYpC7jDzLUIfw==
+
+node-gyp-build@^4.2.0:
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-4.2.3.tgz#ce6277f853835f718829efb47db20f3e4d9c4739"
+  integrity sha512-MN6ZpzmfNCRM+3t57PTJHgHyw/h4OWnZ6mR8P5j/uZtqQr46RRuDE/P+g3n0YR/AiYXeWixZZzaip77gdICfRg==
 
 node-preload@^0.2.1:
   version "0.2.1"
@@ -4625,6 +4632,15 @@ secp256k1@^3.0.1:
     nan "^2.2.1"
     safe-buffer "^5.1.0"
 
+secp256k1@^4.0.0:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/secp256k1/-/secp256k1-4.0.2.tgz#15dd57d0f0b9fdb54ac1fa1694f40e5e9a54f4a1"
+  integrity sha512-UDar4sKvWAksIlfX3xIaQReADn+WFnHvbVujpcbr+9Sf/69odMwy2MUsz5CKLQgX9nsIyrjuxL2imVyoNHa3fg==
+  dependencies:
+    elliptic "^6.5.2"
+    node-addon-api "^2.0.0"
+    node-gyp-build "^4.2.0"
+
 secrets.js-grempe@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/secrets.js-grempe/-/secrets.js-grempe-1.1.0.tgz#bb3b606dd68637ca244681a10fdee6c512049294"
@@ -5044,17 +5060,6 @@ through@^2.3.6:
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU=
 
-tiny-secp256k1@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/tiny-secp256k1/-/tiny-secp256k1-1.0.1.tgz#fc6f96529c22b92be91e12de4040fdd9245f7835"
-  integrity sha512-Wz2kMPWtCI5XBftFeF3bUL8uz2+VlasniKwOkRPjvL7h1QVd9rbhrve/HWUu747kJKzVf1XHonzcdM4Ut8fvww==
-  dependencies:
-    bindings "^1.3.0"
-    bn.js "^4.11.8"
-    create-hmac "^1.1.7"
-    elliptic "^6.4.0"
-    nan "^2.10.0"
-
 tmp@^0.0.33:
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.33.tgz#6d34335889768d21b2bcda0aa277ced3b1bfadf9"
@@ -5201,11 +5206,6 @@ typedoc@^0.14.2:
     typedoc-default-themes "^0.5.0"
     typescript "3.2.x"
 
-typeforce@^1.11.5:
-  version "1.18.0"
-  resolved "https://registry.yarnpkg.com/typeforce/-/typeforce-1.18.0.tgz#d7416a2c5845e085034d70fcc5b6cc4a90edbfdc"
-  integrity sha512-7uc1O8h1M1g0rArakJdf0uLRSSgFcYexrVoKo+bzJd32gd4gDy2L/Z+8/FjPnU9ydY3pEnVPtr9FyscYY60K1g==
-
 typescript@3.2.x:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.2.4.tgz#c585cb952912263d915b462726ce244ba510ef3d"
@@ -5323,13 +5323,6 @@ wide-align@1.1.3:
   integrity sha512-QGkOQc8XL6Bt5PwnsExKBPuMKBxnGxWWW3fU55Xt4feHozMUhdUMaBCk290qpm/wG5u/RSKzwdAC4i51YigihA==
   dependencies:
     string-width "^1.0.2 || 2"
-
-wif@^2.0.6:
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/wif/-/wif-2.0.6.tgz#08d3f52056c66679299726fade0d432ae74b4704"
-  integrity sha1-CNP1IFbGZnkplyb63g1DKudLRwQ=
-  dependencies:
-    bs58check "<3.0.0"
 
 word-wrap@^1.0.3, word-wrap@^1.2.3:
   version "1.2.3"
