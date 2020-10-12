@@ -1,6 +1,6 @@
 {
   "name": "jolocom-lib",
-  "version": "5.1.0-rc9",
+  "version": "5.1.0-rc10",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "files": ["js/"],
