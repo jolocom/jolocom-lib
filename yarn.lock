@@ -605,15 +605,16 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.2.tgz#26520bf09abe4a5644cd5414e37125a8954241dd"
   integrity sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
 
-"@jolocom/jolo-did-registrar@^1.0.0-rc5":
-  version "1.0.0-rc5"
-  resolved "https://registry.yarnpkg.com/@jolocom/jolo-did-registrar/-/jolo-did-registrar-1.0.0-rc5.tgz#4bd2563493c1a0c47d6d1c3b74c654e10361a089"
-  integrity sha512-1pu342rXfoMgiq4ZQZCJxNniwdt9WIXXDatTOtA6zDsPFuwyDSPaduV9kFS6n4vVmf4lIfEgkRmPANy8x8aUkw==
+"@jolocom/jolo-did-registrar@^1.0.0-rc6":
+  version "1.0.0-rc6"
+  resolved "https://registry.yarnpkg.com/@jolocom/jolo-did-registrar/-/jolo-did-registrar-1.0.0-rc6.tgz#67d961cf09eb4fbf6ab066f06741fc738ee317d0"
+  integrity sha512-C+ZmpyJ/SS/txKoVv2JxN3n7X426iym5n+GoHsbTOrMbU7RwWeAQu9cXVGOGM0isdBIvUqY4qlkySubX/DYs+A==
   dependencies:
+    "@decentralized-identity/did-common-typescript" "^0.1.19"
     "@jolocom/registry-contract" "^1.0.0-rc5"
     detect-node "^2.0.4"
     form-data "^3.0.0"
-    node-fetch "^2.6.0"
+    node-fetch "^2.6.1"
 
 "@jolocom/jolo-did-resolver@^1.0.0-rc5":
   version "1.0.0-rc5"
@@ -3883,6 +3884,11 @@ node-fetch@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
+
+node-fetch@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
+  integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
 node-forge@^0.7.6:
   version "0.7.6"
