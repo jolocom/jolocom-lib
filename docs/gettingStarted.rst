@@ -9,7 +9,7 @@ Getting Started
 How to install the Jolocom library
 ###################################
 
-To begin using the Jolocom protocol, first install the Jolocom library as a dependency in your project. You can use ``npm`` or ``yarn`` to do so:
+To begin using the Jolocom library, first add it as a dependency in your project. You can use ``npm`` or ``yarn`` to do so:
 
 .. code-block:: bash
 
