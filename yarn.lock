@@ -616,14 +616,14 @@
     form-data "^3.0.0"
     node-fetch "^2.6.1"
 
-"@jolocom/jolo-did-resolver@^1.0.0-rc5":
-  version "1.0.0-rc5"
-  resolved "https://registry.yarnpkg.com/@jolocom/jolo-did-resolver/-/jolo-did-resolver-1.0.0-rc5.tgz#0411ec2eabb9b1dd2881a5ce7779ff6dfcf2b13f"
-  integrity sha512-Yb4NBL8gaNvDKtpj/SLMGJURvtQ2xLJTYmRC9c7yGZ65ekcAnSPm5T8YbToYYNHa0TWCu6ZbJmXKsF/hDoLZHw==
+"@jolocom/jolo-did-resolver@^1.0.0-rc6":
+  version "1.0.0-rc6"
+  resolved "https://registry.yarnpkg.com/@jolocom/jolo-did-resolver/-/jolo-did-resolver-1.0.0-rc6.tgz#4adc6f8d00687a22e4e10d87d682adf0730f17ea"
+  integrity sha512-7/c3JClqj2W4bUj1Q/wk+u9aJPKlDLFxuKgo1yNYWru8/HUzuhmL4AmKUDKChuy6Cwk9a8IzObbUZd1c/NX5rQ==
   dependencies:
     "@jolocom/registry-contract" "^1.0.0-rc5"
     detect-node "^2.0.4"
-    node-fetch "^2.6.0"
+    node-fetch "^2.6.1"
 
 "@jolocom/local-resolver-registrar@^1.0.0-rc1":
   version "1.0.0-rc1"
@@ -3874,16 +3874,6 @@ node-addon-api@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-2.0.2.tgz#432cfa82962ce494b132e9d72a15b29f71ff5d32"
   integrity sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==
-
-node-fetch@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.3.0.tgz#1a1d940bbfb916a1d3e0219f037e89e71f8c5fa5"
-  integrity sha512-MOd8pV3fxENbryESLgVIeaGKrdl+uaYhCSSVkjeOb/31/njTpcis5aWfdqgNlHIrKOLRbMnfPINPOML2CIFeXA==
-
-node-fetch@^2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
-  integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
 node-fetch@^2.6.1:
   version "2.6.1"

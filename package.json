@@ -50,7 +50,7 @@
   "dependencies": {
     "@hawkingnetwork/ed25519-hd-key-rn": "^1.0.1",
     "@jolocom/jolo-did-registrar": "^1.0.0-rc6",
-    "@jolocom/jolo-did-resolver": "^1.0.0-rc5",
+    "@jolocom/jolo-did-resolver": "^1.0.0-rc6",
     "@jolocom/local-resolver-registrar": "^1.0.0-rc1",
     "@jolocom/native-core": "^1.0.0-rc4",
     "@jolocom/protocol-ts": "^0.5.1",
@@ -66,7 +66,7 @@
     "json-logic-js": "^1.2.2",
     "jsonld": "^1.6.1",
     "jsontokens": "^1.0.0",
-    "node-fetch": "^2.3.0",
+    "node-fetch": "^2.6.1",
     "reflect-metadata": "^0.1.13",
     "secrets.js-grempe": "^1.1.0"
   },
