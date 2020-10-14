@@ -1,4 +1,4 @@
-Getting Started
+Getting Started..
 ===============
 
 .. warning::
@@ -61,9 +61,9 @@ Also :code:`process.version` must be defined, so you might need to just set it i
 How to create a self-sovereign identity
 #########################################
 
-In the context of the Jolocom protocol / stack, an SSI is generally a combination of a DID and a set of signing / encryption / controlling keys. The exact amount and type of cryptographic keys required to act on behalf of a DID depends on the specifics of the used DID Method.
+In the context of the Jolocom protocol / stack, an SSI is esentially a combination of a DID and a set of signing / encryption / controlling keys. The exact amount and type of cryptographic keys required to act on behalf of a DID depends on the specifics of the used DID Method.
 
-We first instantiate a new `SoftwareKeyProvider` class:
+We first instantiate a new empty `SoftwareKeyProvider` instance:
 
 .. code-block:: typescript
   import { walletUtils } from '@jolocom/native-core'
@@ -72,7 +72,7 @@ We first instantiate a new `SoftwareKeyProvider` class:
   const password = 'secretpassword'
   const emptyWallet = SoftwareKeyProvider.newEmptyWallet(walletUtils, 'id:', password)
 
-At this point, an empty wallet (not populated with a DID / keys) is created. Before this wallet can be used, it needs to be provisioned with a DID, and a set of associated keys for signing / encryption / identity management.
+At this point ``emptyWallet`` is not yet configured with a DID or any signing / encryption / identity management keys. The easiest way to configure the wallet with the required keys is to use the ``createIdentityFromKeyProvider`` helper exported by the library:
 
 The easiest way to populate the wallet with the aforementioned keys is:
 
@@ -86,44 +86,44 @@ The easiest way to populate the wallet with the aforementioned keys is:
     didJolo.registrar
   )
 
-Two of the arguments passed to this function are already familliar, we pass the empty wallet we've just created (it will be populated with keys), as well as the password (it will be used to decrypt the encrypted wallet state, as well as encrypt it afterwards).
+The function takes an ``emptyWallet`` and the corresponding encryption ``password`` as it's first two arguments. The ``password`` will be used to decrypt the wallet contents before adding new keys / modifying it, as well as to encrypt the wallet contents afterwards.
 
-The one new argument / concept introduced here is the Did Method abstraction (in this specific example, the ``JoloDidMethod``).
+The key derivation, as well as the DID provisioning is fully delegated to the ``IRegistrar`` instance passed as the third argument.
+Internally, the ``registrar`` has access to the passed ``SoftwareKeyProvider`` instance, and can generate and persist all required keys according to the DID method specification (for instance, the ``JoloDidMethod`` and the ``LocalDidMethod`` modules make use of `BIP32<>`_ and `SLIP0010<>`_ respectively for generating / managing multiple keys).
+The ``registrar`` implementation encapsulates the specification(s) employed for deriving keys (including metadata required for derivation, such as paths, indexes, etc.), as well as the process for deriving a DID based on the aforementioned keys.
 
-A DID method object contains an implementation for a registrar / resolver acting as described in the corresponding DID Method specification. The registrar implementation included within is delegated all key creation / DID derivation operations. [TODO Include info from the SDK]. Depending on the registrar implementation passed, a different corresponding DID / set of keys will be created.
+Provisioning the ``SoftwareKeyProvider`` with keys and a DID is the first step of the identity creation process. At this point, a DID Document (which lists the previously created keys and DID) can be created and "anchored" (e.g. create a mapping between a DID and the DID Document in some `verifiable data registry <>`_). The process / meaning for the "anchoring" operation is defined as part of the corresponding DID method specification.
 
-.. note:: Check out the `jolo-did-methods repository <https://github.com/jolocom/jolo-did-method>`_ for more documentation on this abstraction, as well as the source code for two DID Methods we've integrated with the Jolocom stack.
+.. note:: For more documentation on the ``DidMethod`` abstraction, as well as examples of DID methods integrated with the Jolocom stack, check out the `jolo-did-method <https://github.com/jolocom/jolo-did-method>`_ and the `local-did-method <https://github.com/jolocom/local-did-method>`_ repositories.
 
-Please note that the wallet passed to this function needs to either be empty (i.e. the ``id`` value should not be set to a valid DID, and no keys are present), or correctly populated (i.e. the ``id`` value is set to a correct DID matching the registrar's DID Method, and the wallet is populated with the right set of keys, of the right type). In case the wallet is not empty, and populated with a DID / set of keys incpompatible with the passed registrar, an error is thrown.
+Please note that the wallet passed to this function is generally expected to be empty (i.e. the ``id`` value should not be set to a valid DID, and no keys should be present), with the configuration fully deligated to the specified ``registrar``.
+
+The ``JoloDidMethod`` and ``LocalDidMethod`` registrars can also create an identity using a correctly populated wallet (i.e. the ``id`` value is set to a correct DID matching the ``registrar's`` DID method prefix, and the wallet is populated with the right set of keys, of the right type. In this case, the key / DID generation steps are skipped, and the anchoring operations are fired right away. Whether this functionality is supported or not depends on the ``registrar`` implementation used.
+
+**In case the wallet is not empty, and populated with a DID / set of keys incpompatible with the passed registrar, an error is thrown.**
 
 .. note:: Check out the `SoftwareKeyProvider docmentation <https://github.com/jolocom/vaulted-key-provider>`_ for examples on how to manually populate a wallet instance with keys.
 
-
 **Reusing an identity**
-Given a populated wallet instance, the following alternative to ``createIdentityFromKeyProvider`` can be used to instantiate an identity wallet:
+At later points, the identity can be reused if a ``SoftwareKeyProvider`` provisioned with the corresponding keys is available. The corresponding ``SoftwareKeyProvider`` can be instantiated in a number of ways (e.g. the wallet's encrypted contents can be persisted to storage, and read / decrypted later, or a BIP39 mnemonic can be saved as part of identity creation, and then retrieved / used to derive all required keys).
+
+Given a populated wallet instance, the following alternative to ``authAsIdentityFromKeyProvider`` can be used to instantiate the identity:
 
 .. code-block:: typescript
 
   const didJolo = new JoloDidMethod()
 
+  // The emptyWallet is no longer empty, because createIdentityFromKeyProvider mutates it's contents
   const identityWallet = await authAsIdentityFromKeyProvider(
     emptyWallet,
     password,
     didJolo.resolver
   )
 
-The method is simillar to the one above, except that it does not rely on a registrar, but rather a resolver (responsible for resolving DIDs to DID Documents). This method will attempt to find an existing identity on chain and authentica
-
-
-.. note:: The password must be 32 bytes long **(the expected encoding is UTF-8)**. In case a password of a different length is provided (e.g. the example above), it will be hashed using ``sha256`` internally before usage. An appropriate warning will be printed to the console.
-
+The function is simillar to the helper we've used to create the identity, except that this function will not attempt to "anchor" the identity but rather it will try to resolve (as defined by the corresponding DID method specification) an existing identity based on the DID / keys held by the passed ``SoftwareKeyProvider`` instance.
 
 Using the identity
 ###################
-
-The ``createIdentityFromKeyProvider`` / ``authAsIdentityFromKeyProvider`` function presented in the previous section eventually returns an instance of the ``IdentityWallet`` class, which can be used
-to authenticate against services, issue credentials, and request data from other identities.
-Later sections will explore the exposed interface in more detail.
 
 So far, you have successfully created and anchored a digital self-sovereign identity. The subsequent sections cover how to:
 
