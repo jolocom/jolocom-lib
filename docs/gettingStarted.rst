@@ -1,3 +1,6 @@
+TODO - Check the snippets actually work, i.e. via copy paste
+TODO - is the browser / native section still needed?
+
 Getting Started..
 ===============
 
@@ -61,20 +64,19 @@ Also :code:`process.version` must be defined, so you might need to just set it i
 How to create a self-sovereign identity
 #########################################
 
-In the context of the Jolocom protocol / stack, an SSI is esentially a combination of a DID and a set of signing / encryption / controlling keys. The exact amount and type of cryptographic keys required to act on behalf of a DID depends on the specifics of the used DID Method.
+In the context of the Jolocom protocol / stack, an SSI is esentially a combination of a DID and a set of signing / encryption / controlling keys. The exact number and type of cryptographic keys required depends on the requirements of the used DID Method.
 
-We first instantiate a new empty `SoftwareKeyProvider` instance:
+In order to create a new identity, we first need to create a new ``SoftwareKeyProvider`` instance. This class is responsible for managing the cryptographic material associated with the identity. An empty key provider can be instantiated as follows:
 
 .. code-block:: typescript
+
   import { walletUtils } from '@jolocom/native-core'
   import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
   const password = 'secretpassword'
   const emptyWallet = SoftwareKeyProvider.newEmptyWallet(walletUtils, 'id:', password)
 
-At this point ``emptyWallet`` is not yet configured with a DID or any signing / encryption / identity management keys. The easiest way to configure the wallet with the required keys is to use the ``createIdentityFromKeyProvider`` helper exported by the library:
-
-The easiest way to populate the wallet with the aforementioned keys is:
+At this point ``emptyWallet`` is not yet configured with a DID or any signing / encryption / identity management keys. The easiest way to configure the wallet with the required keys is to use the ``createIdentityFromKeyProvider`` helper provided by the Jolocom library:
 
 .. code-block:: typescript
 
@@ -86,17 +88,19 @@ The easiest way to populate the wallet with the aforementioned keys is:
     didJolo.registrar
   )
 
-The function takes an ``emptyWallet`` and the corresponding encryption ``password`` as it's first two arguments. The ``password`` will be used to decrypt the wallet contents before adding new keys / modifying it, as well as to encrypt the wallet contents afterwards.
+The function takes an ``emptyWallet`` and the corresponding encryption ``password`` as the first two arguments. The ``password`` will be used to decrypt the wallet contents before adding new keys / changing the associated DID / storing metadata, etc. Once the wallet state has been updated, the same password is used to encrypt the new state.
 
-The key derivation, as well as the DID provisioning is fully delegated to the ``IRegistrar`` instance passed as the third argument.
-Internally, the ``registrar`` has access to the passed ``SoftwareKeyProvider`` instance, and can generate and persist all required keys according to the DID method specification (for instance, the ``JoloDidMethod`` and the ``LocalDidMethod`` modules make use of `BIP32<https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ and `SLIP0010<https://github.com/satoshilabs/slips/blob/master/slip-0010.md>`_ respectively for generating / managing multiple keys).
-The ``registrar`` implementation encapsulates the specification(s) employed for deriving keys (including metadata required for derivation, such as paths, indexes, etc.), as well as the process for deriving a DID based on the aforementioned keys.
+.. note:: Please note that this function mutates the contents of the wallet it receives as an argument.
 
-Provisioning the ``SoftwareKeyProvider`` with keys and a DID is the first step of the identity creation process. At this point, a DID Document (which lists the previously created keys and DID) can be created and "anchored" (e.g. create a mapping between a DID and the DID Document in some `verifiable data registry <https://www.w3.org/TR/did-core/#dfn-verifiable-data-registry>`_). The process / meaning for the "anchoring" operation is defined as part of the corresponding DID method specification.
+Deriving the required keys, as well as the wallet DID is fully delegated to the ``IRegistrar`` instance passed as the third argument. Internally, the ``registrar`` has access to the passed ``SoftwareKeyProvider`` instance, and can generate and persist all required keys according to the DID method specification. This approach results in greater flexibility when deriving keys (since the behaviour is fully encapsulated in the ``registrar``), allowing for various approaches to cater to different needs (for instance, the ``JoloDidMethod`` and the ``LocalDidMethod`` modules internally rely on specifications such as `BIP32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ and `SLIP0010 <https://github.com/satoshilabs/slips/blob/master/slip-0010.md>`_ respectively for HD key derivation and simpler backups / recovery).
+
+To reiterate, the ``registrar`` implementation encapsulates the specification(s) employed for deriving keys (including metadata required for derivation, such as paths, indexes, etc.), as well as the process for deriving a DID based on the aforementioned keys.
+
+Provisioning the ``SoftwareKeyProvider`` with keys and a DID is the first step of the identity creation process. At this point, a DID Document (which indexes the keys and DID we've just created) can be created and "anchored" (the exact opperations are DID method specific, and might for example entail creatting a record mapping the newly created DID and the DID Document in a `verifiable data registry <https://www.w3.org/TR/did-core/#dfn-verifiable-data-registry>`_).
 
 .. note:: For more documentation on the ``DidMethod`` abstraction, as well as examples of DID methods integrated with the Jolocom stack, check out the `jolo-did-method <https://github.com/jolocom/jolo-did-method>`_ and the `local-did-method <https://github.com/jolocom/local-did-method>`_ repositories.
 
-Please note that the wallet passed to this function is generally expected to be empty (i.e. the ``id`` value should not be set to a valid DID, and no keys should be present), with the configuration fully deligated to the specified ``registrar``.
+Please note that the wallet passed to this function is generally expected to be empty (i.e. the ``wallet.id`` value should not be set to a valid DID, and no keys should be present), with the configuration fully deligated to the specified ``registrar``.
 
 The ``JoloDidMethod`` and ``LocalDidMethod`` registrars can also create an identity using a correctly populated wallet (i.e. the ``id`` value is set to a correct DID matching the ``registrar's`` DID method prefix, and the wallet is populated with the right set of keys, of the right type. In this case, the key / DID generation steps are skipped, and the anchoring operations are fired right away. Whether this functionality is supported or not depends on the ``registrar`` implementation used.
 
@@ -105,7 +109,8 @@ The ``JoloDidMethod`` and ``LocalDidMethod`` registrars can also create an ident
 .. note:: Check out the `SoftwareKeyProvider docmentation <https://github.com/jolocom/vaulted-key-provider>`_ for examples on how to manually populate a wallet instance with keys.
 
 **Reusing an identity**
-At later points, the identity can be reused if a ``SoftwareKeyProvider`` provisioned with the corresponding keys is available. The corresponding ``SoftwareKeyProvider`` can be instantiated in a number of ways (e.g. the wallet's encrypted contents can be persisted to storage, and read / decrypted later, or a BIP39 mnemonic can be saved as part of identity creation, and then retrieved / used to derive all required keys).
+
+At later points, the identity can be reused if a ``SoftwareKeyProvider`` provisioned with the corresponding keys is available. The corresponding ``SoftwareKeyProvider`` can be instantiated in a number of ways (e.g. the wallet's encrypted contents can be persisted to storage, and read / decrypted later, or a BIP39 / SLIP0010 mnemonic can be saved as part of identity creation, and then retrieved / used to derive all required keys).
 
 Given a populated wallet instance, the following alternative to ``authAsIdentityFromKeyProvider`` can be used to instantiate the identity:
 
@@ -121,6 +126,8 @@ Given a populated wallet instance, the following alternative to ``authAsIdentity
   )
 
 The function is simillar to the helper we've used to create the identity, except that this function will not attempt to "anchor" the identity but rather it will try to resolve (as defined by the corresponding DID method specification) an existing identity based on the DID / keys held by the passed ``SoftwareKeyProvider`` instance.
+
+.. note:: For further examples of identity creation scenarios, check out the `Jolocom-SDK documentation <https://jolocom.github.io/jolocom-sdk/1.0.0-rc11/guides/identity/#creating-an-identity>`_
 
 Using the identity
 ###################
