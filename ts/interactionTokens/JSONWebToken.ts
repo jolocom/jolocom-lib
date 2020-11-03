@@ -49,6 +49,8 @@ interface IPayloadSection<T> {
   iss?: string
   aud?: string
   typ?: string
+  // Proof of Control Authority
+  pca?: string
   interactionToken?: T
 }
 
