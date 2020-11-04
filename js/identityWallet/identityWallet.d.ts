@@ -16,6 +16,7 @@ import { IResolver } from '../didMethods/types';
 declare type WithExtraOptions<T> = T & {
     expires?: Date;
     aud?: string;
+    pca?: string;
 };
 export declare class IdentityWallet {
     private _identity;
@@ -47,18 +48,19 @@ export declare class IdentityWallet {
             typ: string;
             expires?: Date;
             aud?: string;
+            pca?: string;
         }, pass: string, recieved?: JSONWebToken<R>) => Promise<JSONWebToken<T_1>>;
         interactionTokens: {
             request: {
-                auth: ({ expires, aud, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string) => Promise<JSONWebToken<any>>;
-                offer: ({ expires, aud, ...message }: WithExtraOptions<CredentialOfferRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
-                share: ({ expires, aud, ...message }: WithExtraOptions<ICredentialRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
+                auth: ({ expires, aud, pca, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string) => Promise<JSONWebToken<any>>;
+                offer: ({ expires, aud, pca, ...message }: WithExtraOptions<CredentialOfferRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
+                share: ({ expires, aud, pca, ...message }: WithExtraOptions<ICredentialRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
             };
             response: {
-                auth: ({ expires, aud, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, recieved?: JSONWebToken<Authentication>) => Promise<JSONWebToken<any>>;
-                offer: ({ expires, aud, ...message }: WithExtraOptions<CredentialOfferResponseAttrs>, pass: string, recieved?: JSONWebToken<CredentialOfferRequest>) => Promise<JSONWebToken<any>>;
-                share: ({ expires, aud, ...message }: WithExtraOptions<ICredentialResponseAttrs>, pass: string, recieved?: JSONWebToken<CredentialRequest>) => Promise<JSONWebToken<any>>;
-                issue: ({ expires, aud, ...message }: WithExtraOptions<ICredentialsReceiveAttrs>, pass: string, recieved?: JSONWebToken<CredentialOfferResponse>) => Promise<JSONWebToken<any>>;
+                auth: ({ expires, aud, pca, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, recieved?: JSONWebToken<Authentication>) => Promise<JSONWebToken<any>>;
+                offer: ({ expires, aud, pca, ...message }: WithExtraOptions<CredentialOfferResponseAttrs>, pass: string, recieved?: JSONWebToken<CredentialOfferRequest>) => Promise<JSONWebToken<any>>;
+                share: ({ expires, aud, pca, ...message }: WithExtraOptions<ICredentialResponseAttrs>, pass: string, recieved?: JSONWebToken<CredentialRequest>) => Promise<JSONWebToken<any>>;
+                issue: ({ expires, aud, pca, ...message }: WithExtraOptions<ICredentialsReceiveAttrs>, pass: string, recieved?: JSONWebToken<CredentialOfferResponse>) => Promise<JSONWebToken<any>>;
             };
         };
     };
