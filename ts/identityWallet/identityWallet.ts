@@ -37,6 +37,7 @@ import { getRandomBytes } from '../utils/crypto'
 import { cryptoUtils } from '@jolocom/native-core'
 import { validateDigestable } from '../utils/validation'
 import { IResolver } from '../didMethods/types'
+import base64url from 'base64url'
 
 /**
  * @dev We use Class Transformer (CT) to instantiate all interaction Tokens i.e. in
@@ -323,7 +324,7 @@ export class IdentityWallet {
       await jwt.asBytes(),
     ) // TODO Also, are the signatures hex or b64?
 
-    jwt.signature = signature.toString('base64')
+    jwt.signature = base64url.toBase64(signature)
 
     return jwt
   }
