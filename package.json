@@ -56,7 +56,6 @@
     "@jolocom/protocol-ts": "^0.5.1",
     "@jolocom/vaulted-key-provider": "^0.7.4",
     "@types/sinon": "^9.0.5",
-    "base64url": "^3.0.1",
     "bip39": "^3.0.2",
     "class-transformer": "^0.3.1",
     "create-hash": "^1.2.0",
@@ -68,6 +67,7 @@
     "jsontokens": "^1.0.0",
     "node-fetch": "^2.6.1",
     "reflect-metadata": "^0.1.13",
+    "rfc4648": "^1.4.0",
     "secrets.js-grempe": "^1.1.0"
   },
   "devDependencies": {

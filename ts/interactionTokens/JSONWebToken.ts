@@ -1,4 +1,4 @@
-import base64url from 'base64url'
+import { base64url } from 'rfc4648'
 import { decodeToken } from 'jsontokens'
 import {
   classToPlain,
@@ -226,8 +226,8 @@ export class JSONWebToken<T> implements IDigestable {
     }
 
     return [
-      base64url.encode(JSON.stringify(this.header)),
-      base64url.encode(JSON.stringify(this.payload)),
+      base64url.stringify(Buffer.from(JSON.stringify(this.header)), { pad: false }),
+      base64url.stringify(Buffer.from(JSON.stringify(this.payload)), { pad: false }),
       this.signature,
     ].join('.')
   }
@@ -235,8 +235,8 @@ export class JSONWebToken<T> implements IDigestable {
   public async asBytes() {
     return Buffer.from(
       [
-        base64url.encode(JSON.stringify(this.header)),
-        base64url.encode(JSON.stringify(this.payload)),
+        base64url.stringify(Buffer.from(JSON.stringify(this.header)), { pad: false }),
+        base64url.stringify(Buffer.from(JSON.stringify(this.payload)), { pad: false }),
       ].join('.'),
     )
   }
