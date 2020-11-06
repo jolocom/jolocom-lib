@@ -1,3 +1,4 @@
+import { classToPlain, plainToClass } from 'class-transformer'
 import { DidDocument } from './didDocument/didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { IIdentityCreateArgs } from './types'
@@ -6,6 +7,11 @@ import { IIdentityCreateArgs } from './types'
  * @class
  * Class representing an identity, combines a {@link DidDocument} and a public profile {@link SignedCredential}
  */
+
+interface IdentityAttributes {
+  didDocument: DidDocument
+  publicProfileCredential?: SignedCredential
+}
 
 export class Identity {
   private _didDocument: DidDocument
@@ -101,5 +107,21 @@ export class Identity {
     }
 
     return identity
+  }
+
+  /**
+   * Serializes the {@link Identity}
+   */
+
+  public toJSON(): IdentityAttributes {
+    return classToPlain(this) as IdentityAttributes
+  }
+
+  /**
+   * Instantiates an {@link Identity} from it's JSON form
+   * @param json - JSON containing {link @Identity} members
+   */
+  public static fromJSON(json: IdentityAttributes): Identity {
+    return plainToClass(Identity, json)
   }
 }
