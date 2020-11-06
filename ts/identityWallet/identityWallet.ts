@@ -60,6 +60,7 @@ import { base64url } from 'rfc4648'
 type WithExtraOptions<T> = T & {
   expires?: Date
   aud?: string
+  pca?: string
 }
 
 /**
@@ -214,20 +215,21 @@ export class IdentityWallet {
    * @param received - optional received JSONWebToken Class
    */
   private createMessage = async <T, R>(
-    args: { message: T; typ: string; expires?: Date; aud?: string },
+    args: { message: T; typ: string; expires?: Date; aud?: string, pca?: string },
     pass: string,
     recieved?: JSONWebToken<R>,
   ) => {
     const jwt = JSONWebToken.fromJWTEncodable(args.message)
     jwt.interactionType = args.typ
     if (args.aud) jwt.audience = args.aud
+    if (args.pca) jwt.payload.pca = args.pca
     jwt.timestampAndSetExpiry(args.expires)
 
     return this.initializeAndSign(jwt, pass, recieved)
   }
 
   private makeReq = <T>(typ: string) => (
-    { expires, aud, ...message }: WithExtraOptions<T>,
+    { expires, aud, pca, ...message }: WithExtraOptions<T>,
     pass: string,
   ) =>
     this.createMessage(
@@ -237,12 +239,13 @@ export class IdentityWallet {
         typ,
         expires,
         aud,
+        pca
       },
       pass,
     )
 
   private makeRes = <T, R>(typ: string) => (
-    { expires, aud, ...message }: WithExtraOptions<T>,
+    { expires, aud, pca, ...message }: WithExtraOptions<T>,
     pass: string,
     recieved?: JSONWebToken<R>,
   ) =>
@@ -253,6 +256,7 @@ export class IdentityWallet {
         typ,
         expires,
         aud,
+        pca
       },
       pass,
       recieved,

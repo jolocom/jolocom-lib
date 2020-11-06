@@ -16,6 +16,7 @@ interface IPayloadSection<T> {
     iss?: string;
     aud?: string;
     typ?: string;
+    pca?: string;
     interactionToken?: T;
 }
 export declare class JSONWebToken<T> implements IDigestable {
