@@ -1,7 +1,9 @@
-import { classToPlain, plainToClass } from 'class-transformer'
+import { classToPlain, plainToClass, Type, Exclude, Expose } from 'class-transformer'
 import { DidDocument } from './didDocument/didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { IIdentityCreateArgs } from './types'
+import { IDidDocumentAttrs } from './didDocument/types'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 /**
  * @class
@@ -9,10 +11,11 @@ import { IIdentityCreateArgs } from './types'
  */
 
 interface IdentityAttributes {
-  didDocument: DidDocument
-  publicProfileCredential?: SignedCredential
+  didDocument: IDidDocumentAttrs
+  publicProfile?: ISignedCredentialAttrs
 }
 
+@Exclude()
 export class Identity {
   private _didDocument: DidDocument
   private _publicProfileCredential?: SignedCredential
@@ -39,7 +42,8 @@ export class Identity {
    * Get the did document associated with the identity
    * @example `console.log(identity.didDocument) // DidDocument {...}`
    */
-
+  @Expose()
+  @Type(() => DidDocument)
   get didDocument(): DidDocument {
     return this._didDocument
   }
@@ -76,6 +80,8 @@ export class Identity {
    * @example `console.log(identity.publicProfile) // SignedCredential {...}`
    */
 
+  @Expose()
+  @Type(() => SignedCredential)
   get publicProfile() {
     return this._publicProfileCredential
   }

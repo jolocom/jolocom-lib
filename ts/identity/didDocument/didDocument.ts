@@ -42,7 +42,7 @@ export class DidDocument implements IDigestable {
   private _service: ServiceEndpointsSection[] = []
   private _created: Date = new Date()
   private _updated: Date = new Date()
-  private _proof: ILinkedDataSignature
+  private _proof: ILinkedDataSignature = new EcdsaLinkedDataSignature()
   private _context: ContextEntry[] = defaultContextIdentity
 
   /**

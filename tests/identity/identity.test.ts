@@ -43,6 +43,31 @@ describe('Identity', async () => {
     expect(identity.serviceEndpointSections).to.eq(mockDidDocument.service)
   })
 
+  describe('Serialize as JSON and Parse from JSON', () => {
+    it ('Should correctly instantiate from JSON', () => {
+      const identity = Identity.fromJSON({
+        didDocument: mockDidDocument.toJSON(),
+        publicProfile: publicProfileCredJSON,
+      })
+
+      expect(identity.didDocument).to.deep.eq(mockDidDocument)
+      expect(identity.publicProfile).to.deep.eq(mockPublicProfile)
+      expect(identity.did).to.deep.eq(mockDidDocument.did)
+    })
+
+    it ('Should correctly serialize to JSON', () => {
+      const identity = Identity.fromDidDocument({
+        didDocument: mockDidDocument,
+        publicProfile: mockPublicProfile,
+      })
+
+      expect(identity.toJSON()).to.deep.eq({
+        didDocument: mockDidDocument.toJSON(),
+        publicProfile: mockPublicProfile.toJSON(),
+      })
+    })
+  })
+
   /*
    * Following tests are quite repetitive, because all opperations are essentially getters and setters
    * once public profile logic becomes more complexe they should differ more
