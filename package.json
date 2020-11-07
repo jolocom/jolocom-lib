@@ -1,9 +1,11 @@
 {
   "name": "jolocom-lib",
-  "version": "5.1.0-rc11",
+  "version": "5.1.0-rc12",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
-  "files": ["js/"],
+  "files": [
+    "js/"
+  ],
   "typings": "js/index.d.ts",
   "husky": {
     "hooks": {}
@@ -21,11 +23,23 @@
     "generate-api-docs": "typedoc ./ts"
   },
   "nyc": {
-    "include": ["ts/**/*.ts"],
-    "exclude": ["**/types.ts", "**/*.types.ts"],
-    "extension": [".ts"],
-    "require": ["ts-node/register"],
-    "reporter": ["text", "text-summary"],
+    "include": [
+      "ts/**/*.ts"
+    ],
+    "exclude": [
+      "**/types.ts",
+      "**/*.types.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text",
+      "text-summary"
+    ],
     "all": true,
     "sourceMap": true,
     "instrument": true
@@ -34,7 +48,10 @@
     "type": "git",
     "url": "git+https://github.com/jolocom/jolocom-lib.git"
   },
-  "keywords": ["Jolocom", "Self-Sovereign Identity"],
+  "keywords": [
+    "Jolocom",
+    "Self-Sovereign Identity"
+  ],
   "author": "Eugeniu Rusu <eugeniu@jolocom.com>",
   "contributors": [
     "Eugeniu Rusu <eugeniu@jolocom.com>",
