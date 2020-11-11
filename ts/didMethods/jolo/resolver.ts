@@ -10,20 +10,20 @@ import { parseAndValidate } from '../../parse/parseAndValidate'
 type Resolve = (did: string) => Promise<DIDDocument>
 
 export class JolocomResolver implements IResolver {
-  prefix = 'jolo'
-
+  private _prefix: string
   private resolutionFunctions: {
     resolve: Resolve
     getPublicProfile: (didDoc: DIDDocument) => any
   } = {
-    resolve: undefined,
-    getPublicProfile: undefined,
-  }
+      resolve: undefined,
+      getPublicProfile: undefined,
+    }
 
   constructor(
     providerUrl = PROVIDER_URL,
     contractAddress = CONTRACT_ADDRESS,
     ipfsHost = IPFS_ENDPOINT,
+    prefix = 'jolo'
   ) {
     this.resolutionFunctions.getPublicProfile = (didDoc: DIDDocument) =>
       getPublicProfile(didDoc, ipfsHost)
@@ -32,6 +32,12 @@ export class JolocomResolver implements IResolver {
       new Resolver(getResolver(providerUrl, contractAddress, ipfsHost)).resolve(
         did,
       )
+
+    this._prefix = prefix
+  }
+
+  get prefix() {
+    return this._prefix
   }
 
   async resolve(did: string) {

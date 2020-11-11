@@ -7,7 +7,7 @@ import { walletUtils } from '@jolocom/native-core'
 import { authAsIdentityFromKeyProvider } from '../utils'
 
 export class JoloDidMethod implements IDidMethod {
-  public prefix = 'jolo'
+  private _prefix: string
   public resolver: JolocomResolver
   public registrar: JolocomRegistrar
 
@@ -15,13 +15,21 @@ export class JoloDidMethod implements IDidMethod {
     providerUrl = PROVIDER_URL,
     contractAddress = CONTRACT_ADDRESS,
     ipfsHost = IPFS_ENDPOINT,
+    prefix = 'jolo'
   ) {
-    this.resolver = new JolocomResolver(providerUrl, contractAddress, ipfsHost)
+    this.resolver = new JolocomResolver(providerUrl, contractAddress, ipfsHost, prefix)
     this.registrar = new JolocomRegistrar(
       providerUrl,
       contractAddress,
       ipfsHost,
+      prefix
     )
+
+    this._prefix = prefix
+  }
+
+  get prefix(): string {
+    return this._prefix
   }
 
   public async recoverFromSeed(seed: Buffer, newPassword: string) {

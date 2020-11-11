@@ -4,9 +4,10 @@ import { SignedCredential } from '../../credentials/signedCredential/signedCrede
 import { IRegistrar } from '../types';
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider';
 export declare class JolocomRegistrar implements IRegistrar {
-    prefix: string;
+    private _prefix;
     registrarFns: ReturnType<typeof getRegistrar>;
-    constructor(providerUrl?: string, contractAddress?: string, ipfsHost?: string);
+    constructor(providerUrl?: string, contractAddress?: string, ipfsHost?: string, prefix?: string);
+    readonly prefix: string;
     create(keyProvider: SoftwareKeyProvider, password: string): Promise<Identity>;
     didDocumentFromKeyProvider(keyProvider: SoftwareKeyProvider, password: string): Promise<Identity>;
     updatePublicProfile(keyProvider: SoftwareKeyProvider, password: string, identity: Identity, publicProfile: SignedCredential): Promise<boolean>;

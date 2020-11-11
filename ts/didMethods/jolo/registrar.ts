@@ -23,15 +23,21 @@ import { addHexPrefix } from 'ethereumjs-util'
 const { SIGNING_KEY_REF, ANCHOR_KEY_REF, ENCRYPTION_KEY_REF } = KEY_REFS
 
 export class JolocomRegistrar implements IRegistrar {
-  public prefix = 'jolo'
+  private _prefix: string
   public registrarFns: ReturnType<typeof getRegistrar>
 
   constructor(
     providerUrl = PROVIDER_URL,
     contractAddress = CONTRACT_ADDRESS,
     ipfsHost = IPFS_ENDPOINT,
+    prefix = 'jolo'
   ) {
     this.registrarFns = getRegistrar(providerUrl, contractAddress, ipfsHost)
+    this._prefix = prefix
+  }
+
+  get prefix() {
+    return this._prefix
   }
 
   async create(keyProvider: SoftwareKeyProvider, password: string) {
@@ -192,7 +198,7 @@ export class JolocomRegistrar implements IRegistrar {
       ({ type }) =>
         type ===
         claimsMetadata.publicProfile.type[
-          claimsMetadata.publicProfile.type.length - 1
+        claimsMetadata.publicProfile.type.length - 1
         ],
     )
 
