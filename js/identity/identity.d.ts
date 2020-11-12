@@ -1,9 +1,11 @@
 import { DidDocument } from './didDocument/didDocument';
 import { SignedCredential } from '../credentials/signedCredential/signedCredential';
 import { IIdentityCreateArgs } from './types';
+import { IDidDocumentAttrs } from './didDocument/types';
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types';
 interface IdentityAttributes {
-    didDocument: DidDocument;
-    publicProfileCredential?: SignedCredential;
+    didDocument: IDidDocumentAttrs;
+    publicProfile?: ISignedCredentialAttrs;
 }
 export declare class Identity {
     private _didDocument;
