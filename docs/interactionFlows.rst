@@ -69,23 +69,13 @@ will fail. In case you would like to specify a custom expiry date, the following
 .. note:: The expiration date can be passed in a similar manner when creating other interaction token types as well (e.g. Authentication, Credential Offer, etc...)
 
 .. note:: For further documentation and examples explaining how to create and send
- credential requests, check the `API documentation <https://htmlpreview.github.io/?https://raw.githubusercontent.com/jolocom/jolocom-lib/master/api_docs/documentation/classes/credentialrequest.html>`_,
- the `generic backend documentation <https://github.com/jolocom/generic-backend>`_, the `integration tests <https://github.com/jolocom/jolocom-lib/tree/master/tests/integration>`_, and finally `this collection of simple snippets <https://github.com/Exulansis/jolocom_snippets>`_.
+ credential requests, as well as other interaction messages, refer to the `API documentation <https://htmlpreview.github.io/?https://raw.githubusercontent.com/jolocom/jolocom-lib/master/api_docs/documentation/classes/credentialrequest.html>`_,
+ the the `integration tests <https://github.com/jolocom/jolocom-lib/tree/master/tests/integration>`_, and the `Jolocom SDK documentation <https://github.com/jolocom/jolocom-sdk/blob/main/docs/guides/interaction_flows.md>`_.
 
 The easiest way to make the credential request consumable for the client applications is to encode it
-as a `JSON Web Token <https://jwt.io/introduction/>`_. This allows us to easily validate signatures on individual messages, and prevent some replay attacks.
+as a `JSON Web Token <https://jwt.io/introduction/>`_. This allows us to easily validate signatures on individual messages, as well as prevent replay attacks.
 
-In order to make the credential request consumable by the `Jolocom SmartWallet <https://github.com/jolocom/smartwallet-app>`_ the ``JSON Web Token`` must further
-be encoded as a QR code that can be scanned by the wallet application. The ``credentialRequest`` can be encoded as follows:
-
-.. code-block:: typescript
-
-  // Will be deprecated in future releases in favor of more user-friendly and intuitive ways to encode data
-
-  const jwtEncoded = credentialRequest.encode()
-  const QREncoded = new SSO().JWTtoQR(jwtEncoded)
-
-.. note:: The ``JWT`` encoded interaction token can also be sent to the Jolocom SmartWallet via "Deep Links"..
+.. note:: The interaction messages can be sent to other agents for processing via any preffered channel. In order to allow `SmartWallet <https://github.com/jolocom/smartwallet-app>`_ users to consume the message, it can be encoded as a QR code, or via "Deep Links"..
 
 **Consume a Signed Credential Request**
 
@@ -96,7 +86,7 @@ Once the encoded credential request has been received on the client side, a corr
   const credentialRequest = JolocomLib.parse.interactionToken.fromJWT(enc)
   identityWallet.validateJWT(credentialRequest)
 
-.. note:: The ``validateJWT`` method will ensure the credential is not expired, and that it contains a valid signature.
+.. note:: The ``validateJWT`` method will ensure the interaction request is not expired, and that it contains a valid signature.
 
 
 **Create a Credential Response**
@@ -107,20 +97,19 @@ Once the request has been decoded, we can create the response:
 
   /**
    * The callback url has to match the one in the request,
-   * will be populated autmoatically based on the request starting from next major release
    */
 
-  const credentialResponse = awaitidentityWallet.create.interactionTokens.response.share({
+  const credentialResponse = await identityWallet.create.interactionTokens.response.share({
       callbackURL: credentialRequest.payload.interactionToken.callbackURL,
       suppliedCredentials: [signedEmailCredential.toJSON()] // Provide signed credentials of requested type
     },
-    encryptionPass, // The password to decrypt the seed for key generation as part of signing the JWT
+    password, // The password to decrypt the seed for key generation as part of signing the JWT
     credRequest // The received request, used to set the 'nonce' and 'audience' field on the created response
   )
 
 The credential supplied above (conveniently) matches what the service requested.
 To ensure that no credentials other than those corresponding to the service requirements are provided,
-the following method to filter can be used:
+the following method can be used:
 
 .. code-block:: typescript
 
@@ -141,7 +130,7 @@ Once the credential response has been assembled, it can be encoded and sent to t
 
 **Consume a Signed Credential Response**
 
-Back to the service side! The credential response encoded as a ``JSON Web Token`` has been received and the provided data is ready to consume.
+Back to the service side! The credential response has been received and the provided data is ready to consume.
 First, decode the response:
 
 .. code-block:: typescript
@@ -152,18 +141,17 @@ First, decode the response:
 .. note:: The ``validate`` method will ensure the response contains a valid signature, is not expired, lists our
  ``did`` in the ``aud`` (audience) section, and contains the same ``jti`` (nonce) as the request.
 
-After decoding the credential response, verify that the user passed the credentials specified in the request:
+After decoding the credential response, the service can verify that the user passed the credentials specified in the request:
 
 .. code-block:: typescript
 
   /**
    * We check against the request we created in a previous step
    * this requires the server to be stateful. We are currently
-   * expolring alternatives.
+   * expolring alternatives (such as embedding the request in the response token).
    */
 
   const validResponse = credentialResponse.satisfiesRequest(credentialRequest)
-  const registry = JolocomLib.registries.jolocom.create()
 
   if (!validResponse) {
     throw new Error('Incorrect response received')
@@ -199,7 +187,7 @@ Firstly, a credential offer needs to be created:
     }]
   })
 
-The endpoint denoted by the ``callbackURL`` key will be pinged by the client device with a response to the offer.
+The endpoint denoted by the ``callbackURL`` key will be used by the client device to send response to the offer.
 
 The CredentialOffer objects may also contain additional information in the form of ``requestedInput``,
 ``renderInfo`` and ``metadata`` (which currently supports only a boolean ``asynchronous`` key).
@@ -208,7 +196,7 @@ A more complex offer can be created as follows:
 
 .. code-block:: typescript
 
-  import {CredentialRenderTypes} from 'jolocom-lib/interactionTokens/interactionTokens.types'
+  import { CredentialRenderTypes } from 'jolocom-lib/interactionTokens/interactionTokens.types'
 
   const idCardOffer: CredentialOffer = {
     type: 'idCard',
@@ -232,10 +220,10 @@ A more complex offer can be created as follows:
   }
 
 .. note:: The ``metadata.asynchronous`` and ``requestedInput`` keys are not currently used, and act as placeholders. We are awaiting further standardisation efforts.
-    An example of such standardisation initiatives is the `Credential Manifest <https://github.com/decentralized-identity/credential-manifest/blob/master/explainer.md>`_ proposal.
+    An example of such standardisation initiatives is the `Presentation Exchange specification <https://identity.foundation/presentation-exchange/>`_ proposal.
 
 The ``renderInfo`` is used to describe how a credential should be rendered and is currently supported
-by the Jolocom Smartwallet. It allows for a variety of graphical descriptors in it's format:
+by the Jolocom Smartwallet. The currently supported options are:
 
 .. code-block:: typescript
 
@@ -267,7 +255,7 @@ On the client side, we can decode and validate the received credential request a
   const credentialOffer = JolocomLib.parse.interactionToken.fromJWT(enc)
   identityWallet.validateJWT(credentialRequest)
 
-.. note:: The ``validateJWT`` method will ensure the credential is not expired, and that it contains a valid signature.
+.. note:: The ``validateJWT`` method will ensure the interaction request is not expired, and that it contains a valid signature.
 
 **Create a Credential Offer Response**
 
@@ -295,12 +283,6 @@ The credential offer response is sent back to the ``callbackURL`` provided by th
 There are a few way to accomplish the last step, currently the service simply issues a ``CredentialResponse`` JWT containing the credentials.
 We intend to use `Verifiable Presentations <https://w3c.github.io/vc-data-model/#presentations-0>`_ for this step once the specification matures.
 
-An example implementation for an issuance service can be found `here <https://github.com/jolocom/generic-backend>`_.
+For an example of a demo service which can undergo credential issuance flows (as well as other interaction flows supported by the Jolocom SmartWallet), refer to the `Jolocom Demo interaction service <https://github.com/jolocom/interactions-demo>`_.
 
-What next?
-###########
-
-Some additional bits of high level documentation related to the supported interaction flows are available `here <https://jolocom.slite.com/api/s/note/KwPQEd2dvZkBE4C6MfZoQR/Interaction-Tokens>`_
-
-With the reasoning behind the credential request and response flows unpacked, it's time to put it all to the test!
-Head to the next section to learn how to set up your own service for interacting with Jolocom identities.
+.. note:: These interaction flows are also exposed through the Jolocom SDK, as described in the `corresponding SDK documentation section <https://github.com/jolocom/jolocom-sdk/blob/main/docs/guides/interaction_flows.md>`_
