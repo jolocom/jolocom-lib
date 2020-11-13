@@ -32,7 +32,7 @@ export declare class DidDocument implements IDigestable {
     addPublicKeySection(section: PublicKeySection): void;
     addServiceEndpoint(endpoint: ServiceEndpointsSection): void;
     resetServiceEndpoints(): void;
-    static fromPublicKey(publicKey: Buffer): Promise<DidDocument>;
+    static fromPublicKey(publicKey: Buffer, prefix?: string): Promise<DidDocument>;
     sign(vaultedKeyProvider: IVaultedKeyProvider, signConfig: IKeyRefArgs): Promise<void>;
     asBytes(): Promise<Buffer>;
     digest(): Promise<Buffer>;

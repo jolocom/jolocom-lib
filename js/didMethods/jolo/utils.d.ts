@@ -1,2 +1,2 @@
 /// <reference types="node" />
-export declare function publicKeyToJoloDID(publicKey: Buffer): string;
+export declare function publicKeyToDID(publicKey: Buffer, prefix: string): string;

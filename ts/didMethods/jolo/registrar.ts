@@ -17,7 +17,7 @@ import {
 } from '@jolocom/vaulted-key-provider'
 import { validateDigestable } from '../../utils/validation'
 import { KEY_REFS } from './constants'
-import { publicKeyToJoloDID } from './utils'
+import { publicKeyToDID } from './utils'
 import { addHexPrefix } from 'ethereumjs-util'
 
 const { SIGNING_KEY_REF, ANCHOR_KEY_REF, ENCRYPTION_KEY_REF } = KEY_REFS
@@ -91,8 +91,9 @@ export class JolocomRegistrar implements IRegistrar {
         SIGNING_KEY_REF,
       )
 
-      const did = publicKeyToJoloDID(
+      const did = publicKeyToDID(
         Buffer.from(signingKey.publicKeyHex, 'hex'),
+        this.prefix
       )
 
       await keyProvider.changeId(password, did)

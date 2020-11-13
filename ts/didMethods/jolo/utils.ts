@@ -7,8 +7,8 @@ import { keccak256 } from 'ethereumjs-util'
  * @ignore
  */
 
-export function publicKeyToJoloDID(publicKey: Buffer): string {
-  const prefix = 'did:jolo:'
+export function publicKeyToDID(publicKey: Buffer, prefix: string): string {
+  const method = `did:${prefix}:`
   const suffix = keccak256(publicKey)
-  return prefix + suffix.toString('hex')
+  return method + suffix.toString('hex')
 }

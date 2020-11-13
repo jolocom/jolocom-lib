@@ -24,7 +24,7 @@ import {
 import { ContextEntry } from '@jolocom/protocol-ts'
 import { ISigner } from '../../credentials/signedCredential/types'
 import { IVaultedKeyProvider, IKeyRefArgs } from '@jolocom/vaulted-key-provider'
-import { publicKeyToJoloDID } from '../../didMethods/jolo/utils'
+import { publicKeyToDID } from '../../didMethods/jolo/utils'
 
 /**
  * Class modelling a Did Document
@@ -360,8 +360,8 @@ export class DidDocument implements IDigestable {
    * @example `const didDocument = DidDocument.fromPublicKey(Buffer.from('abc...ffe', 'hex'))`
    */
 
-  public static async fromPublicKey(publicKey: Buffer): Promise<DidDocument> {
-    const did = publicKeyToJoloDID(publicKey)
+  public static async fromPublicKey(publicKey: Buffer, prefix: string = 'jolo'): Promise<DidDocument> {
+    const did = publicKeyToDID(publicKey, prefix)
     const keyId = `${did}#keys-1`
 
     const didDocument = new DidDocument()
