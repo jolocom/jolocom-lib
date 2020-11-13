@@ -79,7 +79,7 @@
     "did-resolver": "2.0.0",
     "ethereumjs-util": "^6.1.0",
     "hdkey": "^2.0.1",
-    "json-logic-js": "^1.2.2",
+    "json-logic-js": "^2.0.0",
     "jsonld": "^1.6.1",
     "jsontokens": "^1.0.0",
     "node-fetch": "^2.6.1",
