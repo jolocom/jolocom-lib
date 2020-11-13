@@ -1,5 +1,5 @@
-Using custom connectors
-========================
+Customizing / extending DID methods
+====================================
 
 By default, all identities created using the Jolocom library are indexed in a contract deployed on the Rinkeby test network,
 and the corresponding DID documents are stored on IPFS.

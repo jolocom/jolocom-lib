@@ -24,15 +24,3 @@ A further component of the protocol architecture calls for the integration of a 
   Please do not transfer any real ether to your Jolocom identity.
 
 .. note:: The Jolocom Library is currently only compatible with Node.js versions 10 and 11.
-
-The Jolocom library at a glance
-################################
-
-The Jolocom library exposes an interface with four main entry points:
-
-- ``identityManager`` - used for generating, deriving, and managing multiple keys;
-- ``parse`` - used for instantiating various classess offered by the Jolocom library from encoded / serialized forms;
-- ``registry`` - used for adding, retrieving, and modifying data persisted on IPFS and indexed on Ethereum;
-- ``unsigned`` - used for generating unsigned versions of various data structures offered by the Jolocom library.
-
-The next section examines the API in more detail.
