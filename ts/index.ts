@@ -1,24 +1,31 @@
 import 'reflect-metadata'
 import { parse } from './parse/parse'
-import { registries } from './registries'
-import { SoftwareKeyProvider } from './vaultedKeyProvider/softwareProvider'
-import { KeyTypes } from './vaultedKeyProvider/types'
+import { parseAndValidate } from './parse/parseAndValidate'
 import { constraintFunctions } from './interactionTokens/credentialRequest'
-import { fuelKeyWithEther, getIssuerPublicKey } from './utils/helper'
+import { fuelKeyWithEther } from './utils/helper'
 import { validateDigestable, validateDigestables } from './utils/validation'
+import { didMethods } from './didMethods'
+import { SoftwareKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
+import { walletUtils } from '@jolocom/native-core'
+import { createIdentityFromKeyProvider } from './didMethods/utils'
 
 export const JolocomLib = {
   parse,
-  registries,
+  parseAndValidate,
+  didMethods,
   KeyProvider: SoftwareKeyProvider,
   util: {
     constraintFunctions,
     fuelKeyWithEther,
-    getIssuerPublicKey,
     validateDigestable,
     validateDigestables,
   },
   KeyTypes,
 }
+
+export {
+  SoftwareKeyProvider,
+  IVaultedKeyProvider,
+} from '@jolocom/vaulted-key-provider'
 
 export { claimsMetadata } from '@jolocom/protocol-ts'

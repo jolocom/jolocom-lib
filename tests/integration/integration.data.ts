@@ -1,5 +1,6 @@
-import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
 import { claimsMetadata } from '@jolocom/protocol-ts'
+import { walletUtils } from '@jolocom/native-core'
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
 /* Local configuration for ganache server. the contract address is deterministic */
 export const testEthereumConfig = {
@@ -20,13 +21,13 @@ export const deployerEthKey =
   '0x18e12d1ddf1275201ab20f50dbcc2b7cd6ff21653cc6ac0acd01414862d265c7'
 
 /* The seed for instantiating the user's vault */
-const userSeed = Buffer.from(
+export const userSeed = Buffer.from(
   '901271e3f39bc97987193bfaf986a1590191d83f12d136d3039f6d5a5d837201',
   'hex',
 )
 
 export const userPass = 'a'.repeat(32)
-export const userVault = SoftwareKeyProvider.fromSeed(userSeed, userPass)
+export const getNewVault = (id: string, pass: string)  => SoftwareKeyProvider.newEmptyWallet(walletUtils, id, pass)
 
 /* The private eth key derived from the user's seed */
 export const userEthKey =
@@ -38,10 +39,6 @@ const serviceSeed = Buffer.from(
   'hex',
 )
 export const servicePass = 's'.repeat(32)
-export const serviceVault = SoftwareKeyProvider.fromSeed(
-  serviceSeed,
-  servicePass,
-)
 
 /* The private eth key derived from the service's seed */
 export const serviceEthKey =

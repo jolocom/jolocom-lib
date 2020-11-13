@@ -17,6 +17,7 @@ export declare class EcdsaLinkedDataSignature implements ILinkedDataSignature, I
         keyId: string;
     };
     private normalize;
+    asBytes(): Promise<Buffer>;
     digest(): Promise<Buffer>;
     static fromJSON(json: ILinkedDataSignatureAttrs): EcdsaLinkedDataSignature;
     toJSON(): ILinkedDataSignatureAttrs;

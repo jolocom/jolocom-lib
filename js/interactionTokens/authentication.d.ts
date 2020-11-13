@@ -4,6 +4,6 @@ export declare class Authentication {
     private _description;
     callbackURL: string;
     description: string;
-    toJSON(): Object;
+    toJSON(): Record<string, any>;
     static fromJSON(json: IAuthenticationAttrs): Authentication;
 }

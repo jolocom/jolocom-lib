@@ -24,5 +24,8 @@ export interface ParseMethods {
 export const parse: ParseMethods = {
   interactionToken: JSONWebTokenParser,
   credential: Credential.fromJSON,
-  signedCredential: SignedCredential.fromJSON,
+  //@dev This function is defined this way to avoid the issue -- when this file first evaluates, SignedCredential is undefined,
+  //and trying to reference the static .fromJSON method throws.
+  signedCredential: (json: ISignedCredentialAttrs) =>
+    SignedCredential.fromJSON(json),
 }

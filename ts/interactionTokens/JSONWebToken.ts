@@ -1,4 +1,4 @@
-import base64url from 'base64url'
+import { base64url } from 'rfc4648'
 import { decodeToken } from 'jsontokens'
 import {
   classToPlain,
@@ -7,7 +7,7 @@ import {
   Transform,
   Exclude,
 } from 'class-transformer'
-import { IJWTHeader } from './types'
+import { IJWTHeader, SupportedJWA } from './types'
 import { IJSONWebTokenAttrs, InteractionType } from './types'
 import { sha256 } from '../utils/crypto'
 import { IDigestable } from '../linkedDataSignature/types'
@@ -16,14 +16,17 @@ import { CredentialRequest } from './credentialRequest'
 import { Authentication } from './authentication'
 import { CredentialsReceive } from './credentialsReceive'
 import { keyIdToDid } from '../utils/helper'
-import { PaymentResponse } from './paymentResponse'
-import { PaymentRequest } from './paymentRequest'
 import { CredentialOfferResponse } from './credentialOfferResponse'
 import { CredentialOfferRequest } from './credentialOfferRequest'
 import { ErrorCodes } from '../errors'
 
 // JWTs are valid for one hour by default
 const DEFAULT_EXPIRY_MS = 60 * 60 * 1000
+
+const DEFAULT_JWT_HEADER = {
+  typ: 'JWT',
+  alg: SupportedJWA.ES256K
+}
 
 /* Local interfaces / types to save on typing later */
 
@@ -34,8 +37,6 @@ export type JWTEncodable =
   | CredentialOfferRequest
   | CredentialOfferResponse
   | CredentialsReceive
-  | PaymentRequest
-  | PaymentResponse
 
 interface IJWTEncodable {
   [key: string]: any
@@ -48,6 +49,8 @@ interface IPayloadSection<T> {
   iss?: string
   aud?: string
   typ?: string
+  // Proof of Control Authority
+  pca?: string
   interactionToken?: T
 }
 
@@ -71,10 +74,7 @@ const convertPayload = <T>(args: TransformArgs) => ({
 @Exclude()
 export class JSONWebToken<T> implements IDigestable {
   /* ES256K stands for ec signatures on secp256k1, de facto standard */
-  private _header: IJWTHeader = {
-    typ: 'JWT',
-    alg: 'ES256K',
-  }
+  private _header: IJWTHeader
   private _signature: string
   private _payload: IPayloadSection<T> = {}
 
@@ -173,8 +173,9 @@ export class JSONWebToken<T> implements IDigestable {
    * @returns {Object} - A json web token instance
    */
 
-  public static fromJWTEncodable<T>(toEncode: T): JSONWebToken<T> {
+  public static fromJWTEncodable<T>(toEncode: T, header = DEFAULT_JWT_HEADER): JSONWebToken<T> {
     const jwt = new JSONWebToken<T>()
+    jwt.header = header
     jwt.interactionToken = toEncode
     return jwt
   }
@@ -227,10 +228,19 @@ export class JSONWebToken<T> implements IDigestable {
     }
 
     return [
-      base64url.encode(JSON.stringify(this.header)),
-      base64url.encode(JSON.stringify(this.payload)),
+      base64url.stringify(Buffer.from(JSON.stringify(this.header)), { pad: false }),
+      base64url.stringify(Buffer.from(JSON.stringify(this.payload)), { pad: false }),
       this.signature,
     ].join('.')
+  }
+
+  public async asBytes() {
+    return Buffer.from(
+      [
+        base64url.stringify(Buffer.from(JSON.stringify(this.header)), { pad: false }),
+        base64url.stringify(Buffer.from(JSON.stringify(this.payload)), { pad: false }),
+      ].join('.'),
+    )
   }
 
   /*
@@ -239,12 +249,7 @@ export class JSONWebToken<T> implements IDigestable {
    */
 
   public async digest() {
-    const { encode } = base64url
-    const toSign = [
-      encode(JSON.stringify(this.header)),
-      encode(JSON.stringify(this.payload)),
-    ].join('.')
-    return sha256(Buffer.from(toSign))
+    return sha256(await this.asBytes())
   }
 
   public toJSON(): IJSONWebTokenAttrs {
@@ -301,10 +306,6 @@ const instantiateInteraction = <T>(
       return instantiator(CredentialResponse)
     case InteractionType.Authentication:
       return instantiator(Authentication)
-    case InteractionType.PaymentRequest:
-      return instantiator(PaymentRequest)
-    case InteractionType.PaymentResponse:
-      return instantiator(PaymentResponse)
   }
   throw new Error(ErrorCodes.JWTInvalidInteractionType)
 }

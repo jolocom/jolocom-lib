@@ -1,149 +1,157 @@
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
-import * as integrationHelper from './provision'
-import { IpfsStorageAgent } from '../../ts/ipfs/ipfs'
-import { EthResolver } from '../../ts/ethereum/ethereum'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import {
-  createJolocomRegistry,
-  JolocomRegistry,
-} from '../../ts/registries/jolocomRegistry'
-import { KeyTypes } from '../../ts/vaultedKeyProvider/types'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
-import { publicProfileCredJSON } from '../data/identity.data'
-import {
-  testEthereumConfig,
-  testIpfsConfig,
-  userVault,
   userPass,
-  serviceVault,
+  getNewVault,
   servicePass,
 } from './integration.data'
-import { SoftwareKeyProvider } from '../../ts/vaultedKeyProvider/softwareProvider'
-import { testSeed } from '../data/keys.data'
-import { ContractsGateway } from '../../ts/contracts/contractsGateway'
-import { ContractsAdapter } from '../../ts/contracts/contractsAdapter'
+import { ErrorCodes } from '../../ts/errors'
+import { IDidMethod } from '../../ts/didMethods/types'
+import { LocalDidMethod } from '../../ts/didMethods/local'
+import {
+  createIdentityFromKeyProvider,
+  authAsIdentityFromKeyProvider,
+} from '../../ts/didMethods/utils'
+import { claimsMetadata } from '@jolocom/protocol-ts'
+import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
+import { walletUtils } from '@jolocom/native-core'
+import { PublicKeySection } from '../../ts/identity/didDocument/sections'
 
 chai.use(sinonChai)
 const expect = chai.expect
 
 /* global before and after hook for integration tests & shared variables */
-export let jolocomRegistry: JolocomRegistry
+export let localDidMethod: IDidMethod
 export let userIdentityWallet: IdentityWallet
 export let serviceIdentityWallet: IdentityWallet
-export let testContractsGateway: ContractsGateway
-export let testContractsAdapter: ContractsAdapter
+export let userVault: SoftwareKeyProvider
+export let serviceVault: SoftwareKeyProvider
 
 before(async () => {
-  const {
-    testContractsGateway: gateway,
-    testContractsAdapter: adapter,
-  } = await integrationHelper.init()
+  localDidMethod = new LocalDidMethod()
 
-  testContractsGateway = gateway
-  testContractsAdapter = adapter
+  userVault = await getNewVault('id', userPass)
+  serviceVault = await getNewVault('id', servicePass)
 
-  jolocomRegistry = createJolocomRegistry({
-    ipfsConnector: new IpfsStorageAgent(testIpfsConfig),
-    ethereumConnector: new EthResolver(testEthereumConfig),
-    contracts: { gateway, adapter },
-  })
-
-  userIdentityWallet = await jolocomRegistry.create(userVault, userPass)
-  serviceIdentityWallet = await jolocomRegistry.create(
-    serviceVault,
-    servicePass,
-  )
-})
-
-after(() => {
-  process.exit(0)
+  userIdentityWallet = await createIdentityFromKeyProvider(userVault, userPass, localDidMethod.registrar)
+  serviceIdentityWallet = await createIdentityFromKeyProvider(serviceVault, servicePass, localDidMethod.registrar)
 })
 
 describe('Integration Test - Create, Resolve, Public Profile', () => {
+  const publicProfileContent = {
+    name: 'Test Service',
+    description: 'Integration test service',
+    url: 'https://test.com',
+    image: 'https://images.com',
+  }
+
   it('should correctly create user and service identities', async () => {
-    const remoteUserIdentity = await jolocomRegistry.resolve(
+    const remoteUserIdentity = await localDidMethod.resolver.resolve(
       userIdentityWallet.did,
     )
-    const remoteServiceIdentity = await jolocomRegistry.resolve(
+
+    const remoteServiceIdentity = await localDidMethod.resolver.resolve(
       serviceIdentityWallet.did,
     )
 
-    expect(remoteUserIdentity.didDocument).to.deep.eq(
-      userIdentityWallet.didDocument,
+    remoteUserIdentity.publicKeySection.map(section =>
+      expect(section).instanceOf(PublicKeySection),
     )
-    expect(remoteServiceIdentity.didDocument).to.deep.eq(
-      remoteServiceIdentity.didDocument,
+
+    remoteServiceIdentity.publicKeySection.map(section =>
+      expect(section).instanceOf(PublicKeySection),
     )
+
+    expect(remoteUserIdentity.publicKeySection.length).to.eq(2)
+    expect(remoteServiceIdentity.publicKeySection.length).to.eq(2)
+
+    // TODO Created on proof is generated ad-hoc, via date.now()
+    // expect(remoteUserIdentity.didDocument.toJSON()).to.deep.eq(
+    //   userIdentityWallet.didDocument.toJSON(),
+    // )
+
+    // expect(remoteServiceIdentity.didDocument.toJSON()).to.deep.eq(
+    //   remoteServiceIdentity.didDocument.toJSON(),
+    // )
   })
 
-  it('should correctly add and commit public profile', async () => {
-    const servicePublicProfile = SignedCredential.fromJSON(
-      publicProfileCredJSON,
+  // TODO No public profile on local method yet
+  it.skip('should correctly add and commit public profile', async () => {
+    await localDidMethod.registrar.updatePublicProfile(
+      serviceVault,
+      servicePass,
+      serviceIdentityWallet.identity,
+      await serviceIdentityWallet.create.signedCredential(
+        {
+          metadata: claimsMetadata.publicProfile,
+          claim: publicProfileContent,
+          subject: serviceIdentityWallet.did,
+        },
+        servicePass,
+      ),
     )
-    serviceIdentityWallet.identity.publicProfile = servicePublicProfile
 
-    await jolocomRegistry.commit({
-      vaultedKeyProvider: serviceVault,
-      identityWallet: serviceIdentityWallet,
-      keyMetadata: {
-        derivationPath: KeyTypes.ethereumKey,
-        encryptionPass: servicePass,
-      },
-    })
-
-    const remoteServiceIdentity = await jolocomRegistry.resolve(
+    const remoteServiceIdentity = await localDidMethod.resolver.resolve(
       serviceIdentityWallet.did,
     )
 
-    expect(remoteServiceIdentity.publicProfile).to.deep.eq(servicePublicProfile)
+    expect(remoteServiceIdentity.publicProfile.claim).to.deep.eq({
+      ...publicProfileContent,
+      id: remoteServiceIdentity.did,
+    })
     expect(remoteServiceIdentity.didDocument).to.deep.eq(
       remoteServiceIdentity.didDocument,
     )
   })
 
   it('should correctly implement authenticate with no public profile', async () => {
-    const wallet = await jolocomRegistry.authenticate(userVault, {
-      derivationPath: KeyTypes.jolocomIdentityKey,
-      encryptionPass: userPass,
-    })
-    expect(wallet.identity.didDocument).to.deep.eq(
-      userIdentityWallet.identity.didDocument,
+    const wallet = await authAsIdentityFromKeyProvider(
+      userVault,
+      userPass,
+      localDidMethod.resolver,
     )
+
+    // TODO On the local method created on proof is populated automatically
+    // expect(wallet.identity.didDocument).to.deep.eq(
+    //   userIdentityWallet.identity.didDocument,
+    // )
+
     expect(wallet.identity.publicProfile).to.deep.eq(
       userIdentityWallet.identity.publicProfile,
     )
   })
 
-  it('should correctly implement authenticate with public profile', async () => {
-    const wallet = await jolocomRegistry.authenticate(serviceVault, {
-      derivationPath: KeyTypes.jolocomIdentityKey,
-      encryptionPass: servicePass,
+  it.skip('should correctly implement authenticate with public profile', async () => {
+    const serviceIdentity = await authAsIdentityFromKeyProvider(
+      serviceVault,
+      servicePass,
+      localDidMethod.resolver,
+    )
+    expect(serviceIdentity.identity.publicProfile.subject).to.deep.eq(
+      serviceIdentity.did,
+    )
+    expect(serviceIdentity.identity.publicProfile.claim).to.deep.eq({
+      ...publicProfileContent,
+      id: serviceIdentity.did,
     })
-
-    const remoteDidDoc = wallet.didDocument.toJSON()
-    const localDidDoc = serviceIdentityWallet.didDocument.toJSON()
-
-    const remotePubProf = wallet.identity.publicProfile.toJSON()
-
-    const localPubProf = serviceIdentityWallet.identity.publicProfile.toJSON()
-
-    expect(remoteDidDoc).to.deep.eq(localDidDoc)
-    expect(remotePubProf).to.deep.eq(localPubProf)
   })
 
   it('should correctly fail to authenticate as non existing did', async () => {
-    const mockVault = SoftwareKeyProvider.fromSeed(testSeed, 'pass')
+    const mockVault = await SoftwareKeyProvider.newEmptyWallet(
+      walletUtils,
+      'did:un:wroooooooooong',
+      'pass',
+    )
 
     try {
-      await jolocomRegistry.authenticate(mockVault, {
-        derivationPath: KeyTypes.jolocomIdentityKey,
-        encryptionPass: 'pass',
-      })
-    } catch (err) {
-      expect(err.message).to.eq(
-        'Could not retrieve DID Document. No record for DID found.',
+      await authAsIdentityFromKeyProvider(
+        mockVault,
+        'pass',
+        localDidMethod.resolver,
       )
+    } catch (err) {
+      expect(err.message).to.contain(ErrorCodes.RegistryDIDNotAnchored)
     }
   })
 })

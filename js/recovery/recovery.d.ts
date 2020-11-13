@@ -1,6 +1,9 @@
-import { IdentityWallet } from '../identityWallet/identityWallet';
-import { IKeyDerivationArgs } from '../vaultedKeyProvider/types';
-import { JolocomRegistry } from '../registries/jolocomRegistry';
-declare function recoverFromSeedPhrase(registry: JolocomRegistry, mnemonicPhrase: string, keyMetaData: IKeyDerivationArgs): Promise<IdentityWallet>;
-declare function recoverFromShards(registry: JolocomRegistry, shards: string[], keyMetaData: IKeyDerivationArgs): Promise<IdentityWallet>;
-export { recoverFromSeedPhrase, recoverFromShards };
+export declare const SEED_PHRASE_LENGTH_LIST: number[];
+export declare function sliceSeedPhrase(seedPhrase: string): {
+    seed: string;
+    encodedDid: string;
+};
+export declare const shardsToMnemonic: (shards: string[]) => Promise<{
+    didPhrase: string;
+    seed: string;
+}>;

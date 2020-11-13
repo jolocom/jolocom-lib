@@ -1,6 +1,5 @@
 import 'reflect-metadata'
 import {
-  Type,
   plainToClass,
   classToPlain,
   Exclude,
@@ -28,10 +27,10 @@ import { keyIdToDid } from '../../utils/helper'
 export class EcdsaLinkedDataSignature
   implements ILinkedDataSignature, IDigestable {
   private _type = 'EcdsaKoblitzSignature2016'
-  private _creator: string = ''
+  private _creator = ''
   private _created: Date = new Date()
-  private _nonce: string = ''
-  private _signatureValue: string = ''
+  private _nonce = ''
+  private _signatureValue = ''
 
   /**
    * Get the creation date of the linked data signature
@@ -39,7 +38,7 @@ export class EcdsaLinkedDataSignature
    */
 
   @Expose()
-  @Type(() => Date)
+  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
   @Transform((value: Date) => value && value.toISOString(), {
     toPlainOnly: true,
   })
@@ -153,6 +152,10 @@ export class EcdsaLinkedDataSignature
     delete json.id
 
     return canonize(json)
+  }
+
+  public async asBytes(): Promise<Buffer> {
+    return Buffer.from(await this.normalize())
   }
 
   /**

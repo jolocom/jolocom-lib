@@ -9,7 +9,7 @@ Getting Started
 How to install the Jolocom library
 ###################################
 
-To begin using the Jolocom protocol, first install the Jolocom library as a dependency in your project. You can use ``npm`` or ``yarn`` to do so:
+To begin using the Jolocom library, first add it as a dependency in your project. You can use ``npm`` or ``yarn`` to do so:
 
 .. code-block:: bash
 
@@ -19,176 +19,90 @@ To begin using the Jolocom protocol, first install the Jolocom library as a depe
   # using yarn
   yarn add jolocom-lib
 
-Browser and React Native Environments
-#####################################
 
-To use the library in a browser or react native environment, you also need some polyfills as some of the dependencies assume running in a node environment
+.. note:: To use the library in a browser or a react native environment additional polyfilling is required. For an example of integrating this library with a react native application, please see the `Jolocom SmartWallet metro configuration <https://github.com/jolocom/smartwallet-app/blob/develop/metro.config.js>`_.
 
-.. code-block:: bash
-
-  # using npm
-  npm install --save vm-browserify crypto-browserify assert stream-browserify events
-
-  # using yarn
-  yarn add vm-browserify crypto-browserify assert stream-browserify events
-
-
-Also, you will need to configure your bundler (webpack, parcel, metro, etc) with aliases for the modules named \*-browserify
-
-For React Native's metro.config.js:
-
-.. code-block:: javascript
-
-  module.exports = {
-    resolver: {
-      extraNodeModules: {
-        // Polyfills for node libraries
-        "crypto": require.resolve("crypto-browserify"),
-        "stream": require.resolve("stream-browserify"),
-        "vm": require.resolve("vm-browserify")
-      }
-    },
-  }
-
-
-Also :code:`process.version` must be defined, so you might need to just set it in your index file:
-
-.. code-block:: javascript
-
-  process.version = 'v11.13.0'
 
 How to create a self-sovereign identity
 #########################################
 
-In broad strokes, the creation of a self-sovereign identity comprises the following steps:
+In the context of the Jolocom protocol / stack, an SSI is essentially a combination of a DID and a set of signing / encryption / controlling keys. The exact number and type of cryptographic keys required depends on the requirements of the used DID Method.
 
-* Instantiate a ``SoftwareKeyProvider``
-* Use the instantiated ``keyProvider`` to derive two keys, one to control your Jolocom identity, and another one to sign Ethereum transactions (e.g. for anchoring the identity, rotating keys, etc.)
-* Fuel the second derived key with enough Ether to pay for the transaction anchoring the identity
-* Instantiate and use the ``JolocomRegistry`` to create and anchor the DID document on the Ethereum network
-
-The following sections elaborate on these steps.
-
-**Instantiate the Key Provider class**
-
-The ``SoftwareKeyProvider`` class abstracts all functionality related to `deriving key pairs <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ and creating / validating cryptographic signatures.
-Currently two ways of instantiating the class are supported, namely using the constructor or using the static ``fromSeed`` method:
+Before a new identity can be created, a new ``SoftwareKeyProvider`` instance is required. This class is responsible for managing the cryptographic material associated with an identity. An empty key provider can be instantiated as follows:
 
 .. code-block:: typescript
 
-  import { JolocomLib } from 'jolocom-lib'
-  import { crypto } from 'crypto'
+  import { walletUtils } from '@jolocom/native-core'
+  import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
-  // Feel free to use a better rng module
-  const seed = crypto.randomBytes(32)
-  const password = 'secret'
+  const password = 'secretpassword'
 
-  const vaultedKeyProvider = JolocomLib.KeyProvider.fromSeed(seed, password)
-
-In the snippet above the ``fromSeed`` method is used. It takes the seed in cleartext, and a password that will be used as a key to encrypt the provided seed on the instance.
-
-.. note:: The password must be 32 bytes long **(the expected encoding is UTF-8)**. In case a password of a different length is provided (e.g. the example above), it will be hashed using ``sha256`` internally before usage. An appropriate warning will be printed to the console.
-
-The encrypted seed can be retrieved from the class instance using:
-
-.. code-block:: typescript
-
-  const encryptedSeed = vaultedKeyProvider.encryptedSeed
-
-.. note:: The returned value is a 64 byte ``Buffer``, containing the initialization vector (IV) (16 bytes) concatenated with the ciphertext (48 bytes). ``aes-256-cbc`` is used for encryption.
-
-The alternative way to instantiate the class by using it's constructor:
-
-.. code-block:: typescript
-
-  import { JolocomLib } from 'jolocom-lib'
-
-  const vaultedKeyProvider = new JolocomLib.KeyProvider(encryptedSeed)
-
-.. note:: The expected value for ``encryptedSeed`` is a 64 byte ``Buffer``, containing the initialization vector (IV) (16 bytes) concatenated with the ciphertext (48 bytes). ``aes-256-cbc`` will be used for decryption.
-
-**Derive a key to sign the Ethereum transaction**
-
-The ``vaultedKeyProvider`` just instantiated can be used to derive further key pairs necessary to complete the registration.
-We need to derive a key for signing the Ethereum transaction, which anchors the newly created identity.
-
-.. code-block:: typescript
-
-  const publicEthKey = vaultedKeyProvider.getPublicKey({
-    encryptionPass: secret
-    derivationPath: JolocomLib.KeyTypes.ethereumKey // "m/44'/60'/0'/0/0"
+  SoftwareKeyProvider.newEmptyWallet(walletUtils, 'id:', password).then(emptyWallet => {
+    console.log(emptyWallet)
   })
 
-.. seealso:: In the event that one of your keys becomes compromised, you only lose that one key. All other derived keys (including the most
-  important master key) remain secure. Go to `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_
-  if you want to find out more about this derivation scheme.
-  We are currently looking at key recovery solutions in case the master key itself is compromised.
-
-The only arguments that need to be passed to ``getPublicKey`` are the ``derivationPath``, in the format defined in `BIP-32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_, and the ``encryptionPass`` that was used to create the encryption cipher.
-The Jolocom library comes equipped with a few predefined paths for generating specific key pairs. The list will expand as new use cases are explored.  You can view the available paths as follows:
+At this point ``emptyWallet`` is not yet populated with a DID or any signing / encryption / identity management keys. The easiest way to configure the wallet with the required keys is to use the ``createIdentityFromKeyProvider`` helper provided by the Jolocom library:
 
 .. code-block:: typescript
 
-  console.log(JolocomLib.KeyTypes)
+  import { createIdentityFromKeyProvider } from 'jolocom-lib/js/didMethods/utils'
+  import { JolocomLib } from 'jolocom-lib'
 
-The next step involves transferring a small amount of ether to the Rinkeby address corresponding to the created key pair.
+  const didJolo = JolocomLib.didMethods.jolo
 
-**Transferring ether to the key**
+  // The emptyWallet created in the previous example
 
-In order to anchor the identity on the Ethereum network, a transaction must be assembled and broadcasted. In order to pay for the assembly and broadcasting, a small amount of ether needs to
-be present on the signing key. There are a few ways to receive ether on the Rinkeby test network, and the library also expose a helper function to assist:
-
-.. code-block:: typescript
-
-  await JolocomLib.util.fuelKeyWithEther(publicEthKey)
-
-This will send a request to a `fueling service <https://faucet.jolocom.com/balance>`_ Jolocom is currently hosting.
-
-**Anchoring the identity**
-
-The final step to creating a self-sovereign identity is anchoring the identity on Ethereum and storing the newly created DID document on IPFS.
-For these purposes, the ``JolocomRegistry`` can be used; it is essentially an implementation of a `DID resolver <https://w3c-ccg.github.io/did-spec/#did-resolvers>`_.
-The creation would look as follows:
-
-.. code-block:: typescript
-
-  const registry = JolocomLib.registries.jolocom.create()
-  await registry.create(vaultedKeyProvider, secret)
-
-Behind the scenes, two key pairs are derived from the seed. The first key is used to derive the DID and create a corresponding DID document.
-The second key is used to sign the Ethereum transaction, adding the new DID to the registry smart contract.
-
-.. note:: We intend to add support for `executable signed messages <https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1077.md>`_ in the next major release, thereby eliminating the need to derive two key pairs.
-
-Using the identity
-###################
-
-The ``create`` function presented in the previous section eventually returns an instance of the ``IdentityWallet`` class, which can be used
-to authenticate against services, issue credentials, and request data from other identities.
-Later sections will explore the exposed interface in more detail.
-
-In case you have already created your identity, and would like to instantiate an ``IdentityWallet``, you can
-simply run:
-
-.. code-block:: typescript
-
-  /**
-   * You will need to instantiate a Key Provider using the seed used for identity creation
-   * We are currently working on simplifying, and optimising this part of the api
-   */
-
-  const registry = JolocomLib.registries.jolocom.create()
-  const IdentityWallet = await registry.authenticate(vaultedKeyProvider, {
-    derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
-    encryptionPass: secret
+  createIdentityFromKeyProvider(
+    emptyWallet,
+    password,
+    didJolo.registrar
+  ).then(identityWallet => {
+    console.log(identityWallet.did)
   })
 
-What can I do now?
+
+The function takes an ``emptyWallet`` and the corresponding encryption ``password`` as the first two arguments. The ``password`` will be used to decrypt the wallet contents before adding new keys / changing the associated DID / storing metadata, etc. Once the wallet state has been updated, the same password is used to encrypt the new state.
+
+.. note:: Please note that this function mutates the contents of the wallet instance passed as an argument.
+   I.e. if the creation is successful, the ``emptyWallet.id`` will be set to the new DID, and the `emptyWallet.getPubKeys` method will return all populated keys.
+
+Deriving the required keys, as well as the wallet DID is fully delegated to the ``IRegistrar`` instance passed as the third argument. Internally, the ``registrar`` has access to the passed ``SoftwareKeyProvider`` instance, and can generate and persist all required keys according to the DID method specification. This approach results in greater flexibility when deriving keys (since the behavior is fully encapsulated in the ``registrar``), allowing for various approaches to cater to different needs (for instance, the ``JoloDidMethod`` and the ``LocalDidMethod`` modules internally rely on specifications such as `BIP32 <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>`_ and `SLIP0010 <https://github.com/satoshilabs/slips/blob/master/slip-0010.md>`_ respectively for HD key derivation and simpler backups / recovery).
+
+To reiterate, the ``registrar`` implementation encapsulates the specification(s) employed for deriving keys (including metadata required for derivation, such as paths, indexes, etc.), as well as the process for deriving a DID based on the aforementioned keys.
+
+Provisioning the ``SoftwareKeyProvider`` with keys and a DID is the first step of the identity creation process. At this point, a DID Document (which indexes the keys and DID we've just created) can be created and "anchored" (the exact operations are DID method specific, and might for example entail creating a record mapping the newly created DID and the DID Document in a `verifiable data registry <https://www.w3.org/TR/did-core/#dfn-verifiable-data-registry>`_).
+
+.. note:: For more documentation on the ``DidMethod`` abstraction, as well as examples of DID methods integrated with the Jolocom stack, check out the `jolo-did-method <https://github.com/jolocom/jolo-did-method>`_ and the `local-did-method <https://github.com/jolocom/local-did-method>`_ repositories.
+
+Please note that the wallet passed to this function is generally expected to be empty (i.e. the ``wallet.id`` value should not be set to a valid DID, and no keys should be present), with the configuration fully delegated to the specified ``registrar``.
+
+The ``JoloDidMethod`` and ``LocalDidMethod`` registrars can also create an identity using a correctly populated wallet (i.e. the ``id`` value is set to a correct DID matching the ``registrar's`` DID method prefix, and the wallet is populated with the right set of keys, of the right type. In this case, the key / DID generation steps are skipped, and the anchoring operations are fired right away. Whether this functionality is supported or not depends on the ``registrar`` implementation used.
+
+**In case the wallet is not empty, and populated with a DID / set of keys incompatible with the passed registrar, an error is thrown.**
+
+.. note:: Check out the `SoftwareKeyProvider documentation <https://github.com/jolocom/vaulted-key-provider>`_ for examples on how to manually populate a wallet instance with keys.
+
+How to reuse a self-sovereign identity
 #########################################
 
-So far, you have successfully created and anchored a digital self-sovereign identity. The subsequent sections cover how to:
+At later points, the identity can be reused if a ``SoftwareKeyProvider`` provisioned with the corresponding keys is available. The corresponding ``SoftwareKeyProvider`` can be instantiated in a number of ways (e.g. the wallet's encrypted contents can be persisted to storage, and read / decrypted later, or a BIP39 / SLIP0010 mnemonic can be saved as part of identity creation, and then retrieved / used to derive all required keys).
 
-* create a public profile and make it available through your DID document;
-* issue statements about yourself and others in form of signed `verifiable credentials <https://w3c.github.io/vc-data-model/>`_;
-* authenticate against other identities, share and receive signed verifiable credentials, and create various interaction tokens;
-* use custom connectors for IPFS and Ethereum communication.
+Given a populated wallet instance, the following alternative to ``authAsIdentityFromKeyProvider`` can be used to instantiate the identity:
+
+.. code-block:: typescript
+
+  import { JolocomLib } from 'jolocom-lib'
+  import { authAsIdentityFromKeyProvider } from 'jolocom-lib/js/didMethods/utils'
+
+  const didJolo = JolocomLib.didMethods.jolo
+
+  // E.g. using the previously created / populated SoftwareKeyProvider instance
+  authAsIdentityFromKeyProvider(
+    emptyWallet,
+    password,
+    didJolo.resolver
+  ).then(identityWallet => console.log(identityWallet.did))
+
+The function is similar to the helper we've used to create the identity, except that this function will not attempt to "anchor" the identity but rather it will try to resolve (as defined by the corresponding DID method specification) an existing identity based on the DID / keys held by the passed ``SoftwareKeyProvider`` instance.
+
+.. note:: For further examples of identity creation scenarios, check out the `Jolocom-SDK documentation <https://jolocom.github.io/jolocom-sdk/1.0.0-rc11/guides/identity/#creating-an-identity>`_

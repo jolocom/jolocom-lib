@@ -2,7 +2,7 @@
 
 Library for interacting with the self-sovereign identity solution provided by Jolocom.
 
-Interested in our vision? Take a look at our [whitepaper](https://jolocom.io/wp-content/uploads/2019/12/Jolocom-Whitepaper-v2.1-A-Decentralized-Open-Source-Solution-for-Digital-Identity-and-Access-Management.pdf) (we are refining our architecture currently, and will update the whitepaper accordingly).
+Interested in our vision? Take a look at our [whitepaper](http://jolocom.io/wp-content/uploads/2018/07/Jolocom-Technical-WP-_-Self-Sovereign-and-Decentralised-Identity-By-Design-2018-03-09.pdf) (it is currently outdated, and we are working on updating it).
 
 Want to use our library? Please refer to the following resources:
 
@@ -32,6 +32,3 @@ On VSCode, it is possible to allow ESLint to format upon saving of files, which 
 Additionally, we have included a script in package.json to allow use of ESlint/Prettier from the CLI:
 
 - `yarn format` will auto-fix as many problems as it can in the project in files with the extension `.ts`, and log unfixed errors to the console.
-
-## Contributing
-[Help Develop Jolocom Software](https://github.com/jolocom/jolocom#contributing)
