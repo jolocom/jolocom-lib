@@ -75,7 +75,7 @@ will fail. In case you would like to specify a custom expiry date, the following
 The easiest way to make the credential request consumable for the client applications is to encode it
 as a `JSON Web Token <https://jwt.io/introduction/>`_. This allows us to easily validate signatures on individual messages, as well as prevent replay attacks.
 
-.. note:: The interaction messages can be sent to other agents for processing via any preffered channel. In order to allow `SmartWallet <https://github.com/jolocom/smartwallet-app>`_ users to consume the message, it can be encoded as a QR code, or via "Deep Links"..
+.. note:: The interaction messages can be sent to other agents for processing via any preferred channel. In order to allow `SmartWallet <https://github.com/jolocom/smartwallet-app>`_ users to consume the message, it can be encoded as a QR code, or via "Deep Links"..
 
 **Consume a Signed Credential Request**
 
@@ -96,7 +96,7 @@ Once the request has been decoded, we can create the response:
 .. code-block:: typescript
 
   /**
-   * The callback url has to match the one in the request,
+   * The callback URL has to match the one in the request,
    */
 
   const credentialResponse = await identityWallet.create.interactionTokens.response.share({
@@ -117,12 +117,12 @@ the following method can be used:
   const localCredentials = [emailAddressSignedCredential, phoneNumberCredential]
   const localCredentialsJSON = localCredentials.map(credential => credential.toJSON())
 
-  // The api will change to take instances of the SignedCredential class as opposed to JSON encoded credentials
+  // The API will change to take instances of the SignedCredential class as opposed to JSON encoded credentials
   const validCredentials = credentialRequest.applyConstraints(localCredentialsJSON)
 
   console.log(validCredentials) // [emailAddressSignedCredential]
 
-Once the credential response has been assembled, it can be encoded and sent to the service's callback url:
+Once the credential response has been assembled, it can be encoded and sent to the service's callback URL:
 
 .. code-block:: typescript
 
@@ -148,7 +148,7 @@ After decoding the credential response, the service can verify that the user pas
   /**
    * We check against the request we created in a previous step
    * this requires the server to be stateful. We are currently
-   * expolring alternatives (such as embedding the request in the response token).
+   * exploring alternatives (such as embedding the request in the response token).
    */
 
   const validResponse = credentialResponse.satisfiesRequest(credentialRequest)
@@ -219,8 +219,8 @@ A more complex offer can be created as follows:
     }
   }
 
-.. note:: The ``metadata.asynchronous`` and ``requestedInput`` keys are not currently used, and act as placeholders. We are awaiting further standardisation efforts.
-    An example of such standardisation initiatives is the `Presentation Exchange specification <https://identity.foundation/presentation-exchange/>`_ proposal.
+.. note:: The ``metadata.asynchronous`` and ``requestedInput`` keys are not currently used, and act as placeholders. We are awaiting further standardization efforts.
+    An example of such standardization initiatives is the `Presentation Exchange specification <https://identity.foundation/presentation-exchange/>`_ proposal.
 
 The ``renderInfo`` is used to describe how a credential should be rendered and is currently supported
 by the Jolocom Smartwallet. The currently supported options are:

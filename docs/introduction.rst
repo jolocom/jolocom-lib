@@ -19,7 +19,7 @@ The Jolocom protocol is built using the following core specifications:
 A further component of the protocol architecture calls for the integration of a public, censorship-resistant, decentralized network for anchoring and resolving user identifiers. For this we currently use IPFS for storage and Ethereum for anchoring and indexing identifiers.
 
 
-.. warning:: Please be aware that the Jolocom library is still undergoing active develpoment. All identities are currently anchored on the Rinkeby testnet.
+.. warning:: Please be aware that the Jolocom library is still undergoing active development. All identities are currently anchored on the Rinkeby testnet.
 
   Please do not transfer any real ether to your Jolocom identity.
 

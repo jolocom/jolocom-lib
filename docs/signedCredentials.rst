@@ -50,7 +50,7 @@ The ``SignedCredential`` class provides a number of methods to easily consume th
     }
   }
 
-.. note:: Typings / deifnitions for credential types the library supports by default are made available through the ``@jolocom/protocol-ts`` ``npm`` package.
+.. note:: Typings / definitions for credential types the library supports by default are made available through the ``@jolocom/protocol-ts`` ``npm`` package.
   Alternatively, you can check out the GitHub repositories for the `core types <https://github.com/jolocom/cred-types-jolocom-core>`_, as well as `demo types <https://github.com/jolocom/cred-types-jolocom-demo>`_.
 
 It's worth noting that in the aforementioned credential, the ``issuer``, the ``subject``, and the signature ``creator`` are the same DID.
@@ -79,7 +79,7 @@ Taking a look at the newly created credential, we can indeed see that the ``subj
 .. code-block:: typescript
 
   // The credential in JSON form
-  // All irrelevant / repeating fields have been ommited.
+  // All irrelevant / repeating fields have been omitted.
 
   {
     '@context': [ ... ],
@@ -180,7 +180,7 @@ Let's take another look at the second example use case from the previous section
 
 The extra typing information - ``as {ageOver: number}`` is only relevant if you use TypeScript. It enables
 for auto-completion on the ``claim`` section when creating a ``SignedCredential`` of this type.
-If you develope in JavaScript, you can simply omit this line.
+If you develop in JavaScript, you can simply omit this line.
 
 **Creating and verifying custom credentials**
 
