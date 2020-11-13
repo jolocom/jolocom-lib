@@ -1,6 +1,8 @@
 The Jolocom Protocol - Own Your Digital Self
 ============================================
 
+.. image:: overview.jpg
+
 The Jolocom identity solution aims to be a universal, lightweight, open source protocol for decentralized digital identity and access right management.
 
 The Jolocom stack aggregates a number of existing specifications, largely adopted within the SSI community, and aims to simplify the creation / management of digital identities (including the associated data such as Verifiable Credentials), as well as enable for more complex interactions between the aforementioned identities.
@@ -22,7 +24,6 @@ The Jolocom protocol can be used to:
   :numbered:
   :caption: Where to go next?
 
-  introduction
   gettingStarted
   signedCredentials
   publicProfile
