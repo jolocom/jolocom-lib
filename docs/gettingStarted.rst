@@ -1,4 +1,4 @@
-Getting Started..
+Getting Started
 ===============
 
 .. warning::
@@ -20,43 +20,8 @@ To begin using the Jolocom library, first add it as a dependency in your project
   yarn add jolocom-lib
 
 
-Browser and React Native Environments
-#####################################
+.. note:: To use the library in a browser or a react native environment additional polyfilling is required. For an example of integrating this library with a react native application, please see the `Jolocom SmartWallet metro configuration <https://github.com/jolocom/smartwallet-app/blob/develop/metro.config.js>`_.
 
-To use the library in a browser or react native environment, you also need some polyfills as some of the dependencies assume running in a node environment
-
-.. code-block:: bash
-
-  # using npm
-  npm install --save vm-browserify crypto-browserify assert stream-browserify events
-
-  # using yarn
-  yarn add vm-browserify crypto-browserify assert stream-browserify events
-
-
-Also, you will need to configure your bundler (webpack, parcel, metro, etc) with aliases for the modules named \*-browserify
-
-For React Native's metro.config.js:
-
-.. code-block:: javascript
-
-  module.exports = {
-    resolver: {
-      extraNodeModules: {
-        // Polyfills for node libraries
-        "crypto": require.resolve("crypto-browserify"),
-        "stream": require.resolve("stream-browserify"),
-        "vm": require.resolve("vm-browserify")
-      }
-    },
-  }
-
-
-Also :code:`process.version` must be defined, so you might need to just set it in your index file:
-
-.. code-block:: javascript
-
-  process.version = 'v11.13.0'
 
 How to create a self-sovereign identity
 #########################################
@@ -71,6 +36,7 @@ Before a new identity can be created, a new ``SoftwareKeyProvider`` instance is 
   import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 
   const password = 'secretpassword'
+
   SoftwareKeyProvider.newEmptyWallet(walletUtils, 'id:', password).then(emptyWallet => {
     console.log(emptyWallet)
   })
@@ -116,7 +82,8 @@ The ``JoloDidMethod`` and ``LocalDidMethod`` registrars can also create an ident
 
 .. note:: Check out the `SoftwareKeyProvider docmentation <https://github.com/jolocom/vaulted-key-provider>`_ for examples on how to manually populate a wallet instance with keys.
 
-**Reusing an identity**
+How to reuse a self-sovereign identity
+#########################################
 
 At later points, the identity can be reused if a ``SoftwareKeyProvider`` provisioned with the corresponding keys is available. The corresponding ``SoftwareKeyProvider`` can be instantiated in a number of ways (e.g. the wallet's encrypted contents can be persisted to storage, and read / decrypted later, or a BIP39 / SLIP0010 mnemonic can be saved as part of identity creation, and then retrieved / used to derive all required keys).
 
@@ -139,5 +106,3 @@ Given a populated wallet instance, the following alternative to ``authAsIdentity
 The function is simillar to the helper we've used to create the identity, except that this function will not attempt to "anchor" the identity but rather it will try to resolve (as defined by the corresponding DID method specification) an existing identity based on the DID / keys held by the passed ``SoftwareKeyProvider`` instance. This can
 
 .. note:: For further examples of identity creation scenarios, check out the `Jolocom-SDK documentation <https://jolocom.github.io/jolocom-sdk/1.0.0-rc11/guides/identity/#creating-an-identity>`_
-
-TODO - is the browser / native section still needed?
