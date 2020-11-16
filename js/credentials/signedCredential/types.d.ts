@@ -1,19 +1,5 @@
-import { ICredentialAttrs, IClaimSection } from '../credential/types';
-import { BaseMetadata } from 'cred-types-jolocom-core';
-import { SignedJsonLdObject } from '../../linkedData/types';
-export interface ISignedCredentialAttrs extends SignedJsonLdObject, ICredentialAttrs {
-    id: string;
-    issuer: string;
-    issued: string;
-    expires?: string;
-    claim: IClaimSection;
-}
-export interface ISignedCredCreationArgs<T extends BaseMetadata> {
-    metadata: T;
-    claim: T['claimInterface'];
-    subject: string;
-}
-export interface IKeyMetadata {
-    derivationPath: string;
+export * from '@jolocom/protocol-ts/dist/lib/signedCredential';
+export interface ISigner {
+    did: string;
     keyId: string;
 }

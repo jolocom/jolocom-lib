@@ -2,6 +2,7 @@ import { testPublicIdentityKey } from './keys.data'
 import {
   mockDid,
   mockKeyId,
+  mockKeyId2,
   mockPublicKeyHex,
   mockIpfsHash,
 } from './didDocument.data'
@@ -12,20 +13,21 @@ export const mockPubKeySectionCreationAttrs = {
   keyId: mockKeyId,
 }
 
-export const mockPubKeySectionJSON = {
+export const mockPublicKey = {
   id: mockKeyId,
-  type: 'Secp256k1VerificationKey2018',
-  owner: mockDid,
+  type: 'EcdsaSecp256k1VerificationKey2019',
+  controller: mockDid,
+  publicKeyHex: mockPublicKeyHex,
+}
+export const mockPublicKey2 = {
+  id: mockKeyId2,
+  type: 'EcdsaSecp256k1VerificationKey2019',
+  controller: mockDid,
   publicKeyHex: mockPublicKeyHex,
 }
 
-export const mockAuthSectionJSON = {
-  publicKey: mockKeyId,
-  type: 'Secp256k1SignatureAuthentication2018',
-}
-
 export const mockPubProfServiceEndpointJSON = {
-  id: `${mockDid};jolocomPubProfile`,
+  id: `${mockDid}#jolocomPubProfile`,
   serviceEndpoint: `ipfs://${mockIpfsHash}`,
   description: 'Verifiable Credential describing entity profile',
   type: 'JolocomPublicProfile',

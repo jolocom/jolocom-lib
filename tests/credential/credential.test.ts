@@ -1,10 +1,7 @@
-import { claimsMetadata } from 'cred-types-jolocom-core'
+import { claimsMetadata } from '@jolocom/protocol-ts'
 import { expect } from 'chai'
 import { Credential } from '../../ts/credentials/credential/credential'
-import {
-  EmailClaimMetadata,
-  NameClaimMetadata,
-} from 'cred-types-jolocom-core/js/types'
+import { EmailClaimMetadata, NameClaimMetadata } from '@jolocom/protocol-ts'
 import { defaultContext } from '../../ts/utils/contexts'
 import {
   emailCredentialJSON,

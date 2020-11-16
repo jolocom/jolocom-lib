@@ -7,9 +7,9 @@ import { Identity } from '../../ts/identity/identity'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 const expect = chai.expect
 
-describe('Identity', () => {
+describe('Identity', async () => {
   let clock
-  const mockDidDocument = DidDocument.fromPublicKey(testPublicIdentityKey)
+  const mockDidDocument = await DidDocument.fromPublicKey(testPublicIdentityKey)
   const mockPublicProfile = SignedCredential.fromJSON(publicProfileCredJSON)
 
   before(() => {
@@ -41,6 +41,31 @@ describe('Identity', () => {
     expect(identity.didDocument).to.eq(mockDidDocument)
     expect(identity.publicKeySection).to.eq(mockDidDocument.publicKey)
     expect(identity.serviceEndpointSections).to.eq(mockDidDocument.service)
+  })
+
+  describe('Serialize as JSON and Parse from JSON', () => {
+    it ('Should correctly instantiate from JSON', () => {
+      const identity = Identity.fromJSON({
+        didDocument: mockDidDocument.toJSON(),
+        publicProfile: publicProfileCredJSON,
+      })
+
+      expect(identity.didDocument).to.deep.eq(mockDidDocument)
+      expect(identity.publicProfile).to.deep.eq(mockPublicProfile)
+      expect(identity.did).to.deep.eq(mockDidDocument.did)
+    })
+
+    it ('Should correctly serialize to JSON', () => {
+      const identity = Identity.fromDidDocument({
+        didDocument: mockDidDocument,
+        publicProfile: mockPublicProfile,
+      })
+
+      expect(identity.toJSON()).to.deep.eq({
+        didDocument: mockDidDocument.toJSON(),
+        publicProfile: mockPublicProfile.toJSON(),
+      })
+    })
   })
 
   /*

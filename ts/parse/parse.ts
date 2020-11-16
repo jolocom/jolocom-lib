@@ -3,7 +3,7 @@ import { Credential } from '../credentials/credential/credential'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { ICredentialAttrs } from '../credentials/credential/types'
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
-import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
+import { JSONWebToken } from '../interactionTokens/JSONWebToken'
 import { IJSONWebTokenAttrs } from '../interactionTokens/types'
 
 /**
@@ -14,10 +14,8 @@ import { IJSONWebTokenAttrs } from '../interactionTokens/types'
 
 export interface ParseMethods {
   interactionToken: {
-    fromJWT: <T extends JWTEncodable>(jwt: string) => JSONWebToken<T>
-    fromJSON: <T extends JWTEncodable>(
-      json: IJSONWebTokenAttrs,
-    ) => JSONWebToken<T>
+    fromJWT: <T>(jwt: string) => JSONWebToken<T>
+    fromJSON: <T>(json: IJSONWebTokenAttrs) => JSONWebToken<T>
   }
   credential: (json: ICredentialAttrs) => Credential
   signedCredential: (json: ISignedCredentialAttrs) => SignedCredential
@@ -26,5 +24,8 @@ export interface ParseMethods {
 export const parse: ParseMethods = {
   interactionToken: JSONWebTokenParser,
   credential: Credential.fromJSON,
-  signedCredential: SignedCredential.fromJSON,
+  //@dev This function is defined this way to avoid the issue -- when this file first evaluates, SignedCredential is undefined,
+  //and trying to reference the static .fromJSON method throws.
+  signedCredential: (json: ISignedCredentialAttrs) =>
+    SignedCredential.fromJSON(json),
 }

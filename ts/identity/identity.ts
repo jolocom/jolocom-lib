@@ -1,12 +1,21 @@
+import { classToPlain, plainToClass, Type, Exclude, Expose } from 'class-transformer'
 import { DidDocument } from './didDocument/didDocument'
 import { SignedCredential } from '../credentials/signedCredential/signedCredential'
 import { IIdentityCreateArgs } from './types'
+import { IDidDocumentAttrs } from './didDocument/types'
+import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 /**
  * @class
  * Class representing an identity, combines a {@link DidDocument} and a public profile {@link SignedCredential}
  */
 
+interface IdentityAttributes {
+  didDocument: IDidDocumentAttrs
+  publicProfile?: ISignedCredentialAttrs
+}
+
+@Exclude()
 export class Identity {
   private _didDocument: DidDocument
   private _publicProfileCredential?: SignedCredential
@@ -33,7 +42,8 @@ export class Identity {
    * Get the did document associated with the identity
    * @example `console.log(identity.didDocument) // DidDocument {...}`
    */
-
+  @Expose()
+  @Type(() => DidDocument)
   get didDocument(): DidDocument {
     return this._didDocument
   }
@@ -70,6 +80,8 @@ export class Identity {
    * @example `console.log(identity.publicProfile) // SignedCredential {...}`
    */
 
+  @Expose()
+  @Type(() => SignedCredential)
   get publicProfile() {
     return this._publicProfileCredential
   }
@@ -101,5 +113,21 @@ export class Identity {
     }
 
     return identity
+  }
+
+  /**
+   * Serializes the {@link Identity}
+   */
+
+  public toJSON(): IdentityAttributes {
+    return classToPlain(this) as IdentityAttributes
+  }
+
+  /**
+   * Instantiates an {@link Identity} from it's JSON form
+   * @param json - JSON containing {link @Identity} members
+   */
+  public static fromJSON(json: IdentityAttributes): Identity {
+    return plainToClass(Identity, json)
   }
 }

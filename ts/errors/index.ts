@@ -16,7 +16,9 @@ export enum ErrorCodes {
   IDWInvalidCreationArgs = 'IDWInvalidCreationArgs',
   IDWInvalidJWTSignature = 'IDWInvalidJWTSignature',
   IDWNotIntendedAudience = 'IDWNotIntendedAudience',
+  IDWNotCorrectResponder = 'IDWNotCorrectResponder',
   IDWIncorrectJWTNonce = 'IDWIncorrectJWTNonce',
   IDWTokenExpired = 'IDWTokenExpired',
   VCInvalidExpiryDate = 'VCInvalidExpiryDate',
+  InvalidSignature = 'InvalidSignature',
 }

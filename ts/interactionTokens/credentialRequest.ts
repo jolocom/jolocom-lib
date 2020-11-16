@@ -142,9 +142,7 @@ const assembleStatement = (
   operator: Operator,
   field: string,
   value: string | Comparable,
-): IConstraint => {
-  return { [operator]: [{ var: field }, value] } as IConstraint
-}
+): IConstraint => ({ [operator]: [{ var: field }, value] } as IConstraint)
 
 /**
  * Compares two arrays by going through the elements
@@ -153,6 +151,5 @@ const assembleStatement = (
  * @ignore
  */
 
-const areCredTypesEqual = (first: string[], second: string[]): boolean => {
-  return first.every((el, index) => el === second[index])
-}
+const areCredTypesEqual = (first: string[], second: string[]): boolean =>
+  first.every((el, index) => el === second[index])

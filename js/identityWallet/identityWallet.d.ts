@@ -1,72 +1,66 @@
-import { BaseMetadata } from 'cred-types-jolocom-core';
+/// <reference types="node" />
+import { BaseMetadata } from '@jolocom/protocol-ts';
 import { Credential } from '../credentials/credential/credential';
 import { SignedCredential } from '../credentials/signedCredential/signedCredential';
-import { ExclusivePartial, IIdentityWalletCreateArgs } from './types';
+import { ExclusivePartial, IKeyMetadata, IIdentityWalletCreateArgs } from './types';
 import { Identity } from '../identity/identity';
-import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken';
-import { PaymentRequest } from '../interactionTokens/paymentRequest';
+import { JSONWebToken } from '../interactionTokens/JSONWebToken';
+import { Authentication } from '../interactionTokens/authentication';
 import { CredentialRequest } from '../interactionTokens/credentialRequest';
-import { KeyTypes } from '../vaultedKeyProvider/types';
-import { IKeyMetadata, ISignedCredCreationArgs } from '../credentials/signedCredential/types';
-import { ITransactionEncodable } from '../contracts/types';
-import { IRegistry } from '../registries/types';
+import { ISignedCredCreationArgs } from '../credentials/signedCredential/types';
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest';
-import { CredentialOfferRequestAttrs, CredentialOfferResponseAttrs, IAuthenticationAttrs, ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs, IPaymentRequestAttrs, IPaymentResponseAttrs } from '../interactionTokens/interactionTokens.types';
-interface PaymentRequestCreationArgs {
-    callbackURL: string;
-    description: string;
-    transactionOptions: ExclusivePartial<IPaymentRequestAttrs['transactionOptions'], 'value'>;
-}
-declare type PublicKeyMap = {
-    [key in keyof typeof KeyTypes]?: string;
-};
+import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse';
+import { CredentialOfferRequestAttrs, CredentialOfferResponseAttrs, IAuthenticationAttrs, ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs } from '../interactionTokens/interactionTokens.types';
+import { KeyTypes } from '@jolocom/vaulted-key-provider';
+import { IResolver } from '../didMethods/types';
 declare type WithExtraOptions<T> = T & {
     expires?: Date;
+    aud?: string;
+    pca?: string;
 };
 export declare class IdentityWallet {
     private _identity;
     private _publicKeyMetadata;
-    private _vaultedKeyProvider;
-    private _contractsAdapter;
-    private _contractsGateway;
+    private _keyProvider;
     did: string;
     identity: Identity;
     didDocument: import("../identity/didDocument/didDocument").DidDocument;
     publicKeyMetadata: IKeyMetadata;
-    private vaultedKeyProvider;
-    constructor({ identity, publicKeyMetadata, vaultedKeyProvider, contractsGateway, contractsAdapter, }: IIdentityWalletCreateArgs);
+    constructor({ identity, publicKeyMetadata, vaultedKeyProvider, }: IIdentityWalletCreateArgs);
     private createSignedCred;
-    private createAuth;
-    private createCredOfferRequest;
-    private createCredentialOfferResponse;
-    private createCredReq;
-    private createCredResp;
-    private createCredReceive;
-    getPublicKeys: (encryptionPass: string) => PublicKeyMap;
-    private createPaymentReq;
-    private createPaymentResp;
+    private createMessage;
+    private makeReq;
+    private makeRes;
+    private messageCannonicaliser;
+    getPublicKeys: (encryptionPass: string) => Promise<import("@jolocom/vaulted-key-provider").PublicKeyInfo[]>;
     private initializeAndSign;
-    validateJWT<T extends JWTEncodable, A extends JWTEncodable>(receivedJWT: JSONWebToken<T>, sendJWT?: JSONWebToken<A>, customRegistry?: IRegistry): Promise<void>;
-    private sendTransaction;
-    transactions: {
-        sendTransaction: (request: ITransactionEncodable, pass: string) => Promise<string>;
-    };
+    validateJWT<T, R>(receivedJWT: JSONWebToken<T>, sentJWT?: JSONWebToken<R>, resolver?: IResolver): Promise<void>;
+    asymEncrypt: (data: Buffer, key: Buffer, type: KeyTypes) => Promise<Buffer>;
+    asymEncryptToDidKey: (data: Buffer, keyRef: string, resolver?: IResolver) => Promise<Buffer>;
+    asymEncryptToDid: (data: Buffer, did: string, resolver?: IResolver) => Promise<Buffer>;
+    asymDecrypt: (data: Buffer, pass: string) => Promise<Buffer>;
+    sign: (data: Buffer, pass: string) => Promise<Buffer>;
     create: {
         credential: typeof Credential.create;
         signedCredential: <T extends BaseMetadata>({ expires, ...credentialParams }: WithExtraOptions<ISignedCredCreationArgs<T>>, pass: string) => Promise<SignedCredential>;
+        message: <T_1, R>(args: {
+            message: T_1;
+            typ: string;
+            expires?: Date;
+            aud?: string;
+            pca?: string;
+        }, pass: string, recieved?: JSONWebToken<R>) => Promise<JSONWebToken<T_1>>;
         interactionTokens: {
             request: {
-                auth: (authArgs: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
-                offer: (credOffer: WithExtraOptions<CredentialOfferRequestAttrs>, pass: string) => Promise<JSONWebToken<CredentialOfferRequest>>;
-                share: (credReq: WithExtraOptions<ICredentialRequestAttrs>, pass: string) => Promise<JSONWebToken<CredentialRequest>>;
-                payment: (paymentReq: WithExtraOptions<PaymentRequestCreationArgs>, pass: string) => Promise<JSONWebToken<PaymentRequest>>;
+                auth: ({ expires, aud, pca, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string) => Promise<JSONWebToken<any>>;
+                offer: ({ expires, aud, pca, ...message }: WithExtraOptions<CredentialOfferRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
+                share: ({ expires, aud, pca, ...message }: WithExtraOptions<ICredentialRequestAttrs>, pass: string) => Promise<JSONWebToken<any>>;
             };
             response: {
-                auth: (authArgs: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
-                offer: (credentialOfferResponse: WithExtraOptions<CredentialOfferResponseAttrs>, pass: string, receivedJWT?: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
-                share: (credResp: WithExtraOptions<ICredentialResponseAttrs>, pass: string, receivedJWT: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
-                issue: (credReceive: WithExtraOptions<ICredentialsReceiveAttrs>, pass: string, receivedJWT: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
-                payment: (paymentResp: WithExtraOptions<IPaymentResponseAttrs>, pass: string, receivedJWT: JSONWebToken<JWTEncodable>) => Promise<JSONWebToken<JWTEncodable>>;
+                auth: ({ expires, aud, pca, ...message }: WithExtraOptions<ExclusivePartial<IAuthenticationAttrs, "callbackURL">>, pass: string, recieved?: JSONWebToken<Authentication>) => Promise<JSONWebToken<any>>;
+                offer: ({ expires, aud, pca, ...message }: WithExtraOptions<CredentialOfferResponseAttrs>, pass: string, recieved?: JSONWebToken<CredentialOfferRequest>) => Promise<JSONWebToken<any>>;
+                share: ({ expires, aud, pca, ...message }: WithExtraOptions<ICredentialResponseAttrs>, pass: string, recieved?: JSONWebToken<CredentialRequest>) => Promise<JSONWebToken<any>>;
+                issue: ({ expires, aud, pca, ...message }: WithExtraOptions<ICredentialsReceiveAttrs>, pass: string, recieved?: JSONWebToken<CredentialOfferResponse>) => Promise<JSONWebToken<any>>;
             };
         };
     };

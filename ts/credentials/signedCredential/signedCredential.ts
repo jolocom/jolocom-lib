@@ -7,20 +7,24 @@ import {
   Transform,
   Type,
 } from 'class-transformer'
-import { digestJsonLd } from '../../linkedData'
-import { ISignedCredCreationArgs, ISignedCredentialAttrs } from './types'
+import { digestJsonLd, normalizeSignedLdObject } from '../../linkedData'
+import {
+  ISignedCredCreationArgs,
+  ISignedCredentialAttrs,
+  ISigner,
+} from './types'
 import {
   IDigestable,
   ILinkedDataSignature,
 } from '../../linkedDataSignature/types'
-import { BaseMetadata } from 'cred-types-jolocom-core'
+import { BaseMetadata } from '@jolocom/protocol-ts'
 import { IClaimSection } from '../credential/types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { JsonLdContext } from '../../linkedData/types'
-import { ISigner } from '../../registries/types'
 import { Credential } from '../credential/credential'
-import { SoftwareKeyProvider } from '../../vaultedKeyProvider/softwareProvider'
 import { ErrorCodes } from '../../errors'
+import { getRandomBytes } from '../../utils/crypto'
+import { randomBytes } from 'crypto'
 
 // Credentials are valid for a year by default
 const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
@@ -31,8 +35,8 @@ const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
  * @param length - The length of the random part of the identifier
  */
 
-const generateClaimId = (length: number): string =>
-  `claimId:${SoftwareKeyProvider.getRandom(length).toString('hex')}`
+const generateClaimId = (length: number) =>
+  `claimId:${randomBytes(length).toString('hex')}`
 
 /**
  * @description Data needed to prepare signature on credential
@@ -334,7 +338,8 @@ export class SignedCredential implements IDigestable {
     if (signedCredential.expires <= signedCredential.issued) {
       throw new Error(ErrorCodes.VCInvalidExpiryDate)
     }
-    signedCredential.prepareSignature(issInfo.keyId)
+
+    await signedCredential.prepareSignature(issInfo.keyId)
     signedCredential.issuer = issInfo.issuerDid
 
     return signedCredential
@@ -346,11 +351,15 @@ export class SignedCredential implements IDigestable {
    * @internal
    */
 
-  private prepareSignature(keyId: string) {
+  private async prepareSignature(keyId: string) {
     this.proof.creator = keyId
     // TODO Is this needed?
     this.proof.signature = ''
-    this.proof.nonce = SoftwareKeyProvider.getRandom(8).toString('hex')
+    this.proof.nonce = (await getRandomBytes(8)).toString('hex')
+  }
+
+  public async asBytes(): Promise<Buffer> {
+    return normalizeSignedLdObject(this.toJSON(), this.context)
   }
 
   /**

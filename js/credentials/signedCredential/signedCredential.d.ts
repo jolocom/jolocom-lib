@@ -1,11 +1,10 @@
 /// <reference types="node" />
 import 'reflect-metadata';
-import { ISignedCredCreationArgs, ISignedCredentialAttrs } from './types';
+import { ISignedCredCreationArgs, ISignedCredentialAttrs, ISigner } from './types';
 import { IDigestable, ILinkedDataSignature } from '../../linkedDataSignature/types';
-import { BaseMetadata } from 'cred-types-jolocom-core';
+import { BaseMetadata } from '@jolocom/protocol-ts';
 import { IClaimSection } from '../credential/types';
 import { JsonLdContext } from '../../linkedData/types';
-import { ISigner } from '../../registries/types';
 interface IIssInfo {
     keyId: string;
     issuerDid: string;
@@ -34,6 +33,7 @@ export declare class SignedCredential implements IDigestable {
     name: string;
     static create<T extends BaseMetadata>(credentialOptions: ISignedCredCreationArgs<T>, issInfo: IIssInfo, expires?: Date): Promise<SignedCredential>;
     private prepareSignature;
+    asBytes(): Promise<Buffer>;
     digest(): Promise<Buffer>;
     static fromJSON(json: ISignedCredentialAttrs): SignedCredential;
     toJSON(): ISignedCredentialAttrs;

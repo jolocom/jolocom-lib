@@ -1,38 +1,34 @@
 {
   "name": "jolocom-lib",
-  "version": "4.1.0",
+  "version": "5.1.0",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "files": [
     "js/"
   ],
   "typings": "js/index.d.ts",
+  "husky": {
+    "hooks": {}
+  },
   "scripts": {
-    "test": "yarn clean; nyc mocha --opts ./mocha.opts ./tests/**/*.test.ts --exit",
+    "test": "nyc --reporter=lcov --reporter=text-summary mocha --exit",
     "clean": "rm -rf ./js",
     "prepublish": "yarn clean; yarn build",
     "build": "tsc -p .",
     "build:watch": "tsc -w -p .",
-    "test:watch": "mocha --opts ./mocha.opts -w ./tests/**/*.test.ts",
-    "test:debug": "mocha --opts ./mocha.opts --inspect -w ./tests/**/*.test.ts",
-    "test:single": "nyc -r lcov -r text mocha --opts ./mocha.opts",
-    "test:integration": "mocha --opts ./mocha.opts ./tests/**/*.integration.ts",
-    "format": "eslint --fix --ext .ts .",
+    "test:watch": "mocha -w ./tests/**/*.test.ts",
+    "test:debug": "mocha --inspect -w ./tests/**/*.test.ts",
+    "test:integration": "nyc mocha --require ts-node/register ./tests/**/*.integration.ts --exit",
+    "format": "eslint --fix --ext .ts ./ts",
     "generate-api-docs": "typedoc ./ts"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "precise-commits",
-      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
-    }
   },
   "nyc": {
     "include": [
-      "./ts/**/*.ts"
+      "ts/**/*.ts"
     ],
     "exclude": [
-      "./**/types.ts",
-      "./**/*.types.ts"
+      "**/types.ts",
+      "**/*.types.ts"
     ],
     "extension": [
       ".ts"
@@ -69,55 +65,55 @@
   "license": "MIT",
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
-    "base64url": "^3.0.1",
-    "bip32": "^1.0.2",
-    "bip39": "^3.0.1",
-    "class-transformer": "^0.1.10",
+    "@hawkingnetwork/ed25519-hd-key-rn": "^1.0.1",
+    "@jolocom/jolo-did-registrar": "^1.0.0",
+    "@jolocom/jolo-did-resolver": "^1.0.0",
+    "@jolocom/local-resolver-registrar": "^1.0.1",
+    "@jolocom/native-core": "^1.0.0",
+    "@jolocom/protocol-ts": "^0.5.1",
+    "@jolocom/vaulted-key-provider": "^0.7.4",
+    "@types/sinon": "^9.0.5",
+    "bip39": "^3.0.2",
+    "class-transformer": "^0.3.1",
     "create-hash": "^1.2.0",
-    "cred-types-jolocom-core": "^0.0.11",
-    "detect-node": "^2.0.4",
-    "eccrypto": "rootstock/eccrypto#485e11f163093fb6e0d5263fa46ed5075dedfe88",
-    "ethereumjs-tx": "^1.3.7",
+    "did-resolver": "2.0.0",
     "ethereumjs-util": "^6.1.0",
-    "ethers": "^4.0.27",
-    "form-data": "^2.3.3",
-    "jolocom-registry-contract": "^0.1.7",
-    "json-logic-js": "^1.2.2",
-    "jsonld": "^1.5.3",
+    "hdkey": "^2.0.1",
+    "json-logic-js": "^2.0.0",
+    "jsonld": "^1.6.1",
     "jsontokens": "^1.0.0",
-    "node-fetch": "^2.3.0",
-    "qrcode": "^1.3.3",
+    "node-fetch": "^2.6.1",
     "reflect-metadata": "^0.1.13",
-    "secrets.js-grempe": "^1.1.0",
-    "sinon-chai": "^3.3.0",
-    "tiny-secp256k1": "^1.0.1"
+    "rfc4648": "^1.4.0",
+    "secrets.js-grempe": "^1.1.0"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/bip39": "^2.4.2",
-    "@types/chai": "^4.1.7",
-    "@types/mocha": "^5.2.6",
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.3",
     "@types/node": "^11.9.4",
-    "@typescript-eslint/eslint-plugin": "^1.5.0",
-    "@typescript-eslint/parser": "^1.5.0",
+    "@types/sinon-chai": "^3.2.4",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
     "chai": "^4.2.0",
     "commitizen": "^4.0.3",
     "cz-conventional-changelog": "3.0.2",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^4.1.0",
-    "eslint-plugin-prettier": "^3.0.1",
-    "ganache-core": "^2.4.0",
-    "husky": "^3.0.5",
-    "ipfsd-ctl": "^0.42.0",
+    "eslint": "^7.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.2.5",
     "istanbul": "^0.4.5",
-    "mocha": "^5.0.0",
-    "nyc": "^12.0.2",
+    "mocha": "^8.1.3",
+    "nyc": "^15.1.0",
     "precise-commits": "^1.0.2",
     "prettier": "^1.18.2",
-    "sinon": "^7.2.5",
-    "source-map-support": "^0.5.10",
-    "ts-node": "^8.0.2",
+    "sinon": "^9.0.3",
+    "sinon-chai": "^3.5.0",
+    "source-map-support": "^0.5.19",
+    "ts-node": "^9.0.0",
     "typedoc": "^0.14.2",
-    "typescript": "^3.6.3"
+    "typescript": "3.6.3"
   },
   "config": {
     "commitizen": {

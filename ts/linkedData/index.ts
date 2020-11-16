@@ -1,11 +1,12 @@
-import { SoftwareKeyProvider } from '../vaultedKeyProvider/softwareProvider'
 import { ILinkedDataSignatureAttrs } from '../linkedDataSignature/types'
-import { getIssuerPublicKey, keyIdToDid } from '../utils/helper'
-import { IRegistry } from '../registries/types'
-import { registries } from '../registries/'
+import { keyIdToDid, parseHexOrBase64 } from '../utils/helper'
 import { sha256 } from '../utils/crypto'
 import { canonize } from 'jsonld'
 import { JsonLdObject, SignedJsonLdObject, JsonLdContext } from './types'
+import { JoloDidMethod } from '../didMethods/jolo'
+import { verifySignatureWithIdentity } from '../utils/validation'
+import { Identity } from '../identity/identity'
+import { IResolver } from '../didMethods/types'
 
 /**
  * Helper function to handle JsonLD normalization.
@@ -32,10 +33,19 @@ export const normalizeJsonLd = async (
  * @param context - JsonLD context to use during normalization
  */
 
-export const normalizeLdProof = async (
+const normalizeLdProof = async (
   { signatureValue, id, type, ...toNormalize }: ILinkedDataSignatureAttrs,
   context: JsonLdContext,
 ): Promise<string> => normalizeJsonLd(toNormalize, context)
+
+export const normalizeSignedLdObject = async (
+  { proof, ['@context']: _, ...data }: SignedJsonLdObject,
+  context: JsonLdContext,
+): Promise<Buffer> =>
+  Buffer.concat([
+    sha256(Buffer.from(await normalizeLdProof(proof, context))),
+    sha256(Buffer.from(await normalizeJsonLd(data, context))),
+  ])
 
 /**
  * Helper function to handle signed JsonLD digestions
@@ -47,41 +57,32 @@ export const normalizeLdProof = async (
  */
 
 export const digestJsonLd = async (
-  { proof, ['@context']: _, ...data }: SignedJsonLdObject,
+  signedLdObject: SignedJsonLdObject,
   context: JsonLdContext,
 ): Promise<Buffer> =>
-  sha256(
-    Buffer.concat([
-      sha256(Buffer.from(await normalizeLdProof(proof, context))),
-      sha256(Buffer.from(await normalizeJsonLd(data, context))),
-    ]),
-  )
+  sha256(await normalizeSignedLdObject(signedLdObject, context))
 
 /**
  * Helper function to handle JsonLD validation.
  * @param json - {@link SignedJsonLdObject} to be validated
- * @param customRegistry - Custom registry implementation.
- *   If null, the {@link JolocomRegistry} is used
+ * @param resolverOrIdentity - a instance of an Identity, which can be used
+ *   to find signing keys and verify the signature, or an instance of {@link Resolver} to use for retrieving the signer's keys.
+ *   If nothing is provided, the default Jolocom resolver is used.
  */
 
 export const validateJsonLd = async (
   json: SignedJsonLdObject,
-  customRegistry?: IRegistry,
+  resolverOrIdentity: IResolver | Identity = new JoloDidMethod().resolver,
 ): Promise<boolean> => {
-  const reg = customRegistry || registries.jolocom.create()
-  const issuerIdentity = await reg.resolve(keyIdToDid(json.proof.creator))
+  const issuerIdentity =
+    resolverOrIdentity instanceof Identity
+      ? resolverOrIdentity
+      : await resolverOrIdentity.resolve(keyIdToDid(json.proof.creator))
 
-  try {
-    const issuerPublicKey = getIssuerPublicKey(
-      json.proof.creator,
-      issuerIdentity.didDocument,
-    )
-    return SoftwareKeyProvider.verify(
-      await digestJsonLd(json, json['@context']),
-      issuerPublicKey,
-      Buffer.from(json.proof.signatureValue, 'hex'),
-    )
-  } catch {
-    return false
-  }
+  return verifySignatureWithIdentity(
+    await normalizeSignedLdObject(json, json['@context']),
+    parseHexOrBase64(json.proof.signatureValue),
+    json.proof.creator,
+    issuerIdentity,
+  )
 }
