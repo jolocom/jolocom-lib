@@ -1,4 +1,4 @@
-import { IDidDocumentAttrs } from '../identity/didDocument/types'
+import { IDidDocumentAttrs } from '@jolocom/protocol-ts'
 import { DidDocument } from '../identity/didDocument/didDocument'
 import { JWTEncodable, JSONWebToken } from '../interactionTokens/JSONWebToken'
 import { validateJsonLd } from '../linkedData'

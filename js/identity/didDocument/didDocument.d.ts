@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { IDidDocumentAttrs } from './types';
+import { IDidDocumentAttrs } from '@jolocom/protocol-ts';
 import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections';
 import { IDigestable, ILinkedDataSignature } from '../../linkedDataSignature/types';
 import { ContextEntry } from '@jolocom/protocol-ts';
