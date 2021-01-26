@@ -1,21 +1,3 @@
-import {
-  IAuthenticationSectionAttrsv0,
-  IAuthenticationSectionAttrs,
-  IPublicKeySectionAttrs,
-  IServiceEndpointSectionAttrs,
-} from './sections/types'
-import { ILinkedDataSignatureAttrs } from '@jolocom/protocol-ts/dist/lib/linkedDataSignature'
-import { ContextEntry } from '@jolocom/protocol-ts'
-
-export interface IDidDocumentAttrs {
-  '@context': ContextEntry[] | string
-  specVersion?: number
-  id: string
-  authentication?:
-    | IAuthenticationSectionAttrsv0[]
-    | IAuthenticationSectionAttrs[]
-  publicKey?: IPublicKeySectionAttrs[]
-  service?: IServiceEndpointSectionAttrs[]
-  created?: string
-  proof?: ILinkedDataSignatureAttrs
-}
+// TODO @next here only for backwards compatibility
+// types moved to @jolocom/protocol-ts
+export { IDidDocumentAttrs } from '@jolocom/protocol-ts'

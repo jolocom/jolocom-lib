@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import 'reflect-metadata';
-import { IPublicKeySectionAttrs } from './types';
+import { IPublicKeySectionAttrs } from '@jolocom/protocol-ts';
 export declare class PublicKeySection {
     private _id;
     private _type;

@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { IServiceEndpointSectionAttrs } from './types';
+import { IServiceEndpointSectionAttrs } from '@jolocom/protocol-ts';
 export declare class ServiceEndpointsSection {
     protected _id: string;
     protected _type: string;
