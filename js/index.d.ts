@@ -5,8 +5,8 @@ export declare const JolocomLib: {
     parse: import("./parse/parse").ParseMethods;
     parseAndValidate: {
         interactionToken: (jwt: string, signer: import("./identity/identity").Identity) => Promise<import("./interactionTokens/JSONWebToken").JSONWebToken<import("./interactionTokens/JSONWebToken").JWTEncodable>>;
-        didDocument: (didDocument: import("./identity/didDocument/types").IDidDocumentAttrs) => Promise<import("./identity/didDocument/didDocument").DidDocument>;
-        signedCredential: (signedCredential: import("@jolocom/protocol-ts/dist/lib/signedCredential").ISignedCredentialAttrs, signer: import("./identity/identity").Identity) => Promise<import("./credentials/signedCredential/signedCredential").SignedCredential>;
+        didDocument: (didDocument: import("@jolocom/protocol-ts").IDidDocumentAttrs) => Promise<import("./identity/didDocument/didDocument").DidDocument>;
+        signedCredential: (signedCredential: import("@jolocom/protocol-ts").ISignedCredentialAttrs, signer: import("./identity/identity").Identity) => Promise<import("./credentials/signedCredential/signedCredential").SignedCredential>;
     };
     didMethods: {
         jolo: import("./didMethods/jolo").JoloDidMethod;
@@ -14,10 +14,10 @@ export declare const JolocomLib: {
     };
     KeyProvider: typeof SoftwareKeyProvider;
     util: {
-        constraintFunctions: import("@jolocom/protocol-ts/dist/lib/interactionTokens").IExposedConstraintFunctions;
+        constraintFunctions: import("@jolocom/protocol-ts").IExposedConstraintFunctions;
         fuelKeyWithEther: typeof fuelKeyWithEther;
-        validateDigestable: (toValidate: import("@jolocom/protocol-ts/dist/lib/linkedDataSignature").IDigestable, resolverOrIdentity?: import("./utils/validation").IdentityOrResolver) => Promise<boolean>;
-        validateDigestables: (toValidate: import("@jolocom/protocol-ts/dist/lib/linkedDataSignature").IDigestable[], resolverOrIdentity?: import("./utils/validation").IdentityOrResolver) => Promise<boolean[]>;
+        validateDigestable: (toValidate: import("@jolocom/protocol-ts").IDigestable, resolverOrIdentity?: import("./utils/validation").IdentityOrResolver) => Promise<boolean>;
+        validateDigestables: (toValidate: import("@jolocom/protocol-ts").IDigestable[], resolverOrIdentity?: import("./utils/validation").IdentityOrResolver) => Promise<boolean[]>;
     };
     KeyTypes: typeof KeyTypes;
 };

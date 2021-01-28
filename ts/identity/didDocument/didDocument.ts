@@ -7,7 +7,7 @@ import {
   Transform,
   Type,
 } from 'class-transformer'
-import { IDidDocumentAttrs } from './types'
+import { IDidDocumentAttrs } from '@jolocom/protocol-ts'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import {
   AuthenticationSection,

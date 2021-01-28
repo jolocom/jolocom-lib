@@ -6,7 +6,7 @@ import {
   Expose,
   Transform,
 } from 'class-transformer'
-import { IServiceEndpointSectionAttrs } from './types'
+import { IServiceEndpointSectionAttrs } from '@jolocom/protocol-ts'
 
 /**
  * Class modelling a Did Document Service Endpoint section

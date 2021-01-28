@@ -1,7 +1,7 @@
+import { IDidDocumentAttrs } from '@jolocom/protocol-ts';
 import { DidDocument } from './didDocument/didDocument';
 import { SignedCredential } from '../credentials/signedCredential/signedCredential';
 import { IIdentityCreateArgs } from './types';
-import { IDidDocumentAttrs } from './didDocument/types';
 import { ISignedCredentialAttrs } from '../credentials/signedCredential/types';
 interface IdentityAttributes {
     didDocument: IDidDocumentAttrs;
