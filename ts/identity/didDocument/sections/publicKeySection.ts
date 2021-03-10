@@ -6,7 +6,7 @@ import {
   Expose,
   Transform,
 } from 'class-transformer'
-import { IPublicKeySectionAttrs } from './types'
+import { IPublicKeySectionAttrs } from '@jolocom/protocol-ts'
 
 /**
  * Class modelling a Did Document Pulic Key section
