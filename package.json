@@ -1,6 +1,6 @@
 {
   "name": "jolocom-lib",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "Unified library for interacting with the Jolocom identity solution",
   "main": "js/index.js",
   "files": [
@@ -70,11 +70,11 @@
     "@jolocom/jolo-did-resolver": "^1.0.0",
     "@jolocom/local-resolver-registrar": "^1.0.1",
     "@jolocom/native-core": "^1.0.0",
-    "@jolocom/protocol-ts": "^0.5.3",
+    "@jolocom/protocol-ts": "^0.5.4",
     "@jolocom/vaulted-key-provider": "^0.7.4",
     "@types/sinon": "^9.0.5",
     "bip39": "^3.0.2",
-    "class-transformer": "^0.3.1",
+    "class-transformer": "0.3.1",
     "create-hash": "^1.2.0",
     "did-resolver": "2.0.0",
     "ethereumjs-util": "^6.1.0",
