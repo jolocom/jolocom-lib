@@ -57,7 +57,7 @@ will fail. In case you would like to specify a custom expiry date, the following
 
   // An instance of an identityWallet is required at this point
     const credentialRequest = await identityWallet.create.interactionTokens.request.share({
-      expires: customExpiryDate
+      expires: customExpiryDate,
       callbackURL: 'https://example.com/authentication/',
       credentialRequirements: [{
           type: ['Credential', 'ProofOfEmailCredential'],
