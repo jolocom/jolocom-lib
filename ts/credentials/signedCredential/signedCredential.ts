@@ -290,19 +290,7 @@ export class SignedCredential implements IDigestable {
 
   @Expose()
   get name(): string {
-    if (this._name) {
-      return this._name
-    }
-
-    /* Find first detailed cred type, e.g. ProofOfEmailCredential */
-    const customType = this.type.find(t => t !== 'Credential')
-
-    if (customType) {
-      /* Split pascal cased title along uppercase letters */
-      return customType.replace(/([A-Z])/g, ' $1').trim()
-    }
-
-    return 'Credential'
+    return this._name || ''
   }
 
   /**
