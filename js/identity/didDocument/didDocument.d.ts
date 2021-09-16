@@ -1,0 +1,44 @@
+/// <reference types="node" />
+import { IDidDocumentAttrs } from '@jolocom/protocol-ts';
+import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections';
+import { IDigestable, ILinkedDataSignature } from '../../linkedDataSignature/types';
+import { ContextEntry } from '@jolocom/protocol-ts';
+import { ISigner } from '../../credentials/signedCredential/types';
+import { IVaultedKeyProvider, IKeyRefArgs } from '@jolocom/vaulted-key-provider';
+export declare class DidDocument implements IDigestable {
+    private _id;
+    private _specVersion;
+    private _authentication;
+    private _publicKey;
+    private _service;
+    private _created;
+    private _updated;
+    private _proof;
+    private _context;
+    private _alsoKnownAs;
+    alsoKnownAs: string[];
+    specVersion: number;
+    context: ContextEntry[];
+    did: string;
+    authentication: AuthenticationSection[];
+    publicKey: PublicKeySection[];
+    findPublicKeySectionById(keyId: string): PublicKeySection;
+    service: ServiceEndpointsSection[];
+    created: Date;
+    updated: Date;
+    readonly signer: ISigner;
+    signature: string;
+    proof: ILinkedDataSignature;
+    addAuthKeyId(authenticationKeyId: string): void;
+    addAuthKey(authenticationKey: PublicKeySection): void;
+    addPublicKeySection(section: PublicKeySection): void;
+    addServiceEndpoint(endpoint: ServiceEndpointsSection): void;
+    resetServiceEndpoints(): void;
+    static fromPublicKey(publicKey: Buffer): Promise<DidDocument>;
+    sign(vaultedKeyProvider: IVaultedKeyProvider, signConfig: IKeyRefArgs): Promise<void>;
+    asBytes(): Promise<Buffer>;
+    digest(): Promise<Buffer>;
+    hasBeenUpdated(): void;
+    toJSON(): IDidDocumentAttrs;
+    static fromJSON(json: IDidDocumentAttrs): DidDocument;
+}
