@@ -1,24 +1,7 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "es2017",
-        "removeComments": true,
-        "moduleResolution": "node",
-        "noLib": false,
-        "preserveConstEnums": true,
-        "declaration": true,
-        "sourceMap": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "outDir": "./js/",
-        "rootDir": "./ts",
-        "experimentalDecorators": true
-    },
-    "filesGlob": [
-        "./ts/**/*.ts",
-        "!./node_modules/**/*.ts"
-    ],
-    "exclude": [
-        "./js",
-        "./tests/**/*"
-    ]
+  "extends": "./config/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "js",
+    "types": ["heft-jest", "reflect-metadata", "node"]
+  }
 }
