@@ -313,10 +313,13 @@ export class IdentityWallet {
     const { type: signingKeyType } = await this._keyProvider.getPubKeyByController(
       pass, signingKeyId
     )
+    const alg = KeyTypeToJWA[signingKeyType]
+    if (!alg) throw new Error(ErrorCodes.Unknown) // TODO
+
     jwt.issuer = signingKeyId
     jwt.header = {
       typ: "JWT",
-      alg: KeyTypeToJWA[signingKeyType]
+      alg
     }
 
     const signature = await this._keyProvider.sign(
@@ -353,7 +356,7 @@ export class IdentityWallet {
 
     // TODO Should this somehow take into consideration the issuance date of the request
     // if one is present?
-    if (receivedJWT.expires < Date.now()) {
+    if (receivedJWT.expires && receivedJWT.expires < Date.now()) {
       throw new Error(ErrorCodes.IDWTokenExpired)
     }
 
@@ -446,14 +449,18 @@ export class IdentityWallet {
    * @param data - The data to decrypt
    * @param pass - The VKP password
    */
-  public asymDecrypt = async (data: Buffer, pass: string) =>
-    this._keyProvider.decrypt(
+  public asymDecrypt = async (data: Buffer, pass: string) => {
+    const keyRef = this._publicKeyMetadata.encryptionKeyId
+    if (!keyRef) throw new Error(ErrorCodes.PublicKeyNotFound)
+
+    return this._keyProvider.decrypt(
       {
         encryptionPass: pass,
-        keyRef: this._publicKeyMetadata.encryptionKeyId,
+        keyRef
       },
       data,
     )
+  }
 
   /**
    * Signs data

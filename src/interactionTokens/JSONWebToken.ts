@@ -162,6 +162,7 @@ export class JSONWebToken<T> implements IDigestable {
   }
 
   get signer() {
+    if (!this.issuer) throw new Error('no issuer')
     return {
       did: keyIdToDid(this.issuer),
       keyId: this.issuer,

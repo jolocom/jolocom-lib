@@ -1,4 +1,5 @@
 import { mnemonicToEntropy, validateMnemonic, entropyToMnemonic } from 'bip39'
+import { ErrorCodes } from '../errors'
 import { SocialRecovery } from './socialRecovery'
 
 /**
@@ -24,11 +25,11 @@ export function sliceSeedPhrase(
   const firstEncodedValue = seedPhraseArray.slice(0, divideAt)
   const secondEncodedValue = seedPhraseArray.slice(divideAt)
 
+  if (!secondEncodedValue.length) throw new Error(ErrorCodes.SKPMnemonicInvalid)
+
   return {
     seed: mnemonicToEntropy(firstEncodedValue.join(' ')),
-    encodedDid:
-      secondEncodedValue.length &&
-      mnemonicToEntropy(secondEncodedValue.join(' ')),
+    encodedDid: mnemonicToEntropy(secondEncodedValue.join(' ')),
   }
 }
 
