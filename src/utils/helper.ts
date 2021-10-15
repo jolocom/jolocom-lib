@@ -1,10 +1,10 @@
 import { pubToAddress, addHexPrefix } from 'ethereumjs-util'
-import fetch from 'node-fetch'
+import fetch, { Response } from 'node-fetch'
 import { Identity } from '../identity/identity'
 import { KeyTypes, PublicKeyInfo } from '@jolocom/vaulted-key-provider'
 import { IKeyMetadata } from '../identityWallet/types'
 import { ErrorCodes } from '../errors'
-import { isHexString } from 'ethers/lib/utils'
+import { isHexString } from 'ethereumjs-util'
 
 /**
  * Helper which will strip the 0x prefix from a hex string
@@ -44,7 +44,7 @@ export function keyIdToDid(keyId: string): string {
  * @example `await fuelKeyWithEther(Buffer.from('03848...', 'hex'))`
  */
 
-export function fuelKeyWithEther(publicKey: Buffer) {
+export async function fuelKeyWithEther(publicKey: Buffer): Promise<Response> {
   return fetch('https://faucet.jolocom.com/request/', {
     method: 'POST',
     body: JSON.stringify({ address: publicKeyToAddress(publicKey) }),

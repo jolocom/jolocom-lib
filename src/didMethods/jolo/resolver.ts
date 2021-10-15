@@ -15,9 +15,6 @@ export class JolocomResolver implements IResolver {
   private resolutionFunctions: {
     resolve: Resolve
     getPublicProfile: (didDoc: DIDDocument) => any
-  } = {
-    resolve: undefined,
-    getPublicProfile: undefined,
   }
 
   constructor(
@@ -25,13 +22,13 @@ export class JolocomResolver implements IResolver {
     contractAddress = CONTRACT_ADDRESS,
     ipfsHost = IPFS_ENDPOINT,
   ) {
-    this.resolutionFunctions.getPublicProfile = (didDoc: DIDDocument) =>
-      getPublicProfile(didDoc, ipfsHost)
-
-    this.resolutionFunctions.resolve = (did: string) =>
-      new Resolver(getResolver(providerUrl, contractAddress, ipfsHost)).resolve(
-        did,
-      )
+    this.resolutionFunctions = {
+      getPublicProfile: (didDoc: DIDDocument) => getPublicProfile(didDoc, ipfsHost),
+      resolve: (did: string) =>
+        new Resolver(getResolver(providerUrl, contractAddress, ipfsHost)).resolve(
+          did,
+        )
+    }
   }
 
   async resolve(did: string) {

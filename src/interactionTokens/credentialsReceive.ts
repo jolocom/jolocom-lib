@@ -17,7 +17,7 @@ import { ICredentialsReceiveAttrs } from './interactionTokens.types'
 
 @Exclude()
 export class CredentialsReceive {
-  private _signedCredentials: SignedCredential[]
+  private _signedCredentials!: SignedCredential[]
 
   /**
    * Get all signed credentials encoded in the payload

@@ -55,6 +55,7 @@ export const parseAndValidateInteractionToken = async (
   const isValid = await verifySignatureWithIdentity(
     Buffer.from(Buffer.from([body, payload].join('.'))),
     parseHexOrBase64(signature),
+    // @ts-ignore
     interactionToken.signer.keyId,
     signer,
   )

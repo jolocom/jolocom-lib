@@ -3,6 +3,7 @@ import {
   EncryptedWalletUtils,
 } from '@jolocom/vaulted-key-provider'
 import { getIcpFromKeySet } from '@jolocom/native-core'
+// @ts-ignore
 import { derivePath } from '@hawkingnetwork/ed25519-hd-key-rn'
 import { IDidMethod } from '../types'
 import { authAsIdentityFromKeyProvider } from '../utils'

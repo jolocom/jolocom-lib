@@ -14,10 +14,10 @@ import { JsonLdContext } from '../../linkedData/types'
 @Exclude()
 export class Credential {
   private '_@context': JsonLdContext
-  private _id: string
-  private _type: string[]
-  private _claim: IClaimSection
-  private _name: string
+  private _id!: string
+  private _type!: string[]
+  private _claim!: IClaimSection
+  private _name!: string
 
   /**
    * Get the identifier of the credential
@@ -131,9 +131,10 @@ export class Credential {
     subject,
   }: ISignedCredCreationArgs<T>) {
     const credential = new Credential()
-    credential.context = [...defaultContext, ...metadata.context]
+    credential.context = [...defaultContext, ...metadata.context!]
     credential.type = metadata.type
     credential.name = metadata.name
+    // @ts-ignore
     credential.claim = claim
     credential.claim.id = subject
 

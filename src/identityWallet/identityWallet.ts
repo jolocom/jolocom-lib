@@ -7,7 +7,7 @@ import {
   IIdentityWalletCreateArgs,
 } from './types'
 import { Identity } from '../identity/identity'
-import { JSONWebToken } from '../interactionTokens/JSONWebToken'
+import { JSONWebToken, JWTEncodable } from '../interactionTokens/JSONWebToken'
 import { InteractionType, KeyTypeToJWA } from '../interactionTokens/types'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
@@ -71,8 +71,8 @@ type WithExtraOptions<T> = T & {
  */
 
 export class IdentityWallet {
-  private _identity: Identity
-  private _publicKeyMetadata: IKeyMetadata
+  private _identity!: Identity
+  private _publicKeyMetadata!: IKeyMetadata
   private _keyProvider: IVaultedKeyProvider
 
   /**
@@ -186,8 +186,8 @@ export class IdentityWallet {
   ) => {
     const vCred = await SignedCredential.create(
       {
-        subject: credentialParams.subject || this.did,
         ...credentialParams,
+        subject: credentialParams.subject || this.did,
       },
       {
         keyId: this.publicKeyMetadata.signingKeyId,

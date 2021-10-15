@@ -15,8 +15,8 @@ import { CredentialRequest } from './credentialRequest'
  */
 @Exclude()
 export class CredentialResponse {
-  private _callbackURL: string
-  private _suppliedCredentials: SignedCredential[]
+  private _callbackURL!: string
+  private _suppliedCredentials!: SignedCredential[]
 
   /**
    * Get all signed credentials encoded in the payload

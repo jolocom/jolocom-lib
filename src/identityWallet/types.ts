@@ -17,6 +17,5 @@ export type ExclusivePartial<T, K extends keyof T> = Partial<Omit<T, K>> &
 
 export interface IKeyMetadata {
   signingKeyId: string
-  encryptionKeyId: string
-  [key: string]: string
+  encryptionKeyId?: string
 }

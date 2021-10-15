@@ -18,6 +18,7 @@ export class LocalRegistrar implements IRegistrar {
   private registrar: ReturnType<typeof getRegistrar>
 
   public constructor(db = createDb()) {
+    // @ts-ignore getIcp needs to be typed correctly
     this.registrar = getRegistrar({
       dbInstance: db,
       create: getIcp,

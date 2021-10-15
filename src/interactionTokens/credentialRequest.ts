@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as jsonlogic from 'json-logic-js'
 import { plainToClass, classToPlain, Expose, Exclude } from 'class-transformer'
 import {
@@ -17,8 +18,8 @@ import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
 
 @Exclude()
 export class CredentialRequest {
-  private _callbackURL: string
-  private _credentialRequirements: ICredentialRequest[] = []
+  private _callbackURL!: string
+  private _credentialRequirements!: ICredentialRequest[]
 
   /**
    * Get the credential requirements encoded in payload

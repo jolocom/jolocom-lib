@@ -4,7 +4,7 @@ import {
   KeyTypes,
 } from '@jolocom/vaulted-key-provider'
 import { KEY_PATHS, KEY_REFS } from './constants'
-import { fromMasterSeed } from 'hdkey'
+import hdkey from 'hdkey'
 import { publicKeyToJoloDID } from './utils'
 
 const { JOLO_DERIVATION_PATH, ETH_DERIVATION_PATH } = KEY_PATHS
@@ -16,8 +16,8 @@ export const recoverJoloKeyProviderFromSeed = async (
   impl: EncryptedWalletUtils,
   originalDid?: string,
 ): Promise<SoftwareKeyProvider> => {
-  const joloKeys = fromMasterSeed(seed).derive(JOLO_DERIVATION_PATH)
-  const ethKeys = fromMasterSeed(seed).derive(ETH_DERIVATION_PATH)
+  const joloKeys = hdkey.fromMasterSeed(seed).derive(JOLO_DERIVATION_PATH)
+  const ethKeys = hdkey.fromMasterSeed(seed).derive(ETH_DERIVATION_PATH)
   const did = originalDid || publicKeyToJoloDID(joloKeys.publicKey)
 
   const skp = await SoftwareKeyProvider.newEmptyWallet(impl, did, newPassword)

@@ -147,10 +147,13 @@ export class EcdsaLinkedDataSignature
 
     json['@context'] = defaultContext
 
+    // @ts-ignore
     delete json.signatureValue
+    // @ts-ignore
     delete json.type
     delete json.id
 
+    // @ts-ignore
     return canonize(json)
   }
 

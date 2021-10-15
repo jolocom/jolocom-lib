@@ -7,7 +7,7 @@ import {
   Transform,
   Type,
 } from 'class-transformer'
-import { IDidDocumentAttrs } from '@jolocom/protocol-ts'
+import { IDidDocumentAttrs, IPublicKeySectionAttrs } from '@jolocom/protocol-ts'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import {
   AuthenticationSection,
@@ -35,7 +35,7 @@ const LATEST_SPEC_VERSION = 0.13
 
 @Exclude()
 export class DidDocument implements IDigestable {
-  private _id: string
+  private _id!: string
   private _specVersion: number = LATEST_SPEC_VERSION
   private _authentication: AuthenticationSection[] = []
   private _publicKey: PublicKeySection[] = []
@@ -117,7 +117,7 @@ export class DidDocument implements IDigestable {
   @Transform(
     auths =>
       auths &&
-      auths.map(val => {
+      auths.map((val: IPublicKeySectionAttrs) => {
         const { type, publicKey } = val
         return type === 'Secp256k1SignatureAuthentication2018' && !!publicKey
           ? publicKey

@@ -21,6 +21,7 @@ export const normalizeJsonLd = async (
   { ['@context']: _, ...data }: JsonLdObject,
   context: JsonLdContext,
 ) =>
+  // @ts-ignore
   canonize(data, {
     expandContext: context,
   })
@@ -80,6 +81,7 @@ export const validateJsonLd = async (
       : await resolverOrIdentity.resolve(keyIdToDid(json.proof.creator))
 
   return verifySignatureWithIdentity(
+    // @ts-ignore
     await normalizeSignedLdObject(json, json['@context']),
     parseHexOrBase64(json.proof.signatureValue),
     json.proof.creator,

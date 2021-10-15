@@ -1,4 +1,4 @@
-import * as createHash from 'create-hash'
+import createHash from 'create-hash'
 import { getCryptoProvider } from '@jolocom/vaulted-key-provider'
 import { cryptoUtils } from '@jolocom/native-core'
 

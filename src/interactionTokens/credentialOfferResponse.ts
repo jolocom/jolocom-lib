@@ -12,8 +12,8 @@ import { CredentialOfferRequest } from './credentialOfferRequest'
 
 @Exclude()
 export class CredentialOfferResponse {
-  private _callbackURL: string
-  private _selectedCredentials: CredentialOfferResponseSelection[]
+  private _callbackURL!: string
+  private _selectedCredentials!: CredentialOfferResponseSelection[]
 
   /**
    * Get the callback url encoded in the payload

@@ -1,4 +1,5 @@
-import * as secrets from 'secrets.js-grempe'
+const secrets = require('secrets.js-grempe')
+
 import { entropyToMnemonic } from 'bip39'
 import { ErrorCodes } from '../errors'
 
@@ -49,13 +50,13 @@ export class SocialRecovery {
     return secrets.str2hex(JSON.stringify([secret, label]))
   }
 
-  private static compress(shard) {
+  private static compress(shard: string) {
     const shardData = shard.slice(3)
     const shardDataBase64 = Buffer.from(shardData, 'hex').toString('base64')
     return shard.slice(0, 3) + shardDataBase64
   }
 
-  private static decompress(shard) {
+  private static decompress(shard: string) {
     const shardData = shard.slice(3)
     const shardDataHex = Buffer.from(shardData, 'base64').toString('hex')
     return shard.slice(0, 3) + shardDataHex

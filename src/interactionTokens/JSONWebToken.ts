@@ -1,4 +1,5 @@
 import { base64url } from 'rfc4648'
+// @ts-ignore
 import { decodeToken } from 'jsontokens'
 import {
   classToPlain,
@@ -74,9 +75,9 @@ const convertPayload = <T>(args: TransformArgs) => ({
 @Exclude()
 export class JSONWebToken<T> implements IDigestable {
   /* ES256K stands for ec signatures on secp256k1, de facto standard */
-  private _header: IJWTHeader
-  private _signature: string
-  private _payload: IPayloadSection<T> = {}
+  private _header!: IJWTHeader
+  private _signature!: string
+  private _payload!: IPayloadSection<T>
 
   /*
    * When fromJSON is called, we parse the interaction token section, and instantiate
@@ -139,7 +140,7 @@ export class JSONWebToken<T> implements IDigestable {
     return this.payload.interactionToken
   }
 
-  set interactionToken(interactionToken) {
+  set interactionToken(interactionToken: T) {
     this.payload.interactionToken = interactionToken
   }
 
@@ -291,7 +292,7 @@ const payloadToJWT = <T>(
 
 const instantiateInteraction = <T>(
   typ: InteractionType,
-  instantiator: (t) => T,
+  instantiator: (t: any) => T,
 ) => {
   switch (typ) {
     case InteractionType.CredentialsReceive:

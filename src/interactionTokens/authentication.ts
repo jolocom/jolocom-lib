@@ -10,8 +10,8 @@ import { IAuthenticationAttrs } from './interactionTokens.types'
 
 @Exclude()
 export class Authentication {
-  private _callbackURL: string
-  private _description: string
+  private _callbackURL!: string
+  private _description!: string
 
   /**
    * Get the callback url encoded in the payload

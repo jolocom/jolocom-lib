@@ -58,12 +58,12 @@ interface IIssInfo {
 export class SignedCredential implements IDigestable {
   private '_@context': JsonLdContext
   private _id: string = generateClaimId(8)
-  private _name: string
-  private _issuer: string
-  private _type: string[]
+  private _name!: string
+  private _issuer!: string
+  private _type!: string[]
   private _claim: IClaimSection = {}
-  private _issued: Date
-  private _expires?: Date
+  private _issued!: Date
+  private _expires!: Date
   private _proof: ILinkedDataSignature = new EcdsaLinkedDataSignature()
 
   /**
@@ -251,7 +251,7 @@ export class SignedCredential implements IDigestable {
    */
 
   get subject(): string {
-    return this.claim.id
+    return this.claim.id!
   }
 
   /**

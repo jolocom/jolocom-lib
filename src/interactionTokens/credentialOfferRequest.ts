@@ -14,8 +14,8 @@ import {
 
 @Exclude()
 export class CredentialOfferRequest {
-  private _callbackURL: string
-  private _offeredCredentials: CredentialOffer[]
+  private _callbackURL!: string
+  private _offeredCredentials!: CredentialOffer[]
 
   /**
    * Get the callback url encoded in the payload
@@ -61,7 +61,7 @@ export class CredentialOfferRequest {
    */
 
   getRenderInfoForType(type: string): CredentialOfferRenderInfo | undefined {
-    return this.getOfferForType(type).renderInfo
+    return this.getOfferForType(type)?.renderInfo
   }
 
   /**
@@ -70,7 +70,7 @@ export class CredentialOfferRequest {
    */
 
   getMetadataForType(type: string): CredentialOfferMetadata | undefined {
-    return this.getOfferForType(type).metadata
+    return this.getOfferForType(type)?.metadata
   }
 
   /**
@@ -81,7 +81,7 @@ export class CredentialOfferRequest {
   getRequestedInputForType(
     type: string,
   ): CredentialOfferInputRequest | undefined {
-    return this.getOfferForType(type).requestedInput
+    return this.getOfferForType(type)?.requestedInput
   }
 
   /**
@@ -89,7 +89,7 @@ export class CredentialOfferRequest {
    * @example `console.log(offer.getOfferByType('IdCardCredential')) // {...}
    */
 
-  getOfferForType(type: string): CredentialOffer {
+  getOfferForType(type: string): CredentialOffer | undefined {
     return this.offeredCredentials.find(offer => offer.type === type)
   }
 
