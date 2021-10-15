@@ -228,7 +228,7 @@ export class IdentityWallet {
     return this.initializeAndSign(jwt, pass, recieved)
   }
 
-  private makeReq = <T>(typ: string) => (
+  private makeReq = <T, Ret=JWTEncodable>(typ: string) => (
     { expires, aud, pca, ...message }: WithExtraOptions<T>,
     pass: string,
   ) =>
@@ -242,9 +242,9 @@ export class IdentityWallet {
         pca
       },
       pass,
-    )
+    ) as unknown as Promise<JSONWebToken<Ret>>
 
-  private makeRes = <T, R>(typ: string) => (
+  private makeRes = <T, R, Ret=JWTEncodable>(typ: string) => (
     { expires, aud, pca, ...message }: WithExtraOptions<T>,
     pass: string,
     recieved?: JSONWebToken<R>,
@@ -260,7 +260,7 @@ export class IdentityWallet {
       },
       pass,
       recieved,
-    )
+    ) as unknown as Promise<JSONWebToken<Ret>>
 
   private messageCannonicaliser = (typ: string) => {
     switch (typ) {
@@ -478,28 +478,45 @@ export class IdentityWallet {
     interactionTokens: {
       request: {
         auth: this.makeReq<
-          ExclusivePartial<IAuthenticationAttrs, 'callbackURL'>
+          ExclusivePartial<IAuthenticationAttrs, 'callbackURL'>,
+          Authentication
         >(InteractionType.Authentication),
-        offer: this.makeReq<CredentialOfferRequestAttrs>(
+        offer: this.makeReq<
+          CredentialOfferRequestAttrs,
+          CredentialOfferRequest
+        >(
           InteractionType.CredentialOfferRequest,
         ),
-        share: this.makeReq<ICredentialRequestAttrs>(
+        share: this.makeReq<
+          ICredentialRequestAttrs,
+          CredentialRequest
+        >(
           InteractionType.CredentialRequest,
         ),
       },
       response: {
         auth: this.makeRes<
           ExclusivePartial<IAuthenticationAttrs, 'callbackURL'>,
+          Authentication,
           Authentication
         >(InteractionType.Authentication),
         offer: this.makeRes<
           CredentialOfferResponseAttrs,
-          CredentialOfferRequest
+          CredentialOfferRequest,
+          CredentialOfferResponse
         >(InteractionType.CredentialOfferResponse),
-        share: this.makeRes<ICredentialResponseAttrs, CredentialRequest>(
+        share: this.makeRes<
+          ICredentialResponseAttrs,
+          CredentialRequest,
+          CredentialResponse
+        >(
           InteractionType.CredentialResponse,
         ),
-        issue: this.makeRes<ICredentialsReceiveAttrs, CredentialOfferResponse>(
+        issue: this.makeRes<
+          ICredentialsReceiveAttrs,
+          CredentialOfferResponse,
+          CredentialsReceive
+        >(
           InteractionType.CredentialsReceive,
         ),
       },
