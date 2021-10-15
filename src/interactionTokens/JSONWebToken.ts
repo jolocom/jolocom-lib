@@ -44,12 +44,12 @@ interface IJWTEncodable {
 }
 
 interface IPayloadSection<T> {
-  iat?: number
-  exp?: number
-  jti?: string
-  iss?: string
-  aud?: string
-  typ?: string
+  iat: number
+  exp: number
+  jti: string
+  iss: string
+  aud: string
+  typ: string
   // Proof of Control Authority
   pca?: string
   interactionToken?: T
@@ -137,7 +137,7 @@ export class JSONWebToken<T> implements IDigestable {
   }
 
   get interactionToken() {
-    return this.payload.interactionToken
+    return this.payload.interactionToken!
   }
 
   set interactionToken(interactionToken: T) {
