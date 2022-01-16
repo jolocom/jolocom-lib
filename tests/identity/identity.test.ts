@@ -2,7 +2,7 @@ import * as chai from 'chai'
 import * as sinon from 'sinon'
 import { publicProfileCredJSON } from '../data/identity.data'
 import { testPublicIdentityKey } from '../data/keys.data'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../../ts/credentials/outdated/signedCredential'
 import { Identity } from '../../ts/identity/identity'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 const expect = chai.expect

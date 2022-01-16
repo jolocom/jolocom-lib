@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../../ts/credentials/outdated/signedCredential'
 import { jsonCredReceive } from '../data/interactionTokens/credentialReceive.data'
 import { CredentialsReceive } from '../../ts/interactionTokens/credentialsReceive'
 import { credentialSet } from '../data/interactionTokens/credentialRequest.data'

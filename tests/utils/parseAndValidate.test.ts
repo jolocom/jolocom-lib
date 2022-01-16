@@ -13,7 +13,7 @@ import {
 } from './testVectors/signedCredentialData'
 import { signedJWTTestVector0, signedJWTTestVector1 } from './testVectors/signedJwtTestData'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../../ts/credentials/outdated/signedCredential'
 import { Identity } from '../../ts/identity/identity'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 

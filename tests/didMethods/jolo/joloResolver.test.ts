@@ -10,7 +10,7 @@ import { ErrorCodes } from '../../../ts/errors'
 import { JolocomResolver } from '../../../ts/didMethods/jolo/resolver'
 import { Resolver } from 'did-resolver'
 import { parseAndValidate } from '../../../ts/parse/parseAndValidate'
-import { SignedCredential } from '../../../ts/credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../../../ts/credentials/outdated/signedCredential'
 
 const sandbox = sinon.createSandbox()
 

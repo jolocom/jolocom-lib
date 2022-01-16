@@ -2,7 +2,7 @@ import * as chai from 'chai'
 import * as crypto from 'crypto'
 import * as sinon from 'sinon'
 import * as sinonChai from 'sinon-chai'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../../ts/credentials/outdated/signedCredential'
 import {
   testSeed,
   testPublicIdentityKey,

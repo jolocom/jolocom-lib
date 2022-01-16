@@ -1,9 +1,9 @@
 import { IDidDocumentAttrs } from '@jolocom/protocol-ts'
 import { classToPlain, plainToClass, Type, Exclude, Expose } from 'class-transformer'
 import { DidDocument } from './didDocument/didDocument'
-import { SignedCredential } from '../credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../credentials/outdated/signedCredential'
 import { IIdentityCreateArgs } from './types'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
+import { ISignedCredentialAttrs } from '../credentials/types'
 
 /**
  * @class

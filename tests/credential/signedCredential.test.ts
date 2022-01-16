@@ -1,6 +1,6 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../../ts/credentials/outdated/signedCredential'
 import {
   mockKeyId,
   mockIssuerDid,
@@ -8,7 +8,7 @@ import {
   emailVerifiableCredentialHash,
 } from '../data/credential/signedCredential.data'
 import { EmailClaimMetadata } from '@jolocom/protocol-ts'
-import { Credential } from '../../ts/credentials/credential/credential'
+import { Credential } from '../../ts/credentials/outdated/credential'
 import { mockEmailCredCreationAttrs } from '../data/credential/credential.data'
 import { expect } from 'chai'
 import *  as crypto from '../../ts/utils/crypto'

@@ -6,7 +6,7 @@ import {
   PublicKeySection,
 } from '../../identity/didDocument/sections'
 import { fuelKeyWithEther, stripHexPrefix } from '../../utils/helper'
-import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../../credentials/outdated/signedCredential'
 import { IRegistrar } from '../types'
 import { claimsMetadata } from '@jolocom/protocol-ts'
 import { PROVIDER_URL, CONTRACT_ADDRESS, IPFS_ENDPOINT } from './constants'

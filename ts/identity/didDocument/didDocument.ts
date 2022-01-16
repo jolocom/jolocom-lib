@@ -22,7 +22,7 @@ import {
   ILinkedDataSignature,
 } from '../../linkedDataSignature/types'
 import { ContextEntry } from '@jolocom/protocol-ts'
-import { ISigner } from '../../credentials/signedCredential/types'
+import { ISigner } from '../../credentials/types'
 import { IVaultedKeyProvider, IKeyRefArgs } from '@jolocom/vaulted-key-provider'
 import { publicKeyToJoloDID } from '../../didMethods/jolo/utils'
 

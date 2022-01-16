@@ -12,16 +12,16 @@ import {
   ISignedCredCreationArgs,
   ISignedCredentialAttrs,
   ISigner,
-} from './types'
+} from '../types'
 import {
   IDigestable,
   ILinkedDataSignature,
 } from '../../linkedDataSignature/types'
 import { BaseMetadata } from '@jolocom/protocol-ts'
-import { IClaimSection } from '../credential/types'
+import { IClaimSection } from '../types'
 import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { JsonLdContext } from '../../linkedData/types'
-import { Credential } from '../credential/credential'
+import { Credential } from './credential'
 import { ErrorCodes } from '../../errors'
 import { getRandomBytes } from '../../utils/crypto'
 import { randomBytes } from 'crypto'

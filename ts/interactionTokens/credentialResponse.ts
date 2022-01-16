@@ -6,7 +6,7 @@ import {
   Exclude,
 } from 'class-transformer'
 import { ICredentialResponseAttrs } from './interactionTokens.types'
-import { SignedCredential } from '../credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../credentials/outdated/signedCredential'
 import { CredentialRequest } from './credentialRequest'
 
 /**

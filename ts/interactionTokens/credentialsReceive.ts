@@ -5,7 +5,7 @@ import {
   Expose,
   Exclude,
 } from 'class-transformer'
-import { SignedCredential } from '../credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../credentials/outdated/signedCredential'
 import { ICredentialsReceiveAttrs } from './interactionTokens.types'
 
 /**

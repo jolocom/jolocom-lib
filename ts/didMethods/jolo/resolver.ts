@@ -3,7 +3,7 @@ import { getResolver, getPublicProfile } from '@jolocom/jolo-did-resolver'
 import { ErrorCodes } from '../../errors'
 import { DIDDocument, Resolver } from 'did-resolver'
 import { Identity } from '../../identity/identity'
-import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../../credentials/outdated/signedCredential'
 import { IPFS_ENDPOINT, PROVIDER_URL, CONTRACT_ADDRESS } from './constants'
 import { parseAndValidate } from '../../parse/parseAndValidate'
 

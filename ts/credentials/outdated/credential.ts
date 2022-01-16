@@ -1,8 +1,8 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
-import { ICredentialAttrs, IClaimSection } from './types'
+import { ICredentialAttrs, IClaimSection } from '../types'
 import { BaseMetadata } from '@jolocom/protocol-ts'
 import { defaultContext } from '../../utils/contexts'
-import { ISignedCredCreationArgs } from '../signedCredential/types'
+import { ISignedCredCreationArgs } from '../types'
 import { JsonLdContext } from '../../linkedData/types'
 
 /**

@@ -9,7 +9,7 @@ import {
   credentialSet,
   simpleCredRequestJSON,
 } from '../data/interactionTokens/credentialRequest.data'
-import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../../ts/credentials/outdated/signedCredential'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 
 describe('CredentialResponse', () => {

@@ -8,7 +8,7 @@ import {
   IConstraint,
   Operator,
 } from './interactionTokens.types'
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types'
+import { ISignedCredentialAttrs } from '../credentials/types'
 
 /**
  * @class

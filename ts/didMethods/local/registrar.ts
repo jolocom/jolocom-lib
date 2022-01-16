@@ -1,7 +1,7 @@
 import { Identity } from '../../identity/identity'
 import { getRegistrar } from '@jolocom/local-resolver-registrar'
 import { DidDocument } from '../../identity/didDocument/didDocument'
-import { SignedCredential } from '../../credentials/signedCredential/signedCredential'
+import { SignedCredential } from '../../credentials/outdated/signedCredential'
 import { IRegistrar } from '../types'
 import { createDb } from '@jolocom/local-resolver-registrar/js/db'
 import { getIdFromEvent, validateEvents, getIcp } from '@jolocom/native-core'

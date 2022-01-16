@@ -1,6 +1,6 @@
 import { BaseMetadata } from '@jolocom/protocol-ts'
-import { Credential } from '../credentials/credential/credential'
-import { SignedCredential } from '../credentials/signedCredential/signedCredential'
+import { Credential } from '../credentials/outdated/credential'
+import { SignedCredential } from '../credentials/outdated/signedCredential'
 import {
   ExclusivePartial,
   IKeyMetadata,
@@ -12,7 +12,7 @@ import { InteractionType, KeyTypeToJWA } from '../interactionTokens/types'
 import { Authentication } from '../interactionTokens/authentication'
 import { CredentialRequest } from '../interactionTokens/credentialRequest'
 import { CredentialResponse } from '../interactionTokens/credentialResponse'
-import { ISignedCredCreationArgs } from '../credentials/signedCredential/types'
+import { ISignedCredCreationArgs } from '../credentials/types'
 import { keyIdToDid } from '../utils/helper'
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest'
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse'
