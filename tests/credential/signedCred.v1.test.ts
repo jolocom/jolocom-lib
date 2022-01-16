@@ -1,59 +1,53 @@
 import * as chai from 'chai'
-import { SignedCredential } from '../../ts/credentials/outdated/signedCredential'
+import { SignedCredential } from '../../ts/credentials/v1.1/signedCredential'
 import {
   emailVerifiableCredential,
   emailVerifiableCredentialHash,
   example1,
+  example3,
 } from '../data/credential/signedCredential.data'
 import { expect } from 'chai'
 
 chai.use(require("sinon-chai"))
 
 describe.only('SignedCredential, version 1.1. data model compliance', () => {
-  let vCred: SignedCredential
+  //@ts-ignore TODO #1 PROTOCOL TS CHANGES, LINK LOCAL, TEST, PUBLISH
+  const cred: SignedCredential = SignedCredential.fromJSON(example1)
 
-  it('Should correctly implement fromJSON method', () => {
-    //@ts-ignore TODO #1 PROTOCOL TS CHANGES, LINK LOCAL, TEST, PUBLISH
-    console.log(SignedCredential.fromJSON(example1))
-    const fromJson = SignedCredential.fromJSON(emailVerifiableCredential)
-    vCred = fromJson
-    expect(fromJson).to.deep.eq(vCred)
+  it('@context MUST be present, one or more URIs', async () => {
+    expect(cred.context.length).to.eq(2)
+    expect(cred.context[0]).to.eq("https://www.w3.org/2018/credentials/v1")
   })
 
-  it('Should correctly implement toJSON method', () => {
-    expect(vCred.toJSON()).to.deep.eq(emailVerifiableCredential)
+  it('"id" property MUST be present, must be a single URI', async () => {
+    expect(cred.id).to.eq("http://example.edu/credentials/3732")
   })
 
-  it('Should produce expected digest', async () => {
-    const normalized = (await vCred.digest()).toString('hex')
-    expect(normalized).to.eq(emailVerifiableCredentialHash)
+  it('"type" property MUST be present, first entry must be "VerifiableCredential"', async () => {
+    console.log(cred)
+    expect(cred.type.length).to.eq(2)
+    expect(cred.type[0]).to.eq("VerifiableCredential")
   })
 
-  describe('Getters', () => {
-    const {
-      id,
-      issued,
-      issuer,
-      expires,
-      claim,
-      proof,
-      type,
-    } = emailVerifiableCredential
-    it('Implements all getters', () => {
-      expect(vCred.id).to.eq(id)
-      expect(vCred.issued.toISOString()).to.eq(issued)
-      expect(vCred.type).to.deep.eq(type)
-      expect(vCred.issuer).to.eq(issuer)
-      expect(vCred.signature).to.deep.eq(proof.signatureValue)
-      expect(vCred.expires.toISOString()).to.deep.eq(expires)
-      expect(vCred.proof.toJSON()).to.deep.eq(proof)
-      expect(vCred.subject).to.eq(claim.id)
-      expect(vCred.claim).to.deep.eq(claim)
-      expect(vCred.name).to.eq('Email address')
-      expect(vCred.signer).to.deep.eq({
-        did: issuer,
-        keyId: proof.creator,
-      })
-    })
+  it('"credentialSubject" property MUST be present, MAY be an object', async () => {
+    expect(cred.credentialSubject).to.deep.eq(example1.credentialSubject)
   })
+
+  it('"credentialSubject" property MUST be present, MAY be a set of objects', async () => {
+    //@ts-ignore TODO PROTOCOL TS CHANGES.
+    expect(SignedCredential.fromJSON(example3)).to.deep.eq(example3.credentialSubject)
+  })
+
+  it('"issuer" property MUST be present, MUST be a single URI', async () => {
+    expect(cred.issuer).to.eq(example1.issuer)
+  })
+
+  it('"issuanceDate" property MUST be present, MUST be a single RFC3339 datetime', async () => {
+    expect(cred.issued.toISOString()).to.eq(example1.issuanceDate)
+  })
+
+  it('"expirationDate" property MUST be present, MUST be a single RFC3339 datetime', async () => {
+    expect(cred.expires.toISOString()).to.eq(example1.expirationDate)
+  })
+
 })
