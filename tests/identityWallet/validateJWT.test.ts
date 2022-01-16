@@ -1,6 +1,5 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
-import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { Identity } from '../../ts/identity/identity'
 import { didDocumentJSON, mockKeyId } from '../data/didDocument.data'
@@ -15,7 +14,7 @@ import { JolocomResolver } from '../../ts/didMethods/jolo/resolver'
 import { IVaultedKeyProvider } from '@jolocom/vaulted-key-provider'
 import * as validationUtils from '../../ts/utils/validation'
 
-chai.use(sinonChai)
+chai.use(require("sinon-chai"))
 
 describe('IdentityWallet validate JWT', () => {
   const sandbox = sinon.createSandbox()

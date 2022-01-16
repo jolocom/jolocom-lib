@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import * as sinon from 'sinon'
 import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { CredentialRequest } from '../../ts/interactionTokens/credentialRequest'
 import { simpleCredRequestJSON } from '../data/interactionTokens/credentialRequest.data'
@@ -12,7 +11,8 @@ import {
 } from '../data/interactionTokens/jsonWebToken.data'
 import { InteractionType } from '../../ts/interactionTokens/types'
 import { mockDid } from '../data/didDocument.data'
-chai.use(sinonChai)
+
+chai.use(require("sinon-chai"))
 
 describe('JSONWebToken', () => {
   let clock

@@ -25,7 +25,7 @@ import { publicProfileCredJSON, emailCredential } from '../data/identity.data'
 import { mockDid } from '../data/didDocument.data'
 import { ErrorCodes } from '../../ts/errors'
 
-chai.use(sinonChai)
+chai.use(require("sinon-chai"))
 describe('Software Vaulted Key Provider', () => {
 //  const vault = SoftwareKeyProvider.fromSeed(
 //    testSeed,

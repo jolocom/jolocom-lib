@@ -1,6 +1,5 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
-import * as sinonChai from 'sinon-chai'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import {
   mockKeyId,
@@ -16,7 +15,7 @@ import *  as crypto from '../../ts/utils/crypto'
 import *  as nodeCrypto from 'crypto'
 import { ErrorCodes } from '../../ts/errors'
 
-chai.use(sinonChai)
+chai.use(require("sinon-chai"))
 
 describe('SignedCredential', () => {
   const sandbox = sinon.createSandbox()

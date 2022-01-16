@@ -1,5 +1,4 @@
 import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
 import { parseAndValidate } from '../../ts/parse/parseAndValidate'
 import {
   testDidDoc0,
@@ -17,7 +16,8 @@ import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import { Identity } from '../../ts/identity/identity'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
-chai.use(sinonChai)
+
+chai.use(require("sinon-chai"))
 const expect = chai.expect
 
 // TODO Add vectors

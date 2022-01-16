@@ -1,5 +1,4 @@
 import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
 import { mockSeed, mockPass, mockJunDid, mockJoloDid } from '../data/didDocument.data'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { LocalDidMethod } from '../../ts/didMethods/local/index'
@@ -10,7 +9,7 @@ import { authAsIdentityFromKeyProvider } from '../../ts/didMethods/utils'
 import { recoverJoloKeyProviderFromSeed } from '../../ts/didMethods/jolo/recovery'
 import { walletUtils } from '@jolocom/native-core'
 
-chai.use(sinonChai)
+chai.use(require("sinon-chai"))
 const expect = chai.expect
 
 describe('IdentityWallet', () => {
