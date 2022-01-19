@@ -72,7 +72,7 @@ describe('EcdsaKoblitzSignature', () => {
   it('Should implement setters', () => {
     const bareSignature = new EcdsaLinkedDataSignature()
     bareSignature.created = new Date(0)
-    bareSignature.creator = mockKeyId
+    bareSignature.verificationMethod = mockKeyId
     bareSignature.nonce = '1842fb5f567dd532'
     bareSignature.signature = 'abcdef'
 

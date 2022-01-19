@@ -4,6 +4,8 @@ import { BaseMetadata } from '@jolocom/protocol-ts'
 import { defaultContext } from '../../utils/contexts'
 import { ISignedCredCreationArgs } from '../types'
 import { JsonLdContext } from '../../linkedData/types'
+import { SignedCredential } from './signedCredential'
+import { randomBytes } from 'crypto'
 
 /**
  * @class
@@ -14,7 +16,8 @@ import { JsonLdContext } from '../../linkedData/types'
 @Exclude()
 export class Credential {
   protected '_@context': JsonLdContext
-  protected _id: string
+  // TODO Replace with UUID
+  protected _id: string = randomBytes(8).toString('hex')
   protected _type: string[]
   protected _claim: IClaimSection
 
@@ -117,6 +120,24 @@ export class Credential {
     credential.credentialSubject.id = subject
 
     return credential
+  }
+
+  /**
+   * Instantiates a {@link SignedCredential} based on overlapping properties
+   * from the {@link Credential} instance. Some properties i.e. issuer, issuance date, proofs
+   * can not be set at this point
+   * @see {@link https://w3c.github.io/vc-data-model/ | specification}
+   * @example `const verifiableCredential = Credential.toVerifiableCredential()`
+   */
+
+  public toVerifiableCredential() {
+    const signedCred = new SignedCredential()
+    signedCred.id = this.id
+    signedCred.type = this.type
+    signedCred.context = this.context
+    signedCred.credentialSubject = this.credentialSubject
+    signedCred.proof = []
+    return signedCred
   }
 
   /**

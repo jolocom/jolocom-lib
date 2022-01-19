@@ -23,7 +23,11 @@ export const defaultContext = [
     creator: { '@id': 'dc:creator', '@type': '@id' },
     domain: 'sec:domain',
     nonce: 'sec:nonce',
+    proofPurpose: 'sec:proofPurpose',
     signatureValue: 'sec:signatureValue',
+    verificationMethod: 'sec:verificationMethod',
+    previousProof: 'https://terms.jolocom.com/ChainedProof2021', // TODO Officially register elsewhere
+    chainSignatureSuite: 'https://terms.jolocom.com/chainSignatureSuite' // TODO Officially register elsewhere
   },
 ]
 

@@ -9,20 +9,19 @@ import {
 } from 'class-transformer'
 import { digestJsonLd, normalizeSignedLdObject } from '../../linkedData'
 import {
-  ISignedCredCreationArgs,
   ISignedCredentialAttrs,
   ISigner,
 } from '../types'
 import {
   IDigestable,
   ILinkedDataSignature,
+  ILinkedDataSignatureAttrs,
 } from '../../linkedDataSignature/types'
-import { BaseMetadata } from '@jolocom/protocol-ts'
-import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
+import { ChainedProof2021, EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import { Credential } from './credential'
-import { ErrorCodes } from '../../errors'
-import { getRandomBytes } from '../../utils/crypto'
 import { randomBytes } from 'crypto'
+import { BaseMetadata, ISignedCredCreationArgs } from '@jolocom/protocol-ts'
+import { ErrorCodes } from '../../errors'
 
 // Credentials are valid for a year by default
 const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
@@ -52,13 +51,12 @@ interface IIssInfo {
  * @see {@link https://w3c.github.io/vc-data-model/ | verifiable credential specification}
  */
 
-// TODO CHANGE PROOFS TO ARRAY
 @Exclude()
 export class SignedCredential extends Credential implements IDigestable {
   private _issuer: string
   private _issued: Date
   private _expires?: Date
-  private _proof: ILinkedDataSignature = new EcdsaLinkedDataSignature()
+  private _proof: ILinkedDataSignature[] = []
 
   /**
    * Get the identifier of the signed credential
@@ -99,12 +97,16 @@ export class SignedCredential extends Credential implements IDigestable {
     this._issuer = issuer
   }
 
+  // TODO: Delete, required by IDigestable
+  set signature(signature: string) {
+  }
+
   /**
    * Get the issuance date of the signed credential
    * @example `console.log(signedCredential.issued) // Date 2018-11-11T15:46:09.720Z`
    */
 
-  @Expose({name: "issuanceDate"})
+  @Expose({ name: "issuanceDate" })
   @Transform((value: Date) => value && value.toISOString(), {
     toPlainOnly: true,
   })
@@ -142,33 +144,23 @@ export class SignedCredential extends Credential implements IDigestable {
   }
 
   /**
-   * Get the hex encoded credential signature
-   * @example `console.log(signedCredential.signature) // '2b8504698e...'`
-   */
-
-  get signature() {
-    return this._proof.signature
-  }
-
-  /**
-   * Set the hex encoded credential signature
-   * @example `signedCredential.signature = '2b8504698e...'`
-   */
-
-  set signature(signature: string) {
-    this._proof.signature = signature
-  }
-
-  /**
    * Get aggregated metadata related to the signing public key
    * @see{@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}
    * @example `console.log(signedCredential.signer) // { did: 'did:jolo:...', keyId: 'did:jolo:...#keys-1' }`
    */
 
+  get signers(): ISigner[] {
+    return this._proof.map(({ creator }) => ({
+      did: this.issuer,
+      keyId: creator
+    }))
+  }
+
+
   get signer(): ISigner {
     return {
       did: this.issuer,
-      keyId: this._proof.creator,
+      keyId: this._proof[0].creator,
     }
   }
 
@@ -177,10 +169,11 @@ export class SignedCredential extends Credential implements IDigestable {
    * @example `console.log(signedCredential.expires) // Date 2018-11-11T15:46:09.720Z`
    */
 
-  @Expose({name: "expirationDate"})
+  @Expose({ name: "expirationDate" })
   @Transform((value: Date) => value && value.toISOString(), {
     toPlainOnly: true,
   })
+
   @Transform((value: string) => value && new Date(value), { toClassOnly: true })
   get expires(): Date {
     return this._expires
@@ -195,27 +188,26 @@ export class SignedCredential extends Credential implements IDigestable {
     this._expires = expiry
   }
 
-  /**
-   * Get the {@link EcdsaLinkedDataSignature} member of the instance
-   * @example `console.log(signedCredential.proof) // EcdsaLinkedDataSignature { ... }`
-   */
-
   @Expose()
-  @Type(() => EcdsaLinkedDataSignature)
-  @Transform(value => value || new EcdsaLinkedDataSignature(), {
-    toClassOnly: true,
-  })
-  get proof(): ILinkedDataSignature {
+  @Transform((value) =>
+    value.map(v => v.toJSON()), { toPlainOnly: true }
+  )
+  @Transform((value: ILinkedDataSignatureAttrs[]) => {
+    const proofs = Array.isArray(value) ? value : [value]
+
+    return proofs.map(v => v.type === ChainedProof2021._type ? ChainedProof2021.fromJSON(v) : EcdsaLinkedDataSignature.fromJSON(v))
+  }, { toClassOnly: true })
+
+  get proof(): ILinkedDataSignature[] {
     return this._proof
   }
 
-  /**
-   * Set the {@link EcdsaLinkedDataSignature} member of the instance
-   * @example `signedCredential.proof = new EcdsaLinkedDataSignature()`
-   */
-
-  set proof(proof: ILinkedDataSignature) {
+  set proof(proof: ILinkedDataSignature[]) {
     this._proof = proof
+  }
+
+  addProof(proof: ILinkedDataSignature) {
+    this._proof.push(proof)
   }
 
   /**
@@ -267,7 +259,6 @@ export class SignedCredential extends Credential implements IDigestable {
       throw new Error(ErrorCodes.VCInvalidExpiryDate)
     }
 
-    await signedCredential.prepareSignature(issInfo.keyId)
     signedCredential.issuer = issInfo.issuerDid
 
     return signedCredential
@@ -278,13 +269,6 @@ export class SignedCredential extends Credential implements IDigestable {
    * @param keyId - Public key identifier, as defined in the {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}.
    * @internal
    */
-
-  private async prepareSignature(keyId: string) {
-    this.proof.creator = keyId
-    // TODO Is this needed?
-    this.proof.signature = ''
-    this.proof.nonce = (await getRandomBytes(8)).toString('hex')
-  }
 
   public async asBytes(): Promise<Buffer> {
     return normalizeSignedLdObject(this.toJSON(), this.context)

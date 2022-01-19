@@ -386,7 +386,6 @@ export class DidDocument implements IDigestable {
     this._proof = new EcdsaLinkedDataSignature()
     this._proof.creator = this.signer.keyId
     this._proof.signature = ''
-    this._proof.nonce = (await getRandomBytes(8)).toString('hex')
 
     const signature = await vaultedKeyProvider.sign(
       signConfig,

@@ -11,33 +11,34 @@ import {
   ILinkedDataSignature,
   ILinkedDataSignatureAttrs,
   IDigestable,
+  ProofDerivationOptions
 } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
 import { keyIdToDid } from '../../utils/helper'
 import { IdentityWallet } from '../../identityWallet/identityWallet'
-import { LinkedDataProof } from 'did-resolver'
 import { normalizeJsonLd } from '../../linkedData'
-import { JsonLdObject } from '@jolocom/protocol-ts'
-
-/**
- * @class A EcdsaKoblitz linked data signature implementation
- * @implements {ILinkedDataSignature}
- * @implements {IDigestable}
- * @internal
- */
+import { SupportedSuites } from '..'
 
 @Exclude()
-export class EcdsaLinkedDataSignature
+export class ChainedProof2021
   implements ILinkedDataSignature, IDigestable {
-  static _type = "EcdsaKoblitzSignature2016"
+  static _type = "ChainedProof2021"
   private _verificationMethod = ''
   private _created: Date = new Date()
-  private _proofValue = ''
+  private _signatureValue = ''
+  private _previousProof: ILinkedDataSignature
   private _proofPurpose = 'assertionMethod'
+  private _chainSignatureSuite: SupportedSuites = SupportedSuites.EcdsaKoblitzSignature2016
 
-  // TODO Delete
-  set nonce(nonce: string) {}
+  @Expose()
+  get chainSignatureSuite() {
+    return this._chainSignatureSuite
+  }
+
+  set chainSignatureSuite(chainSignatureSuite) {
+    this._chainSignatureSuite = chainSignatureSuite
+  }
 
   @Expose()
   get proofPurpose() {
@@ -78,7 +79,36 @@ export class EcdsaLinkedDataSignature
 
   @Expose()
   get type() {
-    return EcdsaLinkedDataSignature._type
+    return ChainedProof2021._type
+  }
+
+  /**
+   * Set the type of the linked data signature
+   * @example `proof.type = 'EcdsaKoblitzSignature2016'`
+   */
+
+  set type(type: string) {
+  }
+
+  set nonce(nonce: string) {
+  }
+
+  @Expose()
+  @Transform((value: ILinkedDataSignature) => {
+    return {
+      created: value.created,
+      //@ts-ignore, verificationMethod needs to be defined on the interface
+      verificationMethod: value.verificationMethod,
+      type: value.type,
+      proofPurpose: 'assertionMethod'
+    }
+  })
+  get previousProof() {
+    return this._previousProof
+  }
+
+  set previousProof(prevProof: ILinkedDataSignature) {
+    this._previousProof = prevProof
   }
 
   /**
@@ -87,8 +117,8 @@ export class EcdsaLinkedDataSignature
    */
 
   @Expose({ name: 'signatureValue' })
-  get signatureValue() {
-    return this._proofValue
+  get signature() {
+    return this._signatureValue
   }
 
   /**
@@ -97,17 +127,13 @@ export class EcdsaLinkedDataSignature
    */
 
   set signature(signature: string) {
-    this._proofValue = signature
+    this._signatureValue = signature
   }
 
   /**
-   * Set the identifier of the public signing key
-   * @example `proof.creator = 'did:jolo:...#keys-1`
+   * Get the identifier of the public signing key
+   * @example `console.log(proof.verificationMethod) // 'did:jolo:...#keys-1`
    */
-
-  set creator(creator: string) {
-    this._verificationMethod = creator
-  }
 
   @Expose()
   get verificationMethod() {
@@ -118,6 +144,14 @@ export class EcdsaLinkedDataSignature
     this._verificationMethod = verificationMethod
   }
 
+  /**
+   * Set the identifier of the public signing key
+   * @example `proof.verificationMethod = 'did:jolo:...#keys-1`
+   */
+
+  set creator(creator: string) {
+  }
+
   get signer() {
     return {
       did: keyIdToDid(this.verificationMethod),
@@ -125,34 +159,55 @@ export class EcdsaLinkedDataSignature
     }
   }
 
-  async derive(inputs: DerivationOptions, signer: IdentityWallet, pass: string) {
-    const ldSig = new EcdsaLinkedDataSignature()
+  static fromPreviousProof(prevProof: ILinkedDataSignature, algs: { digest: Function, sign: Function, normalize: Function } = {
+    digest: sha256,
+    sign: () => { },
+    normalize: normalizeJsonLd
+  }): ChainedProof2021 {
+    const cp = new ChainedProof2021()
+    cp.previousProof = prevProof
+    return cp
+  }
 
-    ldSig.verificationMethod = inputs.proofOptions.verificationMethod
-    ldSig.created = inputs.proofOptions.created
+  async derive(inputs: ProofDerivationOptions, signer: IdentityWallet, pass: string) {
+    if (!inputs.previousProofs || inputs.previousProofs.length === 0) {
+      throw new Error('ChainedProof requires existing proofs')
+    }
+
+    let ldSign = new ChainedProof2021()
+
+    // TODO pass index as a proof option
+    ldSign.previousProof = inputs.previousProofs[0]
+    ldSign.verificationMethod = inputs.proofOptions.verificationMethod
+    ldSign.created = inputs.proofOptions.created
 
     const { context, ...document } = inputs.document
-
     const normalizedDoc = await normalizeJsonLd(document, inputs.document['@context'])
+    const normalizedPrevProof = await normalizeJsonLd(ldSign.previousProof.toJSON(), inputs.document['@context'])
 
-    const {signatureValue, ...proofOptions} = ldSig.toJSON()
+    const {signatureValue, ...proofOptions} = ldSign.toJSON()
     const normalizedProofOptions = await normalizeJsonLd(proofOptions, inputs.document['@context'])
 
+    console.log('Normalized "previousProof" node:')
+    console.log(normalizedPrevProof)
+
+    console.log('Normalized "ChainedProof2021" proofOptions:')
+    console.log(normalizedProofOptions)
+
     const toSign = Buffer.concat([
-      sha256(Buffer.from(normalizedProofOptions)),
-      sha256(Buffer.from(normalizedDoc))
+      sha256(Buffer.from(normalizedDoc)),
+      sha256(Buffer.from(normalizedPrevProof))
     ])
 
-    ldSig.signature = await (await signer.sign(toSign, pass)).toString('hex')
+    ldSign.signature = await (await signer.sign(toSign, pass)).toString('hex')
 
-    return ldSig
+    return ldSign
   }
 
   /**
    * Converts the lined data signature to canonical form
    * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
    */
-
 
   private async normalize(): Promise<string> {
     const json: ILinkedDataSignatureAttrs = this.toJSON()
@@ -186,8 +241,8 @@ export class EcdsaLinkedDataSignature
 
   public static fromJSON(
     json: ILinkedDataSignatureAttrs,
-  ): EcdsaLinkedDataSignature {
-    return plainToClass(EcdsaLinkedDataSignature, json)
+  ): ChainedProof2021 {
+    return plainToClass(ChainedProof2021, json)
   }
 
   /**
@@ -196,15 +251,5 @@ export class EcdsaLinkedDataSignature
 
   public toJSON(): ILinkedDataSignatureAttrs {
     return classToPlain(this) as ILinkedDataSignatureAttrs
-  }
-}
-
-
-type DerivationOptions = {
-  document: JsonLdObject,
-  previousProofs?: LinkedDataProof[],
-  proofOptions: {
-    verificationMethod: string,
-    created: Date
   }
 }
