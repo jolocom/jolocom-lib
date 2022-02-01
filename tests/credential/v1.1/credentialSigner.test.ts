@@ -24,7 +24,7 @@ describe.only("VC Builder tests", () => {
     );
 
     const p1 = await builder.generateProof(
-      SupportedSuites.EcdsaKoblitzSignature2016,
+      SupportedSuites.Ed25519Signature2018,
       {
         proofOptions: {
           verificationMethod: identityWallet.publicKeyMetadata.signingKeyId,
@@ -94,14 +94,12 @@ describe.only("VC Builder tests", () => {
     expect(verificationResults[2].referencedProofValid).to.eq(true);
     expect(verificationResults[3].referencedProofValid).to.eq(true);
 
-    console.log({verificationResults})
 
     vc.id = "dsadsa";
 
     const resultsAfterModification = await verifier.verifyAllProofs(vc)
 
     expect(resultsAfterModification[0].valid).to.eq(false);
-
     expect(resultsAfterModification[1].valid).to.eq(true);
     expect(resultsAfterModification[2].valid).to.eq(true);
     expect(resultsAfterModification[3].valid).to.eq(true);
@@ -109,8 +107,6 @@ describe.only("VC Builder tests", () => {
     expect(resultsAfterModification[1].referencedProofValid).to.eq(false);
     expect(resultsAfterModification[2].referencedProofValid).to.eq(false);
     expect(resultsAfterModification[3].referencedProofValid).to.eq(false);
-
-    console.log({resultsAfterModification})
   });
 
   it("Creates a simple example", async () => {

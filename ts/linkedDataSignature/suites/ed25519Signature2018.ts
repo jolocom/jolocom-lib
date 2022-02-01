@@ -6,7 +6,6 @@ import {
   Expose,
   Transform,
 } from 'class-transformer'
-import { canonize } from 'jsonld'
 import { ILinkedDataSignatureAttrs, ProofDerivationOptions } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
@@ -17,19 +16,22 @@ import { JsonLdObject } from '@jolocom/protocol-ts'
 import { Identity } from '../../identity/identity'
 import { verifySignatureWithIdentity } from '../../utils/validation'
 import { LinkedDataProof, SupportedSuites, BaseProofOptions } from '..'
+import { base64url } from 'rfc4648'
 
 /**
- * @class A EcdsaKoblitz linked data signature implementation
+ * @class A Ed25519Signature2018 Linked Data Proof implementation
  * @implements {ILinkedDataSignature}
  * @implements {IDigestable}
  * @internal
  */
 
 @Exclude()
-export class EcdsaLinkedDataSignature<
+export class Ed25519Signature2018<
   T extends BaseProofOptions
 > extends LinkedDataProof<T> {
-  proofType = SupportedSuites.EcdsaKoblitzSignature2016
+  private encodedJWTHeader =
+    'eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19'
+  proofType = SupportedSuites.Ed25519Signature2018
 
   signatureSuite = {
     digestAlg: sha256,
@@ -39,12 +41,21 @@ export class EcdsaLinkedDataSignature<
   }
 
   static create(arg: BaseProofOptions) {
-    const cp = new EcdsaLinkedDataSignature()
+    const cp = new Ed25519Signature2018()
     cp.verificationMethod = arg.verificationMethod
     cp.created = arg.created || new Date()
     cp._proofPurpose = arg.proofPurpose || 'assertionMethod'
 
     return cp as LinkedDataProof<BaseProofOptions>
+  }
+
+  @Expose()
+  get proofPurpose() {
+    return this._proofPurpose
+  }
+
+  set proofPurpose(proofPurpose: string) {
+    this._proofPurpose = proofPurpose
   }
 
   /**
@@ -65,18 +76,9 @@ export class EcdsaLinkedDataSignature<
     this._created = created
   }
 
-  @Expose()
-  get proofPurose() {
-    return this._proofPurpose
-  }
-
-  set proofPurose(proofPurpose: string) {
-    this._proofPurpose = proofPurpose
-  }
-
   /**
    * Get the type of the linked data signature
-   * @example `console.log(proof.type) // 'EcdsaKoblitzSignature2016'`
+   * @example `console.log(proof.type) // 'Ed25519Signature2018'`
    */
 
   @Expose()
@@ -89,7 +91,7 @@ export class EcdsaLinkedDataSignature<
    * @example `console.log(proof.signature) // '2b8504698e...'`
    */
 
-  @Expose({ name: 'signatureValue' })
+  @Expose({ name: 'jws' })
   get signatureValue() {
     return this._proofValue
   }
@@ -139,9 +141,19 @@ export class EcdsaLinkedDataSignature<
       )
     }
 
-    const toSign = await this.generateHashAlg(inputs.document)
+    const documentDigest = await this.generateHashAlg(inputs.document)
+
+    const toSign = Buffer.concat([
+      Buffer.from(this.encodedJWTHeader + '.', 'utf8'),
+      documentDigest,
+    ])
+
     const signature = await signer.sign(toSign, pass)
-    this.signature = signature.toString('hex')
+
+    this.signature =
+      this.encodedJWTHeader +
+      '..' +
+      base64url.stringify(signature, { pad: false })
 
     return this
   }
@@ -151,7 +163,7 @@ export class EcdsaLinkedDataSignature<
     const normalizedDoc = await this.signatureSuite.normalizationFn(document)
 
     // console.log({normalizedDoc, document, context: document['@context']})
-    const { signatureValue, ...proofOptions } = this.toJSON()
+    const { jws, ...proofOptions } = this.toJSON()
 
     const normalizedProofOptions = await this.signatureSuite.normalizationFn(
       proofOptions
@@ -165,58 +177,45 @@ export class EcdsaLinkedDataSignature<
 
   async verify(inputs: ProofDerivationOptions, signer: Identity) {
     const digest = await this.generateHashAlg(inputs.document)
+    const [header, signature] = this.signatureValue.split('..')
+
+    if (header !== this.encodedJWTHeader) {
+      throw new Error(
+        'Invalid JWS header, expected ' +
+          base64url.parse(this.encodedJWTHeader).toString()
+      )
+    }
+
+    const toVerify = Buffer.concat([
+      Buffer.from(this.encodedJWTHeader + '.', 'utf8'),
+      digest,
+    ])
+
+    const decodedSignature = base64url.parse(signature, {
+      loose: true,
+    })
 
     return verifySignatureWithIdentity(
-      digest,
-      parseHexOrBase64(this.signatureValue),
+      toVerify,
+      Buffer.from(decodedSignature),
       this.verificationMethod,
       signer
     )
   }
 
   /**
-   * Converts the lined data signature to canonical form
-   * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
-   */
-
-  private async normalize(): Promise<string> {
-    const json: ILinkedDataSignatureAttrs = this.toJSON()
-
-    json['@context'] = defaultContext[0]
-
-    delete json.signatureValue
-    delete json.type
-    delete json.id
-
-    return canonize(json)
-  }
-
-  public async asBytes(): Promise<Buffer> {
-    return Buffer.from(await this.normalize())
-  }
-
-  /**
-   * Returns the sha256 hash of the linked data signature, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
-   */
-
-  public async digest(): Promise<Buffer> {
-    const normalized = await this.normalize()
-    return sha256(Buffer.from(normalized))
-  }
-
-  /**
-   * Instantiates a {@link EcdsaLinkedDataSignature} from it's JSON form
+   * Instantiates a {@link Ed25519Signature2018} from it's JSON form
    * @param json - Linked data signature in JSON-LD form
    */
 
   public static fromJSON(
     json: ILinkedDataSignatureAttrs
-  ): EcdsaLinkedDataSignature<BaseProofOptions> {
-    return plainToClass(EcdsaLinkedDataSignature, json)
+  ): Ed25519Signature2018<BaseProofOptions> {
+    return plainToClass(Ed25519Signature2018, json)
   }
 
   /**
-   * Serializes the {@link EcdsaLinkedDataSignature} as JSON-LD
+   * Serializes the {@link Ed25519Signature2018} as JSON-LD
    */
 
   public toJSON(): ILinkedDataSignatureAttrs {

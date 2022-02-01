@@ -89,6 +89,15 @@ export class ChainedProof2021<
     this._previousProof = prevProof
   }
 
+  @Expose()
+  get proofPurose() {
+    return this._proofPurpose
+  }
+
+  set proofPurose(proofPurpose: string) {
+    this._proofPurpose = proofPurpose
+  }
+
   /**
    * Get / set the proof / signature value associated with this node
    * @example `console.log(proof.signature) // '2b8504698e...'`
@@ -122,7 +131,7 @@ export class ChainedProof2021<
 
     cp.verificationMethod = args.verificationMethod
     cp.created = args.created || new Date()
-    cp.proofPurpose = args.proofPurpose || 'assertionMethod'
+    cp._proofPurpose = args.proofPurpose || 'assertionMethod'
 
     return cp
   }
@@ -165,6 +174,8 @@ export class ChainedProof2021<
       )
     }
 
+    //@ts-ignore typescript limitation, even if constructor is defined on all
+    // union type members, it can not be called.
     this.signatureSuite = new chainSignatureSuite().signatureSuite
     this.previousProof = customProofOptions.previousProof
 

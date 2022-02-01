@@ -9,6 +9,7 @@ type normalizationFn = (data: JsonLdObject) => Promise<string>;
 export enum SupportedSuites {
   ChainedProof2021 = "ChainedProof2021",
   EcdsaKoblitzSignature2016 = "EcdsaKoblitzSignature2016",
+  Ed25519Signature2018 = "Ed25519Signature2018",
 }
 
 export type BaseProofOptions = {
@@ -19,15 +20,13 @@ export type BaseProofOptions = {
 
 export abstract class LinkedDataProof<T extends BaseProofOptions> {
   abstract readonly proofType: SupportedSuites;
-  protected proofPurpose = "assertionMethod";
-
+  protected _proofPurpose = "assertionMethod";
   protected _verificationMethod = "";
   protected _created: Date = new Date();
   protected _proofValue = "";
 
   abstract verificationMethod: string;
   abstract created: Date;
-
   abstract signatureSuite: {
     digestAlg: digestFn;
     normalizationFn: normalizationFn;
