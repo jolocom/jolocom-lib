@@ -7,18 +7,16 @@ import {
   Transform,
 } from 'class-transformer'
 import { canonize } from 'jsonld'
-import {
-  ILinkedDataSignature,
-  ILinkedDataSignatureAttrs,
-  IDigestable,
-} from '../types'
+import { ILinkedDataSignatureAttrs, ProofDerivationOptions } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
-import { keyIdToDid } from '../../utils/helper'
+import { keyIdToDid, parseHexOrBase64 } from '../../utils/helper'
 import { IdentityWallet } from '../../identityWallet/identityWallet'
-import { LinkedDataProof } from 'did-resolver'
 import { normalizeJsonLd } from '../../linkedData'
 import { JsonLdObject } from '@jolocom/protocol-ts'
+import { Identity } from '../../identity/identity'
+import { verifySignatureWithIdentity } from '../../utils/validation'
+import { LinkedDataProof, SupportedSuites, BaseProofOptions } from '..'
 
 /**
  * @class A EcdsaKoblitz linked data signature implementation
@@ -28,28 +26,29 @@ import { JsonLdObject } from '@jolocom/protocol-ts'
  */
 
 @Exclude()
-export class EcdsaLinkedDataSignature
-  implements ILinkedDataSignature, IDigestable {
-  static _type = "EcdsaKoblitzSignature2016"
-  private _verificationMethod = ''
-  private _created: Date = new Date()
-  private _proofValue = ''
-  private _proofPurpose = 'assertionMethod'
+export class EcdsaLinkedDataSignature<
+  T extends BaseProofOptions
+> extends LinkedDataProof<T> {
+  proofType = SupportedSuites.EcdsaKoblitzSignature2016
 
-  // TODO Delete
-  set nonce(nonce: string) {}
-
-  @Expose()
-  get proofPurpose() {
-    return this._proofPurpose
+  signatureSuite = {
+    digestAlg: sha256,
+    normalizationFn: async (doc: JsonLdObject) => {
+      return await normalizeJsonLd(doc, defaultContext)
+    },
   }
 
-  set proofPurpose(proofPurpose: string) {
-    this._proofPurpose = proofPurpose
+  static create(arg: BaseProofOptions) {
+    const cp = new EcdsaLinkedDataSignature()
+    cp.verificationMethod = arg.verificationMethod
+    cp.created = arg.created || new Date()
+    cp.proofPurpose = arg.proofPurpose || 'assertionMethod'
+
+    return cp as LinkedDataProof<BaseProofOptions>
   }
 
   /**
-   * Get the creation date of the linked data signature
+   * Get / set the expiry date for the linked data signature
    * @example `console.log(proof.created) // Date 2018-11-11T15:46:09.720Z`
    */
 
@@ -62,11 +61,6 @@ export class EcdsaLinkedDataSignature
     return this._created
   }
 
-  /**
-   * Set the creation date of the linked data signature
-   * @example `proof.created = Date 2018-11-11T15:46:09.720Z`
-   */
-
   set created(created: Date) {
     this._created = created
   }
@@ -78,11 +72,11 @@ export class EcdsaLinkedDataSignature
 
   @Expose()
   get type() {
-    return EcdsaLinkedDataSignature._type
+    return this.proofType
   }
 
   /**
-   * Get the hex encoded signature value
+   * Get / set the hex encoded signature value
    * @example `console.log(proof.signature) // '2b8504698e...'`
    */
 
@@ -90,11 +84,6 @@ export class EcdsaLinkedDataSignature
   get signatureValue() {
     return this._proofValue
   }
-
-  /**
-   * Set the hex encoded signature value
-   * @example `proof.signature = '2b8504698e...'`
-   */
 
   set signature(signature: string) {
     this._proofValue = signature
@@ -105,10 +94,6 @@ export class EcdsaLinkedDataSignature
    * @example `proof.creator = 'did:jolo:...#keys-1`
    */
 
-  set creator(creator: string) {
-    this._verificationMethod = creator
-  }
-
   @Expose()
   get verificationMethod() {
     return this._verificationMethod
@@ -118,6 +103,10 @@ export class EcdsaLinkedDataSignature
     this._verificationMethod = verificationMethod
   }
 
+  set creator(creator: string) {
+    this._verificationMethod = creator
+  }
+
   get signer() {
     return {
       did: keyIdToDid(this.verificationMethod),
@@ -125,27 +114,55 @@ export class EcdsaLinkedDataSignature
     }
   }
 
-  async derive(inputs: DerivationOptions, signer: IdentityWallet, pass: string) {
-    const ldSig = new EcdsaLinkedDataSignature()
+  async derive(
+    inputs: ProofDerivationOptions,
+    proofSpecificOptions: {},
+    signer: IdentityWallet,
+    pass: string
+  ) {
+    if (!this.verificationMethod || !this.created) {
+      throw new Error('Proof options not set')
+    }
 
-    ldSig.verificationMethod = inputs.proofOptions.verificationMethod
-    ldSig.created = inputs.proofOptions.created
+    if (this.verificationMethod !== signer.publicKeyMetadata.signingKeyId) {
+      throw new Error(
+        `No signer for referenced verificationMethod ${this.verificationMethod}`
+      )
+    }
 
-    const { context, ...document } = inputs.document
+    const toSign = await this.generateHashAlg(inputs.document)
+    const signature = await signer.sign(toSign, pass)
+    this.signature = signature.toString('hex')
 
-    const normalizedDoc = await normalizeJsonLd(document, inputs.document['@context'])
+    return this
+  }
 
-    const {signatureValue, ...proofOptions} = ldSig.toJSON()
-    const normalizedProofOptions = await normalizeJsonLd(proofOptions, inputs.document['@context'])
+  private async generateHashAlg(document: JsonLdObject) {
+    // Normalized Document
+    const normalizedDoc = await this.signatureSuite.normalizationFn(document)
 
-    const toSign = Buffer.concat([
-      sha256(Buffer.from(normalizedProofOptions)),
-      sha256(Buffer.from(normalizedDoc))
+    // console.log({normalizedDoc, document, context: document['@context']})
+    const { signatureValue, ...proofOptions } = this.toJSON()
+
+    const normalizedProofOptions = await this.signatureSuite.normalizationFn(
+      proofOptions
+    )
+
+    return Buffer.concat([
+      this.signatureSuite.digestAlg(Buffer.from(normalizedProofOptions)),
+      this.signatureSuite.digestAlg(Buffer.from(normalizedDoc)),
     ])
+  }
 
-    ldSig.signature = await (await signer.sign(toSign, pass)).toString('hex')
+  async verify(inputs: ProofDerivationOptions, signer: Identity) {
+    const digest = await this.generateHashAlg(inputs.document)
 
-    return ldSig
+    return verifySignatureWithIdentity(
+      digest,
+      parseHexOrBase64(this.signatureValue),
+      this.verificationMethod,
+      signer
+    )
   }
 
   /**
@@ -153,11 +170,10 @@ export class EcdsaLinkedDataSignature
    * @see {@link https://w3c-dvcg.github.io/ld-signatures/#dfn-canonicalization-algorithm | Canonicalization algorithm }
    */
 
-
   private async normalize(): Promise<string> {
     const json: ILinkedDataSignatureAttrs = this.toJSON()
 
-    json['@context'] = defaultContext
+    json['@context'] = defaultContext[0]
 
     delete json.signatureValue
     delete json.type
@@ -185,8 +201,8 @@ export class EcdsaLinkedDataSignature
    */
 
   public static fromJSON(
-    json: ILinkedDataSignatureAttrs,
-  ): EcdsaLinkedDataSignature {
+    json: ILinkedDataSignatureAttrs
+  ): EcdsaLinkedDataSignature<BaseProofOptions> {
     return plainToClass(EcdsaLinkedDataSignature, json)
   }
 
@@ -196,15 +212,5 @@ export class EcdsaLinkedDataSignature
 
   public toJSON(): ILinkedDataSignatureAttrs {
     return classToPlain(this) as ILinkedDataSignatureAttrs
-  }
-}
-
-
-type DerivationOptions = {
-  document: JsonLdObject,
-  previousProofs?: LinkedDataProof[],
-  proofOptions: {
-    verificationMethod: string,
-    created: Date
   }
 }

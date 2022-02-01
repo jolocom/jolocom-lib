@@ -5,23 +5,15 @@ import {
   Expose,
   plainToClass,
   Transform,
-  Type,
 } from 'class-transformer'
-import { digestJsonLd, normalizeSignedLdObject } from '../../linkedData'
-import {
-  ISignedCredentialAttrs,
-  ISigner,
-} from '../types'
-import {
-  IDigestable,
-  ILinkedDataSignature,
-  ILinkedDataSignatureAttrs,
-} from '../../linkedDataSignature/types'
-import { ChainedProof2021, EcdsaLinkedDataSignature } from '../../linkedDataSignature'
+import { ISignedCredentialAttrs } from '../types'
+import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
+import { LinkedDataProof, BaseProofOptions } from '../../linkedDataSignature'
 import { Credential } from './credential'
 import { randomBytes } from 'crypto'
 import { BaseMetadata, ISignedCredCreationArgs } from '@jolocom/protocol-ts'
 import { ErrorCodes } from '../../errors'
+import { SuiteImplementation } from '../../linkedDataSignature/mapping'
 
 // Credentials are valid for a year by default
 const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
@@ -52,11 +44,12 @@ interface IIssInfo {
  */
 
 @Exclude()
-export class SignedCredential extends Credential implements IDigestable {
+export class SignedCredential extends Credential {
   private _issuer: string
   private _issued: Date
   private _expires?: Date
-  private _proof: ILinkedDataSignature[] = []
+  private _proof: LinkedDataProof<BaseProofOptions>[] = []
+  private _credentialSchema: { id: string; type: string }
 
   /**
    * Get the identifier of the signed credential
@@ -64,7 +57,7 @@ export class SignedCredential extends Credential implements IDigestable {
    */
 
   @Expose()
-  @Transform(value => value || generateClaimId(8), { toClassOnly: true })
+  @Transform((value) => value || generateClaimId(8), { toClassOnly: true })
   get id(): string {
     return this._id
   }
@@ -97,16 +90,12 @@ export class SignedCredential extends Credential implements IDigestable {
     this._issuer = issuer
   }
 
-  // TODO: Delete, required by IDigestable
-  set signature(signature: string) {
-  }
-
   /**
    * Get the issuance date of the signed credential
    * @example `console.log(signedCredential.issued) // Date 2018-11-11T15:46:09.720Z`
    */
 
-  @Expose({ name: "issuanceDate" })
+  @Expose({ name: 'issuanceDate' })
   @Transform((value: Date) => value && value.toISOString(), {
     toPlainOnly: true,
   })
@@ -143,25 +132,13 @@ export class SignedCredential extends Credential implements IDigestable {
     this._type = type
   }
 
-  /**
-   * Get aggregated metadata related to the signing public key
-   * @see{@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}
-   * @example `console.log(signedCredential.signer) // { did: 'did:jolo:...', keyId: 'did:jolo:...#keys-1' }`
-   */
-
-  get signers(): ISigner[] {
-    return this._proof.map(({ creator }) => ({
-      did: this.issuer,
-      keyId: creator
-    }))
+  @Expose()
+  get credentialSchema() {
+    return this._credentialSchema
   }
 
-
-  get signer(): ISigner {
-    return {
-      did: this.issuer,
-      keyId: this._proof[0].creator,
-    }
+  set credentialSchema(schema: { id: string; type: string }) {
+    this._credentialSchema = schema
   }
 
   /**
@@ -169,11 +146,10 @@ export class SignedCredential extends Credential implements IDigestable {
    * @example `console.log(signedCredential.expires) // Date 2018-11-11T15:46:09.720Z`
    */
 
-  @Expose({ name: "expirationDate" })
+  @Expose({ name: 'expirationDate' })
   @Transform((value: Date) => value && value.toISOString(), {
     toPlainOnly: true,
   })
-
   @Transform((value: string) => value && new Date(value), { toClassOnly: true })
   get expires(): Date {
     return this._expires
@@ -189,24 +165,30 @@ export class SignedCredential extends Credential implements IDigestable {
   }
 
   @Expose()
-  @Transform((value) =>
-    value.map(v => v.toJSON()), { toPlainOnly: true }
+  @Transform((value) => value.filter((v) => !!v).map((v) => v.toJSON()), {
+    toPlainOnly: true,
+  })
+  @Transform(
+    (value: ILinkedDataSignatureAttrs[]) => {
+      const proofs = Array.isArray(value) ? value : [value]
+
+      return proofs.map((v) => {
+        const dto = SuiteImplementation[v.type]
+
+        return dto ? dto.impl.fromJSON(v) : undefined
+      })
+    },
+    { toClassOnly: true }
   )
-  @Transform((value: ILinkedDataSignatureAttrs[]) => {
-    const proofs = Array.isArray(value) ? value : [value]
-
-    return proofs.map(v => v.type === ChainedProof2021._type ? ChainedProof2021.fromJSON(v) : EcdsaLinkedDataSignature.fromJSON(v))
-  }, { toClassOnly: true })
-
-  get proof(): ILinkedDataSignature[] {
+  get proof(): Array<LinkedDataProof<BaseProofOptions>> {
     return this._proof
   }
 
-  set proof(proof: ILinkedDataSignature[]) {
+  set proof(proof: Array<LinkedDataProof<BaseProofOptions>>) {
     this._proof = proof
   }
 
-  addProof(proof: ILinkedDataSignature) {
+  addProof(proof: LinkedDataProof<BaseProofOptions>) {
     this._proof.push(proof)
   }
 
@@ -229,12 +211,6 @@ export class SignedCredential extends Credential implements IDigestable {
   }
 
   /**
-   * Get the presentable credential name if present
-   * @default 'Credential'
-   * @example `console.log(signedCredential.name) // 'Email'`
-   */
-
-  /**
    * Instantiates a {@link SignedCredential} based on passed options
    * @param credentialOptions - Options for creating credential, and for deriving public signing key
    * @param issInfo - Public data data
@@ -246,7 +222,7 @@ export class SignedCredential extends Credential implements IDigestable {
   public static async create<T extends BaseMetadata>(
     credentialOptions: ISignedCredCreationArgs<T>,
     issInfo: IIssInfo,
-    expires = new Date(Date.now() + DEFAULT_EXPIRY_MS),
+    expires = new Date(Date.now() + DEFAULT_EXPIRY_MS)
   ) {
     const credential = Credential.build(credentialOptions)
     const json = (credential.toJSON() as unknown) as ISignedCredentialAttrs
@@ -262,25 +238,6 @@ export class SignedCredential extends Credential implements IDigestable {
     signedCredential.issuer = issInfo.issuerDid
 
     return signedCredential
-  }
-
-  /**
-   * Sets all fields on the instance necessary to compute the signature
-   * @param keyId - Public key identifier, as defined in the {@link https://w3c-ccg.github.io/did-spec/#public-keys | specification}.
-   * @internal
-   */
-
-  public async asBytes(): Promise<Buffer> {
-    return normalizeSignedLdObject(this.toJSON(), this.context)
-  }
-
-  /**
-   * Returns the sha256 hash of the signed credential, per {@link https://w3c-dvcg.github.io/ld-signatures/#signature-algorithm | specification}.
-   * @internal
-   */
-
-  public async digest(): Promise<Buffer> {
-    return digestJsonLd(this.toJSON(), this.context)
   }
 
   /**

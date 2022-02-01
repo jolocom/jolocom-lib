@@ -19,11 +19,10 @@ import {
 } from '../../linkedDataSignature/types'
 import { BaseMetadata } from '@jolocom/protocol-ts'
 import { IClaimSection } from '../types'
-import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
+import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import { JsonLdContext } from '../../linkedData/types'
 import { Credential } from './credential'
 import { ErrorCodes } from '../../errors'
-import { getRandomBytes } from '../../utils/crypto'
 import { randomBytes } from 'crypto'
 
 // Credentials are valid for a year by default
@@ -343,7 +342,6 @@ export class SignedCredential implements IDigestable {
     this.proof.creator = keyId
     // TODO Is this needed?
     this.proof.signature = ''
-    this.proof.nonce = (await getRandomBytes(8)).toString('hex')
   }
 
   public async asBytes(): Promise<Buffer> {

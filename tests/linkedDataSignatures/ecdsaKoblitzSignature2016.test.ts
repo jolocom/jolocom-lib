@@ -2,7 +2,7 @@ import * as sinon from 'sinon'
 import { expect } from 'chai'
 import * as jsonld from 'jsonld'
 
-import { EcdsaLinkedDataSignature } from '../../ts/linkedDataSignature'
+import { EcdsaLinkedDataSignature } from '../../ts/linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 import {
   signatureAttributes,
   normalizedSignatureSection,
@@ -11,9 +11,10 @@ import {
 } from './ecdsaSignature.data'
 import { defaultContext } from '../../ts/utils/contexts'
 import { mockKeyId } from '../data/credential/signedCredential.data'
+import { BaseProofOptions } from '../../ts/linkedDataSignature'
 
 describe('EcdsaKoblitzSignature', () => {
-  let signature: EcdsaLinkedDataSignature
+  let signature: EcdsaLinkedDataSignature<BaseProofOptions>
   let clock
   let stubbedCanonise
 
@@ -45,14 +46,12 @@ describe('EcdsaKoblitzSignature', () => {
     const {
       created,
       creator,
-      nonce,
       signatureValue,
       type,
     } = signatureAttributes
 
     expect(signature.created).to.deep.eq(new Date(created))
     expect(signature.creator).to.eq(creator)
-    expect(signature.nonce).to.eq(nonce)
     expect(signature.signature).to.deep.eq(signatureValue)
     expect(signature.type).to.deep.eq(type)
   })
@@ -73,7 +72,6 @@ describe('EcdsaKoblitzSignature', () => {
     const bareSignature = new EcdsaLinkedDataSignature()
     bareSignature.created = new Date(0)
     bareSignature.verificationMethod = mockKeyId
-    bareSignature.nonce = '1842fb5f567dd532'
     bareSignature.signature = 'abcdef'
 
     expect(bareSignature.toJSON()).to.deep.eq(signatureAttributes)

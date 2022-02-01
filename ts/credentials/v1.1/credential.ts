@@ -114,10 +114,15 @@ export class Credential {
     subject,
   }: ISignedCredCreationArgs<T>) {
     const credential = new Credential()
-    credential.context = [...defaultContext, ...metadata.context]
-    credential.type = metadata.type
+
+    credential.context = [
+      'https://www.w3.org/2018/credentials/v1',
+      metadata.context[0],
+    ]
+    credential.type = ['VerifiableCredential', metadata.type[1]]
     credential.credentialSubject = claim
     credential.credentialSubject.id = subject
+    credential.id = `claimId:${randomBytes(8).toString('hex')}`
 
     return credential
   }
@@ -132,6 +137,7 @@ export class Credential {
 
   public toVerifiableCredential() {
     const signedCred = new SignedCredential()
+
     signedCred.id = this.id
     signedCred.type = this.type
     signedCred.context = this.context
