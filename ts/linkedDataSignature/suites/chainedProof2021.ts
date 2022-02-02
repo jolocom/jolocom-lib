@@ -209,7 +209,7 @@ export class ChainedProof2021<
 
     if (matches.length !== 1) {
       throw new Error(
-        `Expected previousProof to match exactly one proof node, instead it matches - ${matches.length}`
+        `Expected previousProof to match exactly one proof node, instead it matches ${matches.length}`
       )
     }
 

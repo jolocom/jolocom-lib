@@ -8,7 +8,6 @@ import {
   Type,
 } from 'class-transformer'
 import { IDidDocumentAttrs } from '@jolocom/protocol-ts'
-import { EcdsaLinkedDataSignature } from '../../linkedDataSignature'
 import {
   AuthenticationSection,
   PublicKeySection,
@@ -25,6 +24,7 @@ import { ContextEntry } from '@jolocom/protocol-ts'
 import { ISigner } from '../../credentials/types'
 import { IVaultedKeyProvider, IKeyRefArgs } from '@jolocom/vaulted-key-provider'
 import { publicKeyToJoloDID } from '../../didMethods/jolo/utils'
+import { EcdsaLinkedDataSignature } from '../../linkedDataSignature/suites/ecdsaKoblitzSignature2016'
 
 /**
  * Class modelling a Did Document
@@ -69,9 +69,9 @@ export class DidDocument implements IDigestable {
   @Expose({ name: '@context' })
   // TODO Is this needed?
   @Transform(
-    (val, obj) => {
+    ({value, obj}) => {
       if (obj.id.startsWith('did:jolo')) return defaultContextIdentity
-      else return val
+      else return value
     },
     { toClassOnly: true },
   )
@@ -115,9 +115,9 @@ export class DidDocument implements IDigestable {
 
   @Expose()
   @Transform(
-    auths =>
-      auths &&
-      auths.map(val => {
+    ({value}) =>
+      value &&
+      value.map(val => {
         const { type, publicKey } = val
         return type === 'Secp256k1SignatureAuthentication2018' && !!publicKey
           ? publicKey
@@ -154,17 +154,17 @@ export class DidDocument implements IDigestable {
 
   @Expose()
   @Transform(
-    (pubKeys, rest) => {
-      const { verificationMethod } = rest
+    ({value, obj}) => {
+      const { verificationMethod } = obj
       if (verificationMethod && verificationMethod.length) {
-        return [...(pubKeys || []), ...verificationMethod]
+        return [...(value || []), ...verificationMethod]
       }
 
-      return pubKeys || []
+      return value || []
     },
     { toClassOnly: true },
   )
-  @Transform(pubKeys => pubKeys && pubKeys.map(PublicKeySection.fromJSON))
+  @Transform(({value}) => value && value.map(PublicKeySection.fromJSON))
   public get publicKey(): PublicKeySection[] {
     return this._publicKey
   }
@@ -215,10 +215,10 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose()
-  @Transform((value: Date) => value && value.toISOString(), {
+  @Transform(({value}) => value && value.toISOString(), {
     toPlainOnly: true,
   })
-  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+  @Transform(({value}) => value && new Date(value), { toClassOnly: true })
   public get created(): Date {
     return this._created
   }
@@ -238,10 +238,11 @@ export class DidDocument implements IDigestable {
    */
 
   @Expose({ since: 0.13 })
-  @Transform((value: Date) => value && value.toISOString(), {
+  @Transform(({value}) => value && value.toISOString(), {
     toPlainOnly: true,
   })
-  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+
+  @Transform(({value}) => value && new Date(value), { toClassOnly: true })
   public get updated(): Date {
     return this._updated
   }

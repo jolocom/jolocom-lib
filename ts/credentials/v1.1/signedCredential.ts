@@ -97,7 +97,6 @@ export class SignedCredential {
    */
 
   @Expose()
-  @Transform(({ value }) => value || generateClaimId(8), { toClassOnly: true })
   get id(): string {
     return this.credential.id
   }

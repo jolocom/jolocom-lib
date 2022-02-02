@@ -262,6 +262,8 @@ const case3 = async (signer: IdentityWallet, pass: string) => {
     pass
   )
 
+  await wait(1)
+
   await credentialSigner.generateProof(
     SupportedSuites.ChainedProof2021,
     {
@@ -332,15 +334,21 @@ const runTest = async () => {
   )
   await case1(identityWallet, PASS)
 
-  // console.log(
-  //   'Case 2. A VC without proofs is received as JSON. Two proofs are added. All signatures are verifiable.'
-  // )
-  // await case2(identityWallet, PASS)
+  console.log(
+    'Case 2. A VC without proofs is received as JSON. Two proofs are added. All signatures are verifiable.'
+  )
+  await case2(identityWallet, PASS)
 
-  // console.log(
-  // 'Case 3. A VC with existing proofs is received as JSON, new signature is added, the VC is tampered with, verification should fail'
-  // )
-  // await case3(identityWallet, PASS)
+  console.log(
+  'Case 3. A VC with existing proofs is received as JSON, new signature is added, the VC is tampered with, verification should fail'
+  )
+  await case3(identityWallet, PASS)
 }
 
-runTest().then(() => console.log('DONE'))
+runTest()
+
+const wait = (duration = 1) => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(undefined), duration * 1000)
+  })
+}

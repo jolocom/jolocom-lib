@@ -1,7 +1,7 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
+import { v4 as uuidv4 } from 'uuid';
 import { ICredentialAttrs, IClaimSection } from '../types'
 import { BaseMetadata } from '@jolocom/protocol-ts'
-import { defaultContext } from '../../utils/contexts'
 import { ISignedCredCreationArgs } from '../types'
 import { JsonLdContext } from '../../linkedData/types'
 import { SignedCredential } from './signedCredential'
@@ -16,14 +16,13 @@ import { randomBytes } from 'crypto'
 @Exclude()
 export class Credential {
   protected '_@context': JsonLdContext
-  // TODO Replace with UUID
-  protected _id: string = randomBytes(8).toString('hex')
+  protected _id: string = `urn:uuid:${uuidv4()}`
   protected _type: string[]
   protected _claim: IClaimSection
 
   /**
    * Get the identifier of the credential
-   * @example `console.log(credential.id) //claimId:25453fa543da7`
+   * @example `console.log(credential.id) //urn:uuid:1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
    */
 
   get id() {
@@ -32,7 +31,7 @@ export class Credential {
 
   /**
    * Set the identifier of the credential
-   * @example `credential.id = 'claimId:2543fa543da7'`
+   * @example `credential.id = '//urn:uuid:1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'`
    */
 
   set id(id: string) {
@@ -122,7 +121,6 @@ export class Credential {
     credential.type = ['VerifiableCredential', metadata.type[1]]
     credential.credentialSubject = claim
     credential.credentialSubject.id = subject
-    credential.id = `claimId:${randomBytes(8).toString('hex')}`
 
     return credential
   }

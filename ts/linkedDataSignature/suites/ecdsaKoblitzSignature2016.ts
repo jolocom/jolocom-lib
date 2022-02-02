@@ -92,12 +92,12 @@ export class EcdsaLinkedDataSignature<
    * @example `console.log(proof.signature) // '2b8504698e...'`
    */
 
-  @Expose({ name: 'signatureValue' })
+  @Expose()
   get signatureValue() {
     return this._proofValue
   }
 
-  set signature(signature: string) {
+  set signatureValue(signature: string) {
     this._proofValue = signature
   }
 
@@ -115,6 +115,7 @@ export class EcdsaLinkedDataSignature<
     this._verificationMethod = verificationMethod
   }
 
+  // These getter / setter methods are needed for backwards compatibility, i.e. with the DIDDocument class
   set creator(creator: string) {
     this._verificationMethod = creator
   }
@@ -124,6 +125,18 @@ export class EcdsaLinkedDataSignature<
       did: keyIdToDid(this.verificationMethod),
       keyId: this.verificationMethod,
     }
+  }
+
+  get signature() {
+    return this._proofValue
+  }
+
+  set signature(signature: string) {
+    this._proofValue = signature
+  }
+
+  get nonce() {
+    return ""
   }
 
   async derive(
@@ -144,7 +157,7 @@ export class EcdsaLinkedDataSignature<
 
     const toSign = await this.generateHashAlg(inputs.document)
     const signature = await signer.sign(toSign, pass)
-    this.signature = this.signatureSuite.signatureEncodingFn(signature)
+    this.signatureValue = this.signatureSuite.signatureEncodingFn(signature)
 
     return this
   }
@@ -171,7 +184,7 @@ export class EcdsaLinkedDataSignature<
 
     return verifySignatureWithIdentity(
       digest,
-      this.signatureSuite.signatureDecodingFn(this.signature),
+      this.signatureSuite.signatureDecodingFn(this.signatureValue),
       this.verificationMethod,
       signer
     )
