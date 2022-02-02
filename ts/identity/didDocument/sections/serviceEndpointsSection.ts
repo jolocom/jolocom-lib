@@ -28,7 +28,7 @@ export class ServiceEndpointsSection {
    */
 
   @Expose()
-  @Transform(id => id.replace(';', '#'), { toClassOnly: true, until: 0.13 })
+  @Transform(({value}) => value.replace(';', '#'), { toClassOnly: true, until: 0.13 })
   get id(): string {
     return this._id
   }

@@ -7,32 +7,42 @@ import {
   Transform,
 } from 'class-transformer'
 import { ILinkedDataSignatureAttrs, ProofDerivationOptions } from '../types'
-import { parseHexOrBase64 } from '../../utils/helper'
 import { IdentityWallet } from '../../identityWallet/identityWallet'
 import { LinkedDataProof, SupportedSuites, BaseProofOptions } from '..'
 import { Identity } from '../../identity/identity'
 import { SuiteImplementation } from '../mapping'
 import { JsonLdObject } from '../../linkedData/types'
 import { verifySignatureWithIdentity } from '../../utils/validation'
+import { dateToIsoString } from '../../credentials/v1.1/signedCredential'
 
 export enum ErrorCodes {
   InnerSignatureVerificationFailed = 'InnerSignatureVerificationFailed',
   ChainAndInnerSignatureVerificationFailed = 'ChainAndInnerSignatureVerificationFailed',
 }
 
+export type PreviousProofOptions = {
+  type: SupportedSuites
+  verificationMethod: string
+  created: Date
+  proofPurpose: string
+  domain?: string
+}
+
 @Exclude()
 export class ChainedProof2021<
-  T extends BaseProofOptions,
-  P extends BaseProofOptions = BaseProofOptions
+  T extends BaseProofOptions
 > extends LinkedDataProof<T> {
   proofType = SupportedSuites.ChainedProof2021
-  private _previousProof: LinkedDataProof<P>
+  proofPurpose = 'assertionMethod'
+  private _previousProof: PreviousProofOptions
   private _chainSignatureSuite: SupportedSuites =
     SupportedSuites.EcdsaKoblitzSignature2016
 
   signatureSuite = {
     digestAlg: undefined,
     normalizationFn: undefined,
+    signatureEncodingFn: undefined,
+    signatureDecodingFn: undefined,
   }
 
   @Expose()
@@ -42,6 +52,18 @@ export class ChainedProof2021<
 
   set chainSignatureSuite(chainSignatureSuite) {
     this._chainSignatureSuite = chainSignatureSuite
+    if (
+      !this.signatureSuite.normalizationFn &&
+      !this.signatureSuite.digestAlg &&
+      !this.signatureSuite.signatureEncodingFn &&
+      !this.signatureSuite.signatureDecodingFn
+    ) {
+      //@ts-ignore typescript limitation, even if constructor is defined on all
+      // union type members, it can not be called.
+      this.signatureSuite = new SuiteImplementation[
+        chainSignatureSuite
+      ].impl().signatureSuite
+    }
   }
 
   /**
@@ -50,8 +72,8 @@ export class ChainedProof2021<
    */
 
   @Expose()
-  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
-  @Transform((value: Date) => value && value.toISOString(), {
+  @Transform(({ value }) => value && new Date(value), { toClassOnly: true })
+  @Transform(({ value }) => dateToIsoString(value), {
     toPlainOnly: true,
   })
   get created() {
@@ -72,20 +94,27 @@ export class ChainedProof2021<
     return this.proofType
   }
 
+  set type(type: SupportedSuites) {
+    this.proofType = type
+  }
+
   @Expose()
-  @Transform((value: LinkedDataProof<P>) => {
-    return {
-      created: value.created,
-      verificationMethod: value.verificationMethod,
-      type: value.proofType,
-      proofPurpose: 'assertionMethod',
-    }
-  })
+  @Transform(
+    ({ value }) => {
+      return {
+        created: value.created,
+        verificationMethod: value.verificationMethod,
+        type: value.type,
+        proofPurpose: value.proofPurpose,
+      }
+    },
+    { toPlainOnly: true }
+  )
   get previousProof() {
     return this._previousProof
   }
 
-  set previousProof(prevProof: LinkedDataProof<P>) {
+  set previousProof(prevProof: PreviousProofOptions) {
     this._previousProof = prevProof
   }
 
@@ -103,7 +132,7 @@ export class ChainedProof2021<
    * @example `console.log(proof.signature) // '2b8504698e...'`
    */
 
-  @Expose({ name: 'signatureValue' })
+  @Expose({ name: 'proofValue' })
   get signature() {
     return this._proofValue
   }
@@ -142,19 +171,12 @@ export class ChainedProof2021<
     signer: IdentityWallet,
     pass: string
   ) {
-    const { previousProofs } = inputs
-    const { previousProof } = customProofOptions
+    this.previousProof = customProofOptions.previousProof
 
-    if (!previousProofs || previousProofs.length === 0) {
-      throw new Error('ChainedProof requires existing proofs')
-    }
-
-    if (!previousProof || previousProofs.indexOf(previousProof) === -1) {
-      throw new Error('Could not find referenced previous proof')
-    }
+    const ldProof = this.findMatchingProof(inputs.previousProofs)
 
     if (customProofOptions.strict) {
-      const prevSigValid = await this.previousProof
+      const prevSigValid = await ldProof
         .verify(inputs, signer.identity)
         .catch((_) => false)
 
@@ -163,38 +185,57 @@ export class ChainedProof2021<
       }
     }
 
-    this.previousProof = previousProof
+    this.chainSignatureSuite = customProofOptions.chainSignatureSuite
 
-    const chainSignatureSuite =
-      SuiteImplementation[customProofOptions.chainSignatureSuite].impl
-
-    if (!chainSignatureSuite) {
-      throw new Error(
-        `Signature suite ${customProofOptions.chainSignatureSuite} is not supported.`
-      )
-    }
-
-    //@ts-ignore typescript limitation, even if constructor is defined on all
-    // union type members, it can not be called.
-    this.signatureSuite = new chainSignatureSuite().signatureSuite
-    this.previousProof = customProofOptions.previousProof
-
-    const toBeSigned = await this.generateHashAlg(inputs.document)
-    this.signature = (await signer.sign(toBeSigned, pass)).toString('hex')
+    const toBeSigned = await this.generateHashAlg(classToPlain(ldProof))
+    this.signature = this.signatureSuite.signatureEncodingFn(
+      await signer.sign(toBeSigned, pass)
+    )
 
     return this
   }
 
-  async verify(inputs: ProofDerivationOptions, signer: Identity) {
-    const toBeVerified = await this.generateHashAlg(inputs.document)
+  private findMatchingProof(proofs: LinkedDataProof<BaseProofOptions>[]) {
+    const matches = proofs.filter(
+      ({ proofPurpose, proofType, created, verificationMethod }) => {
+        return (
+          proofType === this.previousProof.type &&
+          verificationMethod === this.previousProof.verificationMethod &&
+          created.toString() === this.previousProof.created.toString() &&
+          proofPurpose === this.previousProof.proofPurpose
+        )
+      }
+    )
 
-    const referencedProofValid = await this.previousProof
+    if (matches.length !== 1) {
+      throw new Error(
+        `Expected previousProof to match exactly one proof node, instead it matches - ${matches.length}`
+      )
+    }
+
+    return matches[0]
+  }
+
+  async verify(inputs: ProofDerivationOptions, signer: Identity) {
+    const previousProof = this.findMatchingProof(inputs.previousProofs)
+
+    if (!previousProof) {
+      throw new Error('Referenced Previous Proof not found')
+    }
+
+    const toBeVerified = await this.generateHashAlg(classToPlain(previousProof))
+
+    const referencedProofValid = await previousProof
       .verify(inputs, signer)
-      .catch((_) => false)
+      .catch((e) =>
+        e.message && e.message === ErrorCodes.InnerSignatureVerificationFailed
+          ? true
+          : false
+      )
 
     const chainSignatureValid = await verifySignatureWithIdentity(
       toBeVerified,
-      parseHexOrBase64(this.signature),
+      this.signatureSuite.signatureDecodingFn(this.signature),
       this.verificationMethod,
       signer
     ).catch((_) => false)
@@ -211,13 +252,13 @@ export class ChainedProof2021<
   }
 
   private async generateHashAlg(document: JsonLdObject) {
-    // Normalized Previous Proof Node
+    // The entire previousProof node normalized, all properties (e.g. jws, signatureValue) are included.
     const normalizedPrevProof = await this.signatureSuite.normalizationFn({
-      ...classToPlain(this.previousProof),
+      ...document,
       '@context': document['@context'],
     })
 
-    const { signatureValue, ...proofOptions } = this.toJSON()
+    const { proofValue, ...proofOptions } = this.toJSON()
 
     // Normalized Chained Data Proof options
     const normalizedProofOptions = await this.signatureSuite.normalizationFn({
@@ -248,6 +289,6 @@ export class ChainedProof2021<
 
 type CustomOptions = {
   chainSignatureSuite: SupportedSuites
-  previousProof: LinkedDataProof<BaseProofOptions>
+  previousProof: PreviousProofOptions
   strict?: boolean
 }

@@ -17,6 +17,7 @@ import { Identity } from '../../identity/identity'
 import { verifySignatureWithIdentity } from '../../utils/validation'
 import { LinkedDataProof, SupportedSuites, BaseProofOptions } from '..'
 import { base64url } from 'rfc4648'
+import { dateToIsoString } from '../../credentials/v1.1/signedCredential'
 
 /**
  * @class A Ed25519Signature2018 Linked Data Proof implementation
@@ -37,6 +38,19 @@ export class Ed25519Signature2018<
     digestAlg: sha256,
     normalizationFn: async (doc: JsonLdObject) => {
       return await normalizeJsonLd(doc, defaultContext)
+    },
+    signatureEncodingFn: (signature: Buffer) => {
+      return (
+        this.encodedJWTHeader +
+        '..' +
+        base64url.stringify(signature, { pad: false })
+      )
+    },
+    signatureDecodingFn: (jws: string) => {
+      const [_, signature] = jws.split('..')
+      return Buffer.from(base64url.parse(signature, {
+        loose: true,
+      }))
     },
   }
 
@@ -64,8 +78,8 @@ export class Ed25519Signature2018<
    */
 
   @Expose()
-  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
-  @Transform((value: Date) => value && value.toISOString(), {
+  @Transform(({ value }) => value && new Date(value), { toClassOnly: true })
+  @Transform(({ value }) => dateToIsoString(value), {
     toPlainOnly: true,
   })
   get created() {
@@ -91,12 +105,12 @@ export class Ed25519Signature2018<
    * @example `console.log(proof.signature) // '2b8504698e...'`
    */
 
-  @Expose({ name: 'jws' })
-  get signatureValue() {
+  @Expose()
+  get jws() {
     return this._proofValue
   }
 
-  set signature(signature: string) {
+  set jws(signature: string) {
     this._proofValue = signature
   }
 
@@ -148,13 +162,9 @@ export class Ed25519Signature2018<
       documentDigest,
     ])
 
-    const signature = await signer.sign(toSign, pass)
-
-    this.signature =
-      this.encodedJWTHeader +
-      '..' +
-      base64url.stringify(signature, { pad: false })
-
+    this.jws = this.signatureSuite.signatureEncodingFn(
+      await signer.sign(toSign, pass)
+    )
     return this
   }
 
@@ -177,7 +187,7 @@ export class Ed25519Signature2018<
 
   async verify(inputs: ProofDerivationOptions, signer: Identity) {
     const digest = await this.generateHashAlg(inputs.document)
-    const [header, signature] = this.signatureValue.split('..')
+    const [header, _] = this.jws.split('..')
 
     if (header !== this.encodedJWTHeader) {
       throw new Error(
@@ -191,13 +201,9 @@ export class Ed25519Signature2018<
       digest,
     ])
 
-    const decodedSignature = base64url.parse(signature, {
-      loose: true,
-    })
-
     return verifySignatureWithIdentity(
       toVerify,
-      Buffer.from(decodedSignature),
+      this.signatureSuite.signatureDecodingFn(this.jws),
       this.verificationMethod,
       signer
     )

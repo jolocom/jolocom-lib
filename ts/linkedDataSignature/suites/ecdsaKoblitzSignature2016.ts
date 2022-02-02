@@ -10,7 +10,7 @@ import { canonize } from 'jsonld'
 import { ILinkedDataSignatureAttrs, ProofDerivationOptions } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
-import { keyIdToDid, parseHexOrBase64 } from '../../utils/helper'
+import { keyIdToDid} from '../../utils/helper'
 import { IdentityWallet } from '../../identityWallet/identityWallet'
 import { normalizeJsonLd } from '../../linkedData'
 import { JsonLdObject } from '@jolocom/protocol-ts'
@@ -30,12 +30,15 @@ export class EcdsaLinkedDataSignature<
   T extends BaseProofOptions
 > extends LinkedDataProof<T> {
   proofType = SupportedSuites.EcdsaKoblitzSignature2016
+  proofPurpose = 'assertionMethod'
 
   signatureSuite = {
     digestAlg: sha256,
     normalizationFn: async (doc: JsonLdObject) => {
       return await normalizeJsonLd(doc, defaultContext)
     },
+    signatureEncodingFn: (data: Buffer) => data.toString('hex'),
+    signatureDecodingFn: (data: string) => Buffer.from(data, 'hex'),
   }
 
   static create(arg: BaseProofOptions) {
@@ -53,8 +56,8 @@ export class EcdsaLinkedDataSignature<
    */
 
   @Expose()
-  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
-  @Transform((value: Date) => value && value.toISOString(), {
+  @Transform(({ value }) => value && new Date(value), { toClassOnly: true })
+  @Transform(({ value }) => value && value.toISOString(), {
     toPlainOnly: true,
   })
   get created() {
@@ -141,7 +144,7 @@ export class EcdsaLinkedDataSignature<
 
     const toSign = await this.generateHashAlg(inputs.document)
     const signature = await signer.sign(toSign, pass)
-    this.signature = signature.toString('hex')
+    this.signature = this.signatureSuite.signatureEncodingFn(signature)
 
     return this
   }
@@ -168,7 +171,7 @@ export class EcdsaLinkedDataSignature<
 
     return verifySignatureWithIdentity(
       digest,
-      parseHexOrBase64(this.signatureValue),
+      this.signatureSuite.signatureDecodingFn(this.signature),
       this.verificationMethod,
       signer
     )

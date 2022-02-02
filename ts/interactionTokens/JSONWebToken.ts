@@ -84,7 +84,7 @@ export class JSONWebToken<T> implements IDigestable {
    */
 
   @Expose()
-  @Transform(value => convertPayload(value), { toClassOnly: true })
+  @Transform(({value}) => convertPayload(value), { toClassOnly: true })
   get payload() {
     return this._payload
   }
@@ -94,7 +94,7 @@ export class JSONWebToken<T> implements IDigestable {
   }
 
   @Expose()
-  @Transform(value => value || '')
+  @Transform(({value}) => value || '')
   get signature() {
     return this._signature
   }

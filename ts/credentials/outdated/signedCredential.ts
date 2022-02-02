@@ -92,7 +92,7 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Transform(value => value || generateClaimId(8), { toClassOnly: true })
+  @Transform(({value}) => value || generateClaimId(8), { toClassOnly: true })
   get id(): string {
     return this._id
   }
@@ -131,10 +131,10 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Transform((value: Date) => value && value.toISOString(), {
+  @Transform(({value }) => value && value.toISOString(), {
     toPlainOnly: true,
   })
-  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+  @Transform(({value}) => value && new Date(value), { toClassOnly: true })
   get issued(): Date {
     return this._issued
   }
@@ -204,10 +204,10 @@ export class SignedCredential implements IDigestable {
    */
 
   @Expose()
-  @Transform((value: Date) => value && value.toISOString(), {
+  @Transform(({value}) => value && value.toISOString(), {
     toPlainOnly: true,
   })
-  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+  @Transform(({value}) => value && new Date(value), { toClassOnly: true })
   get expires(): Date {
     return this._expires
   }
@@ -228,7 +228,7 @@ export class SignedCredential implements IDigestable {
 
   @Expose()
   @Type(() => EcdsaLinkedDataSignature)
-  @Transform(value => value || new EcdsaLinkedDataSignature(), {
+  @Transform(({value}) => value || new EcdsaLinkedDataSignature(), {
     toClassOnly: true,
   })
   get proof(): ILinkedDataSignature {

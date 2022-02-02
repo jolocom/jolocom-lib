@@ -6,14 +6,19 @@ import {
   plainToClass,
   Transform,
 } from 'class-transformer'
-import { ISignedCredentialAttrs } from '../types'
-import { ILinkedDataSignatureAttrs } from '../../linkedDataSignature/types'
-import { LinkedDataProof, BaseProofOptions } from '../../linkedDataSignature'
+import { LinkedDataProof, BaseProofOptions, SupportedSuites } from '../../linkedDataSignature'
 import { Credential } from './credential'
 import { randomBytes } from 'crypto'
-import { BaseMetadata, ISignedCredCreationArgs } from '@jolocom/protocol-ts'
+import {
+  BaseMetadata,
+  IClaimSection,
+  ISignedCredCreationArgs,
+  JsonLdContext,
+} from '@jolocom/protocol-ts'
 import { ErrorCodes } from '../../errors'
 import { SuiteImplementation } from '../../linkedDataSignature/mapping'
+import { SignedCredentialJSON } from './types'
+import { ChainedProof2021 } from '../../linkedDataSignature/suites/chainedProof2021'
 
 // Credentials are valid for a year by default
 const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
@@ -44,22 +49,57 @@ interface IIssInfo {
  */
 
 @Exclude()
-export class SignedCredential extends Credential {
+export class SignedCredential {
+  public readonly credential: Credential = new Credential()
   private _issuer: string
   private _issued: Date
   private _expires?: Date
   private _proof: LinkedDataProof<BaseProofOptions>[] = []
-  private _credentialSchema: { id: string; type: string }
+  private _credentialSchema?: Array<{ id: string; type: string }>
 
+  @Expose()
+  get credentialSubject(): IClaimSection {
+    return this.credential.credentialSubject
+  }
+
+  /**
+   * Set the `claim` section of the credential
+   * @example `credential.claim = { id: 'did:jolo:abcde', name: 'Example' }`
+   */
+
+  set credentialSubject(claim: IClaimSection) {
+    this.credential.credentialSubject = claim
+  }
+
+  /**
+   * Get the `@context` section of the JSON-ld document
+   * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
+   * @example `console.log(credential.context) // [{name: 'http://schema.org/name', ...}, {...}]`
+   */
+
+  @Expose({ name: '@context' })
+  public get context(): JsonLdContext {
+    return this.credential['_@context']
+  }
+
+  /**
+   * Set the `@context` section of the JSON-ld document
+   * @see {@link https://json-ld.org/spec/latest/json-ld/#the-context | JSON-LD context}
+   * @example `credential.context = [{name: 'http://schema.org/name', ...}, {...}]`
+   */
+
+  public set context(context: JsonLdContext) {
+    this.credential['_@context'] = context
+  }
   /**
    * Get the identifier of the signed credential
    * @example `console.log(signedCredential.id) //claimId:25453fa543da7`
    */
 
   @Expose()
-  @Transform((value) => value || generateClaimId(8), { toClassOnly: true })
+  @Transform(({ value }) => value || generateClaimId(8), { toClassOnly: true })
   get id(): string {
-    return this._id
+    return this.credential.id
   }
 
   /**
@@ -68,7 +108,7 @@ export class SignedCredential extends Credential {
    */
 
   set id(id: string) {
-    this._id = id
+    this.credential.id = id
   }
 
   /**
@@ -96,12 +136,26 @@ export class SignedCredential extends Credential {
    */
 
   @Expose({ name: 'issuanceDate' })
-  @Transform((value: Date) => value && value.toISOString(), {
+  @Transform(({ value }) => dateToIsoString(value), {
     toPlainOnly: true,
   })
-  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
+  @Transform(({ value }) => value && new Date(value), { toClassOnly: true })
   get issued(): Date {
     return this._issued
+  }
+
+  /**
+   * Get the expiry date of the signed credential
+   * @example `console.log(signedCredential.expires) // Date 2018-11-11T15:46:09.720Z`
+   */
+
+  @Expose({ name: 'expirationDate' })
+  @Transform(({ value }) => dateToIsoString(value), {
+    toPlainOnly: true,
+  })
+  @Transform(({ value }) => value && new Date(value), { toClassOnly: true })
+  get expires(): Date {
+    return this._expires
   }
 
   /**
@@ -120,7 +174,7 @@ export class SignedCredential extends Credential {
 
   @Expose()
   get type(): string[] {
-    return this._type
+    return this.credential.type
   }
 
   /**
@@ -129,30 +183,22 @@ export class SignedCredential extends Credential {
    */
 
   set type(type: string[]) {
-    this._type = type
+    this.credential.type = type
   }
 
   @Expose()
+  @Transform(({ value }) => (value && Array.isArray(value) ? value : [value]), {
+    toClassOnly: true,
+  })
+  @Transform(({ value }) => value && (value.length === 1 ? value[0] : value), {
+    toPlainOnly: true,
+  })
   get credentialSchema() {
     return this._credentialSchema
   }
 
-  set credentialSchema(schema: { id: string; type: string }) {
+  set credentialSchema(schema: Array<{ id: string; type: string }>) {
     this._credentialSchema = schema
-  }
-
-  /**
-   * Get the expiry date of the signed credential
-   * @example `console.log(signedCredential.expires) // Date 2018-11-11T15:46:09.720Z`
-   */
-
-  @Expose({ name: 'expirationDate' })
-  @Transform((value: Date) => value && value.toISOString(), {
-    toPlainOnly: true,
-  })
-  @Transform((value: string) => value && new Date(value), { toClassOnly: true })
-  get expires(): Date {
-    return this._expires
   }
 
   /**
@@ -165,16 +211,18 @@ export class SignedCredential extends Credential {
   }
 
   @Expose()
-  @Transform((value) => value.filter((v) => !!v).map((v) => v.toJSON()), {
+  @Transform(({ value }) => value.filter((v) => !!v).map((v) => v.toJSON()), {
     toPlainOnly: true,
   })
   @Transform(
-    (value: ILinkedDataSignatureAttrs[]) => {
+    ({ value }) => {
       const proofs = Array.isArray(value) ? value : [value]
 
       return proofs.map((v) => {
         const dto = SuiteImplementation[v.type]
-
+        if (v.type === SupportedSuites.ChainedProof2021) {
+          return ChainedProof2021.fromJSON(v)
+        }
         return dto ? dto.impl.fromJSON(v) : undefined
       })
     },
@@ -222,22 +270,26 @@ export class SignedCredential extends Credential {
   public static async create<T extends BaseMetadata>(
     credentialOptions: ISignedCredCreationArgs<T>,
     issInfo: IIssInfo,
-    expires = new Date(Date.now() + DEFAULT_EXPIRY_MS)
+    expires?: Date
   ) {
     const credential = Credential.build(credentialOptions)
-    const json = (credential.toJSON() as unknown) as ISignedCredentialAttrs
-    const signedCredential = SignedCredential.fromJSON(json)
 
-    signedCredential.expires = expires
-    signedCredential.issued = new Date()
+    const { context, id, type, credentialSubject } = credential
 
-    if (signedCredential.expires <= signedCredential.issued) {
+    const signedCred = new SignedCredential()
+    signedCred.context = context
+    signedCred.id = id
+    signedCred.type = type
+    signedCred.credentialSubject = credentialSubject
+    signedCred.issued = new Date()
+    signedCred.expires = expires || new Date(Date.now() + DEFAULT_EXPIRY_MS)
+    signedCred.issuer = issInfo.issuerDid
+
+    if (signedCred.expires <= signedCred.issued) {
       throw new Error(ErrorCodes.VCInvalidExpiryDate)
     }
 
-    signedCredential.issuer = issInfo.issuerDid
-
-    return signedCredential
+    return signedCred
   }
 
   /**
@@ -246,7 +298,7 @@ export class SignedCredential extends Credential {
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
    */
 
-  public static fromJSON(json: ISignedCredentialAttrs): SignedCredential {
+  public static fromJSON(json: SignedCredentialJSON): SignedCredential {
     return plainToClass(SignedCredential, json)
   }
 
@@ -255,7 +307,12 @@ export class SignedCredential extends Credential {
    * @see {@link https://w3c.github.io/vc-data-model/ | specification}
    */
 
-  public toJSON(): ISignedCredentialAttrs {
-    return classToPlain(this) as ISignedCredentialAttrs
+  //@ts-ignore
+  public toJSON(): SignedCredentialJSON {
+    return classToPlain(this, {exposeUnsetFields: false}) as SignedCredentialJSON
   }
+}
+
+export const dateToIsoString =(date?: Date) => {
+  return date && date.toISOString().slice(0,-5)+"Z"
 }

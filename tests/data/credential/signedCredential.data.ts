@@ -37,8 +37,8 @@ export const example1 = {
   "id": "http://example.edu/credentials/3732",
   "type": ["VerifiableCredential", "UniversityDegreeCredential"],
   "issuer": "https://example.edu/issuers/14",
-  "issuanceDate": "2010-01-01T19:23:24.000Z",
-  "expirationDate": "2010-01-01T19:23:24.000Z",
+  "issuanceDate": "2010-01-01T19:23:24Z",
+  "expirationDate": "2010-01-01T19:23:24Z",
   "credentialSubject": {
     "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
     "degree": {
@@ -50,9 +50,7 @@ export const example1 = {
     "id": "https://example.org/examples/degree.json",
     "type": "JsonSchemaValidator2018"
   },
-  "proof": {
-    "type": "RsaSignature2018"
-  }
+  "proof": []
 }
 
 export const example2 = {

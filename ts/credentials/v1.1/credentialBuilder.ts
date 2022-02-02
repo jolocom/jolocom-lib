@@ -10,14 +10,18 @@ import {
 } from '../../linkedDataSignature'
 import { ProofOptions } from '../../linkedDataSignature/types'
 import { SuiteImplementation } from '../../linkedDataSignature/mapping'
-import { ChainedProof2021 } from '../../linkedDataSignature/suites/chainedProof2021'
+import {
+  ChainedProof2021,
+  PreviousProofOptions,
+} from '../../linkedDataSignature/suites/chainedProof2021'
+import { SignedCredentialJSON } from './types'
 
 type ExtendedSuites = typeof SuiteImplementation & {
   [SupportedSuites.ChainedProof2021]: {
     impl: typeof ChainedProof2021
     customArgs: {
       chainSignatureSuite: SupportedSuites
-      previousProof: LinkedDataProof<BaseProofOptions>
+      previousProof: PreviousProofOptions
     }
   }
 }
@@ -68,6 +72,10 @@ export class CredentialSigner {
     return this
   }
 
+  get ldProofs() {
+    return this.proofs
+  }
+
   getCredential(): Credential {
     return Object.assign({}, this.credential)
   }
@@ -84,6 +92,14 @@ export class CredentialSigner {
       issuance,
     }
     return this
+  }
+
+  generateDates() {
+    this.issuanceMetadata = {
+      ...this.issuanceMetadata,
+      issuance: new Date(),
+      expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+    }
   }
 
   addProof<P extends BaseProofOptions>(proof: LinkedDataProof<P>) {
@@ -105,7 +121,7 @@ export class CredentialSigner {
         impl: ChainedProof2021,
         customArgs: {} as {
           chainSignatureSuite: SupportedSuites
-          previousProof: LinkedDataProof<BaseProofOptions>
+          previousProof: PreviousProofOptions
         },
       },
       ...SuiteImplementation,
@@ -133,10 +149,7 @@ export class CredentialSigner {
   private ensureReadyToIssue() {
     assert(this.credential, 'no credential set')
     assert(this.issuanceMetadata.issuer, 'issuer not set')
-    assert(
-      this.issuanceMetadata.issuance && this.issuanceMetadata.expiry,
-      'issuance and expiry dates not set'
-    )
+    assert( this.issuanceMetadata.issuance, 'issuance date not set')
     return
   }
 
@@ -161,9 +174,16 @@ export class CredentialSigner {
     return new CredentialSigner().setCredential(credential)
   }
 
-  static fromSignedCredential(signedCredential: SignedCredential) {
+  static fromSignedCredential(
+    vcOrJSON: SignedCredential | SignedCredentialJSON
+  ) {
+    const signedCredential =
+      vcOrJSON instanceof SignedCredential
+        ? vcOrJSON
+        : SignedCredential.fromJSON(vcOrJSON)
+
     return new CredentialSigner()
-      .setCredential(signedCredential)
+      .setCredential(signedCredential.credential)
       .setDates(signedCredential.issued, signedCredential.expires)
       .setIssuer(signedCredential.issuer)
       .setProofs(signedCredential.proof)

@@ -5,7 +5,10 @@ import {
   SupportedSuites,
   BaseProofOptions,
 } from '../../linkedDataSignature'
-import { ErrorCodes } from '../../linkedDataSignature/suites/chainedProof2021'
+import {
+  ChainedProof2021,
+  ErrorCodes,
+} from '../../linkedDataSignature/suites/chainedProof2021'
 import { Identity } from '../../identity/identity'
 
 export class CredentialVerifier {
@@ -32,6 +35,7 @@ export class CredentialVerifier {
     return await ldProof.verify(
       {
         document,
+        previousProofs: credential.proof,
       },
       verifier
     )
@@ -58,11 +62,21 @@ export class CredentialVerifier {
 
     report[index] = {
       valid: true,
-      type: toVerify.proofType,
-      verificationMethod: toVerify.verificationMethod,
-      ...(toVerify.proofType === SupportedSuites.ChainedProof2021
-        ? { referencedProofValid: true }
-        : {}),
+      proofMetadata: {
+        type: toVerify.proofType,
+        created: toVerify.created,
+        verificationMethod: toVerify.verificationMethod,
+        ...(toVerify.proofType === SupportedSuites.ChainedProof2021
+          ? {
+              referencedProofValid: true,
+              previousProof: (toVerify as ChainedProof2021<BaseProofOptions>)
+                .previousProof,
+              chainSignatureSuite: (toVerify as ChainedProof2021<
+                BaseProofOptions
+              >).chainSignatureSuite,
+            }
+          : {}),
+      },
     }
 
     try {
@@ -81,7 +95,10 @@ export class CredentialVerifier {
         report[index] = {
           ...report[index],
           valid: true,
-          referencedProofValid: false,
+          proofMetadata: {
+            ...report[index].proofMetadata,
+            referencedProofValid: false,
+          },
           error: e.message,
         }
       } else if (
@@ -90,14 +107,16 @@ export class CredentialVerifier {
         report[index] = {
           ...report[index],
           valid: false,
-          referencedProofValid: false,
+          proofMetadata: {
+            ...report[index].proofMetadata,
+            referencedProofValid: false,
+          },
           error: e.message,
         }
       } else {
         report[index] = {
           ...report[index],
           valid: false,
-          referencedProofValid: true,
           error: e.message,
         }
       }

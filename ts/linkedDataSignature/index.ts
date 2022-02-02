@@ -5,6 +5,8 @@ import { ProofDerivationOptions } from "./types";
 
 type digestFn = (data: Buffer) => Buffer;
 type normalizationFn = (data: JsonLdObject) => Promise<string>;
+type encodingFn = (data: Buffer) => string
+type decodingFn = (data: string) => Buffer
 
 export enum SupportedSuites {
   ChainedProof2021 = "ChainedProof2021",
@@ -20,16 +22,22 @@ export type BaseProofOptions = {
 
 export abstract class LinkedDataProof<T extends BaseProofOptions> {
   abstract readonly proofType: SupportedSuites;
-  protected _proofPurpose = "assertionMethod";
+
   protected _verificationMethod = "";
+  protected _proofPurpose = "assertionMethod";
+
   protected _created: Date = new Date();
   protected _proofValue = "";
 
   abstract verificationMethod: string;
+  abstract proofPurpose: string;
   abstract created: Date;
+
   abstract signatureSuite: {
     digestAlg: digestFn;
     normalizationFn: normalizationFn;
+    signatureEncodingFn: encodingFn;
+    signatureDecodingFn: decodingFn;
   };
 
   abstract derive(inputs:ProofDerivationOptions, customProofOptions: {}, signer: IdentityWallet, pass: string): Promise<LinkedDataProof<T>>;

@@ -29,7 +29,7 @@ const verifySignature = (
     compatibilityMap[keyType] || keyType,
     data,
     signature,
-  )
+  ).catch(e => {throw new Error("SignatureVerificationFailed: " + e.message)})
 }
 
 export const verifySignatureWithIdentity = async (
