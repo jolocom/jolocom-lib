@@ -1,11 +1,10 @@
 import { classToPlain, plainToClass, Exclude, Expose } from 'class-transformer'
-import { v4 as uuidv4 } from 'uuid';
 import { ICredentialAttrs, IClaimSection } from '../types'
 import { BaseMetadata } from '@jolocom/protocol-ts'
 import { ISignedCredCreationArgs } from '../types'
 import { JsonLdContext } from '../../linkedData/types'
 import { SignedCredential } from './signedCredential'
-import { randomBytes } from 'crypto'
+import { generateCredId } from './util'
 
 /**
  * @class
@@ -16,7 +15,7 @@ import { randomBytes } from 'crypto'
 @Exclude()
 export class Credential {
   protected '_@context': JsonLdContext
-  protected _id: string = `urn:uuid:${uuidv4()}`
+  protected _id: string = generateCredId()
   protected _type: string[]
   protected _claim: IClaimSection
 

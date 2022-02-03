@@ -28,6 +28,8 @@ export const emailVerifiableCredential = {
   },
 }
 
+// Example data structures extracted from here - https://github.com/w3c/vc-test-suite/tree/gh-pages/test/vc-data-model-1.0/input
+// Examples 009, 010, 011
 
 export const example1 = {
   "@context": [

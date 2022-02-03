@@ -8,7 +8,6 @@ import {
 } from 'class-transformer'
 import { LinkedDataProof, BaseProofOptions, SupportedSuites } from '../../linkedDataSignature'
 import { Credential } from './credential'
-import { randomBytes } from 'crypto'
 import {
   BaseMetadata,
   IClaimSection,
@@ -23,15 +22,6 @@ import { dateToIsoString } from './util'
 
 // Credentials are valid for a year by default
 const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
-
-/**
- * @ignore
- * Helper function generating a random claim id
- * @param length - The length of the random part of the identifier
- */
-
-const generateClaimId = (length: number) =>
-  `claimId:${randomBytes(length).toString('hex')}`
 
 /**
  * @description Data needed to prepare signature on credential

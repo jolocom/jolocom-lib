@@ -283,8 +283,8 @@ export class ChainedProof2021<
     })
 
     return Buffer.concat([
-      this.signatureSuite.hashFn(Buffer.from(normalizedPrevProof)),
       this.signatureSuite.hashFn(Buffer.from(normalizedProofOptions)),
+      this.signatureSuite.hashFn(Buffer.from(normalizedPrevProof)),
     ])
   }
 

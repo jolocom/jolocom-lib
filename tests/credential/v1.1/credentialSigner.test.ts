@@ -11,7 +11,7 @@ import { Credential } from '../../../ts/credentials/v1.1/credential'
 
 chai.use(require('sinon-chai'))
 
-describe.only('VC Builder tests', () => {
+describe('VC Builder tests', () => {
   it('Creates a simple example from JSON', async () => {
     const builder = CredentialSigner.fromSignedCredential(
       SignedCredential.fromJSON(example1)
