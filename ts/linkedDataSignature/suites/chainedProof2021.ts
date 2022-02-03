@@ -44,7 +44,6 @@ export class ChainedProof2021<
   T extends BaseProofOptions
 > extends LinkedDataProof<T> {
   proofType = SupportedSuites.ChainedProof2021
-  proofPurpose = 'assertionMethod'
   signatureSuite = {
     hashFn: undefined,
     normalizeFn: undefined,
@@ -113,6 +112,7 @@ export class ChainedProof2021<
    * Get / set the previous proof node
    */
 
+  @Expose()
   get previousProof() {
     return this._previousProof
   }
@@ -126,11 +126,11 @@ export class ChainedProof2021<
    */
 
   @Expose()
-  get proofPurose() {
+  get proofPurpose() {
     return this._proofPurpose
   }
 
-  set proofPurose(proofPurpose: string) {
+  set proofPurpose(proofPurpose: string) {
     this._proofPurpose = proofPurpose
   }
 
@@ -276,6 +276,7 @@ export class ChainedProof2021<
 
     const { proofValue, ...proofOptions } = this.toJSON()
 
+    console.log({normalizedPrevProof})
     // Normalized Chained Data Proof options
     const normalizedProofOptions = await this.signatureSuite.normalizeFn({
       ...proofOptions,

@@ -103,6 +103,12 @@ export const case3 = async (signer: IdentityWallet, pass: string, verifier: Cred
   // Alter the credential, should lead to p1 being invalid.
   finalCredential.credentialSubject.id = 'did:malicious:attacker'
 
+  // Further possible alterations, e.g. to the proofs themselves.
+  // @ts-ignore accessing private property
+  // finalCredential.proof[1]._proofValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..t3VhQ7QsILDuV_HNFSMI-Fb2FoT7fuzalpS5AH8A9c0"
+  // finalCredential.proof[1].created = new Date()
+  // finalCredential.proof[1].proofPurpose = 'capabilityInvocation'
+
   const alteredVerificationResults = await verifier.verifyAllProofs(finalCredential)
   console.log('Verification results, if the signed contents were modified:')
   console.log(alteredVerificationResults)

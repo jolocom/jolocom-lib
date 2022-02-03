@@ -48,8 +48,6 @@ export const defaultContext = [
       'https://w3id.org/security#EcdsaSecp256r1Signature2019',
     Ed25519Signature2018: 'https://w3id.org/security#Ed25519Signature2018',
     EcdsaKoblitzSignature2016: 'sec:EcdsaKoblitzSignature2016',
-    previousProof: 'https://terms.jolocom.com/ChainedProof2021', // TODO Officially register elsewhere
-    chainSignatureSuite: 'https://terms.jolocom.com/chainSignatureSuite', // TODO Officially register elsewhere
     Credential: 'cred:Credential',
     credential: 'cred:credential',
     creator: 'dc:creator',
@@ -296,8 +294,11 @@ export const defaultContext = [
     xone: 'odrl:xone',
     and: 'odrl:and',
     andSequence: 'odrl:andSequence',
-
     policyUsage: 'odrl:policyUsage',
+
+    previousProof: 'https://terms.jolocom.com/previousProof', // TODO Officially register elsewhere
+    ChainedProof2021: 'https://terms.jolocom.com/ChainedProof2021', // TODO Officially register elsewhere
+    chainSignatureSuite: 'https://terms.jolocom.com/chainSignatureSuite', // TODO Officially register elsewhere
   },
 ]
 
