@@ -12,6 +12,7 @@
   },
   "scripts": {
     "test": "nyc --reporter=lcov --reporter=text-summary mocha --exit",
+    "demo": "ts-node ./ts/credentials/v1.1/demo.ts",
     "clean": "rm -rf ./js",
     "prepublish": "yarn clean; yarn build",
     "build": "tsc -p .",
@@ -85,7 +86,8 @@
     "node-fetch": "^2.6.1",
     "reflect-metadata": "^0.1.13",
     "rfc4648": "^1.4.0",
-    "secrets.js-grempe": "^1.1.0"
+    "secrets.js-grempe": "^1.1.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",

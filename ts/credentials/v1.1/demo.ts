@@ -1,6 +1,6 @@
 import { LocalDidMethod } from '../../didMethods/local'
 import { SupportedSuites } from '../../linkedDataSignature'
-import { CredentialSigner } from './credentialBuilder'
+import { CredentialSigner } from './credentialSigner'
 import { CredentialVerifier } from './credentialVerifier'
 import { Credential } from './credential'
 import { claimsMetadata } from '@jolocom/protocol-ts'
@@ -75,7 +75,7 @@ const case1 = async (signer: IdentityWallet, pass: string) => {
   // Instantiate a signer / proof builder based on the credential, configure relevant metadata
   const credentialSigner = CredentialSigner.fromCredential(credential)
   credentialSigner.setIssuer(signer.did)
-  credentialSigner.generateDates()
+  credentialSigner.generateAndSetDates()
 
   // Generate and add a Ed25519Signature2018 proof node to the Verifiable Credential
   const p1 = await credentialSigner.generateProof(
@@ -240,7 +240,7 @@ const case3 = async (signer: IdentityWallet, pass: string) => {
     JSON_CREDENTIAL_WITH_PROOF
   )
 
-  const p1 = credentialSigner.ldProofs[0]
+  const p1 = credentialSigner.proofs[0]
 
   const p2 = await credentialSigner.generateProof(
     SupportedSuites.ChainedProof2021,

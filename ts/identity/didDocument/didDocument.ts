@@ -14,7 +14,6 @@ import {
   ServiceEndpointsSection,
 } from './sections'
 import { defaultContextIdentity } from '../../utils/contexts'
-import { getRandomBytes } from '../../utils/crypto'
 import { digestJsonLd, normalizeSignedLdObject } from '../../linkedData'
 import {
   IDigestable,

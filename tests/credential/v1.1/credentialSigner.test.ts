@@ -1,6 +1,6 @@
 import * as chai from 'chai'
 import { SignedCredential } from '../../../ts/credentials/v1.1/signedCredential'
-import { CredentialSigner } from '../../../ts/credentials/v1.1/credentialBuilder'
+import { CredentialSigner } from '../../../ts/credentials/v1.1/credentialSigner'
 import { CredentialVerifier } from '../../../ts/credentials/v1.1/credentialVerifier'
 import { example1 } from '../../data/credential/signedCredential.data'
 import { expect } from 'chai'

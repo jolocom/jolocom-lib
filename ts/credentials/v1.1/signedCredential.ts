@@ -19,6 +19,7 @@ import { ErrorCodes } from '../../errors'
 import { SuiteImplementation } from '../../linkedDataSignature/mapping'
 import { SignedCredentialJSON } from './types'
 import { ChainedProof2021 } from '../../linkedDataSignature/suites/chainedProof2021'
+import { dateToIsoString } from './util'
 
 // Credentials are valid for a year by default
 const DEFAULT_EXPIRY_MS = 365 * 24 * 3600 * 1000
@@ -130,7 +131,7 @@ export class SignedCredential {
   }
 
   /**
-   * Get the issuance date of the signed credential
+   * Get / set the issuance date of the signed credential
    * @example `console.log(signedCredential.issued) // Date 2018-11-11T15:46:09.720Z`
    */
 
@@ -143,8 +144,12 @@ export class SignedCredential {
     return this._issued
   }
 
+  set issued(issued: Date) {
+    this._issued = issued
+  }
+
   /**
-   * Get the expiry date of the signed credential
+   * Get / set the expiry date of the signed credential
    * @example `console.log(signedCredential.expires) // Date 2018-11-11T15:46:09.720Z`
    */
 
@@ -155,15 +160,6 @@ export class SignedCredential {
   @Transform(({ value }) => value && new Date(value), { toClassOnly: true })
   get expires(): Date {
     return this._expires
-  }
-
-  /**
-   * Set the issuance date of the signed credential
-   * @example `signedCredential.issued = new Date('2018-11-11T15:46:09.720Z')`
-   */
-
-  set issued(issued: Date) {
-    this._issued = issued
   }
 
   /**
@@ -310,8 +306,4 @@ export class SignedCredential {
   public toJSON(): SignedCredentialJSON {
     return classToPlain(this, {exposeUnsetFields: false}) as SignedCredentialJSON
   }
-}
-
-export const dateToIsoString =(date?: Date) => {
-  return date && date.toISOString().slice(0,-5)+"Z"
 }

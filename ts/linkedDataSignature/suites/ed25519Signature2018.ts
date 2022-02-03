@@ -9,7 +9,6 @@ import {
 import { ILinkedDataSignatureAttrs, ProofDerivationOptions } from '../types'
 import { sha256 } from '../../utils/crypto'
 import { defaultContext } from '../../utils/contexts'
-import { keyIdToDid, parseHexOrBase64 } from '../../utils/helper'
 import { IdentityWallet } from '../../identityWallet/identityWallet'
 import { normalizeJsonLd } from '../../linkedData'
 import { JsonLdObject } from '@jolocom/protocol-ts'
@@ -17,13 +16,11 @@ import { Identity } from '../../identity/identity'
 import { verifySignatureWithIdentity } from '../../utils/validation'
 import { LinkedDataProof, SupportedSuites, BaseProofOptions } from '..'
 import { base64url } from 'rfc4648'
-import { dateToIsoString } from '../../credentials/v1.1/signedCredential'
+import { dateToIsoString } from '../../credentials/v1.1/util'
 
 /**
  * @class A Ed25519Signature2018 Linked Data Proof implementation
- * @implements {ILinkedDataSignature}
- * @implements {IDigestable}
- * @internal
+ * {@see https://w3c-ccg.github.io/lds-ed25519-2018/}
  */
 
 @Exclude()
@@ -35,33 +32,31 @@ export class Ed25519Signature2018<
   proofType = SupportedSuites.Ed25519Signature2018
 
   signatureSuite = {
-    digestAlg: sha256,
-    normalizationFn: async (doc: JsonLdObject) => {
+    hashFn: sha256,
+    normalizeFn: async (doc: JsonLdObject) => {
       return await normalizeJsonLd(doc, defaultContext)
     },
-    signatureEncodingFn: (signature: Buffer) => {
+    encodeSignature: (signature: Buffer) => {
       return (
         this.encodedJWTHeader +
         '..' +
         base64url.stringify(signature, { pad: false })
       )
     },
-    signatureDecodingFn: (jws: string) => {
+    decodeSignature: (jws: string) => {
       const [_, signature] = jws.split('..')
-      return Buffer.from(base64url.parse(signature, {
-        loose: true,
-      }))
+      return Buffer.from(
+        base64url.parse(signature, {
+          loose: true,
+        })
+      )
     },
   }
 
-  static create(arg: BaseProofOptions) {
-    const cp = new Ed25519Signature2018()
-    cp.verificationMethod = arg.verificationMethod
-    cp.created = arg.created || new Date()
-    cp._proofPurpose = arg.proofPurpose || 'assertionMethod'
-
-    return cp as LinkedDataProof<BaseProofOptions>
-  }
+  /**
+   * Get /set the proofPurpose field
+   * @example `console.log(proof.proofPurpose) // 'assertionMethod'`
+   */
 
   @Expose()
   get proofPurpose() {
@@ -128,16 +123,30 @@ export class Ed25519Signature2018<
     this._verificationMethod = verificationMethod
   }
 
-  set creator(creator: string) {
-    this._verificationMethod = creator
+  /**
+   * Static method to instantiate a (minimally configured) LD Proof instance
+   * @param args - metadata related to the proof {@link BaseProofOptions}
+   * @returns - new instance of a {@link Ed25519Signature2018}
+   */
+
+  static create(arg: BaseProofOptions) {
+    const cp = new Ed25519Signature2018()
+    cp.verificationMethod = arg.verificationMethod
+    cp.created = arg.created || new Date()
+    cp._proofPurpose = arg.proofPurpose || 'assertionMethod'
+
+    return cp as LinkedDataProof<BaseProofOptions>
   }
 
-  get signer() {
-    return {
-      did: keyIdToDid(this.verificationMethod),
-      keyId: this.verificationMethod,
-    }
-  }
+  /**
+   * Will derive a new instance of a Ed25519Signature2018 proof, populate all relevant fields and
+   * generate the associated signature.
+   * @param inputs - The document to be signed, including existing proof nodes
+   * @param customProofOptions  - no custom options are expected / used for this proof type
+   * @param signer - Insance of IdentityWalle which can be used to generate a signature
+   * @param pass - Password for using the keys managed by the IdentityWallet
+   * @returns - new instance of a {@link Ed25519Signature2018} proof
+   */
 
   async derive(
     inputs: ProofDerivationOptions,
@@ -155,38 +164,29 @@ export class Ed25519Signature2018<
       )
     }
 
-    const documentDigest = await this.generateHashAlg(inputs.document)
+    const documentDigest = await this.createVerifyHash(inputs.document)
 
     const toSign = Buffer.concat([
       Buffer.from(this.encodedJWTHeader + '.', 'utf8'),
       documentDigest,
     ])
 
-    this.jws = this.signatureSuite.signatureEncodingFn(
+    this.jws = this.signatureSuite.encodeSignature(
       await signer.sign(toSign, pass)
     )
     return this
   }
 
-  private async generateHashAlg(document: JsonLdObject) {
-    // Normalized Document
-    const normalizedDoc = await this.signatureSuite.normalizationFn(document)
-
-    // console.log({normalizedDoc, document, context: document['@context']})
-    const { jws, ...proofOptions } = this.toJSON()
-
-    const normalizedProofOptions = await this.signatureSuite.normalizationFn(
-      proofOptions
-    )
-
-    return Buffer.concat([
-      this.signatureSuite.digestAlg(Buffer.from(normalizedProofOptions)),
-      this.signatureSuite.digestAlg(Buffer.from(normalizedDoc)),
-    ])
-  }
+  /**
+   * Will attempt to verify the signature included in the LD Proof instance.
+   * @param inputs - The document to be verified, including existing proof nodes.
+   * @param signer - An {@link Identity} instance expected to hold the appropriate public keys.
+   * to verify the signature (i.e. must hold the required verificationMethod).
+   * @returns {Promise<boolean>} - boolean signalling if the signature is correct or not.
+   */
 
   async verify(inputs: ProofDerivationOptions, signer: Identity) {
-    const digest = await this.generateHashAlg(inputs.document)
+    const digest = await this.createVerifyHash(inputs.document)
     const [header, _] = this.jws.split('..')
 
     if (header !== this.encodedJWTHeader) {
@@ -203,10 +203,33 @@ export class Ed25519Signature2018<
 
     return verifySignatureWithIdentity(
       toVerify,
-      this.signatureSuite.signatureDecodingFn(this.jws),
+      this.signatureSuite.decodeSignature(this.jws),
       this.verificationMethod,
       signer
     )
+  }
+
+  /**
+   * Will normalize the contents of the signed document, hash them, then normalize the
+   * current "Proof Options" and hash them. Generates the inputs for the signature generation / verification functions.
+   * Generally covers this process {@see https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm}
+   * @returns Buffer to be signed / verified.
+   */
+
+  private async createVerifyHash(document: JsonLdObject) {
+    // Normalized Document
+    const normalizedDoc = await this.signatureSuite.normalizeFn(document)
+
+    const { jws, ...proofOptions } = this.toJSON()
+
+    const normalizedProofOptions = await this.signatureSuite.normalizeFn(
+      proofOptions
+    )
+
+    return Buffer.concat([
+      this.signatureSuite.hashFn(Buffer.from(normalizedProofOptions)),
+      this.signatureSuite.hashFn(Buffer.from(normalizedDoc)),
+    ])
   }
 
   /**

@@ -1,11 +1,11 @@
-import { dateToIsoString, SignedCredential } from '../../../ts/credentials/v1.1/signedCredential'
+import { SignedCredential } from '../../../ts/credentials/v1.1/signedCredential'
 import {
   example1,
   example2,
   example3,
 } from '../../data/credential/signedCredential.data'
 import { expect } from 'chai'
-import { LinkedDataProof } from '../../../ts/linkedDataSignature'
+import { dateToIsoString } from '../../../ts/credentials/v1.1/util'
 
 describe.only('SignedCredential, version 1.1. data model compliance', () => {
   const cred: SignedCredential = SignedCredential.fromJSON(example1)

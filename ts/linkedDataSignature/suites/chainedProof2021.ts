@@ -13,11 +13,17 @@ import { Identity } from '../../identity/identity'
 import { SuiteImplementation } from '../mapping'
 import { JsonLdObject } from '../../linkedData/types'
 import { verifySignatureWithIdentity } from '../../utils/validation'
-import { dateToIsoString } from '../../credentials/v1.1/signedCredential'
+import { dateToIsoString } from '../../credentials/v1.1/util'
 
 export enum ErrorCodes {
   InnerSignatureVerificationFailed = 'InnerSignatureVerificationFailed',
   ChainAndInnerSignatureVerificationFailed = 'ChainAndInnerSignatureVerificationFailed',
+}
+
+type customProofOptions = {
+  chainSignatureSuite: SupportedSuites
+  previousProof: PreviousProofOptions
+  strict?: boolean
 }
 
 export type PreviousProofOptions = {
@@ -28,22 +34,27 @@ export type PreviousProofOptions = {
   domain?: string
 }
 
+/**
+ * @class Proof of concept implementation for a new Linked Data Proof type -- ChainedProof2021.
+ * For provisional specifcation, see {@see https://hackmd.io/@RYgJMHAGSlaLMaQzwYjvsQ/SJoDWwTdK}
+ */
+
 @Exclude()
 export class ChainedProof2021<
   T extends BaseProofOptions
 > extends LinkedDataProof<T> {
   proofType = SupportedSuites.ChainedProof2021
   proofPurpose = 'assertionMethod'
+  signatureSuite = {
+    hashFn: undefined,
+    normalizeFn: undefined,
+    encodeSignature: undefined,
+    decodeSignature: undefined,
+  }
+
   private _previousProof: PreviousProofOptions
   private _chainSignatureSuite: SupportedSuites =
     SupportedSuites.EcdsaKoblitzSignature2016
-
-  signatureSuite = {
-    digestAlg: undefined,
-    normalizationFn: undefined,
-    signatureEncodingFn: undefined,
-    signatureDecodingFn: undefined,
-  }
 
   @Expose()
   get chainSignatureSuite() {
@@ -53,10 +64,10 @@ export class ChainedProof2021<
   set chainSignatureSuite(chainSignatureSuite) {
     this._chainSignatureSuite = chainSignatureSuite
     if (
-      !this.signatureSuite.normalizationFn &&
-      !this.signatureSuite.digestAlg &&
-      !this.signatureSuite.signatureEncodingFn &&
-      !this.signatureSuite.signatureDecodingFn
+      !this.signatureSuite.normalizeFn &&
+      !this.signatureSuite.hashFn &&
+      !this.signatureSuite.encodeSignature &&
+      !this.signatureSuite.decodeSignature
     ) {
       //@ts-ignore typescript limitation, even if constructor is defined on all
       // union type members, it can not be called.
@@ -85,8 +96,8 @@ export class ChainedProof2021<
   }
 
   /**
-   * Get the type of the linked data signature
-   * @example `console.log(proof.type) // 'EcdsaKoblitzSignature2016'`
+   * Get / set the type of the linked data signature
+   * @example `console.log(proof.type) // 'ChainedProof2021'`
    */
 
   @Expose()
@@ -98,18 +109,10 @@ export class ChainedProof2021<
     this.proofType = type
   }
 
-  @Expose()
-  @Transform(
-    ({ value }) => {
-      return {
-        created: value.created,
-        verificationMethod: value.verificationMethod,
-        type: value.type,
-        proofPurpose: value.proofPurpose,
-      }
-    },
-    { toPlainOnly: true }
-  )
+  /**
+   * Get / set the previous proof node
+   */
+
   get previousProof() {
     return this._previousProof
   }
@@ -117,6 +120,10 @@ export class ChainedProof2021<
   set previousProof(prevProof: PreviousProofOptions) {
     this._previousProof = prevProof
   }
+
+  /**
+   * Get / set the previous proof purpose
+   */
 
   @Expose()
   get proofPurose() {
@@ -155,6 +162,11 @@ export class ChainedProof2021<
     this._verificationMethod = verificationMethod
   }
 
+  /**
+   * Static method to instantiate a (minimally configured) LD Proof instance
+   * @param args - metadata related to the proof {@link BaseProofOptions}
+   * @returns - new instance of a {@link ChainedProof2021}
+   */
   static create<T extends BaseProofOptions>(args: T): LinkedDataProof<T> {
     const cp = new ChainedProof2021()
 
@@ -165,9 +177,18 @@ export class ChainedProof2021<
     return cp
   }
 
+  /**
+   * Will derive a new instance of a ChainedProof2021, populate all relevant fields and
+   * generate the associated signature.
+   * @param inputs - The document to be signed, including existing proof nodes
+   * @param customProofOptions  - A reference to the previousProof node, the suite to use with the chained proof
+   * @param signer - Insance of IdentityWalle which can be used to generate a signature
+   * @param pass - Password for using the keys managed by the IdentityWallet
+   * @returns - new instance of a {@link ChainedProof2021}
+   */
   async derive(
     inputs: ProofDerivationOptions,
-    customProofOptions: CustomOptions,
+    customProofOptions: customProofOptions,
     signer: IdentityWallet,
     pass: string
   ) {
@@ -187,14 +208,92 @@ export class ChainedProof2021<
 
     this.chainSignatureSuite = customProofOptions.chainSignatureSuite
 
-    const toBeSigned = await this.generateHashAlg(classToPlain(ldProof))
-    this.signature = this.signatureSuite.signatureEncodingFn(
+    const toBeSigned = await this.createVerifyHash(classToPlain(ldProof))
+
+    this.signature = this.signatureSuite.encodeSignature(
       await signer.sign(toBeSigned, pass)
     )
 
     return this
   }
 
+  /**
+   * Will attempt to verify the signature included in the LD Proof instnace.
+   * @param inputs - The document to be verified, including existing proof nodes.
+   * @param signer - An {@link Identity} instance expected to hold the appropriate public keys.
+   * to verify the signature (i.e. must hold the required verificationMethod).
+   * @returns {Promise<boolean>} - boolean signalling if the signature is correct or not.
+   */
+  async verify(inputs: ProofDerivationOptions, signer: Identity) {
+    const previousProof = this.findMatchingProof(inputs.previousProofs)
+
+    if (!previousProof) {
+      throw new Error('Referenced Previous Proof not found')
+    }
+
+    const toBeVerified = await this.createVerifyHash(
+      classToPlain(previousProof)
+    )
+
+    const referencedProofValid = await previousProof
+      .verify(inputs, signer)
+      .catch((e) =>
+        e.message && e.message === ErrorCodes.InnerSignatureVerificationFailed
+          ? true
+          : false
+      )
+
+    const chainSignatureValid = await verifySignatureWithIdentity(
+      toBeVerified,
+      this.signatureSuite.decodeSignature(this.signature),
+      this.verificationMethod,
+      signer
+    ).catch((_) => false)
+
+    if (!referencedProofValid && !chainSignatureValid) {
+      throw new Error(ErrorCodes.ChainAndInnerSignatureVerificationFailed)
+    }
+
+    if (!referencedProofValid) {
+      throw new Error(ErrorCodes.InnerSignatureVerificationFailed)
+    }
+
+    return chainSignatureValid
+  }
+
+  /**
+   * Will normalize the contents of the signed document, hash them, then normalize the
+   * current "Proof Options" and hash them. Generates the inputs for the signature generation / verification functions.
+   * Generally covers this process {@see https://w3c-ccg.github.io/data-integrity-spec/#create-verify-hash-algorithm}
+   * @returns Buffer to be signed / verified.
+   */
+  private async createVerifyHash(document: JsonLdObject) {
+    // The entire previousProof node normalized, all properties (e.g. jws, signatureValue) are included.
+    const normalizedPrevProof = await this.signatureSuite.normalizeFn({
+      ...document,
+      '@context': document['@context'],
+    })
+
+    const { proofValue, ...proofOptions } = this.toJSON()
+
+    // Normalized Chained Data Proof options
+    const normalizedProofOptions = await this.signatureSuite.normalizeFn({
+      ...proofOptions,
+      '@context': document['@context'],
+    })
+
+    return Buffer.concat([
+      this.signatureSuite.hashFn(Buffer.from(normalizedPrevProof)),
+      this.signatureSuite.hashFn(Buffer.from(normalizedProofOptions)),
+    ])
+  }
+
+  /**
+   * Helper function to find a matching LD proof node based on the `previousProof`
+   * options included in a chained proof.
+   * @param proofs - existing {@link LinkedDataProof} nodes associated with the doc
+   * @returns matching {@link LinkedDataProof}, if found
+   */
   private findMatchingProof(proofs: LinkedDataProof<BaseProofOptions>[]) {
     const matches = proofs.filter(
       ({ proofPurpose, proofType, created, verificationMethod }) => {
@@ -216,61 +315,9 @@ export class ChainedProof2021<
     return matches[0]
   }
 
-  async verify(inputs: ProofDerivationOptions, signer: Identity) {
-    const previousProof = this.findMatchingProof(inputs.previousProofs)
-
-    if (!previousProof) {
-      throw new Error('Referenced Previous Proof not found')
-    }
-
-    const toBeVerified = await this.generateHashAlg(classToPlain(previousProof))
-
-    const referencedProofValid = await previousProof
-      .verify(inputs, signer)
-      .catch((e) =>
-        e.message && e.message === ErrorCodes.InnerSignatureVerificationFailed
-          ? true
-          : false
-      )
-
-    const chainSignatureValid = await verifySignatureWithIdentity(
-      toBeVerified,
-      this.signatureSuite.signatureDecodingFn(this.signature),
-      this.verificationMethod,
-      signer
-    ).catch((_) => false)
-
-    if (!referencedProofValid && !chainSignatureValid) {
-      throw new Error(ErrorCodes.ChainAndInnerSignatureVerificationFailed)
-    }
-
-    if (!referencedProofValid) {
-      throw new Error(ErrorCodes.InnerSignatureVerificationFailed)
-    }
-
-    return chainSignatureValid
-  }
-
-  private async generateHashAlg(document: JsonLdObject) {
-    // The entire previousProof node normalized, all properties (e.g. jws, signatureValue) are included.
-    const normalizedPrevProof = await this.signatureSuite.normalizationFn({
-      ...document,
-      '@context': document['@context'],
-    })
-
-    const { proofValue, ...proofOptions } = this.toJSON()
-
-    // Normalized Chained Data Proof options
-    const normalizedProofOptions = await this.signatureSuite.normalizationFn({
-      ...proofOptions,
-      '@context': document['@context'],
-    })
-
-    return Buffer.concat([
-      this.signatureSuite.digestAlg(Buffer.from(normalizedPrevProof)),
-      this.signatureSuite.digestAlg(Buffer.from(normalizedProofOptions)),
-    ])
-  }
+  /**
+   * Parses / Serializes the {@link EcdsaLinkedDataSignature} as / to JSON-LD
+   */
 
   public static fromJSON(
     json: ILinkedDataSignatureAttrs
@@ -278,17 +325,7 @@ export class ChainedProof2021<
     return plainToClass(ChainedProof2021, json)
   }
 
-  /**
-   * Serializes the {@link EcdsaLinkedDataSignature} as JSON-LD
-   */
-
   public toJSON(): ILinkedDataSignatureAttrs {
     return classToPlain(this) as ILinkedDataSignatureAttrs
   }
-}
-
-type CustomOptions = {
-  chainSignatureSuite: SupportedSuites
-  previousProof: PreviousProofOptions
-  strict?: boolean
 }

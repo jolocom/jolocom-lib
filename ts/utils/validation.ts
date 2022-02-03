@@ -9,7 +9,6 @@ import { parseHexOrBase64 } from './helper'
 export type IdentityOrResolver = Identity | IResolver
 
 /**
- * TODO Document
  * Given a buffer (the message, not hashed), a signature, and a pKey object, will attempt to
  * verify the signature (the algs are chosen based on pKey.type)
  */

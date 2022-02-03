@@ -68,8 +68,6 @@ export const publicKeyToAddress = (publicKey: Buffer): string =>
  * Helper function to map DID Document key references to vkp key URNs
  * @param identity - Identity to map keys to
  * @param vkp - store of key material to be mapped
- * @param pass - password for vaulted key provider
- * TODO This should take vkp keys instead of vkp + pass
  */
 export const mapPublicKeys = async (
   identity: Identity,

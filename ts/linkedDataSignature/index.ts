@@ -34,10 +34,10 @@ export abstract class LinkedDataProof<T extends BaseProofOptions> {
   abstract created: Date;
 
   abstract signatureSuite: {
-    digestAlg: digestFn;
-    normalizationFn: normalizationFn;
-    signatureEncodingFn: encodingFn;
-    signatureDecodingFn: decodingFn;
+    hashFn: digestFn;
+    normalizeFn: normalizationFn;
+    encodeSignature: encodingFn;
+    decodeSignature: decodingFn;
   };
 
   abstract derive(inputs:ProofDerivationOptions, customProofOptions: {}, signer: IdentityWallet, pass: string): Promise<LinkedDataProof<T>>;
