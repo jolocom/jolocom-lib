@@ -12,7 +12,6 @@
   },
   "scripts": {
     "test": "nyc --reporter=lcov --reporter=text-summary mocha --exit",
-    "demo": "ts-node ./ts/demo/index.ts",
     "clean": "rm -rf ./js",
     "prepublish": "yarn clean; yarn build",
     "build": "tsc -p .",
