@@ -8,8 +8,12 @@ import { didMethods } from './didMethods'
 import { SoftwareKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
 import { walletUtils } from '@jolocom/native-core'
 import { createIdentityFromKeyProvider } from './didMethods/utils'
+import { CredentialVerifier } from './credentials/v1.1/credentialVerifier'
+import { CredentialSigner } from './credentials/v1.1/credentialSigner'
 
 export const JolocomLib = {
+  credentialSigner: CredentialSigner,
+  credentialVerifier: CredentialVerifier,
   parse,
   parseAndValidate,
   didMethods,
