@@ -97,7 +97,7 @@ describe('VC Builder tests', () => {
     const verifier = new CredentialVerifier([identityWallet])
 
     const vc = SignedCredential.fromJSON(builder.toSignedCredential().toJSON())
-    const verificationResults = await verifier.verifyAllProofs(vc)
+    const verificationResults = await verifier.generateVerificationReport(vc)
 
     expect(verificationResults[0].valid).to.eq(true)
     expect(verificationResults[1].valid).to.eq(true)
@@ -110,7 +110,7 @@ describe('VC Builder tests', () => {
 
     vc.id = 'dsadsa'
 
-    const resultsAfterModification = await verifier.verifyAllProofs(vc)
+    const resultsAfterModification = await verifier.generateVerificationReport(vc)
 
     expect(resultsAfterModification[0].valid).to.eq(false)
     expect(resultsAfterModification[1].valid).to.eq(true)
@@ -218,7 +218,7 @@ describe('VC Builder tests', () => {
     const vc = builder.toSignedCredential()
 
     await verifier.verifyProofAtIndex(vc, 3)
-    const verificationResults = await verifier.verifyAllProofs(vc)
+    const verificationResults = await verifier.generateVerificationReport(vc)
     console.log({ verificationResults })
     expect(verificationResults[0].valid).to.eq(true)
     expect(verificationResults[1].valid).to.eq(true)
@@ -226,7 +226,7 @@ describe('VC Builder tests', () => {
 
     vc.expires = new Date()
 
-    const resultsAfterModification = await verifier.verifyAllProofs(vc)
+    const resultsAfterModification = await verifier.generateVerificationReport(vc)
     console.log({ resultsAfterModification })
     expect(resultsAfterModification[0].valid).to.eq(false)
     expect(resultsAfterModification[1].valid).to.eq(true)
