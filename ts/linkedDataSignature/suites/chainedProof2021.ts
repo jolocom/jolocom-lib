@@ -197,6 +197,7 @@ export class ChainedProof2021<
     const ldProof = this.findMatchingProof(inputs.previousProofs)
 
     if (customProofOptions.strict) {
+
       const prevSigValid = await ldProof
         .verify(inputs, signer.identity)
         .catch((_) => false)
@@ -237,11 +238,7 @@ export class ChainedProof2021<
 
     const referencedProofValid = await previousProof
       .verify(inputs, signer)
-      .catch((e) =>
-        e.message && e.message === ErrorCodes.InnerSignatureVerificationFailed
-          ? true
-          : false
-      )
+      .catch(_ => false)
 
     const chainSignatureValid = await verifySignatureWithIdentity(
       toBeVerified,
@@ -250,12 +247,12 @@ export class ChainedProof2021<
       signer
     ).catch((_) => false)
 
-    if (!referencedProofValid && !chainSignatureValid) {
-      throw new Error(ErrorCodes.ChainAndInnerSignatureVerificationFailed)
-    }
-
     if (!referencedProofValid) {
       throw new Error(ErrorCodes.InnerSignatureVerificationFailed)
+    }
+
+    if (!referencedProofValid && !chainSignatureValid) {
+      throw new Error(ErrorCodes.ChainAndInnerSignatureVerificationFailed)
     }
 
     return chainSignatureValid
@@ -276,7 +273,6 @@ export class ChainedProof2021<
 
     const { proofValue, ...proofOptions } = this.toJSON()
 
-    console.log({normalizedPrevProof})
     // Normalized Chained Data Proof options
     const normalizedProofOptions = await this.signatureSuite.normalizeFn({
       ...proofOptions,

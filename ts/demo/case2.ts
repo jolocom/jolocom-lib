@@ -1,7 +1,4 @@
-import { SupportedSuites } from '../linkedDataSignature'
-import { CredentialSigner } from '../credentials//v1.1/credentialSigner'
-import { CredentialVerifier } from '../credentials//v1.1/credentialVerifier'
-import { IdentityWallet } from '../identityWallet/identityWallet'
+import { CredentialSigner, CredentialVerifier, IdentityWallet, JolocomLib } from '..'
 import assert from 'assert'
 
 // Example data structure from -- https://github.com/w3c/vc-test-suite/blob/gh-pages/test/vc-data-model-1.0/input/example-009.jsonld
@@ -36,7 +33,7 @@ export const case2 = async (signer: IdentityWallet, pass: string, verifier: Cred
 
   // Generate and add a Ed25519Signature2018 node to the document
   const p1 = await credentialSigner.generateProof(
-    SupportedSuites.Ed25519Signature2018,
+    JolocomLib.LinkedDataProofTypes.Ed25519Signature2018,
     {
       proofOptions: {
         verificationMethod: signer.publicKeyMetadata.signingKeyId,
@@ -49,13 +46,13 @@ export const case2 = async (signer: IdentityWallet, pass: string, verifier: Cred
 
   // Add a ChainedProof2021 proof node to the Verifiable Credential, referencing an existing proof.
   await credentialSigner.generateProof(
-    SupportedSuites.ChainedProof2021,
+    JolocomLib.LinkedDataProofTypes.ChainedProof2021,
     {
       proofOptions: {
         verificationMethod: signer.publicKeyMetadata.signingKeyId,
       },
       proofSpecificOptions: {
-        chainSignatureSuite: SupportedSuites.Ed25519Signature2018,
+        chainSignatureSuite: JolocomLib.LinkedDataProofTypes.Ed25519Signature2018,
         // Reference a proof node which was created at an earlier point and included in the received credential.
         previousProof: {
           verificationMethod: p1.verificationMethod,
@@ -77,9 +74,10 @@ export const case2 = async (signer: IdentityWallet, pass: string, verifier: Cred
   console.log(finalCredential.toJSON().proof)
 
   // Verify all proofs on the VC, the returned report should mark all proofs as valid
-  const verificationResults = await verifier.verifyAllProofs(finalCredential)
+  const verificationResults = await verifier.generateVerificationReport(finalCredential)
   console.log('Verification results, if the signed contents are not modified:')
   console.log(verificationResults)
+  assert(await verifier.verifyProofs(finalCredential), 'All proofs should verify correctly')
 
   // Assert all proofs are valid
   assert(verificationResults[0].valid)

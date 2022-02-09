@@ -6,14 +6,18 @@ import { fuelKeyWithEther } from './utils/helper'
 import { validateDigestable, validateDigestables } from './utils/validation'
 import { didMethods } from './didMethods'
 import { SoftwareKeyProvider, KeyTypes } from '@jolocom/vaulted-key-provider'
-import { walletUtils } from '@jolocom/native-core'
-import { createIdentityFromKeyProvider } from './didMethods/utils'
 import { CredentialVerifier } from './credentials/v1.1/credentialVerifier'
 import { CredentialSigner } from './credentials/v1.1/credentialSigner'
+import { Credential } from './credentials/v1.1/credential'
+import { SignedCredential } from './credentials/v1.1/signedCredential'
+import { SupportedSuites } from './linkedDataSignature'
+import { IdentityWallet } from './identityWallet/identityWallet'
 
 export const JolocomLib = {
-  credentialSigner: CredentialSigner,
-  credentialVerifier: CredentialVerifier,
+  credentials: {
+    Credential: Credential,
+    SignedCredential: SignedCredential,
+  },
   parse,
   parseAndValidate,
   didMethods,
@@ -25,7 +29,10 @@ export const JolocomLib = {
     validateDigestables,
   },
   KeyTypes,
+  LinkedDataProofTypes: SupportedSuites,
 }
+
+export { CredentialSigner, CredentialVerifier, IdentityWallet }
 
 export {
   SoftwareKeyProvider,

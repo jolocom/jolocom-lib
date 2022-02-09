@@ -102,6 +102,7 @@ export class CredentialSigner {
       issuance: new Date(),
       expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
     }
+    return this
   }
 
 

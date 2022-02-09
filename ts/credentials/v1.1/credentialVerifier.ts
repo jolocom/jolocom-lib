@@ -41,14 +41,39 @@ export class CredentialVerifier {
     )
   }
 
+  /**
+   * This method will attempt to verify all signatures associated with a JSON-LD VC.
+   * @param credential - A instance of a Signed Verifiable Credential to Verify
+   * @returns Promise<boolean> - true if all signatures are valid, false if any of the signatures is invalid.
+   */
+  public async verifyProofs(credential: SignedCredential) {
+    const toVerify = credential.proof
+    const allVerifications = await Promise.all(credential.proof.map((_, i) => {
+      return this.verifyProofAtIndex(credential, i).catch(_ => false)
+    }))
+
+    return (allVerifications).every(res => res == true)
+  }
+
   public addSignerIdentity(signer: Identity) {
     this.signerIdentities[signer.did] = signer
   }
 
-  public async verifyAllProofs(credential: SignedCredential) {
+  /**
+   * Method attempting to verify all proofs on a Verifiable Credential and generate a simple report data structure.
+   * Mostly used as part of demo use-cases, as well as for various debbuging purposes.
+   * @param credential - A instance of a Signed Verifiable Credential to Verify
+   * @returns Promise<boolean> - true if all signatures are valid, false if any of the signatures is invalid.
+   */
+  public async generateVerificationReport(credential: SignedCredential) {
     return this.verLoop(credential, credential.proof)
   }
 
+  /**
+   * Helper recursive function, used by `generateVerificationReport`. Verifies all provided proofs. All signature verification
+   * failures, as well as errors that came up are included in the generated report.
+   * @returns 
+   */
   private async verLoop(
     credential: SignedCredential,
     [toVerify, ...otherProofs]: LinkedDataProof<BaseProofOptions>[],
