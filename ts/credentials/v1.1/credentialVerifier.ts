@@ -26,6 +26,7 @@ export class CredentialVerifier {
       throw new Error(`Proof at index ${index} not found.`)
     }
     const { proof, ...document } = credential.toJSON()
+
     const verifier = this.signerIdentities[ldProof.verificationMethod]
 
     if (!verifier) {
@@ -37,7 +38,8 @@ export class CredentialVerifier {
         document,
         previousProofs: credential.proof,
       },
-      verifier
+      verifier,
+      Object.values(this.signerIdentities)
     )
   }
 

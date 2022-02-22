@@ -41,5 +41,5 @@ export abstract class LinkedDataProof<T extends BaseProofOptions> {
   };
 
   abstract derive(inputs:ProofDerivationOptions, customProofOptions: {}, signer: IdentityWallet, pass: string): Promise<LinkedDataProof<T>>;
-  abstract verify(inputs: ProofDerivationOptions, signer: Identity): Promise<boolean>;
+  abstract verify(inputs: ProofDerivationOptions, signer: Identity, additionalSigners?: Identity[]): Promise<boolean>;
 }

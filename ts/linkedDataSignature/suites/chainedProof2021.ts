@@ -197,7 +197,6 @@ export class ChainedProof2021<
     const ldProof = this.findMatchingProof(inputs.previousProofs)
 
     if (customProofOptions.strict) {
-
       const prevSigValid = await ldProof
         .verify(inputs, signer.identity)
         .catch((_) => false)
@@ -223,22 +222,35 @@ export class ChainedProof2021<
    * @param inputs - The document to be verified, including existing proof nodes.
    * @param signer - An {@link Identity} instance expected to hold the appropriate public keys.
    * to verify the signature (i.e. must hold the required verificationMethod).
+   * @param additionalSigners - A set of additional {@link Identity[]} instances which might be used to verify signatures on associated artifacts (e.g. referenced proofs).
+   * to verify the signature (i.e. must hold the required verificationMethod).
    * @returns {Promise<boolean>} - boolean signalling if the signature is correct or not.
    */
-  async verify(inputs: ProofDerivationOptions, signer: Identity) {
+  async verify(
+    inputs: ProofDerivationOptions,
+    signer: Identity,
+    additionalSigners?: Array<Identity>
+  ) {
     const previousProof = this.findMatchingProof(inputs.previousProofs)
 
     if (!previousProof) {
       throw new Error('Referenced Previous Proof not found')
     }
 
-    const toBeVerified = await this.createVerifyHash(
-      classToPlain(previousProof)
+    const combinedSigners = [signer, ...additionalSigners]
+
+    // The previous proof might be signed by a different identity
+    const referencedProofSigner = combinedSigners.find((identity) =>
+      previousProof.verificationMethod.includes(identity.did)
     )
 
     const referencedProofValid = await previousProof
-      .verify(inputs, signer)
-      .catch(_ => false)
+      .verify(inputs, referencedProofSigner, combinedSigners)
+      .catch((_) => false)
+
+    const toBeVerified = await this.createVerifyHash(
+      classToPlain(previousProof)
+    )
 
     const chainSignatureValid = await verifySignatureWithIdentity(
       toBeVerified,
