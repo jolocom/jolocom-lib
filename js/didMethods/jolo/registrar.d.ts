@@ -1,6 +1,6 @@
 import { Identity } from '../../identity/identity';
 import { getRegistrar } from '@jolocom/jolo-did-registrar';
-import { SignedCredential } from '../../credentials/signedCredential/signedCredential';
+import { SignedCredential } from '../../credentials/outdated/signedCredential';
 import { IRegistrar } from '../types';
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider';
 export declare class JolocomRegistrar implements IRegistrar {

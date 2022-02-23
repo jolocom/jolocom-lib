@@ -6,4 +6,4 @@ export declare const recoverJunKeyProviderFromSeed: (seed: Buffer, newPassword: 
     keyProvider: SoftwareKeyProvider;
     inceptionEvent: string;
 }>;
-export declare const junMnemonicToEncryptedWallet: (mnemonicPhrase: string, newPassword: string, didMethod: IDidMethod, impl: EncryptedWalletUtils) => Promise<import("../../identityWallet/identityWallet").IdentityWallet>;
+export declare const junMnemonicToEncryptedWallet: (mnemonicPhrase: string, newPassword: string, didMethod: IDidMethod, impl: EncryptedWalletUtils) => Promise<import("../..").IdentityWallet>;

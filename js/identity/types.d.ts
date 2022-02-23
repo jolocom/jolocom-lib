@@ -1,4 +1,4 @@
-import { SignedCredential } from '../credentials/signedCredential/signedCredential';
+import { SignedCredential } from '../credentials/outdated/signedCredential';
 import { DidDocument } from './didDocument/didDocument';
 export interface IIdentityCreateArgs {
     didDocument: DidDocument;

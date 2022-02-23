@@ -1,5 +1,5 @@
 import { ICredentialResponseAttrs } from './interactionTokens.types';
-import { SignedCredential } from '../credentials/signedCredential/signedCredential';
+import { SignedCredential } from '../credentials/outdated/signedCredential';
 import { CredentialRequest } from './credentialRequest';
 export declare class CredentialResponse {
     private _callbackURL;

@@ -3,7 +3,7 @@ import { IDidDocumentAttrs } from '@jolocom/protocol-ts';
 import { AuthenticationSection, PublicKeySection, ServiceEndpointsSection } from './sections';
 import { IDigestable, ILinkedDataSignature } from '../../linkedDataSignature/types';
 import { ContextEntry } from '@jolocom/protocol-ts';
-import { ISigner } from '../../credentials/signedCredential/types';
+import { ISigner } from '../../credentials/types';
 import { IVaultedKeyProvider, IKeyRefArgs } from '@jolocom/vaulted-key-provider';
 export declare class DidDocument implements IDigestable {
     private _id;

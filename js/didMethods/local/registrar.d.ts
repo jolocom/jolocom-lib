@@ -1,5 +1,5 @@
 import { Identity } from '../../identity/identity';
-import { SignedCredential } from '../../credentials/signedCredential/signedCredential';
+import { SignedCredential } from '../../credentials/outdated/signedCredential';
 import { IRegistrar } from '../types';
 import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider';
 export declare class LocalRegistrar implements IRegistrar {

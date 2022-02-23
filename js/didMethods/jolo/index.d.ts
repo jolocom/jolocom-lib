@@ -8,7 +8,7 @@ export declare class JoloDidMethod implements IDidMethod {
     registrar: JolocomRegistrar;
     constructor(providerUrl?: string, contractAddress?: string, ipfsHost?: string);
     recoverFromSeed(seed: Buffer, newPassword: string): Promise<{
-        identityWallet: import("../../identityWallet/identityWallet").IdentityWallet;
+        identityWallet: import("../..").IdentityWallet;
         succesfullyResolved: boolean;
     }>;
 }

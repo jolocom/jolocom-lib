@@ -1,13 +1,13 @@
 /// <reference types="node" />
 import { BaseMetadata } from '@jolocom/protocol-ts';
-import { Credential } from '../credentials/credential/credential';
-import { SignedCredential } from '../credentials/signedCredential/signedCredential';
+import { Credential } from '../credentials/outdated/credential';
+import { SignedCredential } from '../credentials/outdated/signedCredential';
 import { ExclusivePartial, IKeyMetadata, IIdentityWalletCreateArgs } from './types';
 import { Identity } from '../identity/identity';
 import { JSONWebToken } from '../interactionTokens/JSONWebToken';
 import { Authentication } from '../interactionTokens/authentication';
 import { CredentialRequest } from '../interactionTokens/credentialRequest';
-import { ISignedCredCreationArgs } from '../credentials/signedCredential/types';
+import { ISignedCredCreationArgs } from '../credentials/types';
 import { CredentialOfferRequest } from '../interactionTokens/credentialOfferRequest';
 import { CredentialOfferResponse } from '../interactionTokens/credentialOfferResponse';
 import { CredentialOfferRequestAttrs, CredentialOfferResponseAttrs, IAuthenticationAttrs, ICredentialRequestAttrs, ICredentialResponseAttrs, ICredentialsReceiveAttrs } from '../interactionTokens/interactionTokens.types';

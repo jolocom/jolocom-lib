@@ -1,7 +1,6 @@
-import { Credential } from '../credentials/credential/credential';
-import { SignedCredential } from '../credentials/signedCredential/signedCredential';
-import { ICredentialAttrs } from '../credentials/credential/types';
-import { ISignedCredentialAttrs } from '../credentials/signedCredential/types';
+import { Credential } from '../credentials/outdated/credential';
+import { SignedCredential } from '../credentials/outdated/signedCredential';
+import { ICredentialAttrs, ISignedCredentialAttrs } from '../credentials/types';
 import { JSONWebToken } from '../interactionTokens/JSONWebToken';
 import { IJSONWebTokenAttrs } from '../interactionTokens/types';
 export interface ParseMethods {

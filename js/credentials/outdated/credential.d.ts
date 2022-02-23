@@ -1,6 +1,6 @@
-import { ICredentialAttrs, IClaimSection } from './types';
+import { ICredentialAttrs, IClaimSection } from '../types';
 import { BaseMetadata } from '@jolocom/protocol-ts';
-import { ISignedCredCreationArgs } from '../signedCredential/types';
+import { ISignedCredCreationArgs } from '../types';
 import { JsonLdContext } from '../../linkedData/types';
 export declare class Credential {
     private '_@context';
