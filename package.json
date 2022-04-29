@@ -66,7 +66,7 @@
   "homepage": "https://github.com/jolocom/jolocom-lib#readme",
   "dependencies": {
     "@hawkingnetwork/ed25519-hd-key-rn": "^1.0.1",
-    "@jolocom/jolo-did-registrar": "1.0.5",
+    "@jolocom/jolo-did-registrar": "1.0.2",
     "@jolocom/jolo-did-resolver": "^1.0.0",
     "@jolocom/local-resolver-registrar": "^1.0.1",
     "@jolocom/native-core": "^1.0.0",

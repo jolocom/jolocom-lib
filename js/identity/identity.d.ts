@@ -10,11 +10,14 @@ interface IdentityAttributes {
 export declare class Identity {
     private _didDocument;
     private _publicProfileCredential?;
-    did: string;
-    didDocument: DidDocument;
-    readonly serviceEndpointSections: import("./didDocument/sections").ServiceEndpointsSection[];
-    readonly publicKeySection: import("./didDocument/sections").PublicKeySection[];
-    publicProfile: SignedCredential | undefined;
+    get did(): string;
+    set did(did: string);
+    get didDocument(): DidDocument;
+    set didDocument(didDocument: DidDocument);
+    get serviceEndpointSections(): import("./didDocument/sections").ServiceEndpointsSection[];
+    get publicKeySection(): import("./didDocument/sections").PublicKeySection[];
+    get publicProfile(): SignedCredential | undefined;
+    set publicProfile(publicProfile: SignedCredential | undefined);
     static fromDidDocument({ didDocument, publicProfile, }: IIdentityCreateArgs): Identity;
     toJSON(): IdentityAttributes;
     static fromJSON(json: IdentityAttributes): Identity;

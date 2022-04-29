@@ -7,12 +7,17 @@ export declare class EcdsaLinkedDataSignature implements ILinkedDataSignature, I
     private _created;
     private _nonce;
     private _signatureValue;
-    created: Date;
-    type: string;
-    nonce: string;
-    signature: string;
-    creator: string;
-    readonly signer: {
+    get created(): Date;
+    set created(created: Date);
+    get type(): string;
+    set type(type: string);
+    get nonce(): string;
+    set nonce(nonce: string);
+    get signature(): string;
+    set signature(signature: string);
+    get creator(): string;
+    set creator(creator: string);
+    get signer(): {
         did: string;
         keyId: string;
     };
