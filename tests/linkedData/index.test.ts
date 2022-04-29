@@ -1,11 +1,10 @@
 import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
 import { validateJsonLd } from '../../ts/linkedData'
 import { Identity } from '../../ts/identity/identity'
 import { DidDocument } from '../../ts/identity/didDocument/didDocument'
 import { IResolver } from '../../ts/didMethods/types'
 
-chai.use(sinonChai)
+chai.use(require('sinon-chai'))
 const expect = chai.expect
 
 const DID_DOC_V0 = {
