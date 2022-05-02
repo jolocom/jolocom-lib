@@ -1,5 +1,4 @@
 import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
 import { userPass, servicePass, emailCredJSON } from './integration.data'
 import { JSONWebToken } from '../../ts/interactionTokens/JSONWebToken'
 import { keyIdToDid } from '../../ts/utils/helper'
@@ -19,7 +18,7 @@ import { CredentialOfferResponse } from '../../ts/interactionTokens/credentialOf
 import { validateDigestable } from '../../ts/utils/validation'
 import { parseAndValidate } from '../../ts/parse/parseAndValidate'
 
-chai.use(sinonChai)
+chai.use(require('sinon-chai'))
 const expect = chai.expect
 
 describe('Integration Test - Token interaction flow Credential Offer', () => {

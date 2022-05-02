@@ -1,7 +1,6 @@
 import * as chai from 'chai'
 import * as crypto from 'crypto'
 import * as sinon from 'sinon'
-import * as sinonChai from 'sinon-chai'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
 import {
   testSeed,
@@ -25,7 +24,7 @@ import { publicProfileCredJSON, emailCredential } from '../data/identity.data'
 import { mockDid } from '../data/didDocument.data'
 import { ErrorCodes } from '../../ts/errors'
 
-chai.use(sinonChai)
+chai.use(require('sinon-chai'))
 describe('Software Vaulted Key Provider', () => {
 //  const vault = SoftwareKeyProvider.fromSeed(
 //    testSeed,

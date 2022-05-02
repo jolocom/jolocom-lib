@@ -5,6 +5,7 @@
         "removeComments": true,
         "moduleResolution": "node",
         "noLib": false,
+	"esModuleInterop": true,
         "preserveConstEnums": true,
         "declaration": true,
         "sourceMap": true,

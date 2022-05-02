@@ -1,5 +1,4 @@
 import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import {
   userPass,
@@ -18,7 +17,7 @@ import { SoftwareKeyProvider } from '@jolocom/vaulted-key-provider'
 import { walletUtils } from '@jolocom/native-core'
 import { PublicKeySection } from '../../ts/identity/didDocument/sections'
 
-chai.use(sinonChai)
+chai.use(require('sinon-chai'))
 const expect = chai.expect
 
 /* global before and after hook for integration tests & shared variables */

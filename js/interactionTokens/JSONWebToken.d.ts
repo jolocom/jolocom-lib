@@ -23,17 +23,25 @@ export declare class JSONWebToken<T> implements IDigestable {
     private _header;
     private _signature;
     private _payload;
-    payload: IPayloadSection<T>;
-    signature: string;
-    issuer: string;
-    audience: string;
-    readonly issued: number;
-    readonly expires: number;
-    nonce: string;
-    interactionToken: T;
-    interactionType: string;
-    header: IJWTHeader;
-    readonly signer: {
+    get payload(): IPayloadSection<T>;
+    set payload(payload: IPayloadSection<T>);
+    get signature(): string;
+    set signature(signature: string);
+    get issuer(): string;
+    set issuer(issuer: string);
+    get audience(): string;
+    set audience(audience: string);
+    get issued(): number;
+    get expires(): number;
+    get nonce(): string;
+    set nonce(nonce: string);
+    get interactionToken(): T;
+    set interactionToken(interactionToken: T);
+    get interactionType(): string;
+    set interactionType(type: string);
+    get header(): IJWTHeader;
+    set header(jwtHeader: IJWTHeader);
+    get signer(): {
         did: string;
         keyId: string;
     };

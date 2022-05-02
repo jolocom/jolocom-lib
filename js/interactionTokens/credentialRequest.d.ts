@@ -3,9 +3,11 @@ import { ISignedCredentialAttrs } from '../credentials/signedCredential/types';
 export declare class CredentialRequest {
     private _callbackURL;
     private _credentialRequirements;
-    credentialRequirements: ICredentialRequest[];
-    callbackURL: string;
-    readonly requestedCredentialTypes: string[][];
+    get credentialRequirements(): ICredentialRequest[];
+    set credentialRequirements(requirements: ICredentialRequest[]);
+    get callbackURL(): string;
+    set callbackURL(callback: string);
+    get requestedCredentialTypes(): string[][];
     applyConstraints(credentials: ISignedCredentialAttrs[]): ISignedCredentialAttrs[];
     toJSON(): ICredentialRequestAttrs;
     static fromJSON(json: ICredentialRequestAttrs): CredentialRequest;

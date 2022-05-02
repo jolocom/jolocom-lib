@@ -1,5 +1,4 @@
 import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
 import {
   userPass,
   servicePass,
@@ -16,7 +15,7 @@ import {
 } from './identity.integration'
 import { parseAndValidate } from '../../ts/parse/parseAndValidate'
 
-chai.use(sinonChai)
+chai.use(require('sinon-chai'))
 const expect = chai.expect
 
 describe('Integration Test - Token interaction flow Credential Request and Response', () => {

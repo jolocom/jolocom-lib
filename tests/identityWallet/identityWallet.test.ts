@@ -1,6 +1,5 @@
 import * as chai from 'chai'
 import * as sinon from 'sinon'
-import * as sinonChai from 'sinon-chai'
 import { IdentityWallet } from '../../ts/identityWallet/identityWallet'
 import { Credential } from '../../ts/credentials/credential/credential'
 import { SignedCredential } from '../../ts/credentials/signedCredential/signedCredential'
@@ -17,7 +16,7 @@ import { ErrorCodes } from '../../ts/errors'
 import { IVaultedKeyProvider } from '@jolocom/vaulted-key-provider'
 import { emailVerifiableCredential } from '../data/credential/signedCredential.data'
 
-chai.use(sinonChai)
+chai.use(require('sinon-chai'))
 const expect = chai.expect
 
 /* Saves some space during stubbing, helper functions */
