@@ -70,7 +70,7 @@
     "@jolocom/jolo-did-resolver": "^1.0.0",
     "@jolocom/local-resolver-registrar": "^1.0.1",
     "@jolocom/native-core": "^1.0.0",
-    "@jolocom/protocol-ts": "^0.5.4",
+    "@jolocom/protocol-ts": "^0.6.0",
     "@jolocom/vaulted-key-provider": "^0.7.4",
     "@types/sinon": "^9.0.5",
     "bip39": "^3.0.2",

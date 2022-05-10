@@ -56,35 +56,6 @@ export class CredentialOfferRequest {
   }
 
   /**
-   * Returns the corresponding {@link CredentialOfferRenderInfo} section given an offer type
-   * @example `console.log(offer.getRenderInfoForType('IdCardCredential')) // {...}
-   */
-
-  getRenderInfoForType(type: string): CredentialOfferRenderInfo | undefined {
-    return this.getOfferForType(type).renderInfo
-  }
-
-  /**
-   * Returns the corresponding {@link CredentialOfferMetadata} section given an credential type
-   * @example `console.log(offer.getMetadataForType('IdCardCredential')) // {...}
-   */
-
-  getMetadataForType(type: string): CredentialOfferMetadata | undefined {
-    return this.getOfferForType(type).metadata
-  }
-
-  /**
-   * Returns the corresponding {@link CredentialOfferInputRequest} section given an credential type
-   * @example `console.log(offer.getRequestedInputForType('IdCardCredential')) // {...}
-   */
-
-  getRequestedInputForType(
-    type: string,
-  ): CredentialOfferInputRequest | undefined {
-    return this.getOfferForType(type).requestedInput
-  }
-
-  /**
    * Returns the corresponding full {@link CredentialOffer} given a credential type
    * @example `console.log(offer.getOfferByType('IdCardCredential')) // {...}
    */
