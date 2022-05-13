@@ -1,4 +1,4 @@
-import { CredentialOffer, CredentialOfferInputRequest, CredentialOfferMetadata, CredentialOfferRenderInfo, CredentialOfferRequestAttrs } from './interactionTokens.types';
+import { CredentialOffer, CredentialOfferRequestAttrs } from './interactionTokens.types';
 export declare class CredentialOfferRequest {
     private _callbackURL;
     private _offeredCredentials;
@@ -6,9 +6,6 @@ export declare class CredentialOfferRequest {
     set callbackURL(callbackURL: string);
     get offeredCredentials(): CredentialOffer[];
     set offeredCredentials(offeredCredentials: CredentialOffer[]);
-    getRenderInfoForType(type: string): CredentialOfferRenderInfo | undefined;
-    getMetadataForType(type: string): CredentialOfferMetadata | undefined;
-    getRequestedInputForType(type: string): CredentialOfferInputRequest | undefined;
     getOfferForType(type: string): CredentialOffer;
     get offeredTypes(): string[];
     toJSON(): CredentialOfferRequestAttrs;

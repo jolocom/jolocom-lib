@@ -1042,10 +1042,10 @@
     "@jolocom/native-core-node-14-linux-x64" "^1.0.0"
     "@jolocom/native-core-node-14-win32-x64" "^1.0.0"
 
-"@jolocom/protocol-ts@^0.5.4":
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/@jolocom/protocol-ts/-/protocol-ts-0.5.4.tgz#a59052d97b45ad157e877b1ed8ed2cd8235ad45e"
-  integrity sha512-t6gzeLZPgKQUksjAVgMint/htYIEy6LwVfqhm7kZx4+bkAxa0LHIynqEXFPA7bbx1+mrd2hxsvWmSswXiBtlkw==
+"@jolocom/protocol-ts@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/protocol-ts/-/protocol-ts-0.6.1.tgz#e12570fdb100cf609a8c2abf26c03935647eb587"
+  integrity sha512-XmTX0mIneLcMomv8MUrUQBSnH8A5bQ/vZRayzNLcHHNR/0ET4wZ2jNFZz7+oH/Aa1/NnhpVOzA54wXkhc7Pf1A==
   dependencies:
     cred-types-jolocom-core "^0.0.11"
 
