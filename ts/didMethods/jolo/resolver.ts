@@ -27,7 +27,7 @@ export class JolocomResolver implements IResolver {
   ) {
     this.resolutionFunctions.getPublicProfile = (didDoc: DIDDocument) =>
       getPublicProfile(didDoc, ipfsHost)
-
+    //this is lazy loading the resolver so avoids around the ethers.js provider issue
     this.resolutionFunctions.resolve = (did: string) =>
       new Resolver(getResolver(providerUrl, contractAddress, ipfsHost)).resolve(
         did,

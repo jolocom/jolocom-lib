@@ -982,65 +982,65 @@
   resolved "https://registry.yarnpkg.com/@jolocom/local-resolver-registrar/-/local-resolver-registrar-1.0.1.tgz#6816f6aad157a1fbd125e811fe6d067b9174f176"
   integrity sha512-5nSFPmJLDQKU9yvE3Je+yAkoepgLbZqwxsEmeTzYlXOpTaiZKgQW7BTE5HGpg9eXSyRHZdcvisKF5yXfyjzO0g==
 
-"@jolocom/native-core-node-10-darwin-x64@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-10-darwin-x64/-/native-core-node-10-darwin-x64-1.0.0.tgz#90c069afb1bbf701533e4af135dc8c8175b85ca4"
-  integrity sha512-Gzk8pGGC2Q0YdUpkouT2AsesdmYlA2zlyukUHUrcmDI59p6gC3Aj4whTQTyDMjmjinsREtmGr9Nir8fQ51l/bA==
+"@jolocom/native-core-node-10-darwin-x64@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-10-darwin-x64/-/native-core-node-10-darwin-x64-1.1.1.tgz#4f6756fe0f488d12cd7ad61960f9d1c13529466f"
+  integrity sha512-yqLQpGagV0CF9R+AWPpkjKJz6kiEnKmWuWa2mVlqQU4sUoiD8rFPXRICwBTRUnwwyiNXVnQVYaaUe771Bepz4Q==
 
-"@jolocom/native-core-node-10-linux-x64@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-10-linux-x64/-/native-core-node-10-linux-x64-1.0.0.tgz#0727a061f705024a8c01664157198f4f1a12f233"
-  integrity sha512-Yvuq5PPU86THzqb5rctijtI1PqTI13Kt/7HkC4YICFdkKRm6AJGtzOhOodiVyO4btO/YWSTdlhvA5K+MwX3XVg==
+"@jolocom/native-core-node-10-linux-x64@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-10-linux-x64/-/native-core-node-10-linux-x64-1.1.1.tgz#214803c8c9dd64e8e6a1354d6da60c36c3182cd1"
+  integrity sha512-N2bgGcA+EkjbjmsVv5EjNSLuRTf96dRqF4ax7f+LeW0z6YZUbQzpIYs7zp8DuAZF9J7brwszfsi6M9ygCAqg/Q==
 
-"@jolocom/native-core-node-10-win32-x64@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-10-win32-x64/-/native-core-node-10-win32-x64-1.0.0.tgz#51a7a2357e217b63c10344f1639885e58c704e71"
-  integrity sha512-ziicGovrYUbzOG7TGFtevz+TMo6GZwphqIql8CpFpHSkn6mgEhy+ZJyBvtX6l0E7nVtrqE8kJTpbVPUG44fWtA==
+"@jolocom/native-core-node-10-win32-x64@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-10-win32-x64/-/native-core-node-10-win32-x64-1.1.1.tgz#0786133f70bbe6723faf44b4b5a2a1a846c6c3c7"
+  integrity sha512-clZa+IBorME9X0GsUzdoE+MjK3Yv337qSRlthFTRQDrK7+mu4ILgnE8N0ztZIDBh4PMpVhQmZPZiDjG3SOv+2Q==
 
-"@jolocom/native-core-node-12-darwin-x64@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-12-darwin-x64/-/native-core-node-12-darwin-x64-1.0.0.tgz#23d4c87f924a03d1c7736129364cfb8c963b2c11"
-  integrity sha512-8QbFrKyOYHEsjnE0PR4l/if3Np837zcBRo5HQ8DY+KNFr0QpU9db7++oJh68U0BiCByAaDfnX67Hlrtm0UOV0w==
+"@jolocom/native-core-node-12-darwin-x64@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-12-darwin-x64/-/native-core-node-12-darwin-x64-1.1.1.tgz#aff3f60bff1285b0689b3b7673e39e57462dccd0"
+  integrity sha512-7IyfnYsct+l7uuh8X5XiBeZCONFGHeHJtDEopsXjRWOXhF7mOdSE2vLLRlQQNkTq39U+YCOZBMUyVF93nd5teg==
 
-"@jolocom/native-core-node-12-linux-x64@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-12-linux-x64/-/native-core-node-12-linux-x64-1.0.0.tgz#8ae6b055abc25fead34757af1d45269eff9c1cb2"
-  integrity sha512-3TmKbIOPSsBMH9hsJD5FIoRPZC49UthE6MmZC3A4aY4tNK9S2VDmeRIMFV7YfkEXs9+4+R1r2CgG20YzEf9IdQ==
+"@jolocom/native-core-node-12-linux-x64@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-12-linux-x64/-/native-core-node-12-linux-x64-1.1.1.tgz#52b5f53c04b85dc5e21fff9b03b23e4700975f88"
+  integrity sha512-xSk0M58r7uV+OOB93y0SCax4KtZtmrKhCYASzrJvrdK4OnuroUhu7nDLWGkwruDyjiKVbTyC8U9U+9uNOMLjgg==
 
-"@jolocom/native-core-node-12-win32-x64@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-12-win32-x64/-/native-core-node-12-win32-x64-1.0.0.tgz#76803a52134f86ae90b6748fc06b8fc864e9aefd"
-  integrity sha512-M04YVaNwnP75CxoyOu72pi0KbyRRmSa2RuscEeZA8x61WAbXv/Xs5L9rnkU4RuaZBynavS+f6CltFnABdb3V7w==
+"@jolocom/native-core-node-12-win32-x64@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-12-win32-x64/-/native-core-node-12-win32-x64-1.1.1.tgz#c44d0743bbea59ca489c3ef5cf075185638dc87b"
+  integrity sha512-UAym/jt2ZR619ltGJJlr1VHEuQdwCo48/qqvZNma5O0GSjbjDTFO0+2bu7TYUva2N0PlBXrfy4igVJEhFNptwQ==
 
-"@jolocom/native-core-node-14-darwin-x64@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-14-darwin-x64/-/native-core-node-14-darwin-x64-1.0.0.tgz#d097a399e8ff825b7995b86ca3af807ab38b97e5"
-  integrity sha512-4wWOgIrZgpldVyKrQoeqN1N4nT2f2V47rrk/81RBTWcdv+kvTI2pje9RPZ9YQzcYtitrcIeJmcG81l4AFVBh8A==
+"@jolocom/native-core-node-14-darwin-x64@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-14-darwin-x64/-/native-core-node-14-darwin-x64-1.1.1.tgz#6223e93de63f673250abc8778f4f14a179812790"
+  integrity sha512-yeWbRxCXrQEdz6AwKqYYCqrBhx2+KIT/O9AAu1neyX88t6SvJopCCeoRdPOjCkNePMzzVl4+RjU+1TZv3CkaJA==
 
-"@jolocom/native-core-node-14-linux-x64@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-14-linux-x64/-/native-core-node-14-linux-x64-1.0.0.tgz#497b4b9395f304a2d6101fcd72b5e33bec38492d"
-  integrity sha512-5Uymxy3lXKO+7Wkv7k4noPmrituByJHIgD+s0sarqWB0Q5h4tmYzgK8symr3Tzh2htCGRLn3tj7EZFB/JsEXbQ==
+"@jolocom/native-core-node-14-linux-x64@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-14-linux-x64/-/native-core-node-14-linux-x64-1.1.1.tgz#ebb723101edba6939bcfe6a7d893ed7e25b2c252"
+  integrity sha512-+yAyGiSK95qKr6oNldFt/DZkz4GJXT6Xm/unN952tTO7OtqMx3hrG+noKBif3qEbx/NGMO2lH3j/zlBfc8LrXA==
 
-"@jolocom/native-core-node-14-win32-x64@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-14-win32-x64/-/native-core-node-14-win32-x64-1.0.0.tgz#937d249932eab36cea65273049de6ec7c76eb3da"
-  integrity sha512-iPsKczGk7OWQP15gfT+yo2EUClMNMiIyXUeR8UreKeDaRKC5MnkYKtK6rxXA/wZbtKI3CfcEr/rAAnqXwv44Tg==
+"@jolocom/native-core-node-14-win32-x64@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core-node-14-win32-x64/-/native-core-node-14-win32-x64-1.1.1.tgz#87359f08bf05b330f4176f22a9d69c81223d0887"
+  integrity sha512-Hj0Lg286bKPoSnX64P5pjvRpJwnuP2cR5HdUvKu5q3kSp6JWyi8IXsahZJJepZiCUdqjpR2AEtCu7YiLzX6BOw==
 
 "@jolocom/native-core@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@jolocom/native-core/-/native-core-1.0.0.tgz#d87ad5266554d6b90cf713ef404ef5a4fa476506"
-  integrity sha512-KpwVO4fzkLYqO9LUAS+TvtLcP7AYXhmNphaTql8gfZi8d1qNtFvlmH5jMZtm39iR1Lou7+0l/A6K3/IgV1S5Ug==
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@jolocom/native-core/-/native-core-1.1.0.tgz#dfb148df2fd4fb3226055a06fd5ce67f57c08d08"
+  integrity sha512-yUEsCkAwC7qEQ/PlQBwhxTkRUfnEg05NZVf08qPe91wCWYFUvm1c5syFZ03wb4WkqKgZp97T9VqxLx3Fa59wPQ==
   optionalDependencies:
-    "@jolocom/native-core-node-10-darwin-x64" "^1.0.0"
-    "@jolocom/native-core-node-10-linux-x64" "^1.0.0"
-    "@jolocom/native-core-node-10-win32-x64" "^1.0.0"
-    "@jolocom/native-core-node-12-darwin-x64" "^1.0.0"
-    "@jolocom/native-core-node-12-linux-x64" "^1.0.0"
-    "@jolocom/native-core-node-12-win32-x64" "^1.0.0"
-    "@jolocom/native-core-node-14-darwin-x64" "^1.0.0"
-    "@jolocom/native-core-node-14-linux-x64" "^1.0.0"
-    "@jolocom/native-core-node-14-win32-x64" "^1.0.0"
+    "@jolocom/native-core-node-10-darwin-x64" "^1.1.1"
+    "@jolocom/native-core-node-10-linux-x64" "^1.1.1"
+    "@jolocom/native-core-node-10-win32-x64" "^1.1.1"
+    "@jolocom/native-core-node-12-darwin-x64" "^1.1.1"
+    "@jolocom/native-core-node-12-linux-x64" "^1.1.1"
+    "@jolocom/native-core-node-12-win32-x64" "^1.1.1"
+    "@jolocom/native-core-node-14-darwin-x64" "^1.1.1"
+    "@jolocom/native-core-node-14-linux-x64" "^1.1.1"
+    "@jolocom/native-core-node-14-win32-x64" "^1.1.1"
 
 "@jolocom/protocol-ts@^0.6.1":
   version "0.6.1"
