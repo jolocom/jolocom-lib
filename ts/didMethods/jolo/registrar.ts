@@ -19,19 +19,37 @@ import { validateDigestable } from '../../utils/validation'
 import { KEY_REFS } from './constants'
 import { publicKeyToJoloDID } from './utils'
 import { addHexPrefix } from 'ethereumjs-util'
+import { SignatureLike } from '@jolocom/registry-contract';
 
 const { SIGNING_KEY_REF, ANCHOR_KEY_REF, ENCRYPTION_KEY_REF } = KEY_REFS
 
 export class JolocomRegistrar implements IRegistrar {
   public prefix = 'jolo'
-  public registrarFns: ReturnType<typeof getRegistrar>
+  private registrarFns: ReturnType<typeof getRegistrar>
 
   constructor(
     providerUrl = PROVIDER_URL,
     contractAddress = CONTRACT_ADDRESS,
     ipfsHost = IPFS_ENDPOINT,
   ) {
-    this.registrarFns = getRegistrar(providerUrl, contractAddress, ipfsHost)
+    //lazy load the registrar because calling getRegistrar will create an ethers.js JsonRpcProvider that
+    //tries to initiate a connection with the providerUrl
+    //we don't want this connection to be initiated unless we actually try to do something
+
+    //note this approach will lead to multiple connections being created
+    //but i'm hoping these get called rarely and old connections will get garbage collected by js
+    //alternatively we could put a registrar behind a lazy loaded singleton to only have one connection,
+    //but i think its kind of wasteful to keep open a long lived connection when its barely used
+
+    //probably would be better to fix this problem inside jolo-did-method
+    //also jolo-did-method uses a JsonRpcProvider which will periodically poll the provider
+    //for some reason I don't quite understand https://docs.ethers.io/v5/api/providers/jsonrpc-provider/#StaticJsonRpcProvider
+    //it should use a StaticJsonRpcProvider instead
+    this.registrarFns = {
+      broadcastTransaction: getRegistrar(providerUrl, contractAddress, ipfsHost).broadcastTransaction,
+      publishDidDocument: getRegistrar(providerUrl, contractAddress, ipfsHost).publishDidDocument,
+      publishPublicProfile: getRegistrar(providerUrl, contractAddress, ipfsHost).publishPublicProfile
+    }
   }
 
   async create(keyProvider: SoftwareKeyProvider, password: string) {
